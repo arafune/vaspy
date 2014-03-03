@@ -489,16 +489,9 @@ _vector_acceptables = (np.ndarray, np.matrix, list, tuple)
 
 if __name__ == '__main__':
     # $-w = true
-    import argparse, os, imp
+    import argparse
     import functools as ft
-    if os.path.islink(__file__):
-        module = imp.find_module('argParsePostVASP',
-                               [os.path.dirname(os.readlink(__file__))])
-        appv = imp.load_module('argParsePostVASP', *module)
-    else:
-        module = imp.find_module('argParsePostVASP',
-                               [os.path.dirname(__file__)])
-        appv = imp.load_module('argParsePostVASP', *module)
+    import argParsePostVASP as appv
     arg = appv.APPV()
     arg.add_argument('--atom', metavar='atoms', action='append',
                      type=arg.parse_AtomselectionNum,
