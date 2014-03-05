@@ -258,11 +258,12 @@ class CHGCAR(poscar.POSCAR):
 if __name__ == '__main__':
     import argparse
     arg = argparse.ArgumentParser()
-    arg.add_argument('--add', action='store_true', default=False,
+    group = arg.add_mutually_exclusive_group(required=True)
+    group.add_argument('--add', action='store_true', default=False,
                      help="Add two CHGCAR files")
-    arg.add_argument('--diff', action='store_true', default=False,
+    group.add_argument('--diff', action='store_true', default=False,
                      help="Get difference of two CHGCAR files")
-    arg.add_argument('--spin', metavar='spin_operation',
+    group.add_argument('--spin', metavar='spin_operation',
                      help="""spin-relatated operation.
 when this option is set --add, -diff are
 ignored, and CHGCAR_file_2 must not be set.
