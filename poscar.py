@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- conding: utf-8 -*-
 # python 3.3.2
+# translate from poscar.rb of 2014/2/26, master branch
 
 import numpy as np
 import itertools as it
@@ -69,8 +70,8 @@ class for POSCAR (CONTCAR) format
         self.__latticeV1 = np.array([[0., 0., 0.]])
         self.__latticeV2 = np.array([[0., 0., 0.]])
         self.__latticeV3 = np.array([[0., 0., 0.]])
-        self.atomname_list = []
-        self.atomnumber_list = []
+        self.iontype = []
+        self.ionnums = []
         self.coordinate_type = ""
         self.position = []
         self.coordinate_changeflags = []
@@ -101,17 +102,17 @@ class for POSCAR (CONTCAR) format
         self.__latticeV1 = np.array([list(map(float, next(poscar).split()))])
         self.__latticeV2 = np.array([list(map(float, next(poscar).split()))])
         self.__latticeV3 = np.array([list(map(float, next(poscar).split()))])
-        self.atomname_list = next(poscar).split()
+        self.iontype = next(poscar).split()
         # parse POSCAR evenif the element names are not set.
         # At present, the String representation number 
         #   are used for the  dummy name.
-        if self.atomname_list[0].isnum():
-            self.atomnumber_list = list(map(int, self.atomname_list))
-            #                      [int(i) for i in self.atomname_list]
+        if self.iontype[0].isnum():
+            self.ionnums = list(map(int, self.iontype))
+            #                      [int(i) for i in self.iontype]
         else:
-            self.atomnumber_list = list(map(int, next(poscar).split()))
+            self.ionnums = list(map(int, next(poscar).split()))
         ii = 1
-        for elm, n in zip(self.atomname_list, self.atomnumber_list):
+        for elm, n in zip(self.iontype, self.ionnums):
             self.__atom_identifer.extend(
                 '#{0}:{1}{2}'.format(ii+m, elm, m+1) for m in range(n))
             ii += n
@@ -133,13 +134,13 @@ class for POSCAR (CONTCAR) format
   # attribute self.atom_identifer reader
   # return [list] self.__atom_identifer 
   #   To display self.atom_identifer, the value is calculated,
-  #   by using self.atomname_list and self.atomnumber_list, 
+  #   by using self.iontype and self.ionnums, 
   #   not just showing self.__atom_identifer
     @property
     def atom_identifer(self):
         self.__atom_identifer = []
         ii = 1
-        for elm, n in zip(self.atomname_list, self.atomnumber_list):
+        for elm, n in zip(self.iontype, self.ionnums):
             self.__atom_identifer.extend(
                 '#{0}:{1}{2}'.format(ii+m, elm, m+1) for m in range(n))
             ii += n
@@ -262,14 +263,15 @@ class for POSCAR (CONTCAR) format
 '''
         center = _vectorize(center)
         if len(center[0]) != 3: raise ValueError
-        if not self.point_in_box(center):
+        if not self.point_in_box(center / self.scaling_factor,
+                                 self.latticeV1, self.latticeV2, self.latticeV3):
             raise ValueError('the center must be in the Braves lattice')
         if not isinstance(site, int):
             raise ValueError('argument error in atom_rotate method')
         if not is_cartesian: self.to_Cartesian()
         position = self.pos(site)
         position -= center / self.scaling_factor
-        position = (getattr(self, 'rotate' + axis_name.capitalize())(tehta) * position.T).T
+        position = (getattr(self, 'rotate' + axis_name.capitalize())(theta) * position.T).T
         position += center / self.scaling_factor
         self.pos_replace(site, positon)
 
@@ -304,8 +306,8 @@ class for POSCAR (CONTCAR) format
              other.latticeV2 +
              other.latticeV3)) != np.array([[0., 0., 0.]]):
             raise ValueError('lattice vectors are different.')
-        destPOSCAR.atomname_list.extend(other.atomname_list)
-        destPOSCAR.atomnumber_list.extend(other.atomnumber_list)
+        destPOSCAR.iontype.extend(other.iontype)
+        destPOSCAR.ionnums.extend(other.ionnums)
         destPOSCAR.position.extend(other.position)
         destPOSCAR.coordinate_changeflags.extend(other.coordinate_changeflags)
 
@@ -323,9 +325,9 @@ class for POSCAR (CONTCAR) format
         out_list.append(self.latticeV1)
         out_list.append(self.latticeV2)
         out_list.append(self.latticeV3)
-        if not self.atomname_list[0].isnum():
-            out_list.append(self.atomname_list)
-        out_list.append(self.atomnumber_list)
+        if not self.iontype[0].isnum():
+            out_list.append(self.iontype)
+        out_list.append(self.ionnums)
         if self.is_selective:
             out_list.append("Selective Dynamics")
         out_list.append(self.coordinate_type)
@@ -344,9 +346,9 @@ class for POSCAR (CONTCAR) format
         tmp.append(''.join('   {0:20.17f}'.format(i) for i in self.latticeV1[0]))
         tmp.append(''.join('   {0:20.17f}'.format(i) for i in self.latticeV2[0]))
         tmp.append(''.join('   {0:20.17f}'.format(i) for i in self.latticeV3[0]))
-        if not self.atomname_list[0].isnum():
-            tmp.append(' ' + ' '.join(self.atomname_list))
-        tmp.append(' ' + ' '.join(self.atomnumber_list))
+        if not self.iontype[0].isnum():
+            tmp.append(' ' + ' '.join(self.iontype))
+        tmp.append(' ' + ' '.join(self.ionnums))
         if self.is_selective:
             tmp.append('Selective Dynamics')
         tmp.append(self.coordinate_type)
@@ -413,7 +415,7 @@ class for POSCAR (CONTCAR) format
             atoms27 = self.make27candidate(target_atom)
             def func(pos):
                 molecule[index] = pos
-                if center != None: # bool([np.ndarray]) => Error
+                if center is not None: # bool([np.ndarray]) => Error
                     center = _vectorize(center)
                     return np.linalg.norm(pos - center)
                 else:
@@ -460,7 +462,7 @@ class for POSCAR (CONTCAR) format
   # @param [Vector] vector translational vector
   # @return [Array]
 '''
-        atomrange = list(range(1, sum(self.atomnumber_list) + 1))
+        atomrange = list(range(1, sum(self.ionnums) + 1))
         translate(vector, atomrange)
 
     def save(self, filename):
@@ -543,7 +545,7 @@ if not specified, use standard output''')
     #  if "atom" option is not set, all atoms are concerned. 
     #
     if not arguments.atom:
-        nAtoms = sum(arguments.poscar.atomnumber_list)
+        nAtoms = sum(arguments.poscar.ionnums)
         arguments.atom = [arg.parse_AtomselectionNum('1-{0}'.format(nAtoms))]
     #
     #  Translation
