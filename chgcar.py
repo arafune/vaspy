@@ -1,5 +1,6 @@
 #!/usr/bin/env/ python
 # -*- coding: utf-8 -*-
+# translate from chgcar.rb in scRipt4VASP, 2014/2/26 mmaster branch
 
 import re, copy
 import itertools as it
@@ -281,26 +282,26 @@ minority : extract the part for the
     arg.add_argument('--output', metavar='file_name',
                      help="""output file name
 if not specified, use standard output""")
-    arg.add_argument('CHGCAR_file_1')
-    arg.add_argument('CHGCAR_file_2', nargs='?')
+    arg.add_argument('CHGCAR_file_1', type=CHGCAR)
+    arg.add_argument('CHGCAR_file_2', type=CHGCAR, nargs='?')
+    # if CHGCAR_file_2 is not specified, *None* is stored in arguments.CHGCAR_file_2, not CHGCAR(None)
     arguments = arg.parse_args()
     #
     if arguments.spin is not None:
         if arguments.CHGCAR_file_2 is not None:
             raise RuntimeError("Only one CHGCAR file for --spin_operation")
-        a = CHGCAR(arguments.CHGCAR_file_1)
         if arguments.spin == "mag":
-            c = a.magnetization()
+            c = arguments.CHGCAR_file_1.magnetization()
         elif arguments.spin == "magX":
-            c = a.magnetization('x')
+            c = arguments.CHGCAR_file_1.magnetization('x')
         elif arguments.spin == "magY":
-            c = a.magnetization('y')
+            c = arguments.CHGCAR_file_1.magnetization('y')
         elif arguments.spin == "magZ":
-            c = a.magnetization('z')
+            c = arguments.CHGCAR_file_1.magnetization('z')
         elif arguments.spin == "majority":
-            c = a.majorityspin()
+            c = arguments.CHGCAR_file_1.majorityspin()
         elif arguments.spin == "minority":
-            c = a.minorityspin()
+            c = arguments.CHGCAR_file_1.minorityspin()
         else:
             raise RuntimeError("Such spin operation parameter is not defined.")
     #
@@ -309,12 +310,10 @@ if not specified, use standard output""")
     if arguments.add or arguments.diff:
         if (arguments.CHGCAR_file_1 is None) or (arguments.CHGCAR_file_2 is None):
             raise RuntimeError('Two CHGCAR files are required.')
-        a = CHGCAR(arguments.CHGCAR_file_1)
-        b = CHGCAR(argumetns.CHGCAR_file_2)
         if arguments.add:
-            c = a + b
+            c = arguments.CHGCAR_file_1 + argumetns.CHGCAR_file_2
         else:
-            c = a - b
+            c = arguments.CHGCAR_file_1 - argumetns.CHGCAR_file_2
     # 
     if arguments.output is not None:
         c.save(arguments.output)
