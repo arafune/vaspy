@@ -57,7 +57,7 @@ class CHGCAR(poscar.POSCAR):
         with open(chgcarfile) as f:
             for line in f:
                 line = line.rstrip('\n')
-                if section == 'poscar'
+                if section == 'poscar':
                     if re.search(_re_blank, line):
                         self.load_from_array(tmp)
                         section = 'define_separator'
