@@ -2,9 +2,12 @@
 # -*- coding: utf-8 -*-
 # translate from chgcar.rb in scRipt4VASP, 2014/2/26 mmaster branch
 
-import re, copy
+import re, copy, os, sys
 import itertools as it
+mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
+sys.path.append(os.path.dirname(os.path.abspath(mypath)))
 import poscar
+
 
 _re_blank = re.compile(r'^[\s]*$')
 _re_aug_occ = re.compile(r'\baugmentation occupancies')
