@@ -96,7 +96,7 @@ class for POSCAR (CONTCAR) format
         return self.__latticeV3
 
     def load_from_array(self, poscar):
-        poscar = map(str.rstrip, poscar)
+        poscar = iter(map(str.rstrip, poscar))
         self.system_name = next(poscar)
         self.scaling_factor = float(next(poscar))
         self.__latticeV1 = np.array([list(map(float, next(poscar).split()))])
