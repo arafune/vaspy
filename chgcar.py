@@ -290,7 +290,7 @@ if not specified, use standard output""")
     #
     if arguments.spin is not None:
         if arguments.CHGCAR_file_2 is not None:
-            raise RuntimeError("Only one CHGCAR file for --spin_operation")
+            raise RuntimeError("Only one CHGCAR file for --spin operations")
         if arguments.spin == "mag":
             c = arguments.CHGCAR_file_1.magnetization()
         elif arguments.spin == "magX":
