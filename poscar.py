@@ -496,7 +496,7 @@ if __name__ == '__main__':
     mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
     sys.path.append(os.path.dirname(os.path.abspath(mypath)))
     import argParsePostVASP as appv
-    arg = appv.APPV()
+    arg = appv.APPV(formatter_class=argparse.RawTextHelpFormatter)
     arg.add_argument('--atom', metavar='atoms', action='append',
                      type=arg.parse_AtomselectionNum,
                      help='''atoms specified with range using "-"
@@ -510,19 +510,23 @@ or comma-delimnated numbers.
         return [float(i) for i in lis]
     arg.add_argument('--translate', metavar='x,y,z', action='append',
                      type=ft.partial(split_to_float, n=3, name='translate'),
-                     help='displacement (AA unit) by three numbers separated by comma.')
+                     help='''displacement (AA unit) by three numbers
+separated by comma.''')
     arg.add_argument('--rotateX', metavar='theta,x,y,z',
                      type=ft.partial(split_to_float, n=4, name='rotateX'),
                      help='''Rotation around X-axis by "theta" at (x,y,z)
-NOTE: this option is not taken into account the periodic boundary.''')
+NOTE: this option is not taken into account
+the periodic boundary.''')
     arg.add_argument('--rotateY', metavar='theta,x,y,z',
                      type=ft.partial(split_to_float, n=4, name='rotateY'),
                      help='''Rotation around Y-axis by "theta" at (x,y,z)
-NOTE: this option is not taken into account the periodic boundary.''')
+NOTE: this option is not taken into account
+the periodic boundary.''')
     arg.add_argument('--rotateZ', metavar='theta,x,y,z',
                      type=ft.partial(split_to_float, n=4, name='rotateZ'),
                      help='''Rotation around Z-axis by "theta" at (x,y,z)
-NOTE: this option is not taken into account the periodic boundary.''')
+NOTE: this option is not taken into account
+the periodic boundary.''')
     arg.add_argument('--output', metavar='file_name',
                      help='''output file name
 if not specified, use standard output''')

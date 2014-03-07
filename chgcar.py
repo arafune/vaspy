@@ -260,28 +260,29 @@ class CHGCAR(poscar.POSCAR):
 # ------------------------- Main
 if __name__ == '__main__':
     import argparse
-    arg = argparse.ArgumentParser()
-    arg.add_argument('--add', action='store_true', default=False,
+    arg = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+    group = arg.add_mutually_exclusive_group(required=True)
+    group.add_argument('--add', action='store_true', default=False,
                      help="Add two CHGCAR files")
-    arg.add_argument('--diff', action='store_true', default=False,
+    group.add_argument('--diff', action='store_true', default=False,
                      help="Get difference of two CHGCAR files")
-    arg.add_argument('--spin', metavar='spin_operation',
+    group.add_argument('--spin', metavar='spin_operation',
                      help="""spin-relatated operation.
-when this option is set --add, -diff are
-ignored, and CHGCAR_file_2 must not be set.
+when this option is set --add, -diff are ignored,
+and CHGCAR_file_2 must not be set.
 spin operation is one of the followings:
 mag : show the magnetisation
-  density (for spin resolved calculations)
+      density (for spin resolved calculations)
 magX : show the magnetisation density in
-  the X direction (for non collinear calc.)
+       the X direction (for non collinear calc.)
 magY : show the magnetisation density in
-  the Y direction (for non collinear calc.)
+       the Y direction (for non collinear calc.)
 magZ : show the magnetisation density in
-  the Z direction (for non collinear calc.)
+       the Z direction (for non collinear calc.)
 majority : extract the part for the
-  majority spin (for spin resolved calc.)
+           majority spin (for spin resolved calc.)
 minority : extract the part for the
-  minority spin (for spin resolved calc.)""")
+           inority spin (for spin resolved calc.)""")
     arg.add_argument('--output', metavar='file_name',
                      help="""output file name
 if not specified, use standard output""")
@@ -292,7 +293,7 @@ if not specified, use standard output""")
     #
     if arguments.spin is not None:
         if arguments.CHGCAR_file_2 is not None:
-            raise RuntimeError("Only one CHGCAR file for --spin_operation")
+            raise RuntimeError("Only one CHGCAR file for --spin operations")
         if arguments.spin == "mag":
             c = arguments.CHGCAR_file_1.magnetization()
         elif arguments.spin == "magX":
@@ -308,10 +309,8 @@ if not specified, use standard output""")
         else:
             raise RuntimeError("Such spin operation parameter is not defined.")
     #
-    if arguments.add == arguments.diff:
-        raise RuntimeError('\n--add or --diff ? Choose which one.\n')
     if arguments.add or arguments.diff:
-        if (arguments.CHGCAR_file_1 is None) or (arguments.CHGCAR_file_2 is None):
+        if arguments.CHGCAR_file_2 is None:
             raise RuntimeError('Two CHGCAR files are required.')
         if arguments.add:
             c = arguments.CHGCAR_file_1 + argumetns.CHGCAR_file_2
