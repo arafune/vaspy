@@ -257,7 +257,7 @@ class CHGCAR(poscar.POSCAR):
 # ------------------------- Main
 if __name__ == '__main__':
     import argparse
-    arg = argparse.ArgumentParser()
+    arg = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     group = arg.add_mutually_exclusive_group(required=True)
     group.add_argument('--add', action='store_true', default=False,
                      help="Add two CHGCAR files")
@@ -265,21 +265,21 @@ if __name__ == '__main__':
                      help="Get difference of two CHGCAR files")
     group.add_argument('--spin', metavar='spin_operation',
                      help="""spin-relatated operation.
-when this option is set --add, -diff are
-ignored, and CHGCAR_file_2 must not be set.
+when this option is set --add, -diff are ignored,
+and CHGCAR_file_2 must not be set.
 spin operation is one of the followings:
 mag : show the magnetisation
-  density (for spin resolved calculations)
+      density (for spin resolved calculations)
 magX : show the magnetisation density in
-  the X direction (for non collinear calc.)
+       the X direction (for non collinear calc.)
 magY : show the magnetisation density in
-  the Y direction (for non collinear calc.)
+       the Y direction (for non collinear calc.)
 magZ : show the magnetisation density in
-  the Z direction (for non collinear calc.)
+       the Z direction (for non collinear calc.)
 majority : extract the part for the
-  majority spin (for spin resolved calc.)
+           majority spin (for spin resolved calc.)
 minority : extract the part for the
-  minority spin (for spin resolved calc.)""")
+           inority spin (for spin resolved calc.)""")
     arg.add_argument('--output', metavar='file_name',
                      help="""output file name
 if not specified, use standard output""")
