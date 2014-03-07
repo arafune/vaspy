@@ -1,6 +1,6 @@
 #!/usr/bin/env/ python
 # -*- coding: utf-8 -*-
-# translate from chgcar.rb in scRipt4VASP, 2014/2/26 mmaster branch
+# translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 
 import re, copy, os, sys
 import itertools as it
