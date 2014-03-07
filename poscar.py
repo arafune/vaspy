@@ -491,8 +491,10 @@ _vector_acceptables = (np.ndarray, np.matrix, list, tuple)
 
 if __name__ == '__main__':
     # $-w = true
-    import argparse
+    import argparse, os, sys
     import functools as ft
+    mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
+    sys.path.append(os.path.dirname(os.path.abspath(mypath)))
     import argParsePostVASP as appv
     arg = appv.APPV()
     arg.add_argument('--atom', metavar='atoms', action='append',
