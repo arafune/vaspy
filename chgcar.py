@@ -306,10 +306,8 @@ if not specified, use standard output""")
         else:
             raise RuntimeError("Such spin operation parameter is not defined.")
     #
-    if arguments.add == arguments.diff:
-        raise RuntimeError('\n--add or --diff ? Choose which one.\n')
     if arguments.add or arguments.diff:
-        if (arguments.CHGCAR_file_1 is None) or (arguments.CHGCAR_file_2 is None):
+        if arguments.CHGCAR_file_2 is None:
             raise RuntimeError('Two CHGCAR files are required.')
         if arguments.add:
             c = arguments.CHGCAR_file_1 + argumetns.CHGCAR_file_2
