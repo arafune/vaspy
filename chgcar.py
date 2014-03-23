@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 
+from __future__ import division, print_function
 import re, copy, os, sys
 import itertools as it
 mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
@@ -86,7 +87,7 @@ class CHGCAR(poscar.POSCAR):
                         self.__chgArray.extend(map(float, line.split()))
         if len(self.chgArray) % (self.meshX * self.meshY * self.meshZ) != 0:
             raise RuntimeError('Failed: Construction')
-        self.__spininfo = int(len(self.chgArray) / (self.meshX * self.meshY * self.meshZ))
+        self.__spininfo = len(self.chgArray) // (self.meshX * self.meshY * self.meshZ)
         if self.spininfo == 1:
             self.__spininfo = [""]
         elif self.spininfo == 2:
@@ -165,7 +166,7 @@ class CHGCAR(poscar.POSCAR):
             raise RuntimeError('This CHGCAR is not spinresolved version')
         destCHGCAR = copy.deepcopy(self)
         s1, s2 = _each_slice(self.meshX * self.meshY * self.meshZ)
-        destCHGCAR.__chgArray = [(up + down) / 2. for up, down in zip(s1, s2)]
+        destCHGCAR.__chgArray = [(up + down) / 2 for up, down in zip(s1, s2)]
         destCHGCAR.__spininfo = ["up"]
         return destCHGCAR
 
@@ -181,7 +182,7 @@ class CHGCAR(poscar.POSCAR):
             raise RuntimeError('This CHGCAR is not spinresolved version')
         destCHGCAR = copy.deepcopy(self)
         s1, s2 = _each_slice(self.meshX * self.meshY * self.meshZ)
-        destCHGCAR.__chgArray = [(up - down) / 2. for up, down in zip(s1, s2)]
+        destCHGCAR.__chgArray = [(up - down) / 2 for up, down in zip(s1, s2)]
         destCHGCAR.__spininfo = ["down"]
         return destCHGCAR
 
