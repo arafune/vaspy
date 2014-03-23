@@ -3,6 +3,7 @@
 # python 3.3.2
 # translate from poscar.rb of 2014/2/26, master branch
 
+from __future__ import division, print_function
 import numpy as np
 import itertools as it
 import copy, re
