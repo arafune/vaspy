@@ -120,11 +120,11 @@ class PROCAR:
         if len(self.orbital) % (self.numk * self.nBands * self.nAtoms) != 0:
             raise RuntimeError("PROCAR file may be broken")
         if self.spininfo == 1:
-            self.__spininfo = ['']
+            self.__spininfo = ('',)
         elif self.spininfo == 2:
-            self.__spininfo = ['_up', '_down']
+            self.__spininfo = ('_up', '_down')
         elif self.spininfo == 4:
-            self.__spininfo = ['_mT', '_mX', '_mY', '_mZ']
+            self.__spininfo = ('_mT', '_mX', '_mY', '_mZ')
         # orbitalname
         tmpOrb = Orbital()
         tmpOrb.redefine_orbital_list(self.orbitalname)
@@ -170,11 +170,11 @@ class PROCAR:
         if len(self.orbital) % (self.numk * self.nBands * self.nAtoms) != 0:
             raise RuntimeError("PROCAR file may be broken")
         if self.spininfo == 1:
-            self.__spininfo = ['']
+            self.__spininfo = ('',)
         elif self.spininfo == 2:
-            self.__spininfo = ['_up', '_down']
+            self.__spininfo = ('_up', '_down')
         elif self.spininfo == 4:
-            self.__spininfo = ['_mT', '_mX', '_mY', '_mZ']
+            self.__spininfo = ('_mT', '_mX', '_mY', '_mZ')
         # orbitalname
         tmpOrb = Orbital()
         tmpOrb.redefine_orbital_list(self.orbitalname)
