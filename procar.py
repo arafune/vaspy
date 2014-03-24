@@ -3,7 +3,9 @@
 # translate from procar.rb of scRipt4VASP 2014/2/26 master branch
 
 from __future__ import division, print_function
-import re
+import re, copy
+import itertools as it
+import functools as ft
 import numpy as np
 
 class PROCAR:
@@ -91,7 +93,7 @@ class PROCAR:
                 elif re.findall(r'^#', line):
                     self.__numk, self.__nBands, self.__nAtoms = [int(i) for i in line.split() if i.isdigit()]
                 elif re.findall(r'\bk-points\b', line):
-                    self.__kvectors.append([float(i) for i in line.split()[3:6]]) # check data
+                    self.__kvectors.append(np.asarray([list(float(i) for i in line.split()[3:6])])) # check data
                     section.pop()
                 elif re.findall(r'^band\b', line):
                     self.__energies.append(float(line.split()[4]))
@@ -205,16 +207,16 @@ class PROCAR:
                                self.numk * self.nBansd * self.nAtoms,
                                len(phase))
 
+    @property
     def __iter__(self):
-        for line in self.orbital:
-            yield line
+        return self.__orbital.__iter__
 
     def to_band(self):
-        band = Band.(self.kvectors[0:self.numk]) # for no-spin and soi,
-                                                 # [0:self.numk] does not affect
-                                                 # the results.  However for
-                                                 # spin-case, remove the
-                                                 # identical latter kvectors.
+        band = Band(self.kvectors[0:self.numk]) # for no-spin and soi,
+                                                # [0:self.numk] does not affect
+                                                # the results.  However for
+                                                # spin-case, remove the
+                                                # identical latter kvectors.
         for i, orbital in enumerate(self.orbital):
             if len(spininfo) == 1: # spin integrated
                 kindex, x = divmod(i, self.nBands * self.nAtoms)
@@ -242,4 +244,239 @@ class PROCAR:
                 band.append(aState)
         return band
 
-#
+class Band:
+    '''Band class
+  container of State objects
+  class variable : @@kvectors
+  @author Ryuichi Arafune
+'''
+    # attr_accessor :band
+    __kvectors = __kvectors if 'kvectors' in locals() else list()
+    __distance = __distance if 'distance' in locals() else list()
+
+    def __init__(self, arg=None):
+        '''Band(list-of-kvectors) => Band object
+    Band#initialize: Sets @@kvectors and then calculate @@distance
+    @param[Array] arg kvectors array
+'''
+        self.__band = list()
+        if arg is not None:
+            self.__kvectors = arg
+            self.__distance.extend([None] * len((self.kvectors) - len(self.distance)))
+            for i, k in enumerate(self.kvectors):
+                if i == 0:
+                    self.__distance[i] = 0.0
+                else:
+                    self.__distance[i] = self.distance[i - 1] + np.linalg.norm(self.kvectors[i - 1] - k)
+    
+    @property
+    def kvectors(self):
+        '''Band#kvectors
+  # @return [Array<Float, Float, Float>] Returns @@kvectors
+'''
+        return self.__kvectors
+
+    @property
+    def distance(self):
+        '''@return [Array<Float>] Returns @@distance
+'''
+        return self.__distance
+
+    def initialize_copy(self, org):
+        '''for Band.dup()'''
+        self.band = self.band.copy()
+
+    @property
+    def __getitem__(self):
+        '''Band[i]:
+  # same as list[i] or tuple[i]
+  # @return[State] i-th State in *band* object
+'''
+        return self.band.__getitem__
+
+    def __setitem__(self, index, value):
+        '''x.__setitem__(i, y) <==> x[i]=y
+    value must be a procar.State (for single index)
+    or iterable of procar.State objects (ranged indices)'''
+        if isinstance(index, slice):
+            value = tuple(value)
+            if all(isinstance(item, State) for item in value):
+                self.__band[index] = value
+            else:
+                raise TypeError('argument must be an iterable of procar.State objects.')
+        else:
+            if isinstance(value, State):
+                self.__band[index] = value
+            else:
+                raise TypeError('argument must be a procar.State object.')
+
+    @property
+    def __iter__(self):
+        '''x.__iter__() <==> iter(x)
+to work as iterable
+return iterator object'''
+        return self.__band.__iter__
+
+    def fermilevel_correction(self, ef): # check whether it works correctly
+        '''
+  # eigenvalues are corrected by fermi level.
+  # Usually the value are obtained from OUTCAR.
+  #
+  #  @param[Float] ef
+'''
+        for aState in self:
+            aState.fermilevel_correction(ef)
+
+    def append(self, aState):
+        '''same as list.append(), but argument must be a State object.
+    @param [State] aState
+    '''
+        if not isinstance(aState, State):
+            raise TypeError('argument must be a procar.State object.')
+        self.__band.append(aState)
+
+    def extend(self, iterable_of_States):
+        '''same as list.extend(), but argument must be an iterable of State objects.
+'''
+        statetuple = tuple(iterable_of_States)
+        if not all(isinstance(item, State) for item in statetuple):
+            raise TypeError("All items in iterable must be a State object.")
+        self.__band.extend(statetuple)
+
+    @property
+    def pop(self):
+        return self.__band.pop
+    
+    def shift(self, n=1):
+        '''Band.shift(1) <==> Band.pop(0)
+Band.shift(n) <==> Band[:n]; del Band[:n]
+'''
+        #n = min(n, len(self))
+        if n == 1:
+            return self.pop(0)
+        else:
+            return [self.pop(0) for i in range(n)]
+
+    # Array.unshift(a, b, c...) [Ruby] <==> list[:0] = (a, b, c...) [Python]
+    
+    @property
+    def insert(self):
+        return self.__band.insert
+
+    def __len__(self):
+        '''x.__len__() <==> len(x)'''
+        return len(self.band)
+
+    def select_by_site(self, *sites):
+        sites = flatten(sites)
+        sites = sorted(set(sites))
+        dest = Band()
+        #dest.band = self.find_all{|s| sites.include?(s[:ion])}
+        return dest
+
+    def __add__(self, other):
+        '''x.__add__(y) <==> x+y
+'''
+        other = _convert_other_band(other)
+        if other is NotImplemented: return other
+        dest = Band()
+        dest.__band = self.band + other.band
+        return dest
+
+    @property
+    def sort(self):
+        '''In-place sorting of self.__band.
+Use sorted(self) for not In-place sorting.'''
+        return self.__band.sort
+
+    def site_integrate(self, *sites):
+        '''  # @param [Fixnum, Range, Array] sites sites are
+  #     specified by comma-separated number, array,
+  #     or Range object.
+  # @return [Band] site-integrated band object
+'''
+        tmpBand = self.select_by_site(*sites)
+        siteGroup = dict()
+        for aState in tmpBand:
+            x = (aState.kindex, aState.bandindex, aState.spininfo)
+            if siteGroup.get(x) is None:
+                siteGroup[x] = aState
+            else:
+                siteGroup[x] += aState
+        dest = Band()
+        dest.__band = list(siteGroup.values())
+        return dest
+
+    def extract_orbitals_in_place(self, *orbital_symbols):
+        '''  # extract certain orbital component in place
+  # @param [Array] orbital_symbols
+  # @return [self]
+'''
+        for aState in self.band:
+            aState.extract_orbitals(*orbital_symbols)
+        return self
+
+    def extract_orbitals(self, *orbital_symbols):
+        '''  # extract certain orbital component in place
+  # Receiver itself does not change
+  # @param [Array] orbital_symbols
+  # @return [Band] orbital_extracted Band
+'''
+        dest = copy.deepcopy(self)
+        for aState in dest.band:
+            aState.extract_orbitals(*orbital_symbols)
+        return dest
+
+    def header(self):
+        '''  # @param[Array] orbital_symbols
+  # @return [Array] Returns arrray represents header for 
+  #   Band#to_a 
+'''
+        nSites = self.number_of_sites()
+        nSpintype = self.number_of_spintype()
+        tmp = sorted(self)[0:(nSites * nSpintype)]
+        tmp = [str(aState.site) + str(orbital) + aState.spininfo
+               for aState in tmp
+               for orbital in aState.orbital_keys()]
+        tmp[0:0] = ['k', 'energy']
+        return tmp
+
+    def tolist(self):
+        '''x.tolist() => list
+
+  # @param [Array] orbital_symbols
+  # @return [Array] Returns *2D array* (Array of array) for output
+'''
+        nBands = self.number_of_bands()
+        nSites = self.number_of_sites()
+        nSpintype = self.number_of_spintype()
+        # unfinished: restart from procar.rb L465
+
+def flatten(nested):
+    '''flatten(iterable) => list
+flatten nested iterables (without str).'''
+    basestring = basestring if hasattr(__builtins__, 'basestring') else (str, bytes)
+    i = 0
+    while i < len(nested):
+        while isinstance(nested[i], collections.Iterable) and not isinstance(nested[i], basestring):
+            if not nested[i]:
+                nested.pop(i)
+                i -= 1
+                break
+            else:
+                nested[i:i+1] = nested[i]
+        i += 1
+    return nested
+
+class State:
+
+    def extract_orbitals(self, *orbital_symbols):
+        pass
+    
+    def orbital_keys(self):
+        pass
+
+def _convert_other_band(other):
+    if isinstance(other, Band):
+        return other
+    return NotImplemented
