@@ -91,7 +91,7 @@ class PROCAR:
                 elif re.findall(r'^#', line):
                     self.__numk, self.__nBands, self.__nAtoms = [int(i) for i in line.split() if int(i) != 0]
                 elif re.findall(r'\bk-points\b', line):
-                    self.__kvectors.append(float(i) for i in line.split()[3:4]) # check data
+                    self.__kvectors.append(float(i) for i in line.split()[3:6]) # check data
                     section.pop()
                 elif re.findall(r'^band\b', line):
                     self.__energies.append(float(line.split()[4]))
