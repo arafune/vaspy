@@ -89,16 +89,16 @@ class PROCAR:
             for line in f:
                 if re.findall(r'^[\s]*$', line): continue
                 elif re.findall(r'^#', line):
-                    self.__numk, self.__nBands, self.__nAtoms = [int(i) for i in line.split() if int(i) != 0]
+                    self.__numk, self.__nBands, self.__nAtoms = [int(i) for i in line.split() if i.isdigit()]
                 elif re.findall(r'\bk-points\b', line):
-                    self.__kvectors.append(float(i) for i in line.split()[3:6]) # check data
+                    self.__kvectors.append([float(i) for i in line.split()[3:6]]) # check data
                     section.pop()
                 elif re.findall(r'^band\b', line):
                     self.__energies.append(float(line.split()[4]))
                     section.pop()
                 elif re.findall(r'^ion\b', line):
                     separator_to_orbital = separator_to_orbital if 'separator_to_orbital' in locals() else line.rstrip('\n')
-                    separator_to_phase = separator_to_phase if 'separator_to_phase' in locals() else separator_to_orbital[0:-6]
+                    separator_to_phase = separator_to_phase if 'separator_to_phase' in locals() else separator_to_orbital[0:-7]
                     self.__orbitalname = self.__orbitalname if hasattr(self, 'orbitalname') else separator_to_orbital.split()
                     if re.findall(separator_to_orbital, line):
                         section = ['orbital']
