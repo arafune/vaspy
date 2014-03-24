@@ -77,7 +77,7 @@ class PROCAR:
     def orbitalname(self):
         return self.__orbitalname
 
-    def load_from_file(self, file, phase_read=None):
+    def load_from_file(self, file, phase_read=False):
         '''PROCAR#load_from_file
     A virtual parser of PROCAR
     @param [String] file filename of *PROCAR* file
@@ -116,6 +116,56 @@ class PROCAR:
                         tmp = [float(i) for i in line.split()]
                         tmp[0] = int(tmp[0])
                         self.__phase.append(tmp)
+        self.__spininfo = len(self.orbital) // (self.numk * self.nBands * self.nAtoms)
+        if len(self.orbital) % (self.numk * self.nBands * self.nAtoms) != 0:
+            raise RuntimeError("PROCAR file may be broken")
+        if self.spininfo == 1:
+            self.__spininfo = ['']
+        elif self.spininfo == 2:
+            self.__spininfo = ['_up', '_down']
+        elif self.spininfo == 4:
+            self.__spininfo = ['_mT', '_mX', '_mY', '_mZ']
+        # orbitalname
+        tmpOrb = Orbital()
+        tmpOrb.redefine_orbital_list(self.orbitalname)
+
+    def load_from_array(procar, phase_read=False):
+        '''This method effectively acts as a parser of PROCAR.
+    @param [Array] procar Array of PROCAR file (IO.readlines(procar file))
+    @param [Boolian] phase_read Switch for loading phase characters
+    @deprecated Too sloooow!! (about 10 times slower than load_from_file)
+'''
+        section = list()
+        #
+        self.__numk, self.__nBands, self.__nAtoms = [int(i) for i in procar[1].split() if i.isdigit()]
+        separator_to_orbital = procar[7].rstrip('\n')
+        self.__orbitalname = separator_to_orbital.split()
+        separator_to_phase = separator_to_orbital[0:-7]
+        for line in procar:
+            if re.findall(r'^[\s]*$', line): continue
+            elif re.findall(r'^#', line): continue
+            elif re.findall(r'\bk-points\b', line):
+                self.__kvectors.append([float(i) for i in line.split()[3:6]]) # check data
+                section.pop()
+            elif re.findall(r'^band\b', line):
+                self.__energies.append(float(line.split()[4]))
+                section.pop()
+            elif re.findall(separator_to_orbital, line):
+                section = ['orbital']
+            elif re.findall(separator_to_phase, line):
+                section = ['phase']
+            else:
+                if section == ['orbital']:
+                    if re.findall(r'\btot\b', line): continue
+                    tmp = [float(i) for i in line.split()]
+                    tmp[0] = int(tmp[0])
+                    self.__orbital.append(tmp)
+                elif section == ['phase']:
+                    if re.findall(r'\btot\b', line): continue
+                    if not phase_read: continue
+                    tmp = [float(i) for i in line.split()]
+                    tmp[0] = int(tmp[0])
+                    self.__phase.append(tmp)
         self.__spininfo = len(self.orbital) // (self.numk * self.nBands * self.nAtoms)
         if len(self.orbital) % (self.numk * self.nBands * self.nAtoms) != 0:
             raise RuntimeError("PROCAR file may be broken")
