@@ -253,8 +253,8 @@ class Band:
   @author Ryuichi Arafune
 '''
     # attr_accessor :band
-    __kvectors = __kvectors if 'kvectors' in locals() else list()
-    __distance = __distance if 'distance' in locals() else list()
+    __kvectors = list()
+    __distance = list()
 
     def __init__(self, arg=None):
         '''Band(list-of-kvectors) => Band object
