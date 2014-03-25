@@ -30,6 +30,7 @@ class PROCAR:
     #:nBands, :nAtoms, :kvectors, :energies, :oritalname
     def __init__(self, arg=None, phase_read=False):
         self.__orbital = list()
+        self.__orbitalname = list()
         self.__phase = list()
         self.__spininfo = 0 # nospin: 1, spinresolved: 2, soi: 4
         self.__numk = 0
@@ -87,6 +88,7 @@ class PROCAR:
 '''
         section = list()
         separator_to_orbital = None
+        separator_to_phase = None
         with open(file) as f:
             for line in f:
                 if re.findall(r'^[\s]*$', line): continue
@@ -99,9 +101,9 @@ class PROCAR:
                     self.__energies.append(float(line.split()[4]))
                     section.pop()
                 elif re.findall(r'^ion\b', line):
-                    separator_to_orbital = separator_to_orbital if 'separator_to_orbital' in locals() else line.rstrip('\n')
-                    separator_to_phase = separator_to_phase if 'separator_to_phase' in locals() else separator_to_orbital[0:-7]
-                    self.__orbitalname = self.__orbitalname if hasattr(self, 'orbitalname') else separator_to_orbital.split()
+                    separator_to_orbital = separator_to_orbital or line.rstrip('\n')
+                    separator_to_phase = separator_to_phase or separator_to_orbital[0:-7]
+                    self.__orbitalname = self.orbitalname or separator_to_orbital.split()
                     if re.findall(separator_to_orbital, line):
                         section = ['orbital']
                     elif re.findall(separator_to_phase, line):
