@@ -155,7 +155,7 @@ class CHGCAR(poscar.POSCAR):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         destCHGCAR = copy.deepcopy(self)
-        s1, s2 = tools.each_slice(self.meshX * self.meshY * self.meshZ)
+        s1, s2 = tools.each_slice(self.chgArray, self.meshX * self.meshY * self.meshZ)
         destCHGCAR.__chgArray = [(up + down) / 2 for up, down in zip(s1, s2)]
         destCHGCAR.__spininfo = ["up"]
         return destCHGCAR
@@ -171,7 +171,7 @@ class CHGCAR(poscar.POSCAR):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         destCHGCAR = copy.deepcopy(self)
-        s1, s2 = tools.each_slice(self.meshX * self.meshY * self.meshZ)
+        s1, s2 = tools.each_slice(self.chgArray, self.meshX * self.meshY * self.meshZ)
         destCHGCAR.__chgArray = [(up - down) / 2 for up, down in zip(s1, s2)]
         destCHGCAR.__spininfo = ["down"]
         return destCHGCAR
@@ -190,7 +190,7 @@ class CHGCAR(poscar.POSCAR):
             return NotImplemented
         addCHGCAR = poscar.POSCAR.__add__(self, other)
         if any([self.meshX != other.meshX, self.meshY != other.meshY, self.meshZ != other.meshZ]):
-            raise RuntimeError('Mesh sizes are incinsistent')
+            raise RuntimeError('Mesh sizes are inconsistent')
         augend = self.chgArray
         addend = other.chgArray
         if len(augend) == len(addend):
@@ -229,15 +229,15 @@ class CHGCAR(poscar.POSCAR):
         '''x.__str__() <=> str(x)
   # @return [String] return a string representation of CHGCAR.
 '''
-        outputstring = '\n'
-        outputstring += '  {0}  {1}  {2}\n'.format(self.meshX, self.meshY, self.meshZ)
-       #outputstring += '  ' + str(self.meshX) + '  ' + self.meshY + '  ' + self.meshZ + '\n'
+        outputstring = ''
         tmp = self.chgArray
-        output = []
-        for array in tools.each_slice(tmp, 5):
-            array = tools.removeall(array, None)
-            output.append(''.join('  {0:E}'.format(i) for i in array))
-        outputstring += '\n'.join(output)
+        for tmp in tools.each_slice(self.chgArray, self.meshX*self.meshY*self.meshZ):
+            output = []
+            outputstring += '\n  {0}  {1}  {2}\n'.format(self.meshX, self.meshY, self.meshZ)
+            for array in tools.each_slice(tmp, 5):
+                array = tools.removeall(array, None)
+                output.append(''.join('  {0:E}'.format(i) for i in array))
+            outputstring += '\n'.join(output)
         return poscar.POSCAR.__str__(self) + outputstring + '\n'
 
     def save(self, filename):
