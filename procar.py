@@ -212,9 +212,8 @@ class PROCAR:
                                self.numk * self.nBansd * self.nAtoms,
                                len(phase))
 
-    @property
     def __iter__(self):
-        return self.__orbital.__iter__
+        return iter(self.__orbital)
 
     def to_band(self):
         band = Band(self.kvectors[0:self.numk]) # for no-spin and soi,
@@ -291,13 +290,12 @@ class Band:
         '''for Band.dup()'''
         self.band = self.band.copy()
 
-    @property
-    def __getitem__(self):
-        '''Band[i]:
+    def __getitem__(self, i):
+        '''x.__getitem__(i) <==> x[i]
   # same as list[i] or tuple[i]
   # @return[State] i-th State in *band* object
 '''
-        return self.band.__getitem__
+        return self.band[i]
 
     def __setitem__(self, index, value):
         '''x.__setitem__(i, y) <==> x[i]=y
@@ -315,12 +313,11 @@ class Band:
             else:
                 raise TypeError('argument must be a procar.State object.')
 
-    @property
     def __iter__(self):
         '''x.__iter__() <==> iter(x)
 to work as iterable
 return iterator object'''
-        return self.__band.__iter__
+        return iter(self.__band)
 
     def fermilevel_correction(self, ef): # check whether it works correctly
         '''
@@ -348,17 +345,15 @@ return iterator object'''
             raise TypeError("All items in iterable must be a State object.")
         self.__band.extend(statetuple)
 
-    @property
-    def pop(self):
-        return self.__band.pop
+    def pop(self, n=-1):
+        return self.__band.pop(n)
     
     # Band.shift() [Ruby] <==> Band.pop(0) [Python]
     # Band.shift(n) [Ruby] <==> [Band.pop(0) for i in range(n)] # n != 1 [Python]
     # Array.unshift(a, b, c...) [Ruby] <==> list[:0] = (a, b, c...) [Python]
     
-    @property
-    def insert(self):
-        return self.__band.insert
+    def insert(self, index, item):
+        self.__band.insert(index, item)
 
     def __len__(self):
         '''x.__len__() <==> len(x)'''
@@ -380,11 +375,10 @@ return iterator object'''
         dest.__band = self.band + other.band
         return dest
 
-    @property
-    def sort(self):
+    def sort(self, key=None, reverse=False):
         '''In-place sorting of self.__band.
 Use sorted(self) for not In-place sorting.'''
-        return self.__band.sort
+        self.__band.sort(key, reverse)
 
     def site_integrate(self, *sites):
         '''  # @param [Fixnum, Range, Array] sites sites are
@@ -486,7 +480,7 @@ Use sorted(self) for not In-place sorting.'''
 '''
         sites = self.sites
         if len(sites) != len(new_names): raise RuntimeError("Number of sites and new names are must be the same.")
-        rule = dict(pair for pair in zip(sites, new_names))
+        rule = dict(zip(sites, new_names))
         for aState in self:
             aState['ion'] = rule[aState['ion']]
 
