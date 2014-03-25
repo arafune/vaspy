@@ -2,6 +2,7 @@
 #import os
 
 __all__ = ['chgcar',
+           'outcar',
            'poscar',
            'argParsePostVASP']
 

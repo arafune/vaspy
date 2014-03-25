@@ -7,21 +7,11 @@ import re, copy, os, sys
 import itertools as it
 mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
 sys.path.append(os.path.dirname(os.path.abspath(mypath)))
-import poscar
+import poscar, tools
 
 
 _re_blank = re.compile(r'^[\s]*$')
 _re_aug_occ = re.compile(r'\baugmentation occupancies')
-
-def _each_slice(iterable, n, fillvalue=None):
-    args = [iter(iterable)] * n
-    return it.zip_longest(*args, fillvalue=fillvalue)
-
-def _removeall(L, value):
-    'remove all *value* in [list] L'
-    while L.count(value):
-        L.remove(value)
-    return L
 
 class CHGCAR(poscar.POSCAR):
     '''
@@ -136,7 +126,7 @@ class CHGCAR(poscar.POSCAR):
         if len(self.spininfo) == 1:
             raise RuntimeError("This CHGCAR is not spinresolved version")
         destCHGCAR = copy.deepcopy(self)
-        s1, s2, s3, s4 = _each_slice(self.chgArray, self.meshX * self.meshY * self.meshZ)
+        s1, s2, s3, s4 = tools.each_slice(self.chgArray, self.meshX * self.meshY * self.meshZ)
         if len(self.spininfo) == 2:
             desfCHGCAR.__chgArray = list(s2)
             destCHGCAR.__spininfo = ["up-down"]
@@ -165,7 +155,7 @@ class CHGCAR(poscar.POSCAR):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         destCHGCAR = copy.deepcopy(self)
-        s1, s2 = _each_slice(self.meshX * self.meshY * self.meshZ)
+        s1, s2 = tools.each_slice(self.meshX * self.meshY * self.meshZ)
         destCHGCAR.__chgArray = [(up + down) / 2 for up, down in zip(s1, s2)]
         destCHGCAR.__spininfo = ["up"]
         return destCHGCAR
@@ -181,7 +171,7 @@ class CHGCAR(poscar.POSCAR):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         destCHGCAR = copy.deepcopy(self)
-        s1, s2 = _each_slice(self.meshX * self.meshY * self.meshZ)
+        s1, s2 = tools.each_slice(self.meshX * self.meshY * self.meshZ)
         destCHGCAR.__chgArray = [(up - down) / 2 for up, down in zip(s1, s2)]
         destCHGCAR.__spininfo = ["down"]
         return destCHGCAR
@@ -244,8 +234,8 @@ class CHGCAR(poscar.POSCAR):
        #outputstring += '  ' + str(self.meshX) + '  ' + self.meshY + '  ' + self.meshZ + '\n'
         tmp = self.chgArray
         output = []
-        for array in _each_slice(tmp, 5):
-            array = _removeall(array, None)
+        for array in tools.each_slice(tmp, 5):
+            array = tools.removeall(array, None)
             output.append(''.join('  {0:E}'.format(i) for i in array))
         outputstring += '\n'.join(output)
         return poscar.POSCAR.__str__(self) + outputstring + '\n'
