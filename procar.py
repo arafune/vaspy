@@ -3,10 +3,13 @@
 # translate from procar.rb of scRipt4VASP 2014/2/26 master branch
 
 from __future__ import division, print_function
-import re, copy
+import re, copy, os, sys
 import itertools as it
 import functools as ft
 import numpy as np
+mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
+sys.path.append(os.path.dirname(os.path.abspath(mypath)))
+import tools
 
 class PROCAR:
     '''Class for PROCAR file
@@ -349,16 +352,8 @@ return iterator object'''
     def pop(self):
         return self.__band.pop
     
-    def shift(self, n=1):
-        '''Band.shift(1) <==> Band.pop(0)
-Band.shift(n) <==> Band[:n]; del Band[:n]
-'''
-        #n = min(n, len(self))
-        if n == 1:
-            return self.pop(0)
-        else:
-            return [self.pop(0) for i in range(n)]
-
+    # Band.shift() [Ruby] <==> Band.pop(0) [Python]
+    # Band.shift(n) [Ruby] <==> [Band.pop(0) for i in range(n)] # n != 1 [Python]
     # Array.unshift(a, b, c...) [Ruby] <==> list[:0] = (a, b, c...) [Python]
     
     @property
@@ -416,8 +411,7 @@ Use sorted(self) for not In-place sorting.'''
 '''
         for aState in self.band:
             aState.extract_orbitals(*orbital_symbols)
-        return self
-
+    
     def extract_orbitals(self, *orbital_symbols):
         '''  # extract certain orbital component in place
   # Receiver itself does not change
@@ -443,7 +437,7 @@ Use sorted(self) for not In-place sorting.'''
         tmp[0:0] = ['k', 'energy']
         return tmp
 
-    def tolist(self):
+    def tolist(self): # orbital_symbols?
         '''x.tolist() => list
 
   # @param [Array] orbital_symbols
@@ -452,23 +446,15 @@ Use sorted(self) for not In-place sorting.'''
         nBands = self.number_of_bands()
         nSites = self.number_of_sites()
         nSpintype = self.number_of_spintype()
-        # unfinished: restart from procar.rb L465
+        orbital_symbols = self[0].defined_orbital_list()
+        dest = list()
+        distance = self.distance * nBands
+        self.sort()
 
-def flatten(nested):
-    '''flatten(iterable) => list
-flatten nested iterables (without str).'''
-    basestring = basestring if hasattr(__builtins__, 'basestring') else (str, bytes)
-    i = 0
-    while i < len(nested):
-        while isinstance(nested[i], collections.Iterable) and not isinstance(nested[i], basestring):
-            if not nested[i]:
-                nested.pop(i)
-                i -= 1
-                break
-            else:
-                nested[i:i+1] = nested[i]
-        i += 1
-    return nested
+        for array in tools.each_slice(self, nSites * nSpintype):
+            dest.append([aState.send(orbital) for aState in array
+                        for orbital in aState.orbital_keys ].insert(0, array[0].eigenvalue))
+        return list(tools.flatten(i) for i in zip(distance, dest))
 
 class State:
 
