@@ -903,3 +903,24 @@ def _convert_other_orbital(other):
     if isinstance(other, Orbital):
         return other
     return NotImplemented
+
+# -------------------------------------------------------------
+#
+# Main (test) routine
+#
+if __name__ == '__main__':
+    import argparse
+    import outcar
+    import argParsePostVASP as APPV
+
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('--outcar', metavar='outcar_file',
+                        help='''Use "OUTCAR" for the Fermi level correction.
+outcar_file must be specified.
+NOTE:  E-fermi of OUTCAR generated in
+Band-calculation may NOT be reliable.''')
+    parser.add_argument('--fermi', metavar='value', type=float
+                        help='''Fermi level correction
+Energy shifts by this value
+if --outcar is set, this option is ignored''')
+    
