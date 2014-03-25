@@ -238,7 +238,7 @@ class CHGCAR(poscar.POSCAR):
                 array = tools.removeall(array, None)
                 output.append(''.join('  {0:E}'.format(i) for i in array))
             outputstring += '\n'.join(output)
-        return poscar.POSCAR.__str__(self) + outputstring + '\n'
+        return super().__str__(self) + outputstring + '\n'
 
     def save(self, filename):
         '''
