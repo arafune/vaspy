@@ -228,7 +228,7 @@ class PROCAR:
                 eigenvalue = self.energies[i // self.nAtoms]
                 spininfo = self.spininfo[0]
                 aState = State(kindex, bindex, eigenvalue, spininfo, orital)
-                band.push(aState)
+                band.append(aState)
             elif len(spininfo) == 2: # spin resolved
                 kindex, x = divmod(i, self.nBands * self.nAtoms)
                 if i >= self.numk * self.nBands * self.nAtoms: kindex -= self.numk
@@ -239,6 +239,7 @@ class PROCAR:
                 else:
                     spininfo = self.spininfo[0]
                 aState = State(kindex, bindex, eigenvalue, spininfo, orbital)
+                band.append(aState)
             elif len(spininfo) == 4: # SOI
                 kindex, x = divmod(i, self.nBands * self.nAtoms * 4) ## 4 is mT, mX, mY, mZ
                 bindex = x // (self.nAtoms * 4)                      ## 4 is mT, mX, mY, mZ
