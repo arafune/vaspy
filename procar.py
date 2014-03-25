@@ -755,14 +755,145 @@ class Orbital:
         if arg[-1] != 'tot': raise ValueError("Last element of argument mst be 'tot'.")
         self.__orbital_list = arg
 
-class State:
+class State(Orbital):
+    '''# Class for electronic state
+# @author Ryuichi Arafune
+# @version 2.0
+'''
+    #  attr_accessor :orbital
+    #  attr_reader :kindex, :bandindex, :spininfo, :eigenvalue
+    def __init__(self, kindex=None, bandindex=None,
+                 eigenvalue=None, spininfo=None, orbital=None):
+        super().__init__(orbital)
+        self.__kindex = kindex
+        self.__bandindex = bandindex
+        self.__eigenvalue = eigenvalue
+        self.__spininfo = spininfo
+
+    @property
+    def kindex(self):
+        return self.__kindex
+
+    @property
+    def bandindex(self):
+        return self.__bandindex
+
+    @property
+    def eigenvalue(self):
+        return self.__eigenvalue
+
+    @property
+    def spininfo(self):
+        return self.__spininfo
+
+    def __copy__(self):
+        'x.__copy__() <==> copy.copy(x)'
+        dest = State()
+        dest.orbital = copy.copy(self.orbital)
+        dest.__kindex = self.kindex
+        dest.__bandindex = self.bandindex
+        dest.__eigenvalue = self.eigenvalue
+        dest.__spininfo = copy.copy(self.spininfo)
+        return dest
+
+    # python 3.x don't have cmp(),
+    # python 2.6 or older don't have functools.total_odering
+    # => define all rich comparision method.
+
+    def __cmp__(self, other):
+        '''x.__cmp__(y) <==> cmp(x, y) # python 2.x
+'''
+        if not isinstance(other, State): return NotImplemented
+        cmp = np.sign(self.bandindex - other.bandindex)
+        if cmp != 0: return cmp
+        cmp = np.sign(self.kindex - other.kindex)
+        if cmp != 0: return cmp
+        cmp = np.sign(self.site - other.site)
+        if cmp != 0: return cmp
+        return np.sign(self.spininfo - other.spininfo)
+
+    def __eq__(self, other):
+        'x.__eq__(y) <==> x==y'
+        cmp = self.__cmp__(other)
+        if cmp is NotImplemented: return cmp
+        else: return cmp == 0
+
+    def __ne__(self, other):
+        'x.__ne__(y) <==> x!=y
+        return self.__cmp__(other) != 0
+
+    def __lt__(self, other):
+        'x.__lt__(y) <==> x<y'
+        cmp = self.__cmp__(other)
+        if cmp is NotImplemented: return cmp
+        return cmp == -1
+
+    def __le__(self, other):
+        'x.__le__(y) <==> x<=y'
+        cmp = self.__cmp__(other)
+        if cmp is NotImplemented: return cmp
+        return cmp != 1
+
+    def __gt__(self, other):
+        'x.__gt__(y) <==> x>y'
+        cmp = self.__cmp__(other)
+        if cmp is NotImplemented: return cmp
+        return cmp == 1
+
+    def __ge__(self, other):
+        'x.__ge__(y) <==> x>=y'
+        cmp = self.__cmp__(other)
+        if cmp is NotImplemented: return cmp
+        return cmp != -1
+
+    def fermilevel_correction(self, ef):
+        self.__eigenvalue = ef
+
+    def __add__(self, other):
+        '''x.__add__(y) <==> x+y
+
+  #  eigenvalue must be identical with each other.
+  #  In many cases, kvector and bandindex should be same, but not checked. 
+  #  You may calculate k-integrated density of states from *band*...
+  # @param [State] other'''
+        if self.is_empty():
+            dest = copy.copy(other)
+        else:
+            if self.eigenvalue != other.eigenvalue:
+                raise ValueError("Eigenvalues are different.")
+            dest = copy.copy(self)
+            orbital = super().__add__(other)
+            dest.orbital = orbital.todict()
+        return dest
 
     def extract_orbitals(self, *orbital_symbols):
-        pass
+        '''
+  #   Extract specified orbitals 
+  #   (remove other orbital contributions)
+  # @param [Array] orbital_symbols
+  # @return [self] 
+'''
+        orbital_symbols = tools.flatten(orbital_symbols)
+        orbital_symbols.append('ion')
+        self.orbital = dict((key, value) for key, value
+                            in self.items() if key in orbital_symbols)
     
-    def orbital_keys(self):
-        pass
-
+  # State#<<() :  
+  #  eigenvalue must be identical with each other.
+  #  In many cases, kvector and bandindex should be same, but not checked. 
+  #  You may calculate k-integrated density of states from *band*...
+  # @param [State] other
+  #
+  #  def <<(other)
+  #    @@orbital_list[1..-1].each do orbital
+  #      self[orbital]+= other[orbital]
+  #    end
+  #    self[:ion] = self[:ion].to_s
+  #    self[:ion] << "_"<< other[:ion].to_s
+  #  end
+  #  self
+  #end 
+    
 def _convert_other_band(other):
     if isinstance(other, Band):
         return other
