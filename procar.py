@@ -555,12 +555,8 @@ class Orbital:
                       'dyz', 'dz2', 'dxz', 'dx2', 'tot')
 
     def __init__(self, arg=None):
-        self.__orbital = dict()
+        self.orbital = dict()
         if arg is not None: self.load_from_line(arg)
-
-    @property
-    def orbital(self):
-        return self.__orbital
 
     def __copy__(self):
         'x.__copy__() <==> copy.copy(x)'
@@ -600,22 +596,22 @@ class Orbital:
   # @return [String] atom #.
   '''
         if isinstance(arg, str):
-            self.__orbital = dict(zip(self.orbital_list, (float(i) for i in arg.split())))
+            self.orbital = dict(zip(self.orbital_list, (float(i) for i in arg.split())))
         elif isinstance(arg, list, tuple):
-            self.__orbital = dict(zip(self.orbital_list, arg))
+            self.orbital = dict(zip(self.orbital_list, arg))
         elif isinstance(arg, dict):
             if 'ion' in arg:
-                self.__orbital = arg
+                self.orbital = arg
             else:
                 raise ValueError("dict() of {0} cannot be Orbital object.".format(arg))
         elif isinstance(arg, Orbital):
-            self.__orbital = arg.todict()
+            self.orbital = arg.todict()
         else:
             raise ValueError("Cannot create Orbital object from {0}() object.".format(type(arg)))
-        self.__orbital['ion'] = int(self.orbital['ion'])
+        self.orbital['ion'] = int(self.orbital['ion'])
 
     def __iter__(self):
-        return iter(self.__orbital)
+        return iter(self.orbital)
 
     def names(self):
         return self.orbital.keys()
@@ -654,11 +650,11 @@ class Orbital:
 
     def get(self, symbol, default=None):
         '''Orbital.get(s[, D]) -> Orbital[s] if exist, else D'''
-        return self.__orbital.get(symbol, default)
+        return self.orbital.get(symbol, default)
 
     def setdefault(self, symbol, default=None):
         '''Orb.setdefault(s[, D]) -> Orb.get(s, D), also set Orb[k]=D if k not in Orb'''
-        return self.__orbital.setdefault(symbol, default)
+        return self.orbital.setdefault(symbol, default)
 
     def site(self): return self.orbital['ion']
 
