@@ -28,7 +28,7 @@ class PROCAR:
 '''
     #attr_reader :orbital, :phase, :spininfo, :numk,
     #:nBands, :nAtoms, :kvectors, :energies, :oritalname
-    def __init__(self, arg=None, phase_read=None):
+    def __init__(self, arg=None, phase_read=False):
         self.__orbital = list()
         self.__phase = list()
         self.__spininfo = 0 # nospin: 1, spinresolved: 2, soi: 4
@@ -39,9 +39,9 @@ class PROCAR:
         self.__energies = list()
 
         if isinstance(arg, str):
-            self.load_from_file(arg)
+            self.load_from_file(arg, phase_read)
         elif isinstance(arg, (list, tuple)):
-            self.load_from_array(arg)
+            self.load_from_array(arg, phase_read)
 
     @property
     def orbital(self):
