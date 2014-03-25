@@ -446,8 +446,8 @@ Use sorted(self) for not In-place sorting.'''
         self.sort()
 
         for array in tools.each_slice(self, nSites * nSpintype):
-            dest.append([aState.send(orbital) for aState in array
-                        for orbital in aState.orbital_keys ].insert(0, array[0].eigenvalue))
+            dest.append([getattr(aState, orbital) for aState in array
+                        for orbital in aState.orbital_keys].insert(0, array[0].eigenvalue))
         return list(tools.flatten(i) for i in zip(distance, dest))
 
     def __str__(self):
@@ -537,7 +537,216 @@ Use sorted(self) for not In-place sorting.'''
 
     def dump(self, filename):
         pass
-        
+
+class Orbital:
+    '''# Class for storing electronic orbital contribution.
+# A "functionalized" Hash
+# @author Ryuichi Arafune
+# @version 2.0'''
+    __orbital_list = ('ion', 's', 'py', 'pz', 'px', 'dxy',
+                      'dyz', 'dz2', 'dxz', 'dx2', 'tot')
+
+    def __init__(self, arg=None):
+        self.__orbital = dict()
+        if arg is not None: self.load_from_line(arg)
+
+    @property
+    def orbital(self):
+        return self.__orbital
+
+    def initialize_copy(self, arg):
+        self.__orbital = self.orbital.copy()
+
+    def orbital_keys(self):
+        keys = list(self.orbital.keys())
+        keys.remove('ion')
+        return sorted(keys)
+
+    def load_from_line(arg):
+        '''
+  # Read values of orbital contribution from the line.
+  #  (Essentially, this method acts as a parser.)
+  #  The order of the orbitals is determined with the orbitalname array.
+  #  In PROCAR file, the table that corresponds the orbital 
+  #  contribution is like this:
+  #  ion    s     py     pz     px    dxy    dyz    dz2    dxz    dx2    tot
+  #  1  0.001  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.002
+  #  2  0.003  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.005
+  #  3  0.002  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.004
+  #  4  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.001
+  #  5  0.005  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.007
+  #  6  0.003  0.000  0.001  0.000  0.000  0.000  0.001  0.000  0.000  0.005
+  #  ...
+  #  An array called orbitalname is created from the first line of the table 
+  #  that starts with "ion"
+  # @param [String,Array,Hash,Orbital] arg  the format is like this:
+  #
+  #   1  0.001  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.002
+  #
+  #   (the first column indicates the atom #.)
+  # 
+  #   (Each element is separated by the space.)
+  # @return [String] atom #.
+  '''
+        if isinstance(arg, str):
+            self.__orbital = dict(zip(self.orbital_list, (float(i) for i in arg.split())))
+        elif isinstance(arg, list, tuple):
+            self.__orbital = dict(zip(self.orbital_list, arg))
+        elif isinstance(arg, dict):
+            if 'ion' in arg:
+                self.__orbital = arg
+            else:
+                raise ValueError("dict() of {0} cannot be Orbital object.".format(arg))
+        elif isinstance(arg, Orbital):
+            self.__orbital = arg.todict()
+        else:
+            raise ValueError("Cannot create Orbital object from {0}() object.".format(type(arg)))
+        self.__orbital['ion'] = int(self.orbital['ion'])
+
+    def __iter__(self):
+        return iter(self.__orbital)
+
+    def names(self):
+        return self.orbital.keys()
+
+    def contributions(self):
+        return self.orbital.values()
+
+    def items(self):
+        return self.orbital.items()
+
+    def defined_orbital_list():
+        return self.__orbital_list[:]
+
+    def __getitem__(self, orbital_symbol):
+        '''x.__getitem__(i) <==> x[i]
+
+  # Returns contribution of specified orbital.
+  # @param [Symbol] orbital_symbol Orbital name by symbol format
+  #     (ex.):s, :sp.  if orbitalsymol is not exist in the object, it
+  #     tries to generate the value of contribution.  
+  # @return [Float] contribution of the specified orbital.
+'''
+        if orbital_symbol in self.orbital:
+            return self.orbital[orbital_symbol]
+        else:
+            return getattr(self, orbital_symbol)
+
+    def __setitem__(self, orbital_symbol, value):
+        '''x.__setitem__(i, y) <==> x[i]=y
+
+  # Associate the *value* of contribution with the specified *orbital*.
+  # @param [Symbol] orbitalsymbol Orbital name by symbol format (ex.):s, :sp.
+  # @param [Float] value of contribution for the specified orbital.
+'''
+        self.__orbital[orbital_symbol] = value
+
+    def get(self, symbol, default=None):
+        '''Orbital.get(s[, D]) -> Orbital[s] if exist, else D'''
+        return self.__orbital.get(symbol, default)
+
+    def setdefault(self, symbol, default=None):
+        '''Orb.setdefault(s[, D]) -> Orb.get(s, D), also set Orb[k]=D if k not in Orb'''
+        return self.__orbital.setdefault(symbol, default)
+
+    def site(self): return self.orbital['ion']
+
+    def orbital(self): return self
+
+    def todict(self): return self.orbital
+
+    @property
+    def s(self): return self.orbital['s']
+
+    @property
+    def px(self): return self.orbital['px']
+
+    @property
+    def py(self): return self.orbital['py']
+
+    @property
+    def pz(self): return self.orbital['pz']
+
+    @property
+    def dxy(self): return self.orbital['dxy']
+
+    @property
+    def dyz(self): return self.orbital['dyz']
+
+    @property
+    def dz2(self): return self.orbital['dz2']
+
+    @property
+    def dxz(self): return self.orbital['dxz']
+
+    @property
+    def dx2(self): return self.orbital['dx2']
+
+    @property
+    def p(self):
+        return self.setdefault('p', self.px + self.py + self.pz)
+
+    @property
+    def pxpy(self):
+        return self.setdefault('pxpy', self.px + self.py)
+
+    pypx = pxpy
+    
+    @property
+    def pypz(self):
+        return self.setdefault('pypz', self.py + self.pz)
+
+    pzpy = pypz
+
+    @property
+    def pzpx(self):
+        return self.setdefault('pzpx', self.pz + self.px)
+
+    pxpz = pzpx
+
+    @property
+    def sp(self):
+        return self.setdefault('sp', self.s + self.p)
+
+    @property
+    def d(self):
+        return self.setdefault('d', self.dxy + self.dyz + self.dz2 + self.dxz + self.dx2)
+
+    @property
+    def tot(self): return self.orbital['tot']
+
+    spd = total = tot
+
+    def is_empty(self):
+        '''  # @return [Boolean] true if #Orbital is empty.
+'''
+        return len(self.orbital) == 0
+
+    def __add__(self, other):
+        other = _convert_other_orbital(other)
+        if other is NotImplemented: return other
+        dest = Orbital()
+        if self.is_empty():
+            dest = copy.copy(other)
+        else:
+            for orbital_symbol, value in self.__orbital.items():
+                if orbital_symbol == 'ion':
+                    dest[orbital_symbol] = str(value) + ',' + str(other['ion'])
+                else:
+                    dest[orbital_symbol] = value + other[orbital_symbol]
+        return dest
+
+    def redefine_orbital_list(arg):
+        '''Redefine orbital list by arg
+  #   The machine default is set as above.
+  # @param [Array] arg Symbol list consisting orbital name.
+  #   First element must be :ion
+  #   Final element must be :tot
+'''
+        if not isinstance(arg, (list, tuple)): raise RuntimeError("redefine_orbital_list fail")
+        if arg[0] != 'ion': raise ValueError("First element of argument mst be 'ion'.")
+        if arg[-1] != 'tot': raise ValueError("Last element of argument mst be 'tot'.")
+        self.__orbital_list = arg
 
 class State:
 
@@ -549,5 +758,10 @@ class State:
 
 def _convert_other_band(other):
     if isinstance(other, Band):
+        return other
+    return NotImplemented
+
+def _convert_other_orbital(other):
+    if isinstance(other, Orbital):
         return other
     return NotImplemented
