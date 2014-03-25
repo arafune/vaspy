@@ -286,9 +286,16 @@ class Band:
 '''
         return self.__distance
 
-    def initialize_copy(self, org):
-        '''for Band.dup()'''
-        self.band = self.band.copy()
+    def __copy__(self):
+        'x.__copy__() <==> copy.copy(x)'
+        dest = Band()
+        dest.__band = self.band[:]
+        return dest
+
+#    def __deepcopy__(self, memo):
+#        'x.__deepcopy__() <==> copy.deepcopy(x)'
+#        dest = Band()
+#        dest.__band == copy.deepcopy(self.band, memo)
 
     def __getitem__(self, i):
         '''x.__getitem__(i) <==> x[i]
@@ -412,7 +419,7 @@ Use sorted(self) for not In-place sorting.'''
   # @param [Array] orbital_symbols
   # @return [Band] orbital_extracted Band
 '''
-        dest = copy.deepcopy(self)
+        dest = copy.deepcopy(self) ### check it is really deep copy ###
         for aState in dest.band:
             aState.extract_orbitals(*orbital_symbols)
         return dest
@@ -554,8 +561,11 @@ class Orbital:
     def orbital(self):
         return self.__orbital
 
-    def initialize_copy(self, arg):
-        self.__orbital = self.orbital.copy()
+    def __copy__(self):
+        'x.__copy__() <==> copy.copy(x)'
+        dest = Orbital()
+        dest.orbital = self.orbital.copy()
+        return dest
 
     def orbital_keys(self):
         keys = list(self.orbital.keys())
