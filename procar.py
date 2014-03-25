@@ -456,6 +456,95 @@ Use sorted(self) for not In-place sorting.'''
                         for orbital in aState.orbital_keys ].insert(0, array[0].eigenvalue))
         return list(tools.flatten(i) for i in zip(distance, dest))
 
+    def __str__(self):
+        '''x.__str__() <==> str(x)
+
+  # @return[String] Returns cvs formatted text'''
+        array = self.tolist()
+        header = self.header()
+        nColumn = len(header)
+        text = '\t'.join(header) + '\n'
+        for i, e in enumerate(array):
+            if i % len(self.distance) == 0 and i > 0:
+                text += '\t' * (nColumn - 1) + '\n'
+                text += '\t'.join(e) + '\n'
+            else:
+                text += '\t'.join(e) + '\n'
+        return text
+
+    def save(self, filename):
+        '''Store bandstructure with orbital
+  #   contribution to the file.
+  # @param [String] filename
+'''
+        with open(filename, mode='w') as file:
+            dum = file.write(str(self))
+
+    def rename_site(*new_names):
+        '''
+  # @param [Array] new_names
+'''
+        sites = self.sites
+        if len(sites) != len(new_names): raise RuntimeError("Number of sites and new names are must be the same.")
+        rule = dict(pair for pair in zip(sites, new_names))
+        for aState in self:
+            aState['ion'] = rule[aState['ion']]
+
+    def group_by_spintype(self):
+        '''  # Returns Array consists of spin selected band.  
+  # @return[Array<Band>] 
+'''
+        tmp = dict()
+        for aState in self:
+            tmp[aState.spininfo] = tmp.get(aState.spininfo, []).append(aState)
+        dest = dict()
+        for key, value in tmp.items():
+            band = Band()
+            band.__band = value
+            dest[key] = band
+        if '_mT' in dest:
+            destArray = [dest['_mT'], dest['_mX'], dest['_mY'], dest['_mZ']]
+        elif '_up' in dest:
+            destArray = [dest['_up'], dest['_down']]
+        else:
+            destArray = list(dest.values())
+        return destArray
+
+    def number_of_bands(self):
+        '''  # @return [Fixnum] Returns the number of bands in *band*'''
+        return len(set(aState.bandindex for aState in self))
+
+    def number_of_sites(self):
+        '''  # @return [Fixnum] Returns the number of sites in *band*'''
+        return len(set(aState['ion'] for aState in self))
+
+    def number_of_spintype(self):
+        '''  # @return [Fixnum] Returns the number of spintype in *band*'''
+        return len(set(aState.spininfo for aState in self))
+
+    def sites(self):
+        '''  # @return [Array] Return *array* that consists of site names'''
+        return set(aState['ion'] for aState in self)
+
+    def select_by_band(self, *bandindices):
+        '''
+  # @param [Fixnum, Range, Array] bandindexes bandindexes
+  #   are specified by comma-separated number, array,
+  #   or Range object. 
+  # @example Band#select_by_band(1,2,3,4) : same as 
+  #   Band#select_by_band(1..4)/Band#select_by_band([1,2,3,4]) 
+  # @return [Band] Returns a new band object that consists 
+  #    of States specified by bandindex.
+'''
+        bandindices = sorted(set(tools.flatten(bandindices)))
+        dest = Band()
+        dest.__band = [s for s in self if s.bandindex in bandindices]
+        return dest
+
+    def dump(self, filename):
+        pass
+        
+
 class State:
 
     def extract_orbitals(self, *orbital_symbols):
