@@ -155,7 +155,7 @@ class CHGCAR(poscar.POSCAR):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         destCHGCAR = copy.deepcopy(self)
-        s1, s2 = tools.each_slice(self.meshX * self.meshY * self.meshZ)
+        s1, s2 = tools.each_slice(self.chgArray, self.meshX * self.meshY * self.meshZ)
         destCHGCAR.__chgArray = [(up + down) / 2 for up, down in zip(s1, s2)]
         destCHGCAR.__spininfo = ["up"]
         return destCHGCAR
@@ -171,7 +171,7 @@ class CHGCAR(poscar.POSCAR):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         destCHGCAR = copy.deepcopy(self)
-        s1, s2 = tools.each_slice(self.meshX * self.meshY * self.meshZ)
+        s1, s2 = tools.each_slice(self.chgArray, self.meshX * self.meshY * self.meshZ)
         destCHGCAR.__chgArray = [(up - down) / 2 for up, down in zip(s1, s2)]
         destCHGCAR.__spininfo = ["down"]
         return destCHGCAR
@@ -190,7 +190,7 @@ class CHGCAR(poscar.POSCAR):
             return NotImplemented
         addCHGCAR = poscar.POSCAR.__add__(self, other)
         if any([self.meshX != other.meshX, self.meshY != other.meshY, self.meshZ != other.meshZ]):
-            raise RuntimeError('Mesh sizes are incinsistent')
+            raise RuntimeError('Mesh sizes are inconsistent')
         augend = self.chgArray
         addend = other.chgArray
         if len(augend) == len(addend):
