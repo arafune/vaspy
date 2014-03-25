@@ -6,7 +6,10 @@
 from __future__ import division, print_function
 import numpy as np
 import itertools as it
-import copy, re
+import copy, re, os, sys
+mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
+sys.path.append(os.path.dirname(os.path.abspath(mypath)))
+import tools
 
 # @example
 #  l=    " 0.7071067800000000    0.0000000000000000    0.0000000000000000"
@@ -353,9 +356,9 @@ class for POSCAR (CONTCAR) format
         if self.is_selective:
             tmp.append('Selective Dynamics')
         tmp.append(self.coordinate_type)
-        for pos, tf, atom in it.zip_longest(self.position,
-                                            self.coordinate_changeflags,
-                                            self.atom_identifer, fillvalue=''):
+        for pos, tf, atom in tools.ziplong(self.position,
+                                           self.coordinate_changeflags,
+                                           self.atom_identifer, fillvalue=''):
             tmp.append(' '.join('  {0:20.17f}'.format(i) for i in pos) +
                        ' ' + tf + ' ' + atom)
         return '\n'.join(tmp) + '\n'
