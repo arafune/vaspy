@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 ''''''
 
-import collections
+from __future__ import print_function, division
+import collections, re
 import itertools as it
 
 ziplong = it.izip_longest if hasattr(it, 'izip_longest') else it.zip_longest
@@ -38,3 +39,21 @@ str and bytes are regarded as non-iterable'''
                 nested[i:i+1] = nested[i]
         i += 1
     return nested
+
+_rerange = re.compile(r'(\d+)-(\d+)')
+_resingle = re.compile(r'\d+')
+
+def parse_Atomselection(L):
+    array = L.split(',')
+    output = set()
+    for each in array:
+        if re.search(_rerange, each):
+            start, stop = re.findall(_rerange, each)[0]
+            output |= {str(i) for i in range(int(start), int(stop)+1)}
+        elif re.search(_resingle, each):
+            output.add(each)
+    return sorted(output)
+
+def parse_AtomselectionNum(L):
+    return sorted(int(i) for i in parse_Atomselection(L))
+
