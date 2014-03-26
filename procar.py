@@ -922,14 +922,12 @@ Band-calculation may NOT be reliable.''')
                         help='''Fermi level correction
 Energy shifts by this value
 if --outcar is set, this option is ignored''')
-    parser.add_argument('--site', metavar='atom_indices', action='append',
-                        dest='atomname',
+    parser.add_argument('--site', metavar='atom_indices', dest='atomname',
                         type=tools.parse_AtomselectionNum,
                         help='''atom index specifed with range.
 Use "-" or ","
  (ex.) --site 1,2,7-9''')
-    parser.add_argument('--as', metavar='name', action='append',
-                        dest='atomsetname',
+    parser.add_argument('--as', metavar='name', nargs='+', dest='atomsetname',
                         help='''the name of the sites identified
          by --site option
          the name is used in the title of the column''')
@@ -946,7 +944,7 @@ Use "-" or ","
     args = parser.parse_args()
 
     # ---
-    if not (len(args.atomset) == len(args.orbital) == len(args.atomsetname)):
+    if not (len(args.atomname) == len(args.orbital) == len(args.atomsetname)):
         raise parser.error("--atom, --as and --orbital are mismatched.")
 
     if args.outcar is not None:
