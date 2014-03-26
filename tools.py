@@ -44,6 +44,14 @@ _rerange = re.compile(r'(\d+)-(\d+)')
 _resingle = re.compile(r'\d+')
 
 def parse_Atomselection(L):
+    '''
+  # @param [String] l String to represent the range
+  #   of the numbers deliminated by "-" or ",". 
+  #   (ex.) "1-5,8,9,11-15" 
+  #   @example l="1-5,8,8,9-15,10" #=> >["1", "10", "11", "12", "13", "14", "15", "2", "3", "4", "5", "8", "9"]}
+  # @return [Array<String>] Returns the array that consists 
+  #   of the ordered "String" represents the number.
+'''
     array = L.split(',')
     output = set()
     for each in array:
