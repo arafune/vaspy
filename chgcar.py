@@ -235,8 +235,7 @@ class CHGCAR(poscar.POSCAR):
             output = []
             outputstring += '\n  {0}  {1}  {2}\n'.format(self.meshX, self.meshY, self.meshZ)
             for array in tools.each_slice(tmp, 5):
-                array = tools.removeall(array, None)
-                output.append(''.join('  {0:E}'.format(i) for i in array))
+                output.append(''.join('  {0:E}'.format(i) for i in array if i is not None))
             outputstring += '\n'.join(output)
         return super().__str__(self) + outputstring + '\n'
 

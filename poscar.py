@@ -497,12 +497,9 @@ if __name__ == '__main__':
     # $-w = true
     import argparse, os, sys
     import functools as ft
-    mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
-    sys.path.append(os.path.dirname(os.path.abspath(mypath)))
-    import argParsePostVASP as appv
-    arg = appv.APPV(formatter_class=argparse.RawTextHelpFormatter)
+    arg = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     arg.add_argument('--atom', metavar='atoms', action='append',
-                     type=arg.parse_AtomselectionNum,
+                     type=tools.parse_AtomselectionNum,
                      help='''atoms specified with range using "-"
 or comma-delimnated numbers.
  (ex.) --atom 1,2,7-9''')
@@ -556,7 +553,7 @@ if not specified, use standard output''')
     #
     if not arguments.atom:
         nAtoms = sum(arguments.poscar.ionnums)
-        arguments.atom = [arg.parse_AtomselectionNum('1-{0}'.format(nAtoms))]
+        arguments.atom = [tools.parse_AtomselectionNum('1-{0}'.format(nAtoms))]
     #
     #  Translation
     #
