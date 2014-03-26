@@ -819,7 +819,7 @@ class State(Orbital):
         else: return cmp == 0
 
     def __ne__(self, other):
-        'x.__ne__(y) <==> x!=y
+        'x.__ne__(y) <==> x!=y'
         return self.__cmp__(other) != 0
 
     def __lt__(self, other):
