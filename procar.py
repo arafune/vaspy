@@ -932,7 +932,7 @@ Use "-" or ","
          by --site option
          the name is used in the title of the column''')
     parser.add_argument('--orbital', metavar='orbitals',
-                        type=ft.partial(re.split, r'[,;]'),
+                        type=ft.partial(re.split, r'[,:]'),
                         help='''orbital name
          deliminated by ":" or ",".
          orbital names are:
