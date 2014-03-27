@@ -96,13 +96,15 @@ class PROCAR:
             for line in f:
                 if re.findall(r'^[\s]*$', line): continue
                 elif re.findall(r'^#', line):
-                    self.__numk, self.__nBands, self.__nAtoms = [int(i) for i in line.split() if i.isdigit()]
+                    self.__numk, self.__nBands, self.__nAtoms = [
+                        int(i) for i in line.split() if i.isdigit()]
                 elif re.findall(r'\bk-points\b', line):
-                    self.__kvectors.append(np.asarray([list(float(i) for i in line.split()[3:6])])) # check data
-                    section.pop()
+                    self.__kvectors.append(np.asarray(
+                        [list(float(i) for i in line.split()[3:6])]))
+                    section = []
                 elif re.findall(r'^band\b', line):
                     self.__energies.append(float(line.split()[4]))
-                    section.pop()
+                    section = []
                 elif re.findall(r'^ion\b', line):
                     separator_to_orbital = separator_to_orbital or line.rstrip('\n')
                     separator_to_phase = separator_to_phase or separator_to_orbital[0:-7]
@@ -136,7 +138,7 @@ class PROCAR:
         tmpOrb = Orbital()
         tmpOrb.redefine_orbital_list(self.orbitalname)
 
-    def load_from_array(procar, phase_read=False):
+    def load_from_array(self, procar, phase_read=False):
         '''This method effectively acts as a parser of PROCAR.
     @param [Array] procar Array of PROCAR file (IO.readlines(procar file))
     @param [Boolian] phase_read Switch for loading phase characters
@@ -144,7 +146,8 @@ class PROCAR:
 '''
         section = list()
         #
-        self.__numk, self.__nBands, self.__nAtoms = [int(i) for i in procar[1].split() if i.isdigit()]
+        self.__numk, self.__nBands, self.__nAtoms = [
+            int(i) for i in procar[1].split() if i.isdigit()]
         separator_to_orbital = procar[7].rstrip('\n')
         self.__orbitalname = separator_to_orbital.split()
         separator_to_phase = separator_to_orbital[0:-7]
@@ -152,11 +155,12 @@ class PROCAR:
             if re.findall(r'^[\s]*$', line): continue
             elif re.findall(r'^#', line): continue
             elif re.findall(r'\bk-points\b', line):
-                self.__kvectors.append([float(i) for i in line.split()[3:6]]) # check data
-                section.pop()
+                self.__kvectors.append(np.asarray(
+                        [list(float(i) for i in line.split()[3:6])]))
+                section = []
             elif re.findall(r'^band\b', line):
                 self.__energies.append(float(line.split()[4]))
-                section.pop()
+                section = []
             elif re.findall(separator_to_orbital, line):
                 section = ['orbital']
             elif re.findall(separator_to_phase, line):
@@ -222,14 +226,14 @@ class PROCAR:
                                                 # spin-case, remove the
                                                 # identical latter kvectors.
         for i, orbital in enumerate(self.orbital):
-            if len(spininfo) == 1: # spin integrated
+            if len(self.spininfo) == 1: # spin integrated
                 kindex, x = divmod(i, self.nBands * self.nAtoms)
                 bindex = x // self.nAtoms
                 eigenvalue = self.energies[i // self.nAtoms]
                 spininfo = self.spininfo[0]
-                aState = State(kindex, bindex, eigenvalue, spininfo, orital)
+                aState = State(kindex, bindex, eigenvalue, spininfo, orbital)
                 band.append(aState)
-            elif len(spininfo) == 2: # spin resolved
+            elif len(self.spininfo) == 2: # spin resolved
                 kindex, x = divmod(i, self.nBands * self.nAtoms)
                 if i >= self.numk * self.nBands * self.nAtoms: kindex -= self.numk
                 bindex = x // self.nAtoms
@@ -240,7 +244,7 @@ class PROCAR:
                     spininfo = self.spininfo[0]
                 aState = State(kindex, bindex, eigenvalue, spininfo, orbital)
                 band.append(aState)
-            elif len(spininfo) == 4: # SOI
+            elif len(self.spininfo) == 4: # SOI
                 kindex, x = divmod(i, self.nBands * self.nAtoms * 4) ## 4 is mT, mX, mY, mZ
                 bindex = x // (self.nAtoms * 4)                      ## 4 is mT, mX, mY, mZ
                 eigenvalue = self.energies[i // (self.nAtoms * 4)]   ## 4 is mT, mX, mY, mZ
@@ -267,7 +271,7 @@ class Band:
         self.__band = list()
         if arg is not None:
             self.__kvectors = arg
-            self.__distance.extend([None] * len((self.kvectors) - len(self.distance)))
+            self.__distance.extend([None] * (len(self.kvectors) - len(self.distance)))
             for i, k in enumerate(self.kvectors):
                 if i == 0:
                     self.__distance[i] = 0.0
@@ -368,7 +372,7 @@ return iterator object'''
         return len(self.band)
 
     def select_by_site(self, *sites):
-        sites = flatten(sites)
+        sites = tools.flatten(sites)
         sites = sorted(set(sites))
         dest = Band()
         #dest.band = self.find_all{|s| sites.include?(s[:ion])}
@@ -482,11 +486,11 @@ Use sorted(self) for not In-place sorting.'''
         with open(filename, mode='w') as file:
             dum = file.write(str(self))
 
-    def rename_site(*new_names):
+    def rename_site(self, *new_names):
         '''
   # @param [Array] new_names
 '''
-        sites = self.sites
+        sites = self.sites()
         if len(sites) != len(new_names): raise RuntimeError("Number of sites and new names are must be the same.")
         rule = dict(zip(sites, new_names))
         for aState in self:
@@ -569,7 +573,7 @@ class Orbital:
         keys.remove('ion')
         return sorted(keys)
 
-    def load_from_line(arg):
+    def load_from_line(self, arg):
         '''
   # Read values of orbital contribution from the line.
   #  (Essentially, this method acts as a parser.)
@@ -596,9 +600,9 @@ class Orbital:
   # @return [String] atom #.
   '''
         if isinstance(arg, str):
-            self.orbital = dict(zip(self.orbital_list, (float(i) for i in arg.split())))
-        elif isinstance(arg, list, tuple):
-            self.orbital = dict(zip(self.orbital_list, arg))
+            self.orbital = dict(zip(self.defined_orbital_list(), (float(i) for i in arg.split())))
+        elif isinstance(arg, (list, tuple)):
+            self.orbital = dict(zip(self.defined_orbital_list(), arg))
         elif isinstance(arg, dict):
             if 'ion' in arg:
                 self.orbital = arg
@@ -622,7 +626,7 @@ class Orbital:
     def items(self):
         return self.orbital.items()
 
-    def defined_orbital_list():
+    def defined_orbital_list(self):
         return self.__orbital_list[:]
 
     def __getitem__(self, orbital_symbol):
@@ -743,7 +747,7 @@ class Orbital:
                     dest[orbital_symbol] = value + other[orbital_symbol]
         return dest
 
-    def redefine_orbital_list(arg):
+    def redefine_orbital_list(self, arg):
         '''Redefine orbital list by arg
   #   The machine default is set as above.
   # @param [Array] arg Symbol list consisting orbital name.
