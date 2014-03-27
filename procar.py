@@ -4,7 +4,6 @@
 
 from __future__ import division, print_function
 import re, copy, os, sys
-import itertools as it
 import functools as ft
 import numpy as np
 mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
@@ -214,7 +213,7 @@ class PROCAR:
                                self.numk * self.nBands,
                                len(self.orbital),
                                self.numk * self.nBansd * self.nAtoms,
-                               len(phase))
+                               len(self.phase))
 
     def __iter__(self):
         return iter(self.__orbital)
@@ -452,14 +451,15 @@ Use sorted(self) for not In-place sorting.'''
         nBands = self.number_of_bands()
         nSites = self.number_of_sites()
         nSpintype = self.number_of_spintype()
-        orbital_symbols = self[0].defined_orbital_list()
+        #orbital_symbols = self[0].defined_orbital_list()
         dest = list()
         distance = self.distance * nBands
         self.sort()
 
         for array in tools.each_slice(self, nSites * nSpintype):
             dest.append([getattr(aState, orbital) for aState in array
-                        for orbital in aState.orbital_keys].insert(0, array[0].eigenvalue))
+                        for orbital in aState.orbital_keys].insert(
+                        0, array[0].eigenvalue))
         return list(tools.flatten(i) for i in zip(distance, dest))
 
     def __str__(self):
@@ -491,7 +491,9 @@ Use sorted(self) for not In-place sorting.'''
   # @param [Array] new_names
 '''
         sites = self.sites()
-        if len(sites) != len(new_names): raise RuntimeError("Number of sites and new names are must be the same.")
+        if len(sites) != len(new_names): 
+            raise RuntimeError(
+            "Number of sites and new names are must be the same.")
         rule = dict(zip(sites, new_names))
         for aState in self:
             aState['ion'] = rule[aState['ion']]
@@ -600,18 +602,21 @@ class Orbital:
   # @return [String] atom #.
   '''
         if isinstance(arg, str):
-            self.orbital = dict(zip(self.defined_orbital_list(), (float(i) for i in arg.split())))
+            self.orbital = dict(zip(self.defined_orbital_list(),
+                                    (float(i) for i in arg.split())))
         elif isinstance(arg, (list, tuple)):
             self.orbital = dict(zip(self.defined_orbital_list(), arg))
         elif isinstance(arg, dict):
             if 'ion' in arg:
                 self.orbital = arg
             else:
-                raise ValueError("dict() of {0} cannot be Orbital object.".format(arg))
+                raise ValueError(
+                "dict() of {0} cannot be Orbital object.".format(arg))
         elif isinstance(arg, Orbital):
             self.orbital = arg.todict()
         else:
-            raise ValueError("Cannot create Orbital object from {0}() object.".format(type(arg)))
+            raise ValueError(
+            "Cannot create Orbital object from {0}() object.".format(type(arg)))
         self.orbital['ion'] = int(self.orbital['ion'])
 
     def __iter__(self):
@@ -647,7 +652,8 @@ class Orbital:
         '''x.__setitem__(i, y) <==> x[i]=y
 
   # Associate the *value* of contribution with the specified *orbital*.
-  # @param [Symbol] orbitalsymbol Orbital name by symbol format (ex.):s, :sp.
+  # @param [Symbol] orbitalsymbol Orbital name by symbol format
+  #  (ex.):s, :sp.
   # @param [Float] value of contribution for the specified orbital.
 '''
         self.__orbital[orbital_symbol] = value
@@ -657,7 +663,8 @@ class Orbital:
         return self.orbital.get(symbol, default)
 
     def setdefault(self, symbol, default=None):
-        '''Orb.setdefault(s[, D]) -> Orb.get(s, D), also set Orb[k]=D if k not in Orb'''
+        '''X.setdefault(s[, D]) -> X.get(s, D), also set X[k]=D if k not in X
+'''
         return self.orbital.setdefault(symbol, default)
 
     def site(self): return self.orbital['ion']
@@ -721,7 +728,8 @@ class Orbital:
 
     @property
     def d(self):
-        return self.setdefault('d', self.dxy + self.dyz + self.dz2 + self.dxz + self.dx2)
+        return self.setdefault('d', self.dxy + self.dyz + 
+                                    self.dz2 + self.dxz + self.dx2)
 
     @property
     def tot(self): return self.orbital['tot']
@@ -742,7 +750,8 @@ class Orbital:
         else:
             for orbital_symbol, value in self.__orbital.items():
                 if orbital_symbol == 'ion':
-                    dest[orbital_symbol] = str(value) + ',' + str(other['ion'])
+                    dest[orbital_symbol] = (str(value) + ',' +
+                                            str(other['ion']))
                 else:
                     dest[orbital_symbol] = value + other[orbital_symbol]
         return dest
@@ -754,9 +763,12 @@ class Orbital:
   #   First element must be :ion
   #   Final element must be :tot
 '''
-        if not isinstance(arg, (list, tuple)): raise RuntimeError("redefine_orbital_list fail")
-        if arg[0] != 'ion': raise ValueError("First element of argument mst be 'ion'.")
-        if arg[-1] != 'tot': raise ValueError("Last element of argument mst be 'tot'.")
+        if not isinstance(arg, (list, tuple)):
+            raise RuntimeError("redefine_orbital_list fail")
+        if arg[0] != 'ion': 
+            raise ValueError("First element of argument mst be 'ion'.")
+        if arg[-1] != 'tot':
+            raise ValueError("Last element of argument mst be 'tot'.")
         self.__orbital_list = arg
 
 class State(Orbital):
@@ -916,7 +928,8 @@ if __name__ == '__main__':
     import argparse
     from outcar import OUTCAR
     
-    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(
+    formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--outcar', metavar='outcar_file',
                         help='''Use "OUTCAR" for the Fermi level correction.
 outcar_file must be specified.
