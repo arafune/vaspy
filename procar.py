@@ -375,7 +375,7 @@ return iterator object'''
         return len(self.band)
 
     def select_by_site(self, *sites):
-        sites = tools.flatten(list(sites))
+        sites = tools.flatten(sites)
         sites = sorted(set(sites))
         dest = Band()
         dest.__band = [aState for aState in self if aState['ion'] in sites]
@@ -464,7 +464,7 @@ Use sorted(self) for not In-place sorting.'''
             dest.append([getattr(aState, orbital) for aState in array
                         for orbital in aState.orbital_keys()])
             dest[-1].insert(0, array[0].eigenvalue)
-        return list(tools.flatten(list(i)) for i in zip(distance, dest))
+        return list(tools.flatten(i) for i in zip(distance, dest))
 
     def __str__(self):
         '''x.__str__() <==> str(x)
@@ -548,7 +548,7 @@ Use sorted(self) for not In-place sorting.'''
   # @return [Band] Returns a new band object that consists 
   #    of States specified by bandindex.
 '''
-        bandindices = sorted(set(tools.flatten(list(bandindices))))
+        bandindices = sorted(set(tools.flatten(bandindices)))
         dest = Band()
         dest.__band = [s for s in self if s.bandindex in bandindices]
         return dest
@@ -893,7 +893,7 @@ class State(Orbital):
   # @param [Array] orbital_symbols
   # @return [self] 
 '''
-        orbital_symbols = tools.flatten(list(orbital_symbols))
+        orbital_symbols = tools.flatten(orbital_symbols)
         orbital_symbols.append('ion')
         self.orbital = dict((key, value) for key, value
                             in self.items() if key in orbital_symbols)
