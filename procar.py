@@ -97,7 +97,7 @@ class PROCAR:
                 elif re.findall(r'^#', line):
                     self.__numk, self.__nBands, self.__nAtoms = [
                         int(i) for i in line.split() if i.isdigit()]
-                elif re.findall(r'\bk-points\b', line):
+                elif re.findall(r'\bk-point\b', line):
                     self.__kvectors.append(np.asarray(
                         [list(float(i) for i in line.split()[3:6])]))
                     section = []
@@ -200,9 +200,9 @@ class PROCAR:
   # of ions: {0.nAtoms}
   # of kvectors: {1}
   # of energies: {2}
-     ((# of k-points) * (# of bands) = {0.numk}*{0.nBands}={3}
+     ((# of k-points) * (# of bands) = {0.numk}*{0.nBands}={3})
   # of orbital component: {4}
-     ((# of k-points) * (# of bands) * (# of ions) = {0.numk}*{0.nBands}*{0.nAtoms}={5}
+     ((# of k-points) * (# of bands) * (# of ions) = {0.numk}*{0.nBands}*{0.nAtoms}={5})
   # of phase component: {6}
   Orbitals are: {0.orbitalname}
   spininfo: {0.spininfo}
@@ -212,7 +212,7 @@ class PROCAR:
                                len(self.energies),
                                self.numk * self.nBands,
                                len(self.orbital),
-                               self.numk * self.nBansd * self.nAtoms,
+                               self.numk * self.nBands * self.nAtoms,
                                len(self.phase))
 
     def __iter__(self):
@@ -289,6 +289,10 @@ class Band:
         '''@return [Array<Float>] Returns @@distance
 '''
         return self.__distance
+
+    @property
+    def band(self):
+        return self.__band
 
     def __copy__(self):
         'x.__copy__() <==> copy.copy(x)'
@@ -371,10 +375,10 @@ return iterator object'''
         return len(self.band)
 
     def select_by_site(self, *sites):
-        sites = tools.flatten(sites)
+        sites = tools.flatten(list(sites))
         sites = sorted(set(sites))
         dest = Band()
-        #dest.band = self.find_all{|s| sites.include?(s[:ion])}
+        dest.__band = [aState for aState in self if aState['ion'] in sites]
         return dest
 
     def __add__(self, other):
@@ -389,7 +393,7 @@ return iterator object'''
     def sort(self, key=None, reverse=False):
         '''In-place sorting of self.__band.
 Use sorted(self) for not In-place sorting.'''
-        self.__band.sort(key, reverse)
+        self.__band.sort(key=key, reverse=reverse)
 
     def site_integrate(self, *sites):
         '''  # @param [Fixnum, Range, Array] sites sites are
@@ -436,7 +440,7 @@ Use sorted(self) for not In-place sorting.'''
         nSites = self.number_of_sites()
         nSpintype = self.number_of_spintype()
         tmp = sorted(self)[0:(nSites * nSpintype)]
-        tmp = [str(aState.site) + str(orbital) + aState.spininfo
+        tmp = [str(aState.site()) + str(orbital) + aState.spininfo
                for aState in tmp
                for orbital in aState.orbital_keys()]
         tmp[0:0] = ['k', 'energy']
@@ -455,12 +459,12 @@ Use sorted(self) for not In-place sorting.'''
         dest = list()
         distance = self.distance * nBands
         self.sort()
-
+        
         for array in tools.each_slice(self, nSites * nSpintype):
             dest.append([getattr(aState, orbital) for aState in array
-                        for orbital in aState.orbital_keys].insert(
-                        0, array[0].eigenvalue))
-        return list(tools.flatten(i) for i in zip(distance, dest))
+                        for orbital in aState.orbital_keys()])
+            dest[-1].insert(0, array[0].eigenvalue)
+        return list(tools.flatten(list(i)) for i in zip(distance, dest))
 
     def __str__(self):
         '''x.__str__() <==> str(x)
@@ -470,12 +474,12 @@ Use sorted(self) for not In-place sorting.'''
         header = self.header()
         nColumn = len(header)
         text = '\t'.join(header) + '\n'
-        for i, e in enumerate(array):
+        for i, each in enumerate(array):
             if i % len(self.distance) == 0 and i > 0:
                 text += '\t' * (nColumn - 1) + '\n'
-                text += '\t'.join(e) + '\n'
+                text += '\t'.join(str(x) for x in each) + '\n'
             else:
-                text += '\t'.join(e) + '\n'
+                text += '\t'.join(str(x) for x in each) + '\n'
         return text
 
     def save(self, filename):
@@ -532,7 +536,7 @@ Use sorted(self) for not In-place sorting.'''
 
     def sites(self):
         '''  # @return [Array] Return *array* that consists of site names'''
-        return set(aState['ion'] for aState in self)
+        return sorted(set(aState['ion'] for aState in self))
 
     def select_by_band(self, *bandindices):
         '''
@@ -544,7 +548,7 @@ Use sorted(self) for not In-place sorting.'''
   # @return [Band] Returns a new band object that consists 
   #    of States specified by bandindex.
 '''
-        bandindices = sorted(set(tools.flatten(bandindices)))
+        bandindices = sorted(set(tools.flatten(list(bandindices))))
         dest = Band()
         dest.__band = [s for s in self if s.bandindex in bandindices]
         return dest
@@ -656,7 +660,7 @@ class Orbital:
   #  (ex.):s, :sp.
   # @param [Float] value of contribution for the specified orbital.
 '''
-        self.__orbital[orbital_symbol] = value
+        self.orbital[orbital_symbol] = value
 
     def get(self, symbol, default=None):
         '''Orbital.get(s[, D]) -> Orbital[s] if exist, else D'''
@@ -669,7 +673,7 @@ class Orbital:
 
     def site(self): return self.orbital['ion']
 
-    def orbital(self): return self
+    #def orbital(self): return self
 
     def todict(self): return self.orbital
 
@@ -748,7 +752,7 @@ class Orbital:
         if self.is_empty():
             dest = copy.copy(other)
         else:
-            for orbital_symbol, value in self.__orbital.items():
+            for orbital_symbol, value in self.orbital.items():
                 if orbital_symbol == 'ion':
                     dest[orbital_symbol] = (str(value) + ',' +
                                             str(other['ion']))
@@ -863,7 +867,7 @@ class State(Orbital):
         return cmp != -1
 
     def fermilevel_correction(self, ef):
-        self.__eigenvalue = ef
+        self.__eigenvalue -= ef
 
     def __add__(self, other):
         '''x.__add__(y) <==> x+y
@@ -889,7 +893,7 @@ class State(Orbital):
   # @param [Array] orbital_symbols
   # @return [self] 
 '''
-        orbital_symbols = tools.flatten(orbital_symbols)
+        orbital_symbols = tools.flatten(list(orbital_symbols))
         orbital_symbols.append('ion')
         self.orbital = dict((key, value) for key, value
                             in self.items() if key in orbital_symbols)
@@ -940,15 +944,17 @@ Band-calculation may NOT be reliable.''')
 Energy shifts by this value
 if --outcar is set, this option is ignored''')
     parser.add_argument('--site', metavar='atom_indices', dest='atomname',
+                        action='append',
                         type=tools.parse_AtomselectionNum,
                         help='''atom index specifed with range.
 Use "-" or ","
  (ex.) --site 1,2,7-9''')
     parser.add_argument('--as', metavar='name', nargs='+', dest='atomsetname',
+                        action='append',
                         help='''the name of the sites identified
          by --site option
          the name is used in the title of the column''')
-    parser.add_argument('--orbital', metavar='orbitals',
+    parser.add_argument('--orbital', metavar='orbitals', action='append',
                         type=ft.partial(re.split, r'[,:]'),
                         help='''orbital name
          deliminated by ":" or ",".
@@ -963,6 +969,7 @@ Use "-" or ","
     # ---
     if not (len(args.atomname) == len(args.orbital) == len(args.atomsetname)):
         raise parser.error("--atom, --as and --orbital are mismatched.")
+    # ---
 
     if args.outcar is not None:
         outcar = OUTCAR(args.outcar)
@@ -974,16 +981,16 @@ Use "-" or ","
 
     procar = PROCAR(args.procar)
     band = procar.to_band()
-
+    
     if fermi != 0.0:
         band.fermilevel_correction(fermi)
-
+    
     output_band = Band()
     for site, name, orbital in zip(args.atomname,
                                    args.atomsetname,
                                    args.orbital):
         tmpBand = band.site_integrate(site)
-        tmpBand.rename_site(name)
+        tmpBand.rename_site(*name)
         tmpBand.extract_orbitals_in_place(orbital)
         output_band += tmpBand
     output_band.sort()
