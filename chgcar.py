@@ -42,7 +42,7 @@ class CHGCAR(poscar.POSCAR):
         if arg:
             self.load_from_file(arg)
 
-    def load_from_file(chgcarfile):
+    def load_from_file(self, chgcarfile):
         '''
     @param [String] chgcarfile CHGCAR file name
     @return [CHGCAR]
@@ -128,7 +128,7 @@ class CHGCAR(poscar.POSCAR):
         destCHGCAR = copy.deepcopy(self)
         s1, s2, s3, s4 = tools.each_slice(self.chgArray, self.meshX * self.meshY * self.meshZ)
         if len(self.spininfo) == 2:
-            desfCHGCAR.__chgArray = list(s2)
+            destCHGCAR.__chgArray = list(s2)
             destCHGCAR.__spininfo = ["up-down"]
         elif len(self.spininfo) == 4:
             if direction is None: direction = 'x'
@@ -303,9 +303,9 @@ if not specified, use standard output""")
         if arguments.CHGCAR_file_2 is None:
             raise RuntimeError('Two CHGCAR files are required.')
         if arguments.add:
-            c = arguments.CHGCAR_file_1 + argumetns.CHGCAR_file_2
+            c = arguments.CHGCAR_file_1 + arguments.CHGCAR_file_2
         else:
-            c = arguments.CHGCAR_file_1 - argumetns.CHGCAR_file_2
+            c = arguments.CHGCAR_file_1 - arguments.CHGCAR_file_2
     # 
     if arguments.output is not None:
         c.save(arguments.output)

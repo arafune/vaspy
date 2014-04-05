@@ -272,12 +272,12 @@ class for POSCAR (CONTCAR) format
             raise ValueError('the center must be in the Braves lattice')
         if not isinstance(site, int):
             raise ValueError('argument error in atom_rotate method')
-        if not is_cartesian: self.to_Cartesian()
+        if not self.is_cartesian: self.to_Cartesian()
         position = self.pos(site)
         position -= center / self.scaling_factor
         position = (getattr(self, 'rotate' + axis_name.capitalize())(theta) * position.T).T
         position += center / self.scaling_factor
-        self.pos_replace(site, positon)
+        self.pos_replace(site, position)
 
     def atoms_rotate(self, site_list_pack, axis_name, theta, center):
         '''
@@ -441,7 +441,7 @@ class for POSCAR (CONTCAR) format
   # poscar updates
   # @param [Array<Fixnum>] site_list list of site #
 '''
-        molecule = guess_molecule(site_list)
+        molecule = self.guess_molecule(site_list)
         for site, posVector in zip(site_list, molecule):
             self.pos_replace(site, posVector)
 
@@ -467,7 +467,7 @@ class for POSCAR (CONTCAR) format
   # @return [Array]
 '''
         atomrange = list(range(1, sum(self.ionnums) + 1))
-        translate(vector, atomrange)
+        self.translate(vector, atomrange)
 
     def save(self, filename):
         with open(filename, 'w') as f:
