@@ -495,7 +495,7 @@ _vector_acceptables = (np.ndarray, np.matrix, list, tuple)
 
 if __name__ == '__main__':
     # $-w = true
-    import argparse, os, sys
+    import argparse
     import functools as ft
     arg = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     arg.add_argument('--atom', metavar='atoms', action='append',
