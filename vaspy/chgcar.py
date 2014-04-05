@@ -1,10 +1,10 @@
-#!/usr/bin/env/ python
+#!/usr/bin/env python 
 # -*- coding: utf-8 -*-
 # translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 
 from __future__ import division, print_function
 import re, copy, os, sys
-import itertools as it
+
 mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
 sys.path.append(os.path.dirname(os.path.abspath(mypath)))
 import poscar, tools
@@ -33,7 +33,7 @@ class CHGCAR(poscar.POSCAR):
 '''
     # accessor: chgArray, meshX-Y-Z
     def __init__(self, arg=None):
-        poscar.POSCAR.__init__(self, None)
+        super(CHGCAR, self).__init__(None)
         self.__meshX = 0
         self.__meshY = 0
         self.__meshZ = 0
@@ -42,7 +42,7 @@ class CHGCAR(poscar.POSCAR):
         if arg:
             self.load_from_file(arg)
 
-    def load_from_file(chgcarfile):
+    def load_from_file(self, chgcarfile):
         '''
     @param [String] chgcarfile CHGCAR file name
     @return [CHGCAR]
@@ -128,7 +128,7 @@ class CHGCAR(poscar.POSCAR):
         destCHGCAR = copy.deepcopy(self)
         s1, s2, s3, s4 = tools.each_slice(self.chgArray, self.meshX * self.meshY * self.meshZ)
         if len(self.spininfo) == 2:
-            desfCHGCAR.__chgArray = list(s2)
+            destCHGCAR.__chgArray = list(s2)
             destCHGCAR.__spininfo = ["up-down"]
         elif len(self.spininfo) == 4:
             if direction is None: direction = 'x'
@@ -303,9 +303,9 @@ if not specified, use standard output""")
         if arguments.CHGCAR_file_2 is None:
             raise RuntimeError('Two CHGCAR files are required.')
         if arguments.add:
-            c = arguments.CHGCAR_file_1 + argumetns.CHGCAR_file_2
+            c = arguments.CHGCAR_file_1 + arguments.CHGCAR_file_2
         else:
-            c = arguments.CHGCAR_file_1 - argumetns.CHGCAR_file_2
+            c = arguments.CHGCAR_file_1 - arguments.CHGCAR_file_2
     # 
     if arguments.output is not None:
         c.save(arguments.output)
