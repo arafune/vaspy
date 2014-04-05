@@ -58,7 +58,7 @@ Direct
   0.00000      0.00000     16.25818
 '''
 
-class POSCAR:
+class POSCAR(object):
     '''
 class for POSCAR (CONTCAR) format
     This script does *NOT* support for constructing POSCAR from scratch.

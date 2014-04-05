@@ -33,7 +33,7 @@ class CHGCAR(poscar.POSCAR):
 '''
     # accessor: chgArray, meshX-Y-Z
     def __init__(self, arg=None):
-        poscar.POSCAR.__init__(self, None)
+        super(CHGCAR, self).__init__(None)
         self.__meshX = 0
         self.__meshY = 0
         self.__meshZ = 0
