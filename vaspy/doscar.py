@@ -2,8 +2,15 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, division
+import copy as _copy
+import csv as _csv
 import re as _re
+import sys as _sys
 import number.Number as _Number
+if _sys.version_info[0] >= 3:
+    import io.StringIO as _StringIO
+else:
+    import cStringIO.StringIO as _StringIO
 
 
 class DOSCAR(object):
@@ -65,8 +72,15 @@ class DOS(object):
                 self.dos.append((a_float[0], a_float[1:]))
     
     
-    def __copy__(self, orig):
-        self.dos = self.dos.copy()
+    def __deepcopy__(self, memo):
+        "x.__deepcopy__() <-> copy.deepcopy(x)"
+        dest = DOS()
+        dest.dos = _copy.deepcopy(self.dos, memo)
+        return dest
+    
+
+    def deepcopy(self):
+        return _copy.deepcopy(self)
 
     
     def __iter__(self):
@@ -138,14 +152,24 @@ class DOS(object):
         else:
             return self.dos[i][1]
 
+
+    def export_csv(self, file, **kwargs):
+        """Export data to file object (or file-like object) as csv format.
+        kwargs are keyword options of csv.writer().
+        see help(csv.writer) for detail.
+        """
+        csvwriter = _csv.writer(file, **kwargs)
+        csvwriter.writerows([line[0]] + line[1] for line in self.dos)
+
     
     def __str__(self):
         """x.__str__() <=> str(x)
            # @return [String] returns string representation of DOS object.
            # csv-like (tab-deliminated) format.
         """
-        return '\n'.join(str(line[0]) + '\t' + '\t'.join(line[1])
-                            for line in self.dos)
+        with _StringIO() as stream:
+            self.export_csv(stream, delimiter='\t', lineterminator='\n')
+            return stream.getvalue()
 
 
 def _filter_dos_data(data):
@@ -157,6 +181,29 @@ def _filter_dos_data(data):
     if not isinstance(data[1], listlikes):
         raise RuntimeError("non list/tuple instance in data.")
     return data
+
+
+class TDOS(DOS):
+    """# Class for total DOS:
+       # @author Ryuichi Arafune
+    """
+    def __init__(self, array):
+        super(TDOS, self).__init__(array)
+        if len(self.dos[0][1]) == 2:
+            self.header = ("TDOS", "intTDOS")
+        else:
+            self.header = ("TDOS_up", "intTDOS_up",
+                           "TDOS_down", "intTDOS_down")
+
+    
+    def export_csv(self, file, **kwargs):
+        """Export data to file object (or file-like object) as csv format.
+        kwargs are keyword options of csv.writer().
+        see help(csv.writer) for detail.
+        """
+        csvwriter = _csv.writer(file, **kwargs)
+        csvwriter.writerow(["#energy"] + list(self.header))
+        super(TDOS, self).export_csv(file, **kwargs)
 
 
 class PDOS(DOS):
@@ -187,8 +234,66 @@ class PDOS(DOS):
             else:
                 self.orbital_spin = []
     
-    #
+    def __deepcopy__(self, memo):
+        "x.__deepcopy__() <-> copy.deepcopy(x)"
+        dest = super(PDOS, self).deepcopy()
+        dest.site = _copy.deepcopy(self.site, memo)
+        dest.orbital_spin = _copy.deepcopy(self.orbital_spin, memo)
+
         
+    def deepcopy(self):
+        return _copy.deepcopy(self)
+    
+    
+    def __add__(self, other):
+        """x.__add__(y) <-> x+y
+        # @param [PDOS] addend
+        #   addend.energies.length must be equal to self.energies.length.
+        # @return [PDOS] 
+        """
+        if not isinstance(other, PDOS):
+            return NotImplemented
+        if self.dos == [] and self.site == "":
+            return other.deepcopy()
+        else:
+            sumPDOS = PDOS()
+            for s, a in zip(self, other):
+                # sumPDOS.push( [s[0], s[1].zip(a[1]).map{|i| i[0]+i[1]}])
+                sumPDOS.append([s[0],
+                                [sum(each) for each in zip(s[1], a[1])]])
+            sumPDOS.site = self.site + other.site
+            sumPDOS.orbital_spin = self.orbital_spin
+            return sumPDOS
+    
+    
+    def export_csv(self, file, site=None, **kwargs):
+        """Export data to file object (or file-like object) as csv format.
+        kwargs are keyword options of csv.writer().
+        see help(csv.writer) for detail.
+        """
+        csvwriter = _csv.writer(file, **kwargs)
+        tmp = ["#energy"]
+        for i in self.orbital_spin:
+            if site is not None:
+                tmp.append(site+"_"+i)
+            elif self.site == "":
+                tmp.append(i)
+            else:
+                tmp.append(self.site+"_"+i)
+        csvwriter.writerow(tmp)
+        
+        super(PDOS, self).export_csv(file, **kwargs)
+    
+    
+    def __str__(self, site=None):
+        """x.__str__() <-> str(x)
+        # Returns String representation of PDOS object.
+        # @param [String]  site   Site name to overwrite.
+        # @return [String]  String representation of PDOS object.
+        """
+        with _StringIO() as stream:
+            self.export_csv(stream, site, delimiter='\t', lineterminator='\n')
+            return stream.getvalue()
         
 
 """
