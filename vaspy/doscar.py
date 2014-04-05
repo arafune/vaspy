@@ -58,20 +58,15 @@ class DOS(object):
     '''
     # attr_accessor :dos
     def __init__(self, array=None):
-        self.__dos = list()
+        self.dos = list()
         if array is not None:
             for a in array:
                 a_float = [float(i) for i in a]
-                self.__dos.append((a_float[0], a_float[1:]))
+                self.dos.append((a_float[0], a_float[1:]))
     
-
-    @property
-    def dos(self):
-        return self.__dos
-
     
     def __copy__(self, orig):
-        self.__dos = self.dos.copy()
+        self.dos = self.dos.copy()
 
     
     def __iter__(self):
@@ -82,14 +77,14 @@ class DOS(object):
     def append(self, dos_data):
         '''# @param [Array] dos_data
         '''
-        self.__dos.append(_filter_dos_data(dos_data))
+        self.dos.append(_filter_dos_data(dos_data))
     
 
     def pop(self, i=-1):
         '''# @return [Array] return and remove the last element 
            #    (the highest energy data) of the DOS object.
         '''
-        self.__dos.pop(i)
+        self.dos.pop(i)
     
 
     # self.unshift(X) => self.[0:0] = X
@@ -107,17 +102,17 @@ class DOS(object):
             value = _filter_dos_data(value)
         if isinstance(idx, slice):
             value = [_filter_dos_data(each) for each in value]
-        self.__dos.__setitem__(idx, value)
+        self.dos.__setitem__(idx, value)
 
     
     def __getitem__(self, idx):
         """x.__getitem__(i) <=> x[i]"""
-        self.__dos.__getitem__(idx)
+        self.dos.__getitem__(idx)
 
     
     def fermilevel_correction(self, fermi):
         '# @param [Float] fermi fermi level'
-        self.__dos = [(each[0]-fermi, each[1]) for each in self.dos]
+        self.dos = [(each[0]-fermi, each[1]) for each in self.dos]
 
     
     def energies(self, i=None):
