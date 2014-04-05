@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python 
 # -*- conding: utf-8 -*-
 # python 3.3.2
 # translate from poscar.rb of 2014/2/26, master branch
@@ -58,7 +58,7 @@ Direct
   0.00000      0.00000     16.25818
 '''
 
-class POSCAR:
+class POSCAR(object):
     '''
 class for POSCAR (CONTCAR) format
     This script does *NOT* support for constructing POSCAR from scratch.
@@ -272,12 +272,12 @@ class for POSCAR (CONTCAR) format
             raise ValueError('the center must be in the Braves lattice')
         if not isinstance(site, int):
             raise ValueError('argument error in atom_rotate method')
-        if not is_cartesian: self.to_Cartesian()
+        if not self.is_cartesian: self.to_Cartesian()
         position = self.pos(site)
         position -= center / self.scaling_factor
         position = (getattr(self, 'rotate' + axis_name.capitalize())(theta) * position.T).T
         position += center / self.scaling_factor
-        self.pos_replace(site, positon)
+        self.pos_replace(site, position)
 
     def atoms_rotate(self, site_list_pack, axis_name, theta, center):
         '''
@@ -441,7 +441,7 @@ class for POSCAR (CONTCAR) format
   # poscar updates
   # @param [Array<Fixnum>] site_list list of site #
 '''
-        molecule = guess_molecule(site_list)
+        molecule = self.guess_molecule(site_list)
         for site, posVector in zip(site_list, molecule):
             self.pos_replace(site, posVector)
 
@@ -467,7 +467,7 @@ class for POSCAR (CONTCAR) format
   # @return [Array]
 '''
         atomrange = list(range(1, sum(self.ionnums) + 1))
-        translate(vector, atomrange)
+        self.translate(vector, atomrange)
 
     def save(self, filename):
         with open(filename, 'w') as f:
@@ -495,7 +495,7 @@ _vector_acceptables = (np.ndarray, np.matrix, list, tuple)
 
 if __name__ == '__main__':
     # $-w = true
-    import argparse, os, sys
+    import argparse
     import functools as ft
     arg = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     arg.add_argument('--atom', metavar='atoms', action='append',

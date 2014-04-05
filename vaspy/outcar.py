@@ -8,10 +8,9 @@
 
 from __future__ import unicode_literals
 from __future__ import print_function
-import sys
 import re
 
-class OUTCAR:
+class OUTCAR(object):
     """
     Author: Ryuichi Arafune
     python class for OUTCAR file.

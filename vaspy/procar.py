@@ -10,7 +10,7 @@ mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
 sys.path.append(os.path.dirname(os.path.abspath(mypath)))
 import tools
 
-class PROCAR:
+class PROCAR(object):
     '''Class for PROCAR file
  
    PROCAR consists of these lines.  Appeer once per file.
@@ -252,7 +252,7 @@ class PROCAR:
                 band.append(aState)
         return band
 
-class Band:
+class Band(object):
     '''Band class
   container of State objects
   class variable : @@kvectors
@@ -556,7 +556,7 @@ Use sorted(self) for not In-place sorting.'''
     def dump(self, filename):
         pass
 
-class Orbital:
+class Orbital(object):
     '''# Class for storing electronic orbital contribution.
 # A "functionalized" Hash
 # @author Ryuichi Arafune
@@ -784,7 +784,7 @@ class State(Orbital):
     #  attr_reader :kindex, :bandindex, :spininfo, :eigenvalue
     def __init__(self, kindex=None, bandindex=None,
                  eigenvalue=None, spininfo=None, orbital=None):
-        super().__init__(orbital)
+        super(State, self).__init__(orbital)
         self.__kindex = kindex
         self.__bandindex = bandindex
         self.__eigenvalue = eigenvalue
