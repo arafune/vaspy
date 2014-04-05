@@ -4,5 +4,11 @@ from distutils.core import setup
 
 setup(name='vaspy',
       version='0.1.0a',
-      packages=['vaspy']
+      py_modules=[
+          'vaspy.poscar',
+          'vaspy.chgcar',
+          'vaspy.outcar',
+          'vaspy.procar',
+          'vaspy.tools',
+          ]
       )
