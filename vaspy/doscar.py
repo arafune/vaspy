@@ -158,6 +158,39 @@ def _filter_dos_data(data):
         raise RuntimeError("non list/tuple instance in data.")
     return data
 
+
+class PDOS(DOS):
+    '''# Class for partial DOS
+       # @author Ryuichi Arafune
+    '''
+    # attr_accessor :site, :orbital_spin
+    def __init__(self, array=None, site=None):
+        super(PDOS, self).__init__(self, array)
+        self.site = "" if site is None else site
+        self.orbital_spin = list()
+        orbitalname = ("s", "px", "py", "pz", "dxy",
+                       "dyz", "dz", "dxz", "dxy2")
+        soi = ("mT", "mX", "mY", "mZ")
+        spin = ("up","down")
+        if array is not None:
+            flag = len(self.dos[0][1])
+            if flag == 9:
+                self.orbital_spin = orbitalname
+            elif flag == 18: # Spin resolved
+                self.orbital_spin = [
+                    orb+"_"+spn for orb in orbitalname
+                                for spn in spin]
+            elif flag == 36: # SOI
+                self.orbital_spin = [
+                    orb+"_"+spn for orb in orbitalname
+                                for spn in soi]
+            else:
+                self.orbital_spin = []
+    
+    #
+        
+        
+
 """
 From VASP webpage:
 
