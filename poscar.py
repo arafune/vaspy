@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python 
 # -*- conding: utf-8 -*-
 # python 3.3.2
 # translate from poscar.rb of 2014/2/26, master branch
