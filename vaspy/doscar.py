@@ -6,7 +6,7 @@ import re as _re
 import number.Number as _Number
 
 
-class DOSCAR:
+class DOSCAR(object):
     '''# class for DOSCAR file
        # @author Ryuichi Arafune
     '''
@@ -46,7 +46,7 @@ class DOSCAR:
 
 
 
-class DOS:
+class DOS(object):
     '''# Class for DOS
        #
        #  attribute : dos
