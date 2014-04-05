@@ -27,7 +27,7 @@ Use scripts
     
     - Windows
     All user: [PythonDirectory]\Scripts
-    Personal(7): C:\Users\[YourName]\AppData\Roaming\Python\Scripts
+    Personal(Vista and later): C:\Users\[YourName]\AppData\Roaming\Python\Scripts
     Personal(XP): C:\Documents and Settings\[YourName]\Application Data\Python\[PythonXY]\Scripts
     
     [PythonDirectory] is the directory of python.exe; Default is C:\[PythonXY]
