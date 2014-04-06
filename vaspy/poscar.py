@@ -110,7 +110,7 @@ class for POSCAR (CONTCAR) format
         # parse POSCAR evenif the element names are not set.
         # At present, the String representation number 
         #   are used for the  dummy name.
-        if self.iontype[0].isnum():
+        if self.iontype[0].isdigit():
             self.ionnums = list(map(int, self.iontype))
             #                      [int(i) for i in self.iontype]
         else:
@@ -131,7 +131,7 @@ class for POSCAR (CONTCAR) format
         for line, elem in zip(poscar, self.atom_identifer):
             # if not elem: break
             tmp = line.split()
-            self.position.append(np._float(np.array([tmp[:3]])))
+            self.position.append(np.float_(np.array([tmp[:3]])))
             if self.is_selective:
                 self.coordinate_changeflags.append(' '.join(tmp[3:]))
 
@@ -205,22 +205,22 @@ class for POSCAR (CONTCAR) format
 '''
         degree = np.pi / 180.0
         return np.mat([[1.0, 0.0, 0.0],
-                       [0.0, np.cos(theta * degree), -np.sin(theta.degree)],
-                       [0.0, np.sin(theta * degree),  np.cos(theta.degree)]])
+                       [0.0, np.cos(theta * degree), -np.sin(theta * degree)],
+                       [0.0, np.sin(theta * degree),  np.cos(theta * degree)]])
 
     def rotateY(self, theta):
         'see POSCAR.rotateX()'
         degree = np.pi / 180.0
-        return np.mat([[ np.cos(theta * degree), 0.0, np.sin(theta.degree)],
+        return np.mat([[ np.cos(theta * degree), 0.0, np.sin(theta * degree)],
                        [0.0, 1.0, 0.0],
-                       [-np.sin(theta * degree), 0.0, np.cos(theta.degree)]])
+                       [-np.sin(theta * degree), 0.0, np.cos(theta * degree)]])
 
     def rotateZ(self, theta):
         'see POSCAR.rotateX()'
         degree = np.pi / 180.0
-        return np.mat([[np.cos(theta * degree), -np.sin(theta.degree), 0.0],
-                       [np.sin(theta * degree),  np.cos(theta.degree), 0.0]
-                       [0.0, 0.0, 1.0],])
+        return np.mat([[np.cos(theta * degree), -np.sin(theta * degree), 0.0],
+                       [np.sin(theta * degree),  np.cos(theta * degree), 0.0],
+                       [0.0, 0.0, 1.0]])
 
     # class method? or independent function?
     def nearest(self, array, point):
@@ -303,12 +303,12 @@ class for POSCAR (CONTCAR) format
         destPOSCAR = copy.deepcopy(self)
         if destPOSCAR.scaling_factor != other.scaling_factor:
             raise ValueError('scaling factor is different.')
-        if (destPOSCAR.latticeV1 +
-            destPOSCAR.latticeV2 +
-            destPOSCAR.latticeV3 -
-            (other.latticeV1 +
-             other.latticeV2 +
-             other.latticeV3)) != np.array([[0., 0., 0.]]):
+        if np.linalg.norm(destPOSCAR.latticeV1 +
+                          destPOSCAR.latticeV2 +
+                          destPOSCAR.latticeV3 -
+                          (other.latticeV1 +
+                           other.latticeV2 +
+                           other.latticeV3)) != 0:
             raise ValueError('lattice vectors are different.')
         destPOSCAR.iontype.extend(other.iontype)
         destPOSCAR.ionnums.extend(other.ionnums)
@@ -329,7 +329,7 @@ class for POSCAR (CONTCAR) format
         out_list.append(self.latticeV1)
         out_list.append(self.latticeV2)
         out_list.append(self.latticeV3)
-        if not self.iontype[0].isnum():
+        if not self.iontype[0].isdigit():
             out_list.append(self.iontype)
         out_list.append(self.ionnums)
         if self.is_selective:
@@ -350,16 +350,16 @@ class for POSCAR (CONTCAR) format
         tmp.append(''.join('   {0:20.17f}'.format(i) for i in self.latticeV1[0]))
         tmp.append(''.join('   {0:20.17f}'.format(i) for i in self.latticeV2[0]))
         tmp.append(''.join('   {0:20.17f}'.format(i) for i in self.latticeV3[0]))
-        if not self.iontype[0].isnum():
+        if not self.iontype[0].isdigit():
             tmp.append(' ' + ' '.join(self.iontype))
-        tmp.append(' ' + ' '.join(self.ionnums))
+        tmp.append(' ' + ' '.join(str(i) for i in self.ionnums))
         if self.is_selective:
             tmp.append('Selective Dynamics')
         tmp.append(self.coordinate_type)
         for pos, tf, atom in tools.ziplong(self.position,
                                            self.coordinate_changeflags,
                                            self.atom_identifer, fillvalue=''):
-            tmp.append(' '.join('  {0:20.17f}'.format(i) for i in pos) +
+            tmp.append(' '.join('  {0:20.17f}'.format(i) for i in pos[0]) +
                        ' ' + tf + ' ' + atom)
         return '\n'.join(tmp) + '\n'
 
@@ -385,8 +385,10 @@ class for POSCAR (CONTCAR) format
 '''
         if self.is_direct:
             self.coordinate_type = "Cartesian"
-            m = np.mat([self.latticeV1, self.latticeV2, self.latticeV3]).T
-            self.position = [(m * v.T).T for v in self.position]
+            m = np.mat([self.latticeV1[0],
+                        self.latticeV2[0],
+                        self.latticeV3[0]]).T
+            self.position = [np.array(m * v.T).T for v in self.position]
 
     def to_Direct(self):
        '''
@@ -395,7 +397,7 @@ class for POSCAR (CONTCAR) format
        if self.is_cartesian:
            self.coordinate_type = "Direct"
            m = (np.mat([self.latticeV1, self.latticeV2, self.latticeV3]).T).I
-           self.position = [(m * v.T).T for v in self.position]
+           self.position = [np.array(m * v.T).T for v in self.position]
 
     def guess_molecule(self, site_list, center=None):
         '''
@@ -497,7 +499,14 @@ if __name__ == '__main__':
     # $-w = true
     import argparse
     import functools as ft
-    arg = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+    arg = argparse.ArgumentParser(
+                    formatter_class=argparse.RawTextHelpFormatter,
+                    epilog="""NOTE: When you running this script
+on Windows Power Shell, 
+commas are regarded as delimiter of values.
+So you must enclose values which
+contains commas with quotations.
+(ex.) --atom 1,2,3 -> failure / --atom "1,2,3" -> OK""")
     arg.add_argument('--atom', metavar='atoms', action='append',
                      type=tools.parse_AtomselectionNum,
                      help='''atoms specified with range using "-"
@@ -507,7 +516,7 @@ or comma-delimnated numbers.
         lis = string.split(',')
         if len(lis) != n:
             message = '--{0} option requires {1} numbers'.format(name, n)
-            raise argparse.ArgumenTypeError(message)
+            raise argparse.ArgumentTypeError(message)
         return [float(i) for i in lis]
     arg.add_argument('--translate', metavar='x,y,z', action='append',
                      type=ft.partial(split_to_float, n=3, name='translate'),
@@ -586,7 +595,7 @@ if not specified, use standard output''')
     #
     #  Output result
     #
-    if arguments.output:
+    if arguments.output is not None:
         arguments.poscar.save(arguments.output)
     else:
         print(arguments.poscar)

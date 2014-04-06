@@ -130,7 +130,7 @@ if __name__== '__main__':
     parser.add_argument("--plot", action="store_true", help="show plot")
     args=parser.parse_args()
     pff=[ args.posx, args.posy, args.posz,  
-                     args.forcex, args.forcez, args.forcez]  # pff is "posforce_flag"
+                     args.forcex, args.forcey, args.forcez]  # pff is "posforce_flag"
     if pff==[False, False, False, False, False, False]:
         pff=[True, True, True, True, True, True, True]
 
