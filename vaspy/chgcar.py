@@ -48,6 +48,7 @@ class CHGCAR(poscar.POSCAR):
     @return [CHGCAR]
 '''
         section = 'poscar'
+        separator = None
         tmp = []
         with open(chgcarfile) as f:
             for line in f:
@@ -59,9 +60,9 @@ class CHGCAR(poscar.POSCAR):
                     else:
                         tmp.append(line)
                 elif section == 'define_separator':
-                    separator = separator if 'separator' in locals() else line
+                    separator = line if separator is None else separator
                     if self.meshX == self.meshY == self.meshZ == 0:
-                        self.__meshX, self.__meshY, self.__meshZ = list(map(int, line.split))
+                        self.__meshX, self.__meshY, self.__meshZ = list(map(int, line.split()))
                     section = 'grid'
                 elif section == 'aug':
                     if re.search(r'#{0}'.format(separator), line):
@@ -105,7 +106,7 @@ class CHGCAR(poscar.POSCAR):
 
     @property
     def chgArray(self):
-        return self.__chgeArray
+        return self.__chgArray
 
     def magnetization(self, direction=None):
         '''
@@ -188,7 +189,7 @@ class CHGCAR(poscar.POSCAR):
         # augend + aggend
         if not isinstance(other, CHGCAR):
             return NotImplemented
-        addCHGCAR = poscar.POSCAR.__add__(self, other)
+        addCHGCAR = super(CHGCAR, self).__add__(other)
         if any([self.meshX != other.meshX, self.meshY != other.meshY, self.meshZ != other.meshZ]):
             raise RuntimeError('Mesh sizes are inconsistent')
         augend = self.chgArray
@@ -235,9 +236,9 @@ class CHGCAR(poscar.POSCAR):
             output = []
             outputstring += '\n  {0}  {1}  {2}\n'.format(self.meshX, self.meshY, self.meshZ)
             for array in tools.each_slice(tmp, 5):
-                output.append(''.join('  {0:E}'.format(i) for i in array if i is not None))
+                output.append(''.join('  {0:18.11E}'.format(i) for i in array if i is not None))
             outputstring += '\n'.join(output)
-        return super().__str__(self) + outputstring + '\n'
+        return super(CHGCAR, self).__str__() + outputstring + '\n'
 
     def save(self, filename):
         '''
@@ -278,7 +279,8 @@ minority : extract the part for the
 if not specified, use standard output""")
     arg.add_argument('CHGCAR_file_1', type=CHGCAR)
     arg.add_argument('CHGCAR_file_2', type=CHGCAR, nargs='?')
-    # if CHGCAR_file_2 is not specified, *None* is stored in arguments.CHGCAR_file_2, not CHGCAR(None)
+    # if CHGCAR_file_2 is not specified,
+    #*None* is stored in arguments.CHGCAR_file_2, not CHGCAR(None)
     arguments = arg.parse_args()
     #
     if arguments.spin is not None:
