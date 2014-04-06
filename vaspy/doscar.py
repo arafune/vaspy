@@ -6,11 +6,11 @@ import copy as _copy
 import csv as _csv
 import re as _re
 import sys as _sys
-import number.Number as _Number
+from numbers import Number as _Number
 if _sys.version_info[0] >= 3:
-    import io.StringIO as _StringIO
+    from io import StringIO as _StringIO
 else:
-    import cStringIO.StringIO as _StringIO
+    from cStringIO import StringIO as _StringIO
 
 
 class DOSCAR(object):
@@ -212,7 +212,7 @@ class PDOS(DOS):
     '''
     # attr_accessor :site, :orbital_spin
     def __init__(self, array=None, site=None):
-        super(PDOS, self).__init__(self, array)
+        super(PDOS, self).__init__(array)
         self.site = "" if site is None else site
         self.orbital_spin = list()
         orbitalname = ("s", "px", "py", "pz", "dxy",
@@ -236,9 +236,11 @@ class PDOS(DOS):
     
     def __deepcopy__(self, memo):
         "x.__deepcopy__() <-> copy.deepcopy(x)"
-        dest = super(PDOS, self).deepcopy()
+        dest = PDOS()
+        dest.dos = _copy.deepcopy(self.dos, memo)
         dest.site = _copy.deepcopy(self.site, memo)
         dest.orbital_spin = _copy.deepcopy(self.orbital_spin, memo)
+        return dest
 
         
     def deepcopy(self):
