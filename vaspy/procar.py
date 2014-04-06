@@ -571,7 +571,7 @@ class Orbital(object):
     def __copy__(self):
         'x.__copy__() <==> copy.copy(x)'
         dest = Orbital()
-        dest.orbital = self.orbital.copy()
+        dest.orbital = copy.copy(self.orbital)
         return dest
 
     def orbital_keys(self):
