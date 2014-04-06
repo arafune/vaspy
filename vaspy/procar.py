@@ -3,31 +3,36 @@
 # translate from procar.rb of scRipt4VASP 2014/2/26 master branch
 
 from __future__ import division, print_function
-import re, copy, os, sys
+import re, copy, os, sys, csv
 import functools as ft
+if sys.versioninfo[0] >= 3:
+    from io import StringIO
+else:
+    from cStringIO import StringIO
 import numpy as np
 mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
 sys.path.append(os.path.dirname(os.path.abspath(mypath)))
 import tools
 
+
 class PROCAR(object):
     '''Class for PROCAR file
  
-   PROCAR consists of these lines.  Appeer once per file.
-   1 # the first line
-    ex.)   PROCAR lm decomposed + phase  
-   2 set number of k-points, bands and ions.  
+    PROCAR consists of these lines.  Appeer once per file.
+    1 # the first line
+     ex.)   PROCAR lm decomposed + phase  
+    2 set number of k-points, bands and ions.  
       Appear once when spin-integrated, twice when spin-resolved.
-    ex.)   # of k-points:   50         # of bands: 576         # of ions:  98
-   3  k-point character
-    ex.)  k-point    1 :    0.00000000 0.00000000 0.00000000     weight = 0.02000000
-    note that the first character is "blank".
-   4 band character
-    ex.)  band   1 # energy  -11.87868466 # occ.  2.00000000
-   5 orbital contribution.
-    ex.)  1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
-  @author Ryuichi Arafune
-'''
+     ex.)   # of k-points:   50         # of bands: 576         # of ions:  98
+    3  k-point character
+     ex.)  k-point    1 :    0.00000000 0.00000000 0.00000000     weight = 0.02000000
+     note that the first character is "blank".
+    4 band character
+     ex.)  band   1 # energy  -11.87868466 # occ.  2.00000000
+    5 orbital contribution.
+     ex.)  1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
+    @author Ryuichi Arafune
+    '''
     #attr_reader :orbital, :phase, :spininfo, :numk,
     #:nBands, :nAtoms, :kvectors, :energies, :oritalname
     def __init__(self, arg=None, phase_read=False):
@@ -84,10 +89,10 @@ class PROCAR(object):
 
     def load_from_file(self, file, phase_read=False):
         '''PROCAR#load_from_file
-    A virtual parser of PROCAR
-    @param [String] file filename of *PROCAR* file
-    @param [Boolian] phase_read Switch for loading phase characters
-'''
+        A virtual parser of PROCAR
+        @param [String] file filename of *PROCAR* file
+        @param [Boolian] phase_read Switch for loading phase characters
+        '''
         section = list()
         separator_to_orbital = None
         separator_to_phase = None
@@ -139,10 +144,10 @@ class PROCAR(object):
 
     def load_from_array(self, procar, phase_read=False):
         '''This method effectively acts as a parser of PROCAR.
-    @param [Array] procar Array of PROCAR file (IO.readlines(procar file))
-    @param [Boolian] phase_read Switch for loading phase characters
-    @deprecated Too sloooow!! (about 10 times slower than load_from_file)
-'''
+        @param [Array] procar Array of PROCAR file (IO.readlines(procar file))
+        @param [Boolian] phase_read Switch for loading phase characters
+        @deprecated Too sloooow!! (about 10 times slower than load_from_file)
+        '''
         section = list()
         #
         self.__numk, self.__nBands, self.__nAtoms = [
@@ -192,8 +197,8 @@ class PROCAR(object):
     def __str__(self):
         '''x.__str__() <=> str(x)
 
-    show the PROCAR character, not contents.
-'''
+        show the PROCAR character, not contents.
+        '''
         template = '''The properties of this procar:
   # of k-points: {0.numk}
   # of bands: {0.nBands}
@@ -254,19 +259,19 @@ class PROCAR(object):
 
 class Band(object):
     '''Band class
-  container of State objects
-  class variable : @@kvectors
-  @author Ryuichi Arafune
-'''
+    container of State objects
+    class variable : @@kvectors
+    @author Ryuichi Arafune
+    '''
     # attr_accessor :band
     __kvectors = list()
     __distance = list()
 
     def __init__(self, arg=None):
         '''Band(list-of-kvectors) => Band object
-    Band#initialize: Sets @@kvectors and then calculate @@distance
-    @param[Array] arg kvectors array
-'''
+        Band#initialize: Sets @@kvectors and then calculate @@distance
+        @param[Array] arg kvectors array
+        '''
         self.__band = list()
         if arg is not None:
             self.__kvectors = arg
@@ -280,14 +285,14 @@ class Band(object):
     @property
     def kvectors(self):
         '''Band#kvectors
-  # @return [Array<Float, Float, Float>] Returns @@kvectors
-'''
+        # @return [Array<Float, Float, Float>] Returns @@kvectors
+        '''
         return self.__kvectors
 
     @property
     def distance(self):
         '''@return [Array<Float>] Returns @@distance
-'''
+        '''
         return self.__distance
 
     @property
@@ -307,15 +312,15 @@ class Band(object):
 
     def __getitem__(self, i):
         '''x.__getitem__(i) <==> x[i]
-  # same as list[i] or tuple[i]
-  # @return[State] i-th State in *band* object
-'''
+        # same as list[i] or tuple[i]
+        # @return[State] i-th State in *band* object
+        '''
         return self.band[i]
 
     def __setitem__(self, index, value):
         '''x.__setitem__(i, y) <==> x[i]=y
-    value must be a procar.State (for single index)
-    or iterable of procar.State objects (ranged indices)'''
+        value must be a procar.State (for single index)
+        or iterable of procar.State objects (ranged indices)'''
         if isinstance(index, slice):
             value = tuple(value)
             if all(isinstance(item, State) for item in value):
@@ -330,31 +335,32 @@ class Band(object):
 
     def __iter__(self):
         '''x.__iter__() <==> iter(x)
-to work as iterable
-return iterator object'''
+        to work as iterable
+        return iterator object'''
         return iter(self.__band)
 
     def fermilevel_correction(self, ef): # check whether it works correctly
         '''
-  # eigenvalues are corrected by fermi level.
-  # Usually the value are obtained from OUTCAR.
-  #
-  #  @param[Float] ef
-'''
+        # eigenvalues are corrected by fermi level.
+        # Usually the value are obtained from OUTCAR.
+        #
+        #  @param[Float] ef
+        '''
         for aState in self:
             aState.fermilevel_correction(ef)
 
     def append(self, aState):
         '''same as list.append(), but argument must be a State object.
-    @param [State] aState
-    '''
+        @param [State] aState
+        '''
         if not isinstance(aState, State):
             raise TypeError('argument must be a procar.State object.')
         self.__band.append(aState)
 
     def extend(self, iterable_of_States):
-        '''same as list.extend(), but argument must be an iterable of State objects.
-'''
+        '''same as list.extend().
+        but argument must be an iterable of State objects.
+        '''
         statetuple = tuple(iterable_of_States)
         if not all(isinstance(item, State) for item in statetuple):
             raise TypeError("All items in iterable must be a State object.")
@@ -392,15 +398,15 @@ return iterator object'''
 
     def sort(self, key=None, reverse=False):
         '''In-place sorting of self.__band.
-Use sorted(self) for not In-place sorting.'''
+        Use sorted(self) for not In-place sorting.'''
         self.__band.sort(key=key, reverse=reverse)
 
     def site_integrate(self, *sites):
         '''  # @param [Fixnum, Range, Array] sites sites are
-  #     specified by comma-separated number, array,
-  #     or Range object.
-  # @return [Band] site-integrated band object
-'''
+        #     specified by comma-separated number, array,
+        #     or Range object.
+        # @return [Band] site-integrated band object
+        '''
         tmpBand = self.select_by_site(*sites)
         siteGroup = dict()
         for aState in tmpBand:
@@ -415,18 +421,18 @@ Use sorted(self) for not In-place sorting.'''
 
     def extract_orbitals_in_place(self, *orbital_symbols):
         '''  # extract certain orbital component in place
-  # @param [Array] orbital_symbols
-  # @return [self]
-'''
+        # @param [Array] orbital_symbols
+        # @return [self]
+        '''
         for aState in self.band:
             aState.extract_orbitals(*orbital_symbols)
     
     def extract_orbitals(self, *orbital_symbols):
         '''  # extract certain orbital component in place
-  # Receiver itself does not change
-  # @param [Array] orbital_symbols
-  # @return [Band] orbital_extracted Band
-'''
+        # Receiver itself does not change
+        # @param [Array] orbital_symbols
+        # @return [Band] orbital_extracted Band
+        '''
         dest = copy.deepcopy(self) ### check it is really deep copy ###
         for aState in dest.band:
             aState.extract_orbitals(*orbital_symbols)
@@ -434,9 +440,9 @@ Use sorted(self) for not In-place sorting.'''
 
     def header(self):
         '''  # @param[Array] orbital_symbols
-  # @return [Array] Returns arrray represents header for 
-  #   Band#to_a 
-'''
+        # @return [Array] Returns arrray represents header for 
+        #   Band#to_a 
+        '''
         nSites = self.number_of_sites()
         nSpintype = self.number_of_spintype()
         tmp = sorted(self)[0:(nSites * nSpintype)]
@@ -449,9 +455,9 @@ Use sorted(self) for not In-place sorting.'''
     def tolist(self): # orbital_symbols?
         '''x.tolist() => list
 
-  # @param [Array] orbital_symbols
-  # @return [Array] Returns *2D array* (Array of array) for output
-'''
+        # @param [Array] orbital_symbols
+        # @return [Array] Returns *2D array* (Array of array) for output
+        '''
         nBands = self.number_of_bands()
         nSites = self.number_of_sites()
         nSpintype = self.number_of_spintype()
@@ -469,31 +475,43 @@ Use sorted(self) for not In-place sorting.'''
     def __str__(self):
         '''x.__str__() <==> str(x)
 
-  # @return[String] Returns cvs formatted text'''
+        # @return[String] Returns csv formatted text'''
+        with StringIO() as stream:
+            self.export_csv(stream, delimiter='\t', lineterminator='\n')
+            return stream.getvalue()
+
+
+    def export_csv(self, file, **kwargs):
+        """Export data to file object (or file-like object) as csv format.
+        kwargs are keyword options of csv.writer().
+        see help(csv.writer) for detail.
+        """
+        csvwriter = csv.writer(file, **kwargs)
         array = self.tolist()
         header = self.header()
         nColumn = len(header)
-        text = '\t'.join(header) + '\n'
+        csvwriter.writerow(header)
         for i, each in enumerate(array):
             if i % len(self.distance) == 0 and i > 0:
-                text += '\t' * (nColumn - 1) + '\n'
-                text += '\t'.join(str(x) for x in each) + '\n'
+                csvwriter.writerow([None] * (nColumn-1))
+                csvwriter.writerow(str(x) for x in each)
             else:
-                text += '\t'.join(str(x) for x in each) + '\n'
-        return text
+                csvwriter.writerow(str(x) for x in each)
+
 
     def save(self, filename):
         '''Store bandstructure with orbital
-  #   contribution to the file.
-  # @param [String] filename
-'''
+        #   contribution to the file.
+        # @param [String] filename
+        '''
         with open(filename, mode='w') as file:
-            dum = file.write(str(self))
+            file.write(str(self))
+
 
     def rename_site(self, *new_names):
         '''
-  # @param [Array] new_names
-'''
+        # @param [Array] new_names
+        '''
         sites = self.sites()
         if len(sites) != len(new_names): 
             raise RuntimeError(
@@ -504,8 +522,8 @@ Use sorted(self) for not In-place sorting.'''
 
     def group_by_spintype(self):
         '''  # Returns Array consists of spin selected band.  
-  # @return[Array<Band>] 
-'''
+        # @return[Array<Band>] 
+        '''
         tmp = dict()
         for aState in self:
             tmp[aState.spininfo] = tmp.get(aState.spininfo, []).append(aState)
@@ -540,14 +558,14 @@ Use sorted(self) for not In-place sorting.'''
 
     def select_by_band(self, *bandindices):
         '''
-  # @param [Fixnum, Range, Array] bandindexes bandindexes
-  #   are specified by comma-separated number, array,
-  #   or Range object. 
-  # @example Band#select_by_band(1,2,3,4) : same as 
-  #   Band#select_by_band(1..4)/Band#select_by_band([1,2,3,4]) 
-  # @return [Band] Returns a new band object that consists 
-  #    of States specified by bandindex.
-'''
+        # @param [Fixnum, Range, Array] bandindexes bandindexes
+        #   are specified by comma-separated number, array,
+        #   or Range object. 
+        # @example Band#select_by_band(1,2,3,4) : same as 
+        #   Band#select_by_band(1..4)/Band#select_by_band([1,2,3,4]) 
+        # @return [Band] Returns a new band object that consists 
+        #    of States specified by bandindex.
+        '''
         bandindices = sorted(set(tools.flatten(bandindices)))
         dest = Band()
         dest.__band = [s for s in self if s.bandindex in bandindices]
@@ -558,9 +576,9 @@ Use sorted(self) for not In-place sorting.'''
 
 class Orbital(object):
     '''# Class for storing electronic orbital contribution.
-# A "functionalized" Hash
-# @author Ryuichi Arafune
-# @version 2.0'''
+    # A "functionalized" Hash
+    # @author Ryuichi Arafune
+    # @version 2.0'''
     __orbital_list = ('ion', 's', 'py', 'pz', 'px', 'dxy',
                       'dyz', 'dz2', 'dxz', 'dx2', 'tot')
 
@@ -571,7 +589,7 @@ class Orbital(object):
     def __copy__(self):
         'x.__copy__() <==> copy.copy(x)'
         dest = Orbital()
-        dest.orbital = self.orbital.copy()
+        dest.orbital = copy.copy(self.orbital)
         return dest
 
     def orbital_keys(self):
@@ -581,30 +599,30 @@ class Orbital(object):
 
     def load_from_line(self, arg):
         '''
-  # Read values of orbital contribution from the line.
-  #  (Essentially, this method acts as a parser.)
-  #  The order of the orbitals is determined with the orbitalname array.
-  #  In PROCAR file, the table that corresponds the orbital 
-  #  contribution is like this:
-  #  ion    s     py     pz     px    dxy    dyz    dz2    dxz    dx2    tot
-  #  1  0.001  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.002
-  #  2  0.003  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.005
-  #  3  0.002  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.004
-  #  4  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.001
-  #  5  0.005  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.007
-  #  6  0.003  0.000  0.001  0.000  0.000  0.000  0.001  0.000  0.000  0.005
-  #  ...
-  #  An array called orbitalname is created from the first line of the table 
-  #  that starts with "ion"
-  # @param [String,Array,Hash,Orbital] arg  the format is like this:
-  #
-  #   1  0.001  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.002
-  #
-  #   (the first column indicates the atom #.)
-  # 
-  #   (Each element is separated by the space.)
-  # @return [String] atom #.
-  '''
+        # Read values of orbital contribution from the line.
+        #  (Essentially, this method acts as a parser.)
+        #  The order of the orbitals is determined with the orbitalname array.
+        #  In PROCAR file, the table that corresponds the orbital 
+        #  contribution is like this:
+        #  ion    s     py     pz     px    dxy    dyz    dz2    dxz    dx2    tot
+        #  1  0.001  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.002
+        #  2  0.003  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.005
+        #  3  0.002  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.004
+        #  4  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.001
+        #  5  0.005  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.007
+        #  6  0.003  0.000  0.001  0.000  0.000  0.000  0.001  0.000  0.000  0.005
+        #  ...
+        #  An array called orbitalname is created from the first line of the table 
+        #  that starts with "ion"
+        # @param [String,Array,Hash,Orbital] arg  the format is like this:
+        #
+        #   1  0.001  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.002
+        #
+        #   (the first column indicates the atom #.)
+        # 
+        #   (Each element is separated by the space.)
+        # @return [String] atom #.
+        '''
         if isinstance(arg, str):
             self.orbital = dict(zip(self.defined_orbital_list(),
                                     (float(i) for i in arg.split())))
@@ -641,12 +659,12 @@ class Orbital(object):
     def __getitem__(self, orbital_symbol):
         '''x.__getitem__(i) <==> x[i]
 
-  # Returns contribution of specified orbital.
-  # @param [Symbol] orbital_symbol Orbital name by symbol format
-  #     (ex.):s, :sp.  if orbitalsymol is not exist in the object, it
-  #     tries to generate the value of contribution.  
-  # @return [Float] contribution of the specified orbital.
-'''
+        # Returns contribution of specified orbital.
+        # @param [Symbol] orbital_symbol Orbital name by symbol format
+        #     (ex.):s, :sp.  if orbitalsymol is not exist in the object, it
+        #     tries to generate the value of contribution.  
+        # @return [Float] contribution of the specified orbital.
+        '''
         if orbital_symbol in self.orbital:
             return self.orbital[orbital_symbol]
         else:
@@ -655,11 +673,11 @@ class Orbital(object):
     def __setitem__(self, orbital_symbol, value):
         '''x.__setitem__(i, y) <==> x[i]=y
 
-  # Associate the *value* of contribution with the specified *orbital*.
-  # @param [Symbol] orbitalsymbol Orbital name by symbol format
-  #  (ex.):s, :sp.
-  # @param [Float] value of contribution for the specified orbital.
-'''
+        # Associate the *value* of contribution with the specified *orbital*.
+        # @param [Symbol] orbitalsymbol Orbital name by symbol format
+        #  (ex.):s, :sp.
+        # @param [Float] value of contribution for the specified orbital.
+        '''
         self.orbital[orbital_symbol] = value
 
     def get(self, symbol, default=None):
@@ -668,7 +686,7 @@ class Orbital(object):
 
     def setdefault(self, symbol, default=None):
         '''X.setdefault(s[, D]) -> X.get(s, D), also set X[k]=D if k not in X
-'''
+        '''
         return self.orbital.setdefault(symbol, default)
 
     def site(self): return self.orbital['ion']
@@ -742,7 +760,7 @@ class Orbital(object):
 
     def is_empty(self):
         '''  # @return [Boolean] true if #Orbital is empty.
-'''
+        '''
         return len(self.orbital) == 0
 
     def __add__(self, other):
@@ -762,11 +780,11 @@ class Orbital(object):
 
     def redefine_orbital_list(self, arg):
         '''Redefine orbital list by arg
-  #   The machine default is set as above.
-  # @param [Array] arg Symbol list consisting orbital name.
-  #   First element must be :ion
-  #   Final element must be :tot
-'''
+        #   The machine default is set as above.
+        # @param [Array] arg Symbol list consisting orbital name.
+        #   First element must be :ion
+        #   Final element must be :tot
+        '''
         if not isinstance(arg, (list, tuple)):
             raise RuntimeError("redefine_orbital_list fail")
         if arg[0] != 'ion': 
@@ -777,9 +795,9 @@ class Orbital(object):
 
 class State(Orbital):
     '''# Class for electronic state
-# @author Ryuichi Arafune
-# @version 2.0
-'''
+    # @author Ryuichi Arafune
+    # @version 2.0
+    '''
     #  attr_accessor :orbital
     #  attr_reader :kindex, :bandindex, :spininfo, :eigenvalue
     def __init__(self, kindex=None, bandindex=None,
@@ -822,7 +840,7 @@ class State(Orbital):
 
     def __cmp__(self, other):
         '''x.__cmp__(y) <==> cmp(x, y) # python 2.x
-'''
+        '''
         if not isinstance(other, State): return NotImplemented
         cmp = np.sign(self.bandindex - other.bandindex)
         if cmp != 0: return cmp
@@ -872,10 +890,10 @@ class State(Orbital):
     def __add__(self, other):
         '''x.__add__(y) <==> x+y
 
-  #  eigenvalue must be identical with each other.
-  #  In many cases, kvector and bandindex should be same, but not checked. 
-  #  You may calculate k-integrated density of states from *band*...
-  # @param [State] other'''
+        #  eigenvalue must be identical with each other.
+        #  In many cases, kvector and bandindex should be same, but not checked. 
+        #  You may calculate k-integrated density of states from *band*...
+        # @param [State] other'''
         if self.is_empty():
             dest = copy.copy(other)
         else:
@@ -888,11 +906,11 @@ class State(Orbital):
 
     def extract_orbitals(self, *orbital_symbols):
         '''
-  #   Extract specified orbitals 
-  #   (remove other orbital contributions)
-  # @param [Array] orbital_symbols
-  # @return [self] 
-'''
+        #   Extract specified orbitals 
+        #   (remove other orbital contributions)
+        # @param [Array] orbital_symbols
+        # @return [self] 
+        '''
         orbital_symbols = tools.flatten(orbital_symbols)
         orbital_symbols.append('ion')
         self.orbital = dict((key, value) for key, value

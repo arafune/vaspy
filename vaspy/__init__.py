@@ -7,6 +7,6 @@ __all__ = ['chgcar',
            'procar',
            ]
 
-from vasp import *
+from vaspy import *
 
 
