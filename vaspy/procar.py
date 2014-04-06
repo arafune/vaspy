@@ -3,8 +3,12 @@
 # translate from procar.rb of scRipt4VASP 2014/2/26 master branch
 
 from __future__ import division, print_function
-import re, copy, os, sys
+import re, copy, os, sys, csv
 import functools as ft
+if sys.versioninfo[0] >= 3:
+    from io import StringIO
+else:
+    from cStringIO import StringIO
 import numpy as np
 mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
 sys.path.append(os.path.dirname(os.path.abspath(mypath)))
@@ -470,17 +474,28 @@ Use sorted(self) for not In-place sorting.'''
         '''x.__str__() <==> str(x)
 
   # @return[String] Returns cvs formatted text'''
+        with StringIO() as stream:
+            self.export_csv(stream, delimiter='\t', lineterminator='\n')
+            return stream.getvalue()
+
+
+    def export_csv(self, file, **kwargs):
+        """Export data to file object (or file-like object) as csv format.
+        kwargs are keyword options of csv.writer().
+        see help(csv.writer) for detail.
+        """
+        csvwriter = csv.writer(file, **kwargs)
         array = self.tolist()
         header = self.header()
         nColumn = len(header)
-        text = '\t'.join(header) + '\n'
+        csvwriter.writerow(header)
         for i, each in enumerate(array):
             if i % len(self.distance) == 0 and i > 0:
-                text += '\t' * (nColumn - 1) + '\n'
-                text += '\t'.join(str(x) for x in each) + '\n'
+                csvwriter.writerow([None] * (nColumn-1))
+                csvwriter.writerow(str(x) for x in each)
             else:
-                text += '\t'.join(str(x) for x in each) + '\n'
-        return text
+                csvwriter.writerow(str(x) for x in each)
+
 
     def save(self, filename):
         '''Store bandstructure with orbital
