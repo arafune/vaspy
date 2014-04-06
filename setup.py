@@ -12,6 +12,7 @@ setup(name='vaspy',
       py_modules=[
           'vaspy.poscar',
           'vaspy.chgcar',
+          'vaspy.doscar',
           'vaspy.outcar',
           'vaspy.procar',
           'vaspy.tools',
