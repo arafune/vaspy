@@ -292,9 +292,112 @@ class PDOS(DOS):
         # @return [String]  String representation of PDOS object.
         """
         with _StringIO() as stream:
-            self.export_csv(stream, site, delimiter='\t', lineterminator='\n')
+            self.export_csv(stream, site=site,
+                            delimiter='\t', lineterminator='\n')
             return stream.getvalue()
         
+
+if __name__ == '__main__':
+    import argparse
+    import os as _os
+    _path = _os.path
+    mypath = _os.readlink(__file__) if _path.islink(__file__) else __file__
+    _sys.path.append(_path.dirname(_path.abspath(mypath)))
+    from outcar import OUTCAR as _OUTCAR
+    import tools as _tools
+    
+    #------
+    parser = argparse.ArgumentParser(
+                    formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('doscar', metavar='DOSCAR_file')
+    parser.add_argument('-o', '--outcar', metavar='OUTCAR_file',
+                        nargs='?', default=NotImplemented,
+                        help="""Use OUTCAR file.
+If file path is not given,
+try to open OUTCAR file
+in the same directory to DOSCAR.""")
+    # -o data/OUTCAR => args.outcar == "data/OUTCAR"
+    # -o             => args.outcar == None
+    # (not given)    => args.outcar == NotImplemented (default)
+    parser.add_argument('-f', '--fermi', metavar='value', type=float,
+                        default=0.0,
+                        help="""Fermi level correction.
+Energy shifts by this value.
+if --outcar is set, this option is ignored.""")
+    parser.add_argument('-s', '--site', metavar='atoms', action='append',
+                        dest='atomset', type=_tools.parse_AtomselectionNum,
+                        help="""atom # specified with range.
+Use "-" or ","
+(ex.) --site 1,2,7-9""")
+    parser.add_argument('-a', '--as', metavar='name', action='append',
+                        dest='atomsetname',
+                        help="""the name of the range identified by --site.
+(ex.) --as layer1
+the name is used in the output filename.""")
+    #-----
+    
+    args = parser.parse_args()
+    
+    doscar = DOSCAR(args.doscar)
+    atomlist = list()
+    if args.outcar is not NotImplemented:
+        if args.outcar is None:
+            args.outcar = _path.join(_path.dirname(args.doscar), "OUTCAR")
+        outcar = _OUTCAR(args.outcar)
+        atomlist = outcar.atom_names
+        args.fermi = outcar.fermi
+    #    
+    if atomlist == []:
+        atomlist.extend("atom"+str(i) for i in range(1, doscar.nAtom+1))
+    #
+    # construct TDOS & PDOS objects
+    #
+    tmp = doscar.dos_container
+    d = [TDOS(tmp.pop(0))]
+    #
+    d.extend(PDOS(*each) for each in zip(tmp, atomlist)) # tmp[1:] ?
+    #    
+    if args.atomset is not None:
+        if len(args.atomset) == len(args.atomsetname):
+            sumPDOSs = list()
+            for site, name in zip(args.atomset, args.atomsetname):
+                each = PDOS()
+                for atomNo in site:
+                    #print(repr(each.dos), repr(each.site))
+                    each += d[atomNo]
+                each.site = name
+                sumPDOSs.append(each)
+            for summedPDOS in sumPDOSs:
+                filename = summedPDOS.site+".dat"
+                try:
+                    file = open(filename, mode='w', newline='')
+                except TypeError:
+                    file = open(filename, mode='wb')
+                with file:
+                    summedPDOS.export_csv(file, delimiter='\t')
+                    #file.write(str(summedPDOS))
+    #
+    try:
+        file = open("total.dat", mode='w', newline='')
+    except TypeError:
+        file = open("total.dat", mode='wb')
+    with file:
+        d[0].fermilevel_correction(args.fermi)
+        d[0].export_csv(file, delimiter='\t')
+        #file.write(str(d[0]))
+    for i, n in zip(d[1:], atomlist):
+        i.fermilevel_correction(args.fermi)
+        if isinstance(i, PDOS) and i.site == "":
+            i.site = n
+        filename = n + "_dos.dat"
+        try:
+            file = open(filename, mode='w', newline='')
+        except TypeError:
+            file = open(filename, mode='wb')
+        with file:
+            i.export_csv(file, delimiter='\t')
+            #file.write(str(i))
+
 
 """
 From VASP webpage:
