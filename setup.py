@@ -8,7 +8,7 @@ if sys.hexversion <= 0x20600f0:
     reqpkgs.append('argparse')
 
 setup(name='vaspy',
-      version='1.0.0',
+      version='1.0.1',
       author='Mao Kanno',
       author_email='0643839020@mail.ecc.u-tokyo.ac.jp',
       description='vasp postprocessing scripts',
