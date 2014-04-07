@@ -2,6 +2,7 @@
 #import os
 
 __all__ = ['chgcar',
+           'doscar',
            'outcar',
            'poscar',
            'procar',

@@ -5,7 +5,7 @@
 from __future__ import division, print_function
 import re, copy, os, sys, csv
 import functools as ft
-if sys.versioninfo[0] >= 3:
+if sys.version_info[0] >= 3:
     from io import StringIO
 else:
     from cStringIO import StringIO
