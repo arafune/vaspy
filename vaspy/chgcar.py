@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 
-from __future__ import division, print_function
+from __future__ import division, print_function # Version safety
 import re, copy, os, sys
 
 mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
@@ -245,7 +245,7 @@ class CHGCAR(poscar.POSCAR):
     @param [String] filename
     save operated CHGCAR to the file.
 '''
-        try:
+        try: # Version safety
             file = open(filename, mode='w', newline='\n')
         except TypeError:
             file = open(filename, mode='wb')
