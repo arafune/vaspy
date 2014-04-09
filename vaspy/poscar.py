@@ -472,8 +472,12 @@ class for POSCAR (CONTCAR) format
         self.translate(vector, atomrange)
 
     def save(self, filename):
-        with open(filename, 'w') as f:
-            f.write(str(self))
+        try:
+            file = open(filename, mode='w', newline='\n')
+        except TypeError:
+            file = open(filename, mode='wb')
+        with file:
+            file.write(str(self))
 
     def point_in_box(self, point, l1, l2, l3):
         x0, y0, z0 = _vectorize(point).flatten()

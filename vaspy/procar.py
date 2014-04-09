@@ -504,8 +504,12 @@ class Band(object):
         #   contribution to the file.
         # @param [String] filename
         '''
-        with open(filename, mode='w') as file:
-            file.write(str(self))
+        try:
+            file = open(filename, mode='w', newline='')
+        except TypeError:
+            file = open(filename, mode='wb')
+        with file:
+            self.export_csv(file, delimiter='\t', lineterminator='\n')
 
 
     def rename_site(self, *new_names):

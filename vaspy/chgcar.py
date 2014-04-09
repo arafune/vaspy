@@ -245,7 +245,11 @@ class CHGCAR(poscar.POSCAR):
     @param [String] filename
     save operated CHGCAR to the file.
 '''
-        with open(filename, mode='w') as file:
+        try:
+            file = open(filename, mode='w', newline='\n')
+        except TypeError:
+            file = open(filename, mode='wb')
+        with file:
             file.write(str(self))
 
 # ------------------------- Main
