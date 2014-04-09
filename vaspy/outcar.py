@@ -6,11 +6,11 @@
 
 """
 
-from __future__ import unicode_literals
-from __future__ import print_function
+from __future__ import unicode_literals # Version safety
+from __future__ import print_function # Version safety
 import re
 
-class OUTCAR(object):
+class OUTCAR(object): # Version safety
     """
     Author: Ryuichi Arafune
     python class for OUTCAR file.
