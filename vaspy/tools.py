@@ -73,6 +73,7 @@ def parse_Atomselection(L):
     for each in array:
         if re.search(_rerange, each):
             start, stop = re.findall(_rerange, each)[0]
+            # Version safety
             output |= set(str(i) for i in range(int(start), int(stop)+1))
         elif re.search(_resingle, each):
             output.add(each)
@@ -86,7 +87,7 @@ if __name__ == '__main__':
     each_slice_demo = lambda L, n: list(each_slice(L, n))
     demo = {'each_slice_demo': (range(10), 3),
             'removeall': ([1, 0, 0, 1, 0, 1, 0, 0], 0),
-            'flatten': ((1, [range(2), 3, set([4, 5]), [6]],
+            'flatten': ((1, [range(2), 3, set([4, 5]), [6]], #Version safety
                              frozenset([7, 8])),),
             'parse_Atomselection': ('1-5,8,9,11-15',),
             }
