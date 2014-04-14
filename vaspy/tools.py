@@ -73,7 +73,7 @@ def parse_Atomselection(L):
     for each in array:
         if re.search(_rerange, each):
             start, stop = re.findall(_rerange, each)[0]
-            output |= {str(i) for i in range(int(start), int(stop)+1)}
+            output |= set(str(i) for i in range(int(start), int(stop)+1))
         elif re.search(_resingle, each):
             output.add(each)
     return sorted(output)
@@ -86,7 +86,8 @@ if __name__ == '__main__':
     each_slice_demo = lambda L, n: list(each_slice(L, n))
     demo = {'each_slice_demo': (range(10), 3),
             'removeall': ([1, 0, 0, 1, 0, 1, 0, 0], 0),
-            'flatten': ((1, [range(2), 3, {4, 5}, [6]], frozenset([7, 8])),),
+            'flatten': ((1, [range(2), 3, set([4, 5]), [6]],
+                             frozenset([7, 8])),),
             'parse_Atomselection': ('1-5,8,9,11-15',),
             }
     argcounts = {'each_slice_demo': 2,
@@ -125,14 +126,14 @@ See epilog for notices for argument notation.''')
             values = demo[func]
         else:
             if argcounts[func] != len(args.values[index]):
-                print('''argument number not match (require {}, given {})
+                print('''argument number not match (require {0}, given {1})
 use default values.'''.format(
                       argcounts[func], len(args.values[index])))
                 values = demo[func]
             else:
                 values = [eval(s) for s in args.values[index]]
             index += 1
-        print('Demonstrate function {}()\ninput:  '.format(func), end='')
+        print('Demonstrate function {0}()\ninput:  '.format(func), end='')
         print(*values, sep=' : ')
         print('output: ', end='')
         print(vars()[func](*values))
