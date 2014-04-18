@@ -20,11 +20,10 @@ def split_to_float(string, n, name):
 
 parser = argparse.ArgumentParser(
                      formatter_class=argparse.RawTextHelpFormatter,
-                     epilog="""NOTE: When you run this script
-on Windows Power Shell,
+                     epilog="""
+NOTE: When you run this script on Windows Power Shell,
 commas are regarded as delimiter of values.
-So you must enclose values which
-contains commas with quotations.
+So you must enclose values which contains commas with quotations.
 (ex.) --atom 1,2,3 -> failure / --atom "1,2,3" -> OK""")
 parser.add_argument('--atom', metavar='atoms', action='append',
                     type=tools.parse_AtomselectionNum,
@@ -32,31 +31,35 @@ parser.add_argument('--atom', metavar='atoms', action='append',
 or comma-delimnated numbers.
  (ex.) --atom 1,2,7-9''')
 
-parser.add_argument('--translate', metavar='x,y,z', action='append',
-                    type=ft.partial(split_to_float, n=3, name='translate'),
-                     help='''displacement (AA unit) by three numbers
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument('--translate', metavar='x,y,z', action='append',
+                   type=ft.partial(split_to_float, n=3, name='translate'),
+                   help='''displacement (AA unit) by three numbers
 separated by comma.''')
-parser.add_argument('--rotateX', metavar='theta,x,y,z',
-                    type=ft.partial(split_to_float, n=4, name='rotateX'),
-                    help='''Rotation around X-axis by "theta" at (x,y,z)
+group.add_argument('--rotateX', metavar='theta,x,y,z',
+                   type=ft.partial(split_to_float, n=4, name='rotateX'),
+                   help='''Rotation around X-axis by "theta" at (x,y,z)
 NOTE: this option is not taken into account
 the periodic boundary.''')
-parser.add_argument('--rotateY', metavar='theta,x,y,z',
-                    type=ft.partial(split_to_float, n=4, name='rotateY'),
-                    help='''Rotation around Y-axis by "theta" at (x,y,z)
+group.add_argument('--rotateY', metavar='theta,x,y,z',
+                   type=ft.partial(split_to_float, n=4, name='rotateY'),
+                   help='''Rotation around Y-axis by "theta" at (x,y,z)
 NOTE: this option is not taken into account
 the periodic boundary.''')
-parser.add_argument('--rotateZ', metavar='theta,x,y,z',
-                    type=ft.partial(split_to_float, n=4, name='rotateZ'),
-                    help='''Rotation around Z-axis by "theta" at (x,y,z)
+group.add_argument('--rotateZ', metavar='theta,x,y,z',
+                   type=ft.partial(split_to_float, n=4, name='rotateZ'),
+                   help='''Rotation around Z-axis by "theta" at (x,y,z)
 NOTE: this option is not taken into account
 the periodic boundary.''')
+
 parser.add_argument('--output', metavar='file_name',
                     help='''output file name
 if not specified, use standard output''')
 parser.add_argument('poscar', metavar='POSCAR_file (or CONTCAR_file)',
                     type=POSCAR)
+
 args = parser.parse_args()
+
 # translate option and rotate option are not set simulaneously.
 if args.translate and any([args.rotateX,
                            args.rotateY,
