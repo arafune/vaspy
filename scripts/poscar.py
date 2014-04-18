@@ -4,8 +4,8 @@
 script to use(demonstrate) vaspy.poscar functions.
 """
 
-import argparse as _argparse
-import functools as _ft
+import argparse
+import functools as ft
 from vaspy import tools
 from vaspy.poscar import POSCAR
 
@@ -14,14 +14,14 @@ def split_to_float(string, n, name):
     lis = string.split(',')
     if len(lis) != n:
         message = '--{0} option requires {1} numbers'.format(name, n)
-        raise _argparse.ArgumentTypeError(message)
+        raise argparse.ArgumentTypeError(message)
     return [float(i) for i in lis]
 
 
-parser = _argparse.ArgumentParser(
-                     formatter_class=_argparse.RawTextHelpFormatter,
+parser = argparse.ArgumentParser(
+                     formatter_class=argparse.RawTextHelpFormatter,
                      epilog="""NOTE: When you run this script
-on Windows Power Shell, 
+on Windows Power Shell,
 commas are regarded as delimiter of values.
 So you must enclose values which
 contains commas with quotations.
@@ -33,21 +33,21 @@ or comma-delimnated numbers.
  (ex.) --atom 1,2,7-9''')
 
 parser.add_argument('--translate', metavar='x,y,z', action='append',
-                    type=_ft.partial(split_to_float, n=3, name='translate'),
+                    type=ft.partial(split_to_float, n=3, name='translate'),
                      help='''displacement (AA unit) by three numbers
 separated by comma.''')
 parser.add_argument('--rotateX', metavar='theta,x,y,z',
-                    type=_ft.partial(split_to_float, n=4, name='rotateX'),
+                    type=ft.partial(split_to_float, n=4, name='rotateX'),
                     help='''Rotation around X-axis by "theta" at (x,y,z)
 NOTE: this option is not taken into account
 the periodic boundary.''')
 parser.add_argument('--rotateY', metavar='theta,x,y,z',
-                    type=_ft.partial(split_to_float, n=4, name='rotateY'),
+                    type=ft.partial(split_to_float, n=4, name='rotateY'),
                     help='''Rotation around Y-axis by "theta" at (x,y,z)
 NOTE: this option is not taken into account
 the periodic boundary.''')
 parser.add_argument('--rotateZ', metavar='theta,x,y,z',
-                    type=_ft.partial(split_to_float, n=4, name='rotateZ'),
+                    type=ft.partial(split_to_float, n=4, name='rotateZ'),
                     help='''Rotation around Z-axis by "theta" at (x,y,z)
 NOTE: this option is not taken into account
 the periodic boundary.''')
@@ -61,10 +61,10 @@ args = parser.parse_args()
 if args.translate and any([args.rotateX,
                            args.rotateY,
                            args.rotateZ]):
-    raise RuntimeError("Cannot set --translate and rotate option simultanaously.")
+    parser.error("Cannot set --translate and rotate option simultanaously.")
 # rotate options are not set multiply.
 if (args.rotateX, args.rotateY, args.rotateZ).count(None) < 2:
-    raise RuntimeError("Cannot set multiple rotate options simultanaously.")
+    parser.error("Cannot set multiple rotate options simultanaously.")
 #
 
 ############
@@ -74,7 +74,7 @@ args.poscar.to_Cartesian()
 print(args.poscar)
 
 #
-#  if "atom" option is not set, all atoms are concerned. 
+#  if "atom" option is not set, all atoms are concerned.
 #
 if not args.atom:
     nAtoms = sum(args.poscar.ionnums)
@@ -84,7 +84,7 @@ if not args.atom:
 #
 if args.translate:
     if len(args.atom) != len(args.translate):
-        raise RuntimeError
+        parser.error()
     for v, a in zip(args.translate, args.atom):
         args.poscar.translate(v, a)
 #
@@ -92,7 +92,7 @@ if args.translate:
 #
 if any([args.rotateX, args.rotateY, args.rotateZ]):
     if len(args.atom) != 1:
-        raise RuntimeError("--atom option set once!")
+        parser.error("--atom option set once!")
     if args.rotateX:
         axis_name = 'X'
         theta = args.rotateX[0]
