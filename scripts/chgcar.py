@@ -1,4 +1,4 @@
-#/usr/bin/env python 
+#!/usr/bin/env python 
 # -*- coding: utf-8 -*-
 """
 script to use(demonstrate) vaspy.chgcar module
