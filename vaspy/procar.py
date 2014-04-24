@@ -359,7 +359,7 @@ class Band(object): # Version safety
 
     def extend(self, iterable_of_States):
         '''same as list.extend().
-        but argument must be an iterable of State objects.
+        but argument must be a finite iterable of State objects.
         '''
         statetuple = tuple(iterable_of_States)
         if not all(isinstance(item, State) for item in statetuple):
