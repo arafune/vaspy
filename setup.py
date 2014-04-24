@@ -24,6 +24,7 @@ setup(name='vaspy',
                'scripts/doscar.py',
                'scripts/outcar.py',
                'scripts/poscar.py',
+               'scripts/procar.py',
                ],
       requires=reqpkgs
       )
