@@ -6,8 +6,8 @@ from __future__ import division, print_function # Version safety
 import re, copy, os, sys
 
 mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
-sys.path.append(os.path.dirname(os.path.abspath(mypath)))
-import poscar, tools
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(mypath))))
+from vaspy import poscar, tools
 
 
 _re_blank = re.compile(r'^[\s]*$')

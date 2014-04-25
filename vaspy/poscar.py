@@ -8,8 +8,8 @@ import numpy as np
 import itertools as it
 import copy, re, os, sys
 mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
-sys.path.append(os.path.dirname(os.path.abspath(mypath)))
-import tools
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(mypath))))
+from vaspy import tools
 
 # @example
 #  l=    " 0.7071067800000000    0.0000000000000000    0.0000000000000000"
