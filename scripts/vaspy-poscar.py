@@ -72,9 +72,9 @@ if (args.rotateX, args.rotateY, args.rotateZ).count(None) < 2:
 
 ############
 
-print(args.poscar)
+#print(args.poscar) #DEBUG
 args.poscar.to_Cartesian()
-print(args.poscar)
+#print(args.poscar) #DEBUG
 
 #
 #  if "atom" option is not set, all atoms are concerned.
