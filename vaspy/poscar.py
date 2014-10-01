@@ -3,13 +3,13 @@
 # python 3.3.2
 # translate from poscar.rb of 2014/2/26, master branch
 
-from __future__ import division, print_function
+from __future__ import division, print_function # Version safety
 import numpy as np
 import itertools as it
 import copy, re, os, sys
 mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
-sys.path.append(os.path.dirname(os.path.abspath(mypath)))
-import tools
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(mypath))))
+from vaspy import tools
 
 # @example
 #  l=    " 0.7071067800000000    0.0000000000000000    0.0000000000000000"
@@ -100,12 +100,12 @@ class for POSCAR (CONTCAR) format
         return self.__latticeV3
 
     def load_from_array(self, poscar):
-        poscar = iter(map(str.rstrip, poscar))
+        poscar = iter(map(str.rstrip, poscar)) # Version safety
         self.system_name = next(poscar)
         self.scaling_factor = float(next(poscar))
-        self.__latticeV1 = np.array([list(map(float, next(poscar).split()))])
-        self.__latticeV2 = np.array([list(map(float, next(poscar).split()))])
-        self.__latticeV3 = np.array([list(map(float, next(poscar).split()))])
+        self.__latticeV1 = np.array([list(map(float, next(poscar).split()))]) # Version safety
+        self.__latticeV2 = np.array([list(map(float, next(poscar).split()))]) # Version safety
+        self.__latticeV3 = np.array([list(map(float, next(poscar).split()))]) # Version safety
         self.iontype = next(poscar).split()
         # parse POSCAR evenif the element names are not set.
         # At present, the String representation number 
@@ -114,7 +114,7 @@ class for POSCAR (CONTCAR) format
             self.ionnums = list(map(int, self.iontype))
             #                      [int(i) for i in self.iontype]
         else:
-            self.ionnums = list(map(int, next(poscar).split()))
+            self.ionnums = list(map(int, next(poscar).split())) # Version safety
         ii = 1
         for elm, n in zip(self.iontype, self.ionnums):
             self.__atom_identifer.extend(
@@ -356,7 +356,7 @@ class for POSCAR (CONTCAR) format
         if self.is_selective:
             tmp.append('Selective Dynamics')
         tmp.append(self.coordinate_type)
-        for pos, tf, atom in tools.ziplong(self.position,
+        for pos, tf, atom in tools.ziplong(self.position, # Version safety
                                            self.coordinate_changeflags,
                                            self.atom_identifer, fillvalue=''):
             tmp.append(' '.join('  {0:20.17f}'.format(i) for i in pos[0]) +
@@ -472,8 +472,12 @@ class for POSCAR (CONTCAR) format
         self.translate(vector, atomrange)
 
     def save(self, filename):
-        with open(filename, 'w') as f:
-            f.write(str(self))
+        try: # Version safety
+            file = open(filename, mode='w', newline='\n')
+        except TypeError:
+            file = open(filename, mode='wb')
+        with file:
+            file.write(str(self))
 
     def point_in_box(self, point, l1, l2, l3):
         x0, y0, z0 = _vectorize(point).flatten()
@@ -553,9 +557,9 @@ if not specified, use standard output''')
     
     ############
 
-    print(arguments.poscar)
+    #print(arguments.poscar) #DEBUG
     arguments.poscar.to_Cartesian()
-    print(arguments.poscar)
+    #print(arguments.poscar) #DEBUG
 
     #
     #  if "atom" option is not set, all atoms are concerned. 

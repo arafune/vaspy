@@ -1,19 +1,19 @@
 #!/usr/bin/env python 
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, division
+from __future__ import print_function, division # Version safety
 import copy as _copy
 import csv as _csv
 import re as _re
 import sys as _sys
 from numbers import Number as _Number
-if _sys.version_info[0] >= 3:
+if _sys.version_info[0] >= 3: # Version safety
     from io import StringIO as _StringIO
 else:
     from cStringIO import StringIO as _StringIO
 
 
-class DOSCAR(object):
+class DOSCAR(object): # Version safety
     '''# class for DOSCAR file
        # @author Ryuichi Arafune
     '''
@@ -53,7 +53,7 @@ class DOSCAR(object):
 
 
 
-class DOS(object):
+class DOS(object): # Version safety
     '''# Class for DOS
        #
        #  attribute : dos
@@ -371,7 +371,7 @@ the name is used in the output filename.""")
                 sumPDOSs.append(each)
             for summedPDOS in sumPDOSs:
                 filename = summedPDOS.site+".dat"
-                try:
+                try: # Version safety
                     file = open(filename, mode='w', newline='')
                 except TypeError:
                     file = open(filename, mode='wb')
@@ -379,7 +379,7 @@ the name is used in the output filename.""")
                     summedPDOS.export_csv(file, delimiter='\t')
                     #file.write(str(summedPDOS))
     #
-    try:
+    try: # Version safety
         file = open("total.dat", mode='w', newline='')
     except TypeError:
         file = open("total.dat", mode='wb')
@@ -392,7 +392,7 @@ the name is used in the output filename.""")
         if isinstance(i, PDOS) and i.site == "":
             i.site = n
         filename = n + "_dos.dat"
-        try:
+        try: # Version safety
             file = open(filename, mode='w', newline='')
         except TypeError:
             file = open(filename, mode='wb')

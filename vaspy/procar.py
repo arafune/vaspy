@@ -2,20 +2,20 @@
 # -*- coding: utf-8 -*-
 # translate from procar.rb of scRipt4VASP 2014/2/26 master branch
 
-from __future__ import division, print_function
+from __future__ import division, print_function # Version safety
 import re, copy, os, sys, csv
 import functools as ft
-if sys.version_info[0] >= 3:
+if sys.version_info[0] >= 3: # Version safety
     from io import StringIO
 else:
     from cStringIO import StringIO
 import numpy as np
 mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
-sys.path.append(os.path.dirname(os.path.abspath(mypath)))
-import tools
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(mypath))))
+from vaspy import tools
 
 
-class PROCAR(object):
+class PROCAR(object): # Version safety
     '''Class for PROCAR file
  
     PROCAR consists of these lines.  Appeer once per file.
@@ -257,7 +257,7 @@ class PROCAR(object):
                 band.append(aState)
         return band
 
-class Band(object):
+class Band(object): # Version safety
     '''Band class
     container of State objects
     class variable : @@kvectors
@@ -359,7 +359,7 @@ class Band(object):
 
     def extend(self, iterable_of_States):
         '''same as list.extend().
-        but argument must be an iterable of State objects.
+        but argument must be a finite iterable of State objects.
         '''
         statetuple = tuple(iterable_of_States)
         if not all(isinstance(item, State) for item in statetuple):
@@ -504,8 +504,12 @@ class Band(object):
         #   contribution to the file.
         # @param [String] filename
         '''
-        with open(filename, mode='w') as file:
-            file.write(str(self))
+        try: # Version safety
+            file = open(filename, mode='w', newline='')
+        except TypeError:
+            file = open(filename, mode='wb')
+        with file:
+            self.export_csv(file, delimiter='\t', lineterminator='\n')
 
 
     def rename_site(self, *new_names):
@@ -574,7 +578,7 @@ class Band(object):
     def dump(self, filename):
         pass
 
-class Orbital(object):
+class Orbital(object): # Version safety
     '''# Class for storing electronic orbital contribution.
     # A "functionalized" Hash
     # @author Ryuichi Arafune
@@ -838,7 +842,7 @@ class State(Orbital):
     # python 2.6 or older don't have functools.total_odering
     # => define all rich comparision method.
 
-    def __cmp__(self, other):
+    def __cmp__(self, other): # Version safety
         '''x.__cmp__(y) <==> cmp(x, y) # python 2.x
         '''
         if not isinstance(other, State): return NotImplemented
@@ -850,35 +854,35 @@ class State(Orbital):
         if cmp != 0: return cmp
         return np.sign(self.spininfo - other.spininfo)
 
-    def __eq__(self, other):
+    def __eq__(self, other): # Version safety
         'x.__eq__(y) <==> x==y'
         cmp = self.__cmp__(other)
         if cmp is NotImplemented: return cmp
         else: return cmp == 0
 
-    def __ne__(self, other):
+    def __ne__(self, other): # Version safety
         'x.__ne__(y) <==> x!=y'
         return self.__cmp__(other) != 0
 
-    def __lt__(self, other):
+    def __lt__(self, other): # Version safety
         'x.__lt__(y) <==> x<y'
         cmp = self.__cmp__(other)
         if cmp is NotImplemented: return cmp
         return cmp == -1
 
-    def __le__(self, other):
+    def __le__(self, other): # Version safety
         'x.__le__(y) <==> x<=y'
         cmp = self.__cmp__(other)
         if cmp is NotImplemented: return cmp
         return cmp != 1
 
-    def __gt__(self, other):
+    def __gt__(self, other): # Version safety
         'x.__gt__(y) <==> x>y'
         cmp = self.__cmp__(other)
         if cmp is NotImplemented: return cmp
         return cmp == 1
 
-    def __ge__(self, other):
+    def __ge__(self, other): # Version safety
         'x.__ge__(y) <==> x>=y'
         cmp = self.__cmp__(other)
         if cmp is NotImplemented: return cmp

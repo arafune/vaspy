@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 ''''''
 
-from __future__ import print_function, division
+from __future__ import print_function, division # Version safety
 import re
 import itertools as it
 from collections import Iterable
-
+ # Version safety
 ziplong = it.izip_longest if hasattr(it, 'izip_longest') else it.zip_longest
 
-if not hasattr(__builtins__, 'basestring'):
+if not hasattr(__builtins__, 'basestring'): # Version safety
     flatten_ignore = (dict, str, bytes, bytearray)
 else:
     flatten_ignore = (dict, basestring)
@@ -20,7 +20,7 @@ def each_slice(iterable, n, fillvalue=None):
 make new iterator object which get n item from [iterable] at once.
 '''
     args = [iter(iterable)] * n
-    return ziplong(*args, fillvalue=fillvalue)
+    return ziplong(*args, fillvalue=fillvalue) # Version safety
 
 def removeall(L, value):
     'remove all *value* in [list] L'
@@ -73,6 +73,7 @@ def parse_Atomselection(L):
     for each in array:
         if re.search(_rerange, each):
             start, stop = re.findall(_rerange, each)[0]
+            # Version safety
             output |= set(str(i) for i in range(int(start), int(stop)+1))
         elif re.search(_resingle, each):
             output.add(each)
@@ -86,7 +87,7 @@ if __name__ == '__main__':
     each_slice_demo = lambda L, n: list(each_slice(L, n))
     demo = {'each_slice_demo': (range(10), 3),
             'removeall': ([1, 0, 0, 1, 0, 1, 0, 0], 0),
-            'flatten': ((1, [range(2), 3, set([4, 5]), [6]],
+            'flatten': ((1, [range(2), 3, set([4, 5]), [6]], #Version safety
                              frozenset([7, 8])),),
             'parse_Atomselection': ('1-5,8,9,11-15',),
             }
