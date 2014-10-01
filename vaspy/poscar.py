@@ -557,9 +557,9 @@ if not specified, use standard output''')
     
     ############
 
-    print(arguments.poscar)
+    #print(arguments.poscar) #DEBUG
     arguments.poscar.to_Cartesian()
-    print(arguments.poscar)
+    #print(arguments.poscar) #DEBUG
 
     #
     #  if "atom" option is not set, all atoms are concerned. 
