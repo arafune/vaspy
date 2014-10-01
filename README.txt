@@ -8,6 +8,7 @@ Requirement
     Python (2.6 or newer)
     NumPy (any version)
     argparse (for Python 2.6, 3.0, 3.1)
+    matplotlib (only when using outcar script)
 
 Installation
     In this directory type following command:
@@ -18,7 +19,7 @@ Installation
     $ python setup.py install --user
 
 Use scripts
-    *** THIS VERSION DOES NOT CONTAIN SCRIPTS (yet). ***
+    *** SCRIPTS OF THIS VERSION DOES NOT WORK CORRECTLY (yet). ***
     Add directory which contains scripts to your PATH.
     The default directory is:
     - Linux

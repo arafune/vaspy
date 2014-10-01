@@ -11,8 +11,8 @@ else:
     from cStringIO import StringIO
 import numpy as np
 mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
-sys.path.append(os.path.dirname(os.path.abspath(mypath)))
-import tools
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(mypath))))
+from vaspy import tools
 
 
 class PROCAR(object): # Version safety
