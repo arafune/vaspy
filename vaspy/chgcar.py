@@ -16,20 +16,25 @@ _re_aug_occ = re.compile(r'\baugmentation occupancies')
 class CHGCAR(poscar.POSCAR):
     '''
     class for CHGCAR format
-    @version 1.0.0
-    @note the current verstion does not take account "augmentation occupacies".
 
-     An example of the first few line of the CHGCAR. :
-      hBN-Cu                                  #1st line   @poscar[0]
-      1.00000000000000                        #2nd line   @poscar[1]
-        6.762964    0.000000    0.000000      #3rd line   @poscar[2]
-        3.381482    5.856898    0.000000      #4th line   @poscar[3]
-        0.000000    0.000000   29.004836      #5th line   @poscar[4]
-      B    Cu   N    Si                       #6th line   @poscar[5]
-        7    21     7     6                   #7th line   @poscar[6]
-      Direct                                  #8th line   @poscar[7]
-        0.047680  0.261795  0.361962          #9th line   @poscar[8]
-        ....
+
+     An example of the first few line of the CHGCAR. ::
+
+           hBN-Cu                                  #1st line   @poscar[0]
+           1.00000000000000                        #2nd line   @poscar[1]
+             6.762964    0.000000    0.000000      #3rd line   @poscar[2]
+             3.381482    5.856898    0.000000      #4th line   @poscar[3]
+             0.000000    0.000000   29.004836      #5th line   @poscar[4]
+           B    Cu   N    Si                       #6th line   @poscar[5]
+             7    21     7     6                   #7th line   @poscar[6]
+           Direct                                  #8th line   @poscar[7]
+             0.047680  0.261795  0.361962          #9th line   @poscar[8]
+             ....
+
+    :todo: fit the above description with python style
+    :version: 1.0.0
+    :note: the current verstion does not take account "augmentation occupacies".
+
 '''
     # accessor: chgArray, meshX-Y-Z
     def __init__(self, arg=None):
@@ -44,8 +49,8 @@ class CHGCAR(poscar.POSCAR):
 
     def load_from_file(self, chgcarfile):
         '''
-    @param [String] chgcarfile CHGCAR file name
-    @return [CHGCAR]
+     :param string chgcarfile: CHGCAR file name
+     :return: CHGCAR
 '''
         section = 'poscar'
         separator = None
@@ -110,19 +115,18 @@ class CHGCAR(poscar.POSCAR):
 
     def magnetization(self, direction=None):
         '''
-  # CHGCAR#magnetization(direction=nil)
-  # @return [CHGCAR] returns CHGCAR of the spin-distribution 
-  #
-  #   For spinpolarized calculations, two sets of data can be found in
-  #   the CHGCAR file. The first set contains the total charge density
-  #   (spin up plus spin down), the second one the magnetization
-  #   density (spin up minus spin down). For non collinear
-  #   calculations the CHGCAR file contains the total charge density
-  #   and the magnetisation density in the x, y and z direction in
-  #   this order.
+        CHGCAR#magnetization(direction=nil)
 
-  # for spinpolarized calculation the argument does not make a sense.
-  # For non collinear CHGCAR direction should be one of 'x', 'y' 'z'
+        For spinpolarized calculations (``ISPIN=2`` but ``LSORBIT=.FALSE.``), two sets of data can be found in the CHGCAR file. The first set contains the total charge density (spin up plus spin down), the second one the magnetization density (spin up minus spin down). 
+        For non collinear calculations (``ISPIN=2`` but ``LSORBIT=.TRUE.``) the CHGCAR file contains the total charge density and the magnetisation density in the x, y and z direction in this order.
+
+        For spinpolarized calculation the argument does not make a sense.   For non collinear CHGCAR direction should be one of 'x', 'y' 'z'
+
+
+        :param string direction:
+        :return:  CHGCAR of the spin-distribution 
+        :rtype: CHGCAR
+
 '''
         if len(self.spininfo) == 1:
             raise RuntimeError("This CHGCAR is not spinresolved version")
@@ -146,12 +150,12 @@ class CHGCAR(poscar.POSCAR):
 
     def majorityspin(self):
         '''
-  # CHGCAR#majorityspin
-  # @return [CHGCAR] returns CHGCAR for the majority spin charge
-  #   from CHGCAR given by ISPIN=2 but not-SOI calculations.
-  #   According to Dr. Minamitani, the former part of charge 
-  #   distribution corresponds for majority spin + minority spin,
-  #   the latter part for  majority - minority
+        CHGCAR#majorityspin
+      
+        From CHGCAR given by ISPIN=2 but not-SOI calculations.   According to Dr. Minamitani, the former part of charge    distribution corresponds for majority spin + minority spin, the latter part for  majority - minority
+
+        :return: CHGCAR for the majority spin charge
+        :rtype:  CHGCAR
 '''
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
@@ -162,12 +166,13 @@ class CHGCAR(poscar.POSCAR):
         return destCHGCAR
 
     def minorityspin(self):
-        '''  # CHGCAR#minorityspin
-  # @return [CHGCAR] returns CHGCAR for the minority  spin charge
-  #   from CHGCAR given by ISPIN=2 but not-SOI calculations.
-  #   According to Dr. Minamitani, the former part of charge 
-  #   distribution corresponds for majority spin + minority spin,
-  #   the latter part for  majority - minority
+        '''
+        CHGCAR#minorityspin
+
+        from CHGCAR given by ISPIN=2 but not-SOI calculations.   According to Dr. Minamitani, the former part of charge distribution corresponds for majority spin + minority spin, the latter part for  majority - minority
+
+        :return: CHGCAR for the minority  spin charge
+        :rtype: CHGCAR  
 '''
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
@@ -178,13 +183,18 @@ class CHGCAR(poscar.POSCAR):
         return destCHGCAR
 
     def __add__(self, other):
-        '''x.__add__(y) <=> x + y
-    @param [CHGCAR] other addition CHGCAR object
-    @return [CHGCAR] returns CHGCAR of the result by summing two CHGCARs:
-    @note
-      in the returned CHGCAR :
-      the charge distribution is just summantion of two CHGCARs,
-      and the atoms are also summantion of two CHGCARs.
+        '''
+        x.__add__(y) <=> x + y
+        
+
+        :param CHGCAR: other addition CHGCAR object
+        :return: CHGCAR of the result by summing two CHGCARs:
+        :rtype: [CHGCAR] 
+        :note:
+        in the returned CHGCAR :
+        the charge distribution is just summantion of two CHGCARs,
+        and the atoms are also summantion of two CHGCARs.
+
 '''
         # augend + aggend
         if not isinstance(other, CHGCAR):

@@ -16,22 +16,27 @@ from vaspy import tools
 
 
 class PROCAR(object): # Version safety
-    '''Class for PROCAR file
- 
+    '''
+    Class for PROCAR file
+
+    .. py:class:: PROCAR(object)
+
     PROCAR consists of these lines.  Appeer once per file.
-    1 # the first line
-     ex.)   PROCAR lm decomposed + phase  
-    2 set number of k-points, bands and ions.  
+
+    1. # the first line
+     ex.)   PROCAR lm decomposed + phase
+    2. set number of k-points, bands and ions.
       Appear once when spin-integrated, twice when spin-resolved.
      ex.)   # of k-points:   50         # of bands: 576         # of ions:  98
-    3  k-point character
+    3.  k-point character
      ex.)  k-point    1 :    0.00000000 0.00000000 0.00000000     weight = 0.02000000
      note that the first character is "blank".
-    4 band character
+    4. band character
      ex.)  band   1 # energy  -11.87868466 # occ.  2.00000000
-    5 orbital contribution.
+    5. orbital contribution.
      ex.)  1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
-    @author Ryuichi Arafune
+
+    :author: Ryuichi Arafune
     '''
     #attr_reader :orbital, :phase, :spininfo, :numk,
     #:nBands, :nAtoms, :kvectors, :energies, :oritalname
@@ -258,19 +263,24 @@ class PROCAR(object): # Version safety
         return band
 
 class Band(object): # Version safety
-    '''Band class
+    '''
+    .. py:class:: Band class
+
     container of State objects
-    class variable : @@kvectors
-    @author Ryuichi Arafune
+
+    :class variable: kvectors
+    :author: Ryuichi Arafune
     '''
     # attr_accessor :band
     __kvectors = list()
     __distance = list()
 
     def __init__(self, arg=None):
-        '''Band(list-of-kvectors) => Band object
+        '''
+        Band(list-of-kvectors) => Band object
         Band#initialize: Sets @@kvectors and then calculate @@distance
-        @param[Array] arg kvectors array
+
+        :param Array arg: kvectors array
         '''
         self.__band = list()
         if arg is not None:
@@ -284,14 +294,19 @@ class Band(object): # Version safety
     
     @property
     def kvectors(self):
-        '''Band#kvectors
-        # @return [Array<Float, Float, Float>] Returns @@kvectors
+        '''
+        Band#kvectors
+
+        :return: kvectors
+        :rtype: Array<Float, Float, Float>
         '''
         return self.__kvectors
 
     @property
     def distance(self):
-        '''@return [Array<Float>] Returns @@distance
+        '''
+        :return: distance
+        :rtype: Array<Float>
         '''
         return self.__distance
 
@@ -341,24 +356,25 @@ class Band(object): # Version safety
 
     def fermilevel_correction(self, ef): # check whether it works correctly
         '''
-        # eigenvalues are corrected by fermi level.
-        # Usually the value are obtained from OUTCAR.
-        #
-        #  @param[Float] ef
+        eigenvalues are corrected by fermi level.  Usually the value are obtained from OUTCAR.
+
+        :param float ef:
         '''
         for aState in self:
             aState.fermilevel_correction(ef)
 
     def append(self, aState):
-        '''same as list.append(), but argument must be a State object.
-        @param [State] aState
+        '''
+        same as list.append(), but argument must be a State object.
+        :param State aState:
         '''
         if not isinstance(aState, State):
             raise TypeError('argument must be a procar.State object.')
         self.__band.append(aState)
 
     def extend(self, iterable_of_States):
-        '''same as list.extend().
+        '''
+        same as list.extend().
         but argument must be a finite iterable of State objects.
         '''
         statetuple = tuple(iterable_of_States)
@@ -402,10 +418,10 @@ class Band(object): # Version safety
         self.__band.sort(key=key, reverse=reverse)
 
     def site_integrate(self, *sites):
-        '''  # @param [Fixnum, Range, Array] sites sites are
-        #     specified by comma-separated number, array,
-        #     or Range object.
-        # @return [Band] site-integrated band object
+        '''
+        :param [Fixnum, Range, Array] sites: sites are specified by comma-separated number, array, or Range object.
+        :return:  site-integrated band object
+        :rtype: Band
         '''
         tmpBand = self.select_by_site(*sites)
         siteGroup = dict()
@@ -428,10 +444,11 @@ class Band(object): # Version safety
             aState.extract_orbitals(*orbital_symbols)
     
     def extract_orbitals(self, *orbital_symbols):
-        '''  # extract certain orbital component in place
-        # Receiver itself does not change
-        # @param [Array] orbital_symbols
-        # @return [Band] orbital_extracted Band
+        '''
+        Extract certain orbital component in place.  Receiver itself does not change
+        :param Array orbital_symbols:
+        :return: orbital_extracted Band
+        :rtype: Band
         '''
         dest = copy.deepcopy(self) ### check it is really deep copy ###
         for aState in dest.band:
@@ -439,9 +456,10 @@ class Band(object): # Version safety
         return dest
 
     def header(self):
-        '''  # @param[Array] orbital_symbols
-        # @return [Array] Returns arrray represents header for 
-        #   Band#to_a 
+        '''
+        :param Array orbital_symbols:
+        :return: Arrray represents header for Band#to_a 
+        :rtype: Array 
         '''
         nSites = self.number_of_sites()
         nSpintype = self.number_of_spintype()
@@ -562,13 +580,10 @@ class Band(object): # Version safety
 
     def select_by_band(self, *bandindices):
         '''
-        # @param [Fixnum, Range, Array] bandindexes bandindexes
-        #   are specified by comma-separated number, array,
-        #   or Range object. 
-        # @example Band#select_by_band(1,2,3,4) : same as 
-        #   Band#select_by_band(1..4)/Band#select_by_band([1,2,3,4]) 
-        # @return [Band] Returns a new band object that consists 
-        #    of States specified by bandindex.
+        :param [Fixnum, Range, Array] bandindexes: bandindexes are specified by comma-separated number, array, or Range object. 
+        :example: Band#select_by_band(1,2,3,4) : same as Band#select_by_band(1..4)/Band#select_by_band([1,2,3,4]) 
+        :return: a new band object that consists of States specified by bandindex.
+        :rtype: Band
         '''
         bandindices = sorted(set(tools.flatten(bandindices)))
         dest = Band()
@@ -579,10 +594,16 @@ class Band(object): # Version safety
         pass
 
 class Orbital(object): # Version safety
-    '''# Class for storing electronic orbital contribution.
-    # A "functionalized" Hash
-    # @author Ryuichi Arafune
-    # @version 2.0'''
+    '''
+    .. py:class:: Orbital(object)
+    
+    Electronic orbital contribution.
+    
+    A "functionalized" Hash
+
+    :author: Ryuichi Arafune
+    :version: 2.0
+    '''
     __orbital_list = ('ion', 's', 'py', 'pz', 'px', 'dxy',
                       'dyz', 'dz2', 'dxz', 'dx2', 'tot')
 
@@ -603,29 +624,33 @@ class Orbital(object): # Version safety
 
     def load_from_line(self, arg):
         '''
-        # Read values of orbital contribution from the line.
-        #  (Essentially, this method acts as a parser.)
-        #  The order of the orbitals is determined with the orbitalname array.
-        #  In PROCAR file, the table that corresponds the orbital 
-        #  contribution is like this:
-        #  ion    s     py     pz     px    dxy    dyz    dz2    dxz    dx2    tot
-        #  1  0.001  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.002
-        #  2  0.003  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.005
-        #  3  0.002  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.004
-        #  4  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.001
-        #  5  0.005  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.007
-        #  6  0.003  0.000  0.001  0.000  0.000  0.000  0.001  0.000  0.000  0.005
-        #  ...
-        #  An array called orbitalname is created from the first line of the table 
-        #  that starts with "ion"
-        # @param [String,Array,Hash,Orbital] arg  the format is like this:
-        #
-        #   1  0.001  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.002
-        #
-        #   (the first column indicates the atom #.)
-        # 
-        #   (Each element is separated by the space.)
-        # @return [String] atom #.
+        Read values of orbital contribution from the line.  (Essentially, this method acts as a parser.) The order of the orbitals is determined with the orbitalname array.  In PROCAR file, the table that corresponds the orbital contribution is like this::
+
+          ion    s     py     pz     px    dxy    dyz    dz2    dxz    dx2    tot
+          1  0.001  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.002
+          2  0.003  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.005
+          3  0.002  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.004
+          4  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.001
+          5  0.005  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.007
+          6  0.003  0.000  0.001  0.000  0.000  0.000  0.001  0.000  0.000  0.005
+          ...
+
+
+          An array called orbitalname is created from the first line of the table 
+          that starts with "ion"
+
+
+        :param [String,Array,Hash,Orbital] arg:
+
+        the format is like this::
+
+           1  0.001  0.000  0.001  0.000  0.000  0.000  0.000  0.000  0.000  0.002
+                #   (the first column indicates the atom #.)
+
+           (Each element is separated by the space.)
+
+        :return: atom #.
+        :rtype:  string
         '''
         if isinstance(arg, str):
             self.orbital = dict(zip(self.defined_orbital_list(),

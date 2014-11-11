@@ -1,4 +1,10 @@
-'''modules made for VASP pre\postprocess.'''
+# -*- coding: utf-8 -*-
+"""
+    VASPy
+   ======
+
+    modules made for VASP pre\postprocess.
+"""
 #import os
 
 __all__ = ['chgcar',

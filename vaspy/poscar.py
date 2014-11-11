@@ -15,6 +15,7 @@ from vaspy import tools
 #  l=    " 0.7071067800000000    0.0000000000000000    0.0000000000000000"
 #  Vector.elements(l.split.map{|i| i.to_f}) # => Vector[0.70710678, 0.0, 0.0]
 
+
 '''
  fcc (111) surface                      
    3.52000000000000     
@@ -60,15 +61,20 @@ Direct
 
 class POSCAR(object):
     '''
-class for POSCAR (CONTCAR) format
-    This script does *NOT* support for constructing POSCAR from scratch.
-    (Use ASE for this purpose.)
-    It provides a way to slightly modify the POSCAR(CONTCAR),
-      which has already works well.
-  methods list: to_Cartesian, translate, translate_all
-  @version 2.0'''
+..    .. py:class:: POSCAR(object)
+    
+    class for POSCAR (CONTCAR) format
+
+    This script does *NOT* support for constructing POSCAR from scratch. (Use ASE for this purpose.)
+    
+    It provides a way to slightly modify the POSCAR(CONTCAR), which has already works well.
+    :methods list: to_Cartesian, translate, translate_all
+    :version: 2.0
+    '''
     def __init__(self, arg=None):
-        '''arg is POSCAR file name, or list of POSCAR text.'''
+        '''
+        :param arg string: POSCAR file name, or list of POSCAR text.
+        '''
         self.system_name = ""
         self.scaling_factor = 0.
         self.__latticeV1 = np.array([[0., 0., 0.]])
@@ -160,36 +166,48 @@ class for POSCAR (CONTCAR) format
 
     @property
     def is_cartesian(self):
-        '''return True if coordinate is cartesian'''
+        '''
+        :return: True if coordinate is cartesian
+        :rtype: Boolean
+        '''
         return bool(re.search(r'^[ck]', self.coordinate_type, re.I))
     
     @property
     def is_direct(self):
-        '''return True if coordinate is direct (not cartesian)'''
+        '''
+        :return: True if coordinate is direct (not cartesian)
+        :rtype: Boolean
+        '''
         return not self.is_cartesian
 
     @property
     def is_selective(self):
-        '''return True if "Selective Dynamics" switch on.'''
+        '''
+        :return: True if "Selective Dynamics" switch on.
+        :rtype: Boolean
+        '''
         return self.__selective
 
     def pos(self, i):
         '''
-    POSCAR.pos(i): An accessor of POSCAR.position.
-      As in VASP, the atom index starts with "1", not "0".  
-      This method follows this manner.
-    @param [Fixnum] i site #
-     @note the first site # is "1", not "0". (Follow VESTA's way.)
-    @return [numpy.array] Returns i-th atom's position by Vector representation.
+        POSCAR.pos(i): An accessor of POSCAR.position.
+
+        As in VASP, the atom index starts with "1", not "0".   This method follows this manner.
+
+        :param i: site #
+        :param type: int
+        :note: the first site # is "1", not "0". (Follow VESTA's way.)
+        :return: *i* -th atom's position by Vector representation.
+        :rtype: numpy.array
 '''
         return self.position[i - 1]
 
     def pos_replace(self, i, vector):
         '''
-    @param [Fixnum] i site #
-     @note the first site # is "1", not "0". 
-        (follow VESTA's and VASP's way.)
-    @param [Vector] vector  Vector representation of the i-th atom position.
+        :param int i: site #
+        :param vector vector:  Vector representation of the i-th atom position.
+        :note: the first site # is "1", not "0".  (follow VESTA's and VASP's way.)
+    
 '''
         vector = _vectorize(vector)
         if not isinstance(i, int): raise ValueError
@@ -200,8 +218,9 @@ class for POSCAR (CONTCAR) format
 
     def rotateX(self, theta):
         '''
-    @param [float] theta angle of rotation (Degrees)
-    @return [np.matrix] rotation matrix
+        :param float theta: angle of rotation (Degrees)
+        :return: rotation matrix
+        :rtype: np.matrix
 '''
         degree = np.pi / 180.0
         return np.mat([[1.0, 0.0, 0.0],
@@ -225,19 +244,18 @@ class for POSCAR (CONTCAR) format
     # class method? or independent function?
     def nearest(self, array, point):
         '''
-    @param [list-of-np.array] array
-    @param [np.array] point
-    @return [np.array]
+        :param list-of-np.array array:
+        :param np.array point:
+        :return: np.array
+        :rtype: np.array
 '''
         return min(array, key=lambda pos: np.linalg.norm(pos - point))
 
     # class method? or independent function?
     def make27candidate(self, position):
         '''
-  # @param [np.array] position atom position defined
-  #    in the coordinated by latticeV1, latticeV2, 
-  #    latticeV3 ( scaling facter is not accounted).
-  # @return [list-of-np.array]
+        :param np.array position: atom position defined in the coordinated by latticeV1, latticeV2, latticeV3 ( scaling facter is not accounted).
+        :return: list-of-np.array
 '''
         position = _vectorize(position)
         candidates27 = []
@@ -257,13 +275,14 @@ class for POSCAR (CONTCAR) format
 
     def atom_rotate(self, site, axis_name, theta, center):
         '''
-    Rotate atom under periodic boundary condition
-    @param [Fixnum] site site # for rotation (The first atom is "1".).
-    @param [String] axis_name "X", "x", "Y", "y", "Z", or "z". Rotation axis.
-    @param [Float] theta Rotation angle (Degrees).
-    @param [Array<Float>, Vector] center center position for rotation. 
-    @todo  check the center in the Braves lattice.
-    @todo  take into account the periodic boundary. 
+        Rotate atom under periodic boundary condition
+        
+        :param int site: site # for rotation (The first atom is "1".).
+        :param string axis_name: "X", "x", "Y", "y", "Z", or "z". Rotation axis.
+        :param float theta: Rotation angle (Degrees).
+        :param Array<Float> center: center position for rotation. 
+        :todo:  check the center in the Braves lattice.
+        :todo:  take into account the periodic boundary. 
 '''
         center = _vectorize(center)
         if len(center[0]) != 3: raise ValueError
@@ -281,13 +300,10 @@ class for POSCAR (CONTCAR) format
 
     def atoms_rotate(self, site_list_pack, axis_name, theta, center):
         '''
-  # @param [Array<Fixnum>] site_list_pack list array of the 
-  #   list array (not typo!) of  site # for rotation 
-  #   (The first atom is "1".).
-  # @param [String] axis_name "X", "x", "Y", "y", "Z",
-  #   or "z". Rotation axis.
-  # @param [Float] theta Rotation angle (Degrees).
-  # @param [Array<Float>, Vector] center center position for rotation. 
+        :param Array<Fixnum> site_list_pack: list array of the  list array (not typo!) of site for rotation   (The first atom is "1".).
+        :param string axis_name: "X", "x", "Y", "y", "Z",or "z". Rotation axis.
+        :param float theta: Rotation angle (Degrees).
+        :param Vector center: center position for rotation.  (Does `Vector` class exists in python?)
 '''
         for site_list in site_list_pack:
             for site in site_list:
@@ -295,9 +311,9 @@ class for POSCAR (CONTCAR) format
 
     def __add__(self, other):
         '''
-  # @param [POSCAR] other
-  # @return [POSCAR] 
-  # @todo Check the lattice vectors, coordinate_type and so on.
+        :param POSCAR other:
+        :return: POSCAR
+        :todo: Check the lattice vectors, coordinate_type and so on.
 '''
         #if not isinstance(other, POSCAR): return NotImplemented
         destPOSCAR = copy.deepcopy(self)
@@ -321,7 +337,8 @@ class for POSCAR (CONTCAR) format
 
     def to_list(self):
         '''
-    @return [list] a list representation of POSCAR.
+        :return: a list representation of POSCAR.
+        :rtype: list
 '''
         out_list = []
         out_list.append(self.system_name)
@@ -342,7 +359,8 @@ class for POSCAR (CONTCAR) format
 
     def __str__(self):
         '''
-    @return [String] a string representation of POSCAR
+        :return: a string representation of POSCAR
+        :rtype: string
 '''
         tmp = []
         tmp.append(self.system_name)
@@ -365,9 +383,10 @@ class for POSCAR (CONTCAR) format
 
     def tune_scaling_factor(self, new_scaling_factor=1.0):
         '''
-    change scaling factor to new value.
-        The Braves lattice are corrected (to be equal size).
-    @param [Float] new_scaling_factor
+        change scaling factor to new value. 
+
+        :param float new_scaling_factor:
+        :note:  **The Braves lattice are corrected (to be equal size).**
 '''
         old = self.scaling_factor
         self.__latticeV1 *= (old / new_scaling_factor)
@@ -380,8 +399,10 @@ class for POSCAR (CONTCAR) format
 
     def to_Cartesian(self):
         '''
-    change the coordinate to cartesian from direct.
-    @return [Boolian] true if POSCAR file is cartesian coordinate
+        change the coordinate to cartesian from direct.
+        
+        :return: true if POSCAR file is cartesian coordinate
+        :rtype: Boolean
 '''
         if self.is_direct:
             self.coordinate_type = "Cartesian"
@@ -401,18 +422,14 @@ class for POSCAR (CONTCAR) format
 
     def guess_molecule(self, site_list, center=None):
         '''
-  # arrange atom position to form a molecule.  This method is effective for molecular rotation.
-  # @param [Array<Fixnum>] site_list list of site #
-  # @param [Vector] center center position of "molecule" (Optional).
-  # @note When the optional argument, center, is set, the 
-  #   atoms are re-arranged as to
-  #   minimize the distance from this center.  If not the
-  #   center is not set, atoms are re-arranged to minimize 
-  #   the total bonding length.  As the algorithm for mimizing the
-  #   total length is not exhaustive, the resultant atom arrangement
-  #   may different from what you expect, in spite of time-waste.
-  #   So, the center option is highly recommended to form a molecule.
-  # @return [Array<Vector>] Array of Vector that represents "molecule".
+        arrange atom position to form a molecule.  This method is effective for molecular rotation.
+
+        :param Array<Fixnum> site_list: list of site #
+        :param Vector center: center position of "molecule" (Optional).
+        :return: Array of Vector that represents "molecule".
+        :rtype:  Array<Vector> 
+        :note: When the optional argument, center, is set, the  atoms are re-arranged as to minimize the distance from this center.  If not the   center is not set, atoms are re-arranged to minimize  the total bonding length.  As the algorithm for mimizing the total length is not exhaustive, the resultant atom arrangement  may different from what you expect, in spite of time-waste. So, the center option is highly recommended to form a molecule.
+
 '''
         #list for atom positions for "molecule"
         molecule = [self.pos(j) for j in site_list]
@@ -439,20 +456,23 @@ class for POSCAR (CONTCAR) format
 
     def guess_molecule2(self, site_list):
         '''
-  # arrange atom position to form a molecule.
-  # poscar updates
-  # @param [Array<Fixnum>] site_list list of site #
+        arrange atom position to form a molecule.  poscar updates
+
+        :param Array<Fixnum> site_list: list of site #
 '''
         molecule = self.guess_molecule(site_list)
         for site, posVector in zip(site_list, molecule):
             self.pos_replace(site, posVector)
 
     def translate(self, vector, atomlist):
-        '''  # Translate the selected atom(s) by vector
-  # @param [Vector] vector translational vector
-  # @param [Array] atomlist list of the atome for moving 
-  #  @note the first atom is "1", not "0".
-  # @return [Array]
+        '''  
+        Translate the selected atom(s) by vector
+
+        :param Vector vector: translational vector
+        :param Array atomlist: list of the atome for moving 
+        :note: the first atom is "1", not "0".
+        :return: Array
+        :rtype: Array
 '''
         if self.is_cartesian:
             vector = _vectorize(vector)
@@ -464,9 +484,12 @@ class for POSCAR (CONTCAR) format
         return self.postion
 
     def translate_all(self, vector):
-        '''  # Translate all atoms by vector
-  # @param [Vector] vector translational vector
-  # @return [Array]
+        '''  
+        Translate **all** atoms by vector
+
+        :param Vector vector: translational vector
+        :return: Array
+        :rtype: Array
 '''
         atomrange = list(range(1, sum(self.ionnums) + 1))
         self.translate(vector, atomrange)
