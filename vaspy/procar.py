@@ -693,6 +693,7 @@ class Orbital(object): # Version safety
         '''
         return self.orbital.setdefault(symbol, default)
 
+    @property
     def site(self): return self.orbital['ion']
 
     #def orbital(self): return self
@@ -797,6 +798,8 @@ class Orbital(object): # Version safety
             raise ValueError("Last element of argument mst be 'tot'.")
         self.__orbital_list = arg
 
+_cmpattr = ('bandindex', 'kindex', 'site', 'spininfo')
+
 class State(Orbital):
     '''# Class for electronic state
     # @author Ryuichi Arafune
@@ -846,19 +849,27 @@ class State(Orbital):
         '''x.__cmp__(y) <==> cmp(x, y) # python 2.x
         '''
         if not isinstance(other, State): return NotImplemented
-        cmp = np.sign(self.bandindex - other.bandindex)
-        if cmp != 0: return cmp
-        cmp = np.sign(self.kindex - other.kindex)
-        if cmp != 0: return cmp
-        cmp = np.sign(self.site - other.site)
-        if cmp != 0: return cmp
-        return np.sign(self.spininfo - other.spininfo)
+        for attr in _cmpattr:
+            selfside = getattr(self, attr)
+            otherside = getattr(other, attr)
+            if selfside > otherside:
+                return 1
+            elif selfside < otherside:
+                return -1
+        return 0
+        #cmp = np.sign(self.bandindex - other.bandindex)
+        #if cmp != 0: return cmp
+        #cmp = np.sign(self.kindex - other.kindex)
+        #if cmp != 0: return cmp
+        #cmp = np.sign(self.site - other.site)
+        #if cmp != 0: return cmp
+        #return np.sign(self.spininfo - other.spininfo)
 
     def __eq__(self, other): # Version safety
         'x.__eq__(y) <==> x==y'
         cmp = self.__cmp__(other)
         if cmp is NotImplemented: return cmp
-        else: return cmp == 0
+        return cmp == 0
 
     def __ne__(self, other): # Version safety
         'x.__ne__(y) <==> x!=y'
