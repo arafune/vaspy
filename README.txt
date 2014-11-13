@@ -19,7 +19,6 @@ Installation
     $ python setup.py install --user
 
 Use scripts
-    *** SCRIPTS OF THIS VERSION DOES NOT WORK CORRECTLY (yet). ***
     Add directory which contains scripts to your PATH.
     The default directory is:
     - Linux
