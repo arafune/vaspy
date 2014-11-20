@@ -446,7 +446,7 @@ class Band(object): # Version safety
         nSites = self.number_of_sites()
         nSpintype = self.number_of_spintype()
         tmp = sorted(self)[0:(nSites * nSpintype)]
-        tmp = [str(aState.site()) + str(orbital) + aState.spininfo
+        tmp = [str(aState.site) + str(orbital) + aState.spininfo
                for aState in tmp
                for orbital in aState.orbital_keys()]
         tmp[0:0] = ['k', 'energy']
@@ -494,9 +494,9 @@ class Band(object): # Version safety
         for i, each in enumerate(array):
             if i % len(self.distance) == 0 and i > 0:
                 csvwriter.writerow([None] * (nColumn-1))
-                csvwriter.writerow(str(x) for x in each)
+                csvwriter.writerow([str(x) for x in each])
             else:
-                csvwriter.writerow(str(x) for x in each)
+                csvwriter.writerow([str(x) for x in each])
 
 
     def save(self, filename):
