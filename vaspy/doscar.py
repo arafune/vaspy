@@ -98,7 +98,7 @@ class DOS(object): # Version safety
         '''# @return [Array] return and remove the last element 
            #    (the highest energy data) of the DOS object.
         '''
-        self.dos.pop(i)
+        return self.dos.pop(i)
     
 
     # self.unshift(X) => self.[0:0] = X
