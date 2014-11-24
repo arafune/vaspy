@@ -1,3 +1,4 @@
 docs
 *.pyc
 build
+install-vaspy.txt
