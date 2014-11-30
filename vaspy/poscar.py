@@ -115,9 +115,12 @@ class POSCAR(object):
         poscar = iter(map(str.rstrip, poscar)) # Version safety
         self.system_name = next(poscar)
         self.scaling_factor = float(next(poscar))
-        self.__latticeV1 = np.array([list(map(float, next(poscar).split()))]) # Version safety
-        self.__latticeV2 = np.array([list(map(float, next(poscar).split()))]) # Version safety
-        self.__latticeV3 = np.array([list(map(float, next(poscar).split()))]) # Version safety
+        self.__latticeV1 = np.array(
+            [list(map(float, next(poscar).split()))]) # Version safety
+        self.__latticeV2 = np.array(
+            [list(map(float, next(poscar).split()))]) # Version safety
+        self.__latticeV3 = np.array(
+            [list(map(float, next(poscar).split()))]) # Version safety
         self.iontype = next(poscar).split()
         # parse POSCAR evenif the element names are not set.
         # At present, the String representation number 
@@ -126,7 +129,8 @@ class POSCAR(object):
             self.ionnums = list(map(int, self.iontype))
             #                      [int(i) for i in self.iontype]
         else:
-            self.ionnums = list(map(int, next(poscar).split())) # Version safety
+            self.ionnums = list(
+                map(int, next(poscar).split())) # Version safety
         ii = 1
         for elm, n in zip(self.iontype, self.ionnums):
             self.__atom_identifer.extend(
@@ -198,7 +202,8 @@ class POSCAR(object):
         '''
         POSCAR.pos(i): An accessor of POSCAR.position.
 
-        As in VASP, the atom index starts with "1", not "0".   This method follows this manner.
+        As in VASP, the atom index starts with "1",
+        not "0".   This method follows this manner.
 
         :param i: site #
         :param type: int
@@ -211,9 +216,10 @@ class POSCAR(object):
     def pos_replace(self, i, vector):
         '''
         :param int i: site #
-        :param vector vector:  Vector representation of the i-th atom position.
-        :note: the first site # is "1", not "0".  (follow VESTA's and VASP's way.)
-    
+        :param vector vector: Vector representation of the i-th
+        atom position.
+        :note: the first site # is "1", not "0".
+        (follow VESTA's and VASP's way.)
 '''
         vector = _vectorize(vector)
         if not isinstance(i, int): raise ValueError
@@ -227,21 +233,38 @@ class POSCAR(object):
         :param float theta: angle of rotation (Degrees)
         :return: rotation matrix
         :rtype: np.matrix
-'''
+        >>> t = POSCAR()
+        >>> t.rotateX(60)
+        matrix([[ 1.       ,  0.       ,  0.       ],
+                [ 0.       ,  0.5      , -0.8660254],
+                [ 0.       ,  0.8660254,  0.5      ]])
+        '''
         degree = np.pi / 180.0
         return np.mat([[1.0, 0.0, 0.0],
                        [0.0, np.cos(theta * degree), -np.sin(theta * degree)],
                        [0.0, np.sin(theta * degree),  np.cos(theta * degree)]])
 
     def rotateY(self, theta):
-        'see POSCAR.rotateX()'
+        '''
+        >>> t = POSCAR()
+        >>> t.rotateY(60)
+        matrix([[ 0.5      ,  0.       ,  0.8660254],
+                [ 0.       ,  1.       ,  0.       ],
+                [-0.8660254,  0.       ,  0.5      ]])
+        '''
         degree = np.pi / 180.0
         return np.mat([[ np.cos(theta * degree), 0.0, np.sin(theta * degree)],
                        [0.0, 1.0, 0.0],
                        [-np.sin(theta * degree), 0.0, np.cos(theta * degree)]])
 
     def rotateZ(self, theta):
-        'see POSCAR.rotateX()'
+        '''
+        >>> t = POSCAR()
+        >>> t.rotateZ(60)
+        matrix([[ 0.5      , -0.8660254,  0.       ],
+                [ 0.8660254,  0.5      ,  0.       ],
+                [ 0.       ,  0.       ,  1.       ]])
+        '''
         degree = np.pi / 180.0
         return np.mat([[np.cos(theta * degree), -np.sin(theta * degree), 0.0],
                        [np.sin(theta * degree),  np.cos(theta * degree), 0.0],
@@ -640,3 +663,11 @@ if not specified, use standard output''')
         arguments.poscar.save(arguments.output)
     else:
         print(arguments.poscar)
+
+##
+##
+##
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

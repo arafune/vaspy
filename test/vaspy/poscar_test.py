@@ -3,7 +3,8 @@
 
 import unittest
 import os
-import  numpy as np
+import tempfile
+import numpy as np
 from vaspy.poscar import POSCAR
 
 class TestPOSCAR(unittest.TestCase):
@@ -46,10 +47,13 @@ Direct
 -0.553429027	-0.333333333	0.5
 -0.333333333	-0.553429027	0.5
 """
-        f = open('testPOSCAR', 'w') 
-        f.write(test_poscar_string) 
+        filePOSCAR=tempfile.mkstemp()
+        f = open(filePOSCAR[1], 'w')
+        f.write(test_poscar_string)
         f.close() 
-        self.testposcar = POSCAR("./testPOSCAR")
+        self.testposcar = POSCAR(filePOSCAR[1])
+        self.blancposcar = POSCAR()
+
 ##        
 ##  
 ##      
@@ -84,11 +88,16 @@ Direct
 
     def is_selective_test(self):
         self.assertTrue(self.testposcar.is_selective)
-
+        self.assertFalse( self.blancposcar.is_selective)
     def pos_test(self):
+        np.testing.assert_array_equal(np.array([[0.,0.5,0.5]])
+                                      , self.testposcar.pos(3))
+        np.testing.assert_allclose(np.array([[0.23764,0.429027113,0.5]])
+                                   , self.testposcar.pos(4),
+                                   rtol=1e-04)
+
+    def to_list_test(self):
         pass
-
-
 
 if __name__ == '__main__':
     unittest.main()
