@@ -53,6 +53,7 @@ Direct
         f.close() 
         self.testposcar = POSCAR(filePOSCAR[1])
         self.blancposcar = POSCAR()
+        os.remove(filePOSCAR[1])
 
 ##        
 ##  
