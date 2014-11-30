@@ -10,9 +10,12 @@ if sys.version_info[0] >= 3: # Version safety
 else:
     from cStringIO import StringIO
 import numpy as np
-mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(mypath))))
-from vaspy import tools
+try:
+    from vaspy import tools
+except ImportError:
+    mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
+    sys.path.append(os.path.dirname(os.path.abspath(mypath)))
+    import tools
 
 
 class PROCAR(object): # Version safety
