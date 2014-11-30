@@ -12,6 +12,7 @@ __all__ = ['chgcar',
            'outcar',
            'poscar',
            'procar',
+           'argParsePostVASP',
            ]
 
 from vaspy import *

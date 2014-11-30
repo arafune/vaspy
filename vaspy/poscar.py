@@ -68,9 +68,12 @@ class POSCAR(object):
     
     class for POSCAR (CONTCAR) format
 
-    This script does *NOT* support for constructing POSCAR from scratch. (Use ASE for this purpose.)
+    This script does *NOT* support for constructing POSCAR 
+    from scratch. (Use ASE for this purpose.)
     
-    It provides a way to slightly modify the POSCAR(CONTCAR), which has already works well.
+    It provides a way to slightly modify the POSCAR or 
+    CONTCAR, which has already works well.
+    
     :methods list: to_Cartesian, translate, translate_all
     :version: 2.0
     '''
@@ -415,24 +418,31 @@ class POSCAR(object):
             self.position = [np.array(m * v.T).T for v in self.position]
 
     def to_Direct(self):
-       '''
+        '''
     change the coordinate to direct from cartesian.
 '''
-       if self.is_cartesian:
+        if self.is_cartesian:
            self.coordinate_type = "Direct"
            m = (np.mat([self.latticeV1, self.latticeV2, self.latticeV3]).T).I
            self.position = [np.array(m * v.T).T for v in self.position]
 
     def guess_molecule(self, site_list, center=None):
         '''
-        arrange atom position to form a molecule.  This method is effective for molecular rotation.
+        arrange atom position to form a molecule. 
+        This method is effective for molecular rotation.
 
         :param Array<Fixnum> site_list: list of site #
         :param Vector center: center position of "molecule" (Optional).
         :return: Array of Vector that represents "molecule".
         :rtype:  Array<Vector> 
-        :note: When the optional argument, center, is set, the  atoms are re-arranged as to minimize the distance from this center.  If not the   center is not set, atoms are re-arranged to minimize  the total bonding length.  As the algorithm for mimizing the total length is not exhaustive, the resultant atom arrangement  may different from what you expect, in spite of time-waste. So, the center option is highly recommended to form a molecule.
-
+        :note: When the optional argument, center, is set, 
+        the  atoms are re-arranged as to minimize the distance 
+        from this center.  If not the   center is not set, atoms
+        are re-arranged to minimize  the total bonding length.  
+        As the algorithm for mimizing the total length is not 
+        exhaustive, the resultant atom arrangement  may different 
+        from what you expect, in spite of time-waste. 
+        So, the center option is highly recommended to form a molecule.
 '''
         #list for atom positions for "molecule"
         molecule = [self.pos(j) for j in site_list]
@@ -445,9 +455,11 @@ class POSCAR(object):
                     center = _vectorize(center)
                     return np.linalg.norm(pos - center)
                 else:
-                    # fixme!! when the highest symmetry point can be detemined from the position list,
-                    #              guess_molecule method does not require the "center" option.
-                    #(molecule.product(molecule)).inject(0.0) do | s, vectors |
+                    # fixme!! when the highest symmetry point
+                    # can be detemined from the position list,
+                    # guess_molecule method does not require
+                    # the "center" option.
+                    # (molecule.product(molecule)).inject(0.0) do | s, vectors |
                     # s+ (vectors[0]-vectors[1]).magnitude
                     s = 0.0
                     for vectors in it.product(molecule, molecule):
@@ -460,7 +472,6 @@ class POSCAR(object):
     def guess_molecule2(self, site_list):
         '''
         arrange atom position to form a molecule.  poscar updates
-
         :param Array<Fixnum> site_list: list of site #
 '''
         molecule = self.guess_molecule(site_list)
