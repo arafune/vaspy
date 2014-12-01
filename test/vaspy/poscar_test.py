@@ -83,6 +83,8 @@ Direct
 
     def is_cartesian_test(self):
         self.assertFalse(self.testposcar.is_cartesian)
+        self.testposcar.to_Cartesian()
+        self.assertTrue(self.testposcar.is_cartesian)
 
     def is_direct_test(self):
         self.assertTrue(self.testposcar.is_direct)
@@ -96,7 +98,30 @@ Direct
         np.testing.assert_allclose(np.array([[0.23764,0.429027113,0.5]])
                                    , self.testposcar.pos(4),
                                    rtol=1e-04)
+    def pos_replace_test(self):
+        np.testing.assert_array_equal(np.array([[0.333333333,0.237639553,0.5]]), self.testposcar.pos(6))
+        self.testposcar.pos_replace(6,[0,0,0])
+        np.testing.assert_array_equal(np.array([[0,0,0]]), self.testposcar.pos(6))
+        
 
+    def tune_scaling_factor_test(self):
+        pass
+        
+    def to_Cartesian_test(self):
+        tmp = self.testposcar.pos(6)
+        self.testposcar.to_Cartesian()
+        np.testing.assert_allclose(np.array([[0.494477, -0.047847,  0.512645]]),
+                                   self.testposcar.pos(6),
+                                   rtol=1e-04)
+        self.testposcar.to_Direct()
+        np.testing.assert_array_equal(tmp, self.testposcar.pos(6))
+
+    def to_Direct_test(self):
+        tmp = self.testposcar.pos(6)
+        self.testposcar.to_Direct()
+        np.testing.assert_array_equal(tmp, self.testposcar.pos(6))
+
+    
     def to_list_test(self):
         pass
 

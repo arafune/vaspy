@@ -216,8 +216,7 @@ class POSCAR(object):
     def pos_replace(self, i, vector):
         '''
         :param int i: site #
-        :param vector vector: Vector representation of the i-th
-        atom position.
+        :param vector vector: list of the i-th atom position.
         :note: the first site # is "1", not "0".
         (follow VESTA's and VASP's way.)
 '''
@@ -343,7 +342,7 @@ class POSCAR(object):
         :param POSCAR other:
         :return: POSCAR
         :todo: Check the lattice vectors, coordinate_type and so on.
-'''
+        '''
         #if not isinstance(other, POSCAR): return NotImplemented
         destPOSCAR = copy.deepcopy(self)
         if destPOSCAR.scaling_factor != other.scaling_factor:
@@ -426,7 +425,7 @@ class POSCAR(object):
             self.position = [i * old / new_scaling_factor
                              for i in self.position]
 
-    def to_Cartesian(self):
+    def to_Cartesian(self):    #fixme!!! Not work correctly.
         '''
         change the coordinate to cartesian from direct.
         
@@ -440,7 +439,7 @@ class POSCAR(object):
                         self.latticeV3[0]]).T
             self.position = [np.array(m * v.T).T for v in self.position]
 
-    def to_Direct(self):
+    def to_Direct(self):       #fixme!!! Not work correctly.
         '''
     change the coordinate to direct from cartesian.
 '''
