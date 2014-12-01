@@ -445,7 +445,9 @@ class POSCAR(object):
 '''
         if self.is_cartesian:
            self.coordinate_type = "Direct"
-           m = (np.mat([self.latticeV1, self.latticeV2, self.latticeV3]).T).I
+           m = (np.mat([self.latticeV1[0],
+                        self.latticeV2[0],
+                        self.latticeV3[0]]).T).I
            self.position = [np.array(m * v.T).T for v in self.position]
 
     def guess_molecule(self, site_list, center=None):

@@ -110,11 +110,15 @@ Direct
     def to_Cartesian_test(self):
         tmp = self.testposcar.pos(6)
         self.testposcar.to_Cartesian()
-        np.testing.assert_allclose(np.array([[0.494477, -0.047847,  0.512645]]),
+        np.testing.assert_allclose(
+            np.array([[0.494477, -0.047847, 0.512645]]),
                                    self.testposcar.pos(6),
-                                   rtol=1e-04)
+                                   rtol=1e-05)
         self.testposcar.to_Direct()
-        np.testing.assert_array_equal(tmp, self.testposcar.pos(6))
+        np.testing.assert_allclose(
+            tmp,
+            self.testposcar.pos(6),
+            rtol=1e-05)
 
     def to_Direct_test(self):
         tmp = self.testposcar.pos(6)
