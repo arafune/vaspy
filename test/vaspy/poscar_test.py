@@ -21,7 +21,7 @@ Selective Dynamics
 Direct
 0.5	0.5	0.5     T  T  T
 0.5	0       0.5	T  T  T
-0	0.5	0.5     T  T  T
+0	0.5	0.5     T  F  T
 0.237639553	0.429027113	0.5  T  T  T
 0.237639553	0.333333333	0.5  T  T  T
 0.333333333	0.237639553	0.5  T  T  T
@@ -91,7 +91,7 @@ Direct
 
     def is_selective_test(self):
         self.assertTrue(self.testposcar.is_selective)
-        self.assertFalse( self.blancposcar.is_selective)
+        self.assertFalse(self.blancposcar.is_selective)
     def pos_test(self):
         np.testing.assert_array_equal(np.array([[0.,0.5,0.5]])
                                       , self.testposcar.pos(3))
@@ -100,8 +100,13 @@ Direct
                                    rtol=1e-04)
     def pos_replace_test(self):
         np.testing.assert_array_equal(np.array([[0.333333333,0.237639553,0.5]]), self.testposcar.pos(6))
-        self.testposcar.pos_replace(6,[0,0,0])
+
+        self.assertRaises(RuntimeError,self.testposcar.pos_replace,6,[0,0,0])
+        self.testposcar.to_Cartesian()
+        self.testposcar.pos_replace(6, [0,0,0])
         np.testing.assert_array_equal(np.array([[0,0,0]]), self.testposcar.pos(6))
+        self.testposcar.pos_replace(7, [1,3,4])
+        np.testing.assert_array_equal(np.array([[1,3,4]]), self.testposcar.pos(7))
         
 
     def tune_scaling_factor_test(self):
@@ -147,9 +152,40 @@ Direct
 
     
     def to_list_test(self):
+        tmp = self.testposcar.to_list()
+        self.assertEqual("NiC4S4", tmp[0])
+        self.assertEqual(14.63, tmp[1])
+        np.testing.assert_allclose([[0.8660254, -0.5, 0]], tmp[2])
+        np.testing.assert_allclose([[0.8660254, 0.5, 0]], tmp[3])
+        np.testing.assert_allclose([[0,	0,	1.0252904990]], tmp[4])
+        self.assertEqual(['Ni', 'C', 'S'], tmp[5])
+        self.assertEqual([3, 12, 12], tmp[6])
+        self.assertEqual('Selective Dynamics', tmp[7])
+        self.assertEqual('Direct', tmp[8])
+        np.testing.assert_allclose([[0.5, 0.5, 0.5]], tmp[9][0])
+        np.testing.assert_allclose([[0.5, 0., 0.5]], tmp[9][1])
+        np.testing.assert_allclose([[0., 0.5, 0.5]], tmp[9][2])
+        # ...
+        self.assertEqual('T T T', tmp[10][0])
+        self.assertEqual('T T T', tmp[10][1])
+        self.assertEqual('T F T', tmp[10][2])
+        # ...
+        self.assertEqual('#1:Ni1', tmp[11][0])
+        self.assertEqual('#2:Ni2', tmp[11][1])
+        self.assertEqual('#3:Ni3', tmp[11][2])
+        self.assertEqual('#4:C1' , tmp[11][3])
+
+    def guess_molecule(self):
         pass
 
+        
+    def atom_rotate_test(self):
+        pass
+    
+    
 
+
+    
     def plus_test(self):
         pass
     
