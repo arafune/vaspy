@@ -165,6 +165,7 @@ Direct
         np.testing.assert_allclose([[0.5, 0.5, 0.5]], tmp[9][0])
         np.testing.assert_allclose([[0.5, 0., 0.5]], tmp[9][1])
         np.testing.assert_allclose([[0., 0.5, 0.5]], tmp[9][2])
+        np.testing.assert_allclose([[0.237639553,0.429027113,0.5]], tmp[9][3])
         # ...
         self.assertEqual('T T T', tmp[10][0])
         self.assertEqual('T T T', tmp[10][1])
@@ -175,16 +176,20 @@ Direct
         self.assertEqual('#3:Ni3', tmp[11][2])
         self.assertEqual('#4:C1' , tmp[11][3])
 
-    def guess_molecule(self):
+    def nearest_test(self):
+        pass
+
+    def make27candidate(self):
+        pass
+        
+        
+    def guess_molecule_test(self):
+#        self.testposcar.guess_molecule(
         pass
 
         
     def atom_rotate_test(self):
         pass
-    
-    
-
-
     
     def plus_test(self):
         pass
