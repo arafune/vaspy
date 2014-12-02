@@ -302,7 +302,7 @@ class for POSCAR (CONTCAR) format
   # @return [POSCAR] 
   # @todo Check the lattice vectors, coordinate_type and so on.
 '''
-        #if not isinstance(other, POSCAR): return NotImplemented
+        if not isinstance(other, POSCAR): return NotImplemented
         destPOSCAR = copy.deepcopy(self)
         if destPOSCAR.scaling_factor != other.scaling_factor:
             raise ValueError('scaling factor is different.')
