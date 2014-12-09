@@ -62,13 +62,13 @@ Direct
         # a=os.getcwd()  # return the directory where nose execute.
         self.assertEqual('NiC4S4',self.testposcar.system_name)
     def latticeV1_test(self):
-        np.testing.assert_array_equal(np.array([[0.866025404, -0.5, 0.]]),
+        np.testing.assert_array_equal(np.array([0.866025404, -0.5, 0.]),
                                       self.testposcar.latticeV1)
     def latticeV2_test(self):
-        np.testing.assert_array_equal(np.array([[0.866025404, 0.5, 0.]]),
+        np.testing.assert_array_equal(np.array([0.866025404, 0.5, 0.]),
                                       self.testposcar.latticeV2)
     def latticeV3_test(self):
-        np.testing.assert_array_equal(np.array([[0.0, 0.0, 1.025290499]]),
+        np.testing.assert_array_equal(np.array([0.0, 0.0, 1.025290499]),
                                       self.testposcar.latticeV3)
 
     def atom_identifer_test(self):
@@ -93,26 +93,26 @@ Direct
         self.assertTrue(self.testposcar.is_selective)
         self.assertFalse(self.blancposcar.is_selective)
     def pos_test(self):
-        np.testing.assert_array_equal(np.array([[0.,0.5,0.5]])
+        np.testing.assert_array_equal(np.array([0.,0.5,0.5])
                                       , self.testposcar.pos(3))
-        np.testing.assert_allclose(np.array([[0.23764,0.429027113,0.5]])
+        np.testing.assert_allclose(np.array([0.23764,0.429027113,0.5])
                                    , self.testposcar.pos(4),
                                    rtol=1e-04)
     def pos_replace_test(self):
-        np.testing.assert_array_equal(np.array([[0.333333333,0.237639553,0.5]]), self.testposcar.pos(6))
+        np.testing.assert_array_equal(np.array([0.333333333,0.237639553,0.5]), self.testposcar.pos(6))
 
         self.assertRaises(RuntimeError,self.testposcar.pos_replace,6,[0,0,0])
         self.testposcar.to_Cartesian()
         self.testposcar.pos_replace(6, [0,0,0])
-        np.testing.assert_array_equal(np.array([[0,0,0]]), self.testposcar.pos(6))
+        np.testing.assert_array_equal(np.array([0,0,0]), self.testposcar.pos(6))
         self.testposcar.pos_replace(7, [1,3,4])
-        np.testing.assert_array_equal(np.array([[1,3,4]]), self.testposcar.pos(7))
+        np.testing.assert_array_equal(np.array([1,3,4]), self.testposcar.pos(7))
         
 
     def tune_scaling_factor_test(self):
         self.testposcar.tune_scaling_factor(1.0)
         np.testing.assert_allclose(
-            np.array([[12.66995166052, -7.315, 0.0]]),
+            np.array([12.66995166052, -7.315, 0.0]),
             self.testposcar.latticeV1,
             rtol=1e-07)
 
@@ -120,15 +120,15 @@ Direct
         self.testposcar.to_Cartesian()
         self.testposcar.tune_scaling_factor(1.0)
         np.testing.assert_allclose(
-            np.array([[12.66995166052, -7.315, 0.0]]),
+            np.array([12.66995166052, -7.315, 0.0]),
             self.testposcar.latticeV1,
             rtol=1e-07)
         np.testing.assert_allclose(
-            np.array([[12.66995166052, 0.0, 7.5000000001850005]]),
+            np.array([12.66995166052, 0.0, 7.5000000001850005]),
                      self.testposcar.pos(1),
                      rtol=1e-06)
         np.testing.assert_allclose(
-            np.array([[8.4466344319, -1.4000000014, 7.500000000185]]),
+            np.array([8.4466344319, -1.4000000014, 7.500000000185]),
             self.testposcar.pos(7),
             rtol=1e-06)
         
@@ -136,7 +136,7 @@ Direct
         tmp = self.testposcar.pos(6)
         self.testposcar.to_Cartesian()
         np.testing.assert_allclose(
-            np.array([[0.494477, -0.047847, 0.512645]]),
+            np.array([0.494477, -0.047847, 0.512645]),
                                    self.testposcar.pos(6),
                                    rtol=1e-05)
         self.testposcar.to_Direct()
@@ -155,17 +155,17 @@ Direct
         tmp = self.testposcar.to_list()
         self.assertEqual("NiC4S4", tmp[0])
         self.assertEqual(14.63, tmp[1])
-        np.testing.assert_allclose([[0.8660254, -0.5, 0]], tmp[2])
-        np.testing.assert_allclose([[0.8660254, 0.5, 0]], tmp[3])
-        np.testing.assert_allclose([[0,	0,	1.0252904990]], tmp[4])
+        np.testing.assert_allclose([0.8660254, -0.5, 0], tmp[2])
+        np.testing.assert_allclose([0.8660254, 0.5, 0], tmp[3])
+        np.testing.assert_allclose([0,	0,	1.0252904990], tmp[4])
         self.assertEqual(['Ni', 'C', 'S'], tmp[5])
         self.assertEqual([3, 12, 12], tmp[6])
         self.assertEqual('Selective Dynamics', tmp[7])
         self.assertEqual('Direct', tmp[8])
-        np.testing.assert_allclose([[0.5, 0.5, 0.5]], tmp[9][0])
-        np.testing.assert_allclose([[0.5, 0., 0.5]], tmp[9][1])
-        np.testing.assert_allclose([[0., 0.5, 0.5]], tmp[9][2])
-        np.testing.assert_allclose([[0.237639553,0.429027113,0.5]], tmp[9][3])
+        np.testing.assert_allclose([0.5, 0.5, 0.5], tmp[9][0])
+        np.testing.assert_allclose([0.5, 0., 0.5], tmp[9][1])
+        np.testing.assert_allclose([0., 0.5, 0.5], tmp[9][2])
+        np.testing.assert_allclose([0.237639553,0.429027113,0.5], tmp[9][3])
         # ...
         self.assertEqual('T T T', tmp[10][0])
         self.assertEqual('T T T', tmp[10][1])
