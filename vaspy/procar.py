@@ -124,7 +124,7 @@ class PROCAR(object): # Version safety
                 elif "ion " in line:
                     separator_to_orbital = separator_to_orbital or line.rstrip('\n')
                     separator_to_phase = separator_to_phase or separator_to_orbital[0:-7]
-                    self.__orbitalname = separator_to_orbital.split()
+                    self.__orbitalname = self.orbitalname or separator_to_orbital.split()
                     if " tot" in line:
                         section = ['orbital']
                     else:
