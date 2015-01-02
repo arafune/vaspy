@@ -107,7 +107,7 @@ class PROCAR(object): # Version safety
         first_line=f.readline()
         if 'PROCAR lm decomposed + phase' not in first_line:
             close(f)
-            raise ValueError("This PROCAR is not a proper format\nSee INCAR in the calculation.")
+            raise RuntimeError("This PROCAR is not a proper format\nSee INCAR in the calculation.\n")
         section = list()
         with f:
             for line in f:
@@ -125,19 +125,16 @@ class PROCAR(object): # Version safety
                 elif "ion" in line:
                     if "tot" in line:
                         section = ['orbital']
-
+                        orbitalnames=line.split()[1:-1]
                     else: 
                         section = ['phase']
                 else:
                     if section == ['orbital']:
-                        tmp = [float(i) for i in line.split()]
-                        del tmp[0]       # ion index is removed
-                        del tmp[-1]      # total is removed
+                        tmp = [float(i) for i in line.split()[1:-1]]
                         self.__orbital.append(tmp)
                     elif section == ['phase']:
                         if not phase_read: continue
-                        tmp = [float(i) for i in line.split()]
-                        del tmp[0]
+                        tmp = [float(i) for i in line.split()[1:]]
                         self.__phase.append(tmp)
                         
         self.__spininfo = len(self.orbital) // (self.numk * self.nBands * self.nAtoms)
@@ -150,8 +147,8 @@ class PROCAR(object): # Version safety
         elif self.spininfo == 4:
             self.__spininfo = ('_mT', '_mX', '_mY', '_mZ')
         # orbitalname
-        tmpOrb = Orbital()
-        tmpOrb.redefine_orbital_list(self.orbitalname)
+#        tmpOrb = Orbital()
+#        tmpOrb.redefine_orbital_list(self.orbitalname)
 
     def load_from_array(self, procar, phase_read=False):
         '''This method effectively acts as a parser of PROCAR.
@@ -202,8 +199,8 @@ class PROCAR(object): # Version safety
         elif self.spininfo == 4:
             self.__spininfo = ('_mT', '_mX', '_mY', '_mZ')
         # orbitalname
-        tmpOrb = Orbital()
-        tmpOrb.redefine_orbital_list(self.orbitalname)
+#        tmpOrb = Orbital()
+#        tmpOrb.redefine_orbital_list(self.orbitalname)
 
     def __str__(self):
         '''x.__str__() <=> str(x)
