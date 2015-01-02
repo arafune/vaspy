@@ -101,38 +101,40 @@ class PROCAR(object): # Version safety
         @param [String] file filename of *PROCAR* file
         @param [Boolian] phase_read Switch for loading phase characters
         '''
+        f= open(file)
+        line=f.readline()
+        if "PROCAR lm decomposed + phase" not in line:
+            raise RuntimeError("Check your PROCAR and INCAR\nThe format of PROCAR does not suit with this script.")
         section = list()
         separator_to_orbital = None
         separator_to_phase = None
-        with open(file) as f:
+        with  f:
             for line in f:
-                if re.findall(r'^[\s]*$', line): continue
-                elif re.findall(r'^#', line):
+                if line.isspace(): continue
+                elif "k-points: " in line:
                     self.__numk, self.__nBands, self.__nAtoms = [
                         int(i) for i in line.split() if i.isdigit()]
-                elif re.findall(r'\bk-point\b', line):
+                elif "k-point " in line:
                     self.__kvectors.append(np.asarray(
                         [list(float(i) for i in line.split()[3:6])]))
                     section = []
-                elif re.findall(r'^band\b', line):
+                elif "band " in line:
                     self.__energies.append(float(line.split()[4]))
                     section = []
-                elif re.findall(r'^ion\b', line):
+                elif "ion " in line:
                     separator_to_orbital = separator_to_orbital or line.rstrip('\n')
                     separator_to_phase = separator_to_phase or separator_to_orbital[0:-7]
-                    self.__orbitalname = self.orbitalname or separator_to_orbital.split()
-                    if re.findall(separator_to_orbital, line):
+                    self.__orbitalname = separator_to_orbital.split()
+                    if " tot" in line:
                         section = ['orbital']
-                    elif re.findall(separator_to_phase, line):
+                    else:
                         section = ['phase']
                 else:
                     if section == ['orbital']:
-                        if re.findall(r'\btot\b', line): continue
                         tmp = [float(i) for i in line.split()]
                         tmp[0] = int(tmp[0])
                         self.__orbital.append(tmp)
                     elif section == ['phase']:
-                        if re.findall(r'\btot\b', line): continue
                         if not phase_read: continue
                         tmp = [float(i) for i in line.split()]
                         tmp[0] = int(tmp[0])
