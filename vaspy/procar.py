@@ -131,6 +131,7 @@ class PROCAR(object): # Version safety
                         section = ['phase']
                 else:
                     if section == ['orbital']:
+                        if 'tot ' in line[0:3]: continue
                         tmp = [float(i) for i in line.split()]
                         tmp[0] = int(tmp[0])
                         self.__orbital.append(tmp)
