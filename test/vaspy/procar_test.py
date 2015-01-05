@@ -16,7 +16,7 @@ class TestPROCAR(unittest.TestCase):
         f = open(filePROCAR[1], 'w')
         f.write(procar_woSpi)
         f.close()
-        self.testprocar = PROCAR(filePROCAR[1])
+        self.procar_std = PROCAR(filePROCAR[1])
         os.remove(filePROCAR[1])
         # with Spin
         global procar_Spin
@@ -24,12 +24,47 @@ class TestPROCAR(unittest.TestCase):
         f = open(filePROCAR[1], 'w')
         f.write(procar_Spin)
         f.close()
-        self.testprocar = PROCAR(filePROCAR[1])
+        self.procar_spin = PROCAR(filePROCAR[1])
         os.remove(filePROCAR[1])
 
     def procar_load_test(self):
         pass
 
+    def procar_std_print_test(self):
+        self.assertEqual(output_print_procar_std, self.procar_std.__str__())   
+
+    def procar_spin_print_test(self):
+        self.assertEqual(output_print_procar_spin, self.procar_spin.__str__())
+
+output_print_procar_std="""The properties of this procar:
+  # of k-points: 3
+  # of bands: 2
+  # of ions: 3
+  # of kvectors: 3
+  # of energies: 6
+    ((# of k-points) * (# of bands) = 3*2=6)
+  # of orbital component: 18
+    ((# of k-points) * (# of bands) * (# of ions) =
+        3*2*3=18)
+  # of phase component: 0
+  Orbitals are: ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2']
+  spininfo: ('',)
+"""
+
+output_print_procar_spin="""The properties of this procar:
+  # of k-points: 3
+  # of bands: 2
+  # of ions: 3
+  # of kvectors: 6
+  # of energies: 12
+    ((# of k-points) * (# of bands) = 3*2=6)
+  # of orbital component: 36
+    ((# of k-points) * (# of bands) * (# of ions) =
+        3*2*3=18)
+  # of phase component: 0
+  Orbitals are: ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2']
+  spininfo: ('_up', '_down')
+"""
 
 if __name__ == '__main__':
     unittest.main()
