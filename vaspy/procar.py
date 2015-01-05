@@ -221,6 +221,83 @@ class PROCAR(object):  # Version safety
         return band
 
 
+class BandStructure(object):
+    '''
+    .. py:class:: BandStructure class
+
+    The "Band structure" object deduced from PROCAR file.
+
+    :class variables: kvectors, energies, states, spin, orb_names
+    Finally, Band, Orbital, State classes can be removed ?
+    '''
+    __kvectors = list()
+    __distance = list()
+    __orb_names = list()
+
+    @property
+    def orb_names(self):
+        return self.__orb_names
+
+    def __init__(self, arg=None):
+        pass
+
+    def compose_sites(self, site_number_list):
+        pass
+
+    def compose_orbital(self, composed_orbital_name):
+        '''add composed orbital contribution in each 'states'.
+
+        Firstly, check if "composed_orbital_name" can change preferable name
+        ('pypx' should be 'pxpy', for example), and then check if
+        "composed_orbital_name" already exists in orb_name.
+        note::
+        special orbital names are :  sp, p, spd, d
+        '''
+        composed_orbital_name = self.check_orb_name(composed_orbital_name)
+        if composed_orbital_name in self.orb_names:
+            pass
+        elif composed_orbital_name == 'p':
+            self.__orb_names = self.orb_names + ['p']
+            pass
+        elif composed_orbital_name == 'd':
+            self.__orb_names = self.orb_names + ['d']
+            pass
+        elif composed_orbital_name == 'sp':
+            self.__orb_names = self.orb_names + ['sp']
+            pass
+        elif composed_orbital_name == 'spd':
+            self.__orb_names = self.orb_names + ['spd']
+            pass
+        elif composed_orbital_name == 'pxpy':
+            self.__orb_names = self.orb_names + ['pxpy']
+            pass
+        elif composed_orbital_name == 'pypz':
+            self.__orb_names = self.orb_names + ['pypz']
+            pass
+        elif composed_orbital_name == 'pxpz':
+            self.__orb_names = self.orb_names + ['pxpz']
+            pass
+
+    def check_orb_name(self, orb):
+        '''Check if the argument org is feasible name for composed orbital
+        '''
+        translate_dict = {'pypx': 'pxpy', 'pzpx': 'pxpz', 'pzpy': 'pypz',
+                          'pxpypz': 'p', 'pxpzpy': 'p', 'pypxpz': 'p',
+                          'pypzpx': 'p', 'pzpxpy': 'p', 'pzpypx': 'p',
+        }
+        proper_orb_name_list = orb_name + ['sp', 'pxpy', 'spd' , 'd']
+        if orb in translate_dict.keys():
+            orb = translate_dict['orb']
+
+        if orb in self.orb_name:
+            return orb
+        else:
+            raise RuntimeError("Such (composed) orbital name was not defined.")
+
+    def del_band(self, band_index):
+        pass
+
+
 class Band(object):  # Version safety
     '''
     .. py:class:: Band class
