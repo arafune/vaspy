@@ -5,18 +5,26 @@ import unittest
 import os
 import tempfile
 import numpy as np
-from vaspy.procar import PROCAR
+import vaspy.procar as procar
 
 
 class TestPROCAR(unittest.TestCase):
     def setUp(self):
+        # single state
+        global procar_single
+        filePROCAR = tempfile.mkstemp()
+        f = open(filePROCAR[1], 'w')
+        f.write(procar_single)
+        f.close()
+        self.procar_single = procar.PROCAR(filePROCAR[1],phase_read = True)
+        os.remove(filePROCAR[1])
         # without Spi/Spin
         global procar_woSpi
         filePROCAR = tempfile.mkstemp()
         f = open(filePROCAR[1], 'w')
         f.write(procar_woSpi)
         f.close()
-        self.procar_std = PROCAR(filePROCAR[1])
+        self.procar_std = procar.PROCAR(filePROCAR[1], phase_read = True)
         os.remove(filePROCAR[1])
         # with Spin
         global procar_Spin
@@ -24,7 +32,7 @@ class TestPROCAR(unittest.TestCase):
         f = open(filePROCAR[1], 'w')
         f.write(procar_Spin)
         f.close()
-        self.procar_spin = PROCAR(filePROCAR[1])
+        self.procar_spin = procar.PROCAR(filePROCAR[1], phase_read = True)
         os.remove(filePROCAR[1])
 
     def procar_load_test(self):
