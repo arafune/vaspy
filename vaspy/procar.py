@@ -242,34 +242,123 @@ class BandStructure(object):
     :class variables: kvectors, energies, states, spin, orb_names
     Finally, Band, Orbital, State classes can be removed ?
     '''
-    self.__kvectors = list()
-    self.__distance = list()
-    self.__orb_names = list()
-    self.__composed_sites = list()
-    self.__spin = list()
-    self.__available_band = list()
-    self.__states=0
-    self.__nBand=0
-    self.__kpoints=0
-    
-    @property
-    def orb_names(self):
-        return self.__orb_names
-
-    @property
-    def states(self):
-        return self.__states
-
-    @states.setter
-    def states(self, states):
-        self.__states = states
-        pass  # <- set __nBand and __kpoints
-        
     def __init__(self, arg=None):
+        self.__kvectors = list()
+        self.__kdistance = list()
+        self.__composed_sites = list()
+        self.__orbitals = 0
+        self.__phase = 0
         pass
+
+#    @property
+#    def orb_names(self):
+#        return self.__orb_names
+
+    @property
+    def orbitals(self):
+        return self.__orbitals
+
+    @orbitals.setter
+    def orbitals(self, arg):
+        '''Setter for orbitals
+
+        When standard (i.e. ISPIN = 0) or SOI, return is 4-rank tensor
+        When spin-resolved (i.e. ISPIN = 2 but w/o SOI),
+        return tuple that consists of 4-rank tensor
+        arg is usually listlike object that can smoothly convert to ndarray.
+        for testing, 4-rank tensor (ndarray) is accepted.
+        (But this option is not so entirely tested.
+        Do not use for real analysis)
+        '''
+
+        if type(arg) == np.ndarray and arg.ndim == 4:
+            self.__orbitals == arg
+        elif (self.numk,
+              self.nAtoms,
+              self.nBands,
+              len(self.orb_names),
+              len(self.spininfo)) != (0, 0, 0, 0, 0):
+            if len(self.spininfo) == 1 or len(self.spininfo) == 4:
+                self.__orbitals = \
+                    np.array(arg).reshape(self.numk,
+                                          self.nBands,
+                                          self.nAtoms * len(self.spininfo),
+                                          len(self.orb_names))
+                self.available_band = list(range(nBands))
+                pass  # <- set available_band
+            elif len(self.spininfo) == 2:
+                arg = np.array(arg)
+            else:
+                raise TypeError("arg is not array object")
+        else:
+            errmsg = "check if nAtoms, nBands, numk, spininfo, orb_names are set"
+            raise ValueError(errmsg)
+
+    @property
+    def phase(self):
+        return self.__phase
+
+    @phase.setter
+    def phase(self, arg):
+        '''Setter for phase
+
+        When standard (i.e. ISPIN = 0) or SOI, return is 4-rank tensor
+        When spin-resolved (i.e. ISPIN = 2 but w/o SOI),
+        return tuple that consists of 4-rank tensor
+
+        arg must be the list of the list.
+        Two elements convert into the single complex ndarray.
+        '''
+        pass
+
+    @property
+    def kvectors(self):
+        return self.__kvectors
+
+    @kvectors.setter
+    def kvectors(self, kvectors):
+        if type(kvectors) != list:
+            errmsg = 'kvectors must be an array of ndarray\n'
+            raise TypeError(errmsg)
+        self.__kvectors = kvectors
+        self.numk = len(self.kvectors)
+        self.__kdistance = list()
+        for i, k in enumerate(self.kvectors):
+            if i == 0:
+                self.__kdistance.append(0.0)
+            else:
+                self.__kdistance.append(
+                    self.kdistance[i - 1] +
+                    np.linalg.norm(self.kvectors[i - 1] - k))
+
+    @property
+    def kdistance(self):
+        return self.__kdistance
+
+    @property
+    def available_bands(self):
+        return self.__available_band
 
     def compose_sites(self, site_number_list):
         pass
+
+    def check_orb_name(self, orb):
+        '''Check if the argument org is feasible name for composed orbital
+        '''
+        translate_dict = {'pypx': 'pxpy', 'pzpx': 'pxpz', 'pzpy': 'pypz',
+                          'pxpypz': 'p', 'pxpzpy': 'p', 'pypxpz': 'p',
+                          'pypzpx': 'p', 'pzpxpy': 'p', 'pzpypx': 'p'}
+        if hasattr(self, "orb_names"):
+            proper_orb_name_list = self.orb_names + ['sp', 'pxpy', 'spd', 'd']
+        else:
+            proper_orb_name_list = ['sp', 'pxpy', 'spd', 'd']
+        if orb in translate_dict.keys():
+            orb = translate_dict[orb]
+        if orb in proper_orb_name_list:
+            return orb
+        else:
+            errmsg = "Such (composed) orbital name was not defined."
+            raise ValueError(errmsg)
 
     def compose_orbital(self, composed_orbital_name):
         '''add composed orbital contribution in each 'states'.
