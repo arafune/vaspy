@@ -34,6 +34,10 @@ class TestPROCAR(unittest.TestCase):
         f.close()
         self.procar_spin = procar.PROCAR(filePROCAR[1], phase_read = True)
         os.remove(filePROCAR[1])
+        #
+        # Band object
+        #
+        self.nullband = procar.BandStructure()
 
     def procar_load_test(self):
         pass
@@ -44,6 +48,44 @@ class TestPROCAR(unittest.TestCase):
     def procar_spin_print_test(self):
         self.assertEqual(output_print_procar_spin, self.procar_spin.__str__())
 
+    def band_check_orb_name_test(self):
+        self.assertEqual('sp', self.nullband.check_orb_name('sp'))
+        self.assertEqual('pxpy', self.nullband.check_orb_name('pypx'))
+        self.assertRaises(ValueError, self.nullband.check_orb_name, 'nonexist')
+        self.assertRaises(ValueError, self.nullband.check_orb_name, 'px')
+        self.nullband.orb_names = self.procar_std.orb_names
+        self.assertEqual('px', self.nullband.check_orb_name('px'))
+
+    def BScreation_fromnull_test(self):
+        self.nullband.kvectors = self.procar_std.kvectors
+        np.testing.assert_array_equal([np.array([0.0, 0.0, 0.0]),
+                                       np.array([0.25, 0.25, 0.]),
+                                       np.array([0.5, 0.5, 0.])],
+                                      self.nullband.kvectors)
+        self.assertEqual([0.0,
+                          np.sqrt(0.25**2+ 0.25**2),
+                          np.sqrt(0.5**2+ 0.5**2)],
+                         self.nullband.kdistance)
+        self.assertEqual(3, self.nullband.numk)
+
+    def BScreation_from_procar_std_test(self):
+        testBand = self.procar_std.bandstructure()
+        self.assertEqual(3, testBand.nAtoms)
+        self.assertEqual(2, testBand.nBands)
+        self.assertEqual(("",), testBand.spininfo)
+        np.testing.assert_array_equal([np.array([0.0, 0.0, 0.0]),
+                                       np.array([0.25, 0.25, 0.]),
+                                       np.array([0.5, 0.5, 0.])],
+                                      testBand.kvectors)
+
+    def BScreation_from_procar_single_test(self):
+        testBand = self.procar_single.bandstructure()
+        self.assertEqual(3, testBand.nAtoms)
+        self.assertEqual(1, testBand.nBands)
+        np.testing.assert_array_equal([np.array([0.0, 0.0, 0.0])],
+                                      testBand.kvectors)
+        np.testing.assert_array_equal(np.array([[[[0.0000, 0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008], [0.0010, 0.0011, 0.0012, 0.0013, 0.0014, 0.0015, 0.0016, 0.0017, 0.0018], [0.0020, 0.0021, 0.0022, 0.0023, 0.0024, 0.0025, 0.0026, 0.0027, 0.0028]]]]), testBand.orbitals )
+        
 output_print_procar_std="""The properties of this procar:
   # of k-points: 3
   # of bands: 2
