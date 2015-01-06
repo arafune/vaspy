@@ -186,6 +186,18 @@ class PROCAR(object):  # Version safety
     def __iter__(self):
         return iter(self.__orbital)
 
+    def bandstructure(self):
+        band = BandStructure()
+        band.kvectors = self.kvectors[0:self.numk]
+        band.nBands = self.nBands
+        band.nAtoms = self.nAtoms
+        band.spininfo = self.spininfo
+        band.orb_names = self.orb_names
+        #
+        band.orbitals = self.orbital
+        band.phases = self.phase
+        return band
+
     def to_band(self):
         band = Band(self.kvectors[0:self.numk])
         # for no-spin and soi, [0:self.numk] does not affect the results.
