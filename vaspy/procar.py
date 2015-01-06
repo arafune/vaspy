@@ -394,22 +394,6 @@ class BandStructure(object):
             self.__orb_names = self.orb_names + ['pxpz']
             pass
 
-    def check_orb_name(self, orb):
-        '''Check if the argument org is feasible name for composed orbital
-        '''
-        translate_dict = {'pypx': 'pxpy', 'pzpx': 'pxpz', 'pzpy': 'pypz',
-                          'pxpypz': 'p', 'pxpzpy': 'p', 'pypxpz': 'p',
-                          'pypzpx': 'p', 'pzpxpy': 'p', 'pzpypx': 'p',
-                          }
-        proper_orb_name_list = orb_name + ['sp', 'pxpy', 'spd', 'd']
-        if orb in translate_dict.keys():
-            orb = translate_dict['orb']
-
-        if orb in self.orb_name:
-            return orb
-        else:
-            raise RuntimeError("Such (composed) orbital name was not defined.")
-
     def del_band(self, band_index):
         pass
 
