@@ -230,14 +230,29 @@ class BandStructure(object):
     :class variables: kvectors, energies, states, spin, orb_names
     Finally, Band, Orbital, State classes can be removed ?
     '''
-    __kvectors = list()
-    __distance = list()
-    __orb_names = list()
-
+    self.__kvectors = list()
+    self.__distance = list()
+    self.__orb_names = list()
+    self.__composed_sites = list()
+    self.__spin = list()
+    self.__available_band = list()
+    self.__states=0
+    self.__nBand=0
+    self.__kpoints=0
+    
     @property
     def orb_names(self):
         return self.__orb_names
 
+    @property
+    def states(self):
+        return self.__states
+
+    @states.setter
+    def states(self, states):
+        self.__states = states
+        pass  # <- set __nBand and __kpoints
+        
     def __init__(self, arg=None):
         pass
 
@@ -284,8 +299,8 @@ class BandStructure(object):
         translate_dict = {'pypx': 'pxpy', 'pzpx': 'pxpz', 'pzpy': 'pypz',
                           'pxpypz': 'p', 'pxpzpy': 'p', 'pypxpz': 'p',
                           'pypzpx': 'p', 'pzpxpy': 'p', 'pzpypx': 'p',
-        }
-        proper_orb_name_list = orb_name + ['sp', 'pxpy', 'spd' , 'd']
+                          }
+        proper_orb_name_list = orb_name + ['sp', 'pxpy', 'spd', 'd']
         if orb in translate_dict.keys():
             orb = translate_dict['orb']
 
@@ -295,6 +310,9 @@ class BandStructure(object):
             raise RuntimeError("Such (composed) orbital name was not defined.")
 
     def del_band(self, band_index):
+        pass
+
+    def isconsistent(self):
         pass
 
 
