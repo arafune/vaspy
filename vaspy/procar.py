@@ -211,16 +211,48 @@ class BandStructure(object):
     Finally, Band, Orbital, State classes can be removed ?
     '''
     def __init__(self, arg=None):
+        self.__nBands = 0
         self.__kvectors = list()
         self.__kdistance = list()
         self.__composed_sites = list()
         self.__orbitals = 0
         self.__phases = 0
+        self.__energies = 0
         pass
 
-#    @property
-#    def orb_names(self):
-#        return self.__orb_names
+    def isready(self):
+        '''Return True if numk, nBands, nAtoms, spininfo,
+        orb_names are set, otherwise raise ValueError.
+
+        This method is used before when orbitals, phases, energies
+        are set.'''
+
+        if not hasattr(self, "numk"):
+            raise ValueError("numk is not defined")
+        if self.numk == 0:
+            raise ValueError("numk is not defined")
+        if self.nBands == 0:
+            raise ValueError("nBands is not correctly set")
+        if not hasattr(self, "nAtoms"):
+            raise ValueError("nAtoms is not defined")
+        if not hasattr(self, "spininfo"):
+            raise ValueError("spininfo is not defined")
+        elif not type(self.spininfo) == tuple:
+            raise TypeError("spininfo type should be tuple")
+        if not hasattr(self, "orb_names"):
+            raise ValueError("orb_names is not defined")
+        if 's' not in self.orb_names:
+            raise ValueError("orb_names is not correctly set")
+        return True
+
+    @property
+    def nBands(self):
+        return self.__nBands
+
+    @nBands.setter
+    def nBands(self, arg):
+        self.__nBands = arg
+        self.available_band = list(range(self.nBands))
 
     @property
     def orbitals(self):
