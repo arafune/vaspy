@@ -193,7 +193,7 @@ class PROCAR(object):  # Version safety
         band.nAtoms = self.nAtoms
         band.spininfo = self.spininfo
         band.orb_names = self.orb_names
-        #
+        # BandStructure.isready() must be True
         band.orbitals = self.orbital
         band.phases = self.phase
         band.energies = self.energies
