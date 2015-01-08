@@ -77,7 +77,7 @@ class TestPROCAR(unittest.TestCase):
         self.assertEqual(3, self.nullband.numk)
 
     def BScreation_from_procar_std_test(self):
-        testBand = self.procar_std.bandstructure()
+        testBand = self.procar_std.band()
         self.assertEqual(3, testBand.nAtoms)
         self.assertEqual(2, testBand.nBands)
         self.assertEqual(("",), testBand.spininfo)
@@ -87,12 +87,42 @@ class TestPROCAR(unittest.TestCase):
                                       testBand.kvectors)
 
     def BScreation_from_procar_single_test(self):
-        testBand = self.procar_single.bandstructure()
+        testBand = self.procar_single.band()
         self.assertEqual(3, testBand.nAtoms)
         self.assertEqual(1, testBand.nBands)
         np.testing.assert_array_equal([np.array([0.0, 0.0, 0.0])],
                                       testBand.kvectors)
         np.testing.assert_array_equal(np.array([[[[0.0000, 0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008], [0.0010, 0.0011, 0.0012, 0.0013, 0.0014, 0.0015, 0.0016, 0.0017, 0.0018], [0.0020, 0.0021, 0.0022, 0.0023, 0.0024, 0.0025, 0.0026, 0.0027, 0.0028]]]]), testBand.orbitals )
+        np.testing.assert_array_equal(np.array([[[[0.0000 + 0.0010J, 0.0001 + 0.0011J, 0.0002 + 0.0012J, 0.0003 + 0.0013J, 0.0004 + 0.0014J, 0.0005 + 0.0015J, 0.0006 + 0.0016J, 0.0007 + 0.0017J, 0.0008 + 0.0018J],[0.0020 + 0.0030J, 0.0021 + 0.0031J, 0.0022 + 0.0032J,  0.0023 + 0.0033J, 0.0024 + 0.0034J, 0.0025 + 0.0035J,0.0026 + 0.0036J, 0.0027 + 0.0037J, 0.0028 + 0.0038J],[0.0040 + 0.0050J, 0.0041 + 0.0051J, 0.0042 + 0.0052J, 0.0043 + 0.0053J, 0.0044 + 0.0054J, 0.0045 +  0.0055J, 0.0046 + 0.0056J, 0.0047+ 0.0057J, 0.0048 + 0.0058J]]]]), testBand.phases)
+
+
+    def BScreation_from_procar_spin_test(self):
+        testBand = self.procar_spin.band()
+        self.assertEqual(3, testBand.nAtoms)
+        self.assertEqual(2, testBand.nBands)
+        self.assertEqual(("_up", "_down"), testBand.spininfo)
+        np.testing.assert_array_equal([np.array([0.0, 0.0, 0.0]),
+                                       np.array([0.25, 0.25, 0.]),
+                                       np.array([0.5, 0.5, 0.])],
+                                      testBand.kvectors)
+        self.assertEqual((3,2,3,9), testBand.phases[0].shape)
+        self.assertEqual((3,2,3,9), testBand.phases[1].shape)
+        self.assertEqual((3,2,3,9), testBand.orbitals[0].shape)
+        self.assertEqual((3,2,3,9), testBand.orbitals[1].shape)
+
+    def BScreation_from_procar_soi_test(self):
+        testBand = self.procar_soi.band()
+        self.assertEqual(3, testBand.nAtoms)
+        self.assertEqual(2, testBand.nBands)
+        self.assertEqual(("_mT", "_mX", "_mY", "_mZ"), testBand.spininfo)
+        np.testing.assert_array_equal([np.array([0.0, 0.0, 0.0]),
+                                       np.array([0.25, 0.25, 0.]),
+                                       np.array([0.5, 0.5, 0.])],
+                                      testBand.kvectors)
+
+        
+        
+# -------------------------------------------------        
         
 output_print_procar_std="""The properties of this procar:
   # of k-points: 3

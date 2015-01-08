@@ -186,7 +186,7 @@ class PROCAR(object):  # Version safety
     def __iter__(self):
         return iter(self.__orbital)
 
-    def bandstructure(self):
+    def band(self):
         band = BandStructure()
         band.kvectors = self.kvectors[0:self.numk]
         band.nBands = self.nBands
@@ -194,43 +194,11 @@ class PROCAR(object):  # Version safety
         band.spininfo = self.spininfo
         band.orb_names = self.orb_names
         #
+        band.energies = self.energies
         band.orbitals = self.orbital
         band.phases = self.phase
         return band
 
-    def to_band(self):
-        band = Band(self.kvectors[0:self.numk])
-        # for no-spin and soi, [0:self.numk] does not affect the results.
-        # However for spin-case, remove the identical latter kvectors.
-        for i, orbital in enumerate(self.orbital):
-            if len(self.spininfo) == 1:  # spin integrated
-                kindex, x = divmod(i, self.nBands * self.nAtoms)
-                bindex = x // self.nAtoms
-                eigenvalue = self.energies[i // self.nAtoms]
-                spininfo = self.spininfo[0]
-                aState = State(kindex, bindex, eigenvalue, spininfo, orbital)
-                band.append(aState)
-            elif len(self.spininfo) == 2:  # spin resolved
-                kindex, x = divmod(i, self.nBands * self.nAtoms)
-                if i >= self.numk * self.nBands * self.nAtoms:
-                    kindex -= self.numk
-                bindex = x // self.nAtoms
-                eigenvalue = self.energies[i // self.nAtoms]
-                if i >= self.numk * self.nBands * self.nAtoms:
-                    spininfo = self.spininfo[1]
-                else:
-                    spininfo = self.spininfo[0]
-                aState = State(kindex, bindex, eigenvalue, spininfo, orbital)
-                band.append(aState)
-            elif len(self.spininfo) == 4:  # SOI
-                # 4 is mT, mX, mY, mZ
-                kindex, x = divmod(i, self.nBands * self.nAtoms * 4)
-                bindex = x // (self.nAtoms * 4)
-                eigenvalue = self.energies[i // (self.nAtoms * 4)]
-                spininfo = self.spininfo[i % 4]
-                aState = State(kindex, bindex, eigenvalue, spininfo, orbital)
-                band.append(aState)
-        return band
 
 
 class BandStructure(object):
@@ -247,7 +215,7 @@ class BandStructure(object):
         self.__kdistance = list()
         self.__composed_sites = list()
         self.__orbitals = 0
-        self.__phase = 0
+        self.__phases = 0
         pass
 
 #    @property
@@ -270,37 +238,41 @@ class BandStructure(object):
         (But this option is not so entirely tested.
         Do not use for real analysis)
         '''
-
         if type(arg) == np.ndarray and arg.ndim == 4:
-            self.__orbitals == arg
-        elif (self.numk,
-              self.nAtoms,
-              self.nBands,
-              len(self.orb_names),
-              len(self.spininfo)) != (0, 0, 0, 0, 0):
-            if len(self.spininfo) == 1 or len(self.spininfo) == 4:
-                self.__orbitals = \
-                    np.array(arg).reshape(self.numk,
-                                          self.nBands,
-                                          self.nAtoms * len(self.spininfo),
-                                          len(self.orb_names))
-                self.available_band = list(range(nBands))
-                pass  # <- set available_band
-            elif len(self.spininfo) == 2:
-                arg = np.array(arg)
-            else:
-                raise TypeError("arg is not array object")
-        else:
-            errmsg = "check if nAtoms, nBands, numk, spininfo, orb_names are set"
-            raise ValueError(errmsg)
+            self.__orbitals = arg
+        elif not hasattr(self, "numk"):
+            raise ValueError ("numk is not defind")
+        elif not hasattr(self, "nAtoms"):
+            raise ValueError ("nAtoms is not defind")
+        elif not hasattr(self, "nBands"):
+            raise ValueError ("nAtoms is not defind")
+        elif 's' not in self.orb_names:
+            raise ValueError ("orbital name does not seem to be correctly defined.")
+        elif not hasattr(self, "spininfo"):
+            raise ValueError ("spininfo is not defined")
+        elif len(self.spininfo) == 1 or len(self.spininfo) == 4:
+            self.__orbitals = \
+                np.array(arg).reshape(self.numk,
+                                      self.nBands,
+                                      self.nAtoms * len(self.spininfo),
+                                      len(self.orb_names))
+            self.available_band = list(range(self.nBands))
+        elif len(self.spininfo) == 2:
+            self.__orbitals = \
+                np.array(arg).reshape(2, self.numk,
+                                      self.nBands,
+                                      self.nAtoms,
+                                      len(self.orb_names))
+            self.available_band = list(range(self.nBands))
+            self.__orbitals = (self.__orbitals[0], self.__orbitals[1]) 
 
     @property
-    def phase(self):
-        return self.__phase
+    def phases(self):
+        return self.__phases
 
-    @phase.setter
-    def phase(self, arg):
-        '''Setter for phase
+    @phases.setter
+    def phases(self, arg):
+        '''Setter for phases
 
         When standard (i.e. ISPIN = 0) or SOI, return is 4-rank tensor
         When spin-resolved (i.e. ISPIN = 2 but w/o SOI),
@@ -309,7 +281,28 @@ class BandStructure(object):
         arg must be the list of the list.
         Two elements convert into the single complex ndarray.
         '''
-        pass
+        phase_re = np.array(arg[::2])
+        phase_im = np.array(arg[1::2])
+        phases = phase_re + phase_im * (0.0 + 1.0J) 
+        if not hasattr(self, "numk"):
+            raise ValueError ("numk is not defind")
+        elif not hasattr(self, "nAtoms"):
+            raise ValueError ("nAtoms is not defind")
+        elif not hasattr(self, "nBands"):
+            raise ValueError ("nAtoms is not defind")
+        elif 's' not in self.orb_names:
+            raise ValueError ("orbital name does not seem to be correctly defined.")
+        elif  len(self.spininfo) == 1 or len(self.spininfo) == 4:
+            self.__phases = \
+                            phases.reshape(self.numk, self.nBands,
+                                           self.nAtoms,
+                                           len(self.orb_names))
+        elif  len(self.spininfo) == 2:
+            self.__phases = \
+                            phases.reshape(2, self.numk, self.nBands,
+                                           self.nAtoms,
+                                           len(self.orb_names))
+            self.__phases = (self.__phases[0], self.__phases[1])
 
     @property
     def kvectors(self):
@@ -334,10 +327,6 @@ class BandStructure(object):
     @property
     def kdistance(self):
         return self.__kdistance
-
-    @property
-    def available_bands(self):
-        return self.__available_band
 
     def compose_sites(self, site_number_list):
         pass
