@@ -468,7 +468,8 @@ class BandStructure(object):
             raise ValueError(errmsg)
 
     def compose_orbital(self, composed_orbital_name):
-        '''add composed orbital contribution in each 'states'.
+        '''add composed orbital contribution in each 'sites' stored in 
+        BandStructure.sitecomposed.
 
         Firstly, check if "composed_orbital_name" can change preferable name
         ('pypx' should be 'pxpy', for example), and then check if
@@ -476,6 +477,10 @@ class BandStructure(object):
         note::
         special orbital names are :  sp, p, spd, d
         '''
+        if not self.sitecomposed:
+            err = "This method operates with on sitecomposed attribute,
+            but it's null"
+            raise RunetimeError(err)
         composed_orbital_name = self.check_orb_name(composed_orbital_name)
         if composed_orbital_name in self.orb_names:
             pass
@@ -501,11 +506,11 @@ class BandStructure(object):
             self.__orb_names = self.orb_names + ['pxpz']
             pass
 
-    def del_band(self, band_index):
-        pass
-
-    def isconsistent(self):
-        pass
+    def del_band(self, band_indexes):
+        if not self.sitecomposed:
+            err = "This method operates with on sitecomposed attribute,
+            but it's null"
+            raise RunetimeError(err)
 
 
 class states(object):
