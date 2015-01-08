@@ -302,6 +302,7 @@ class BandStructure(object):
         '''
         if len(arg) == 0:
             self.__phases = list()
+            return self.__phases
         else:
             phase_re = np.array(arg[::2])
             phase_im = np.array(arg[1::2])
