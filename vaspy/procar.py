@@ -213,7 +213,7 @@ class BandStructure(object):
         self.__nBands = 0
         self.__kvectors = list()
         self.__kdistance = list()
-        self.__sitecomposed = None
+        self.__sitecomposed = []
         self.__orbitals = 0
         self.__phases = 0
         self.__energies = 0
@@ -375,11 +375,11 @@ class BandStructure(object):
                 for j in range(len(self.available_band))]
                 for i in range(self.numk)])
             if self.__sitecomposed:
-                self.__sitecomposed = np.concatenate((self.__sitecomposed,
-                                                      cmporbs),
-                                                     axis=2)
+                self.__sitecomposed[0] = np.concatenate(
+                    (self.__sitecomposed[0], cmporbs),
+                    axis=2)
             else:
-                self.__sitecomposed = cmporbs
+                self.__sitecomposed = [cmporbs]
         if len(self.spininfo) == 2:
             upspin_orbitals = self.orbitals[0]
             downspin_orbitals = self.orbitals[1]
@@ -409,7 +409,7 @@ class BandStructure(object):
                     (self.__sitecomposed[1], cmporbsDown),
                     axis=2)
             else:
-                self.__sitecomposed = (cmporbsUp, cmporbsDown)
+                self.__sitecomposed = [cmporbsUp, cmporbsDown]
         if len(self.spininfo) == 4:
             site_numbers_mT = tuple(x + self.nAtoms * 0 for x in site_numbers)
             site_numbers_mX = tuple(x + self.nAtoms * 1 for x in site_numbers)
@@ -432,16 +432,22 @@ class BandStructure(object):
                 self.orbitals[i, j]) if x in site_numbers_mZ], axis=0)]
                 for j in range(len(self.available_band))]
                 for i in range(self.numk)])
-            cmporbs = np.concatenate((cmporbs_mT,
-                                      cmporbs_mX,
-                                      cmporbs_mY,
-                                      cmporbs_mZ), axis=2)
             if self.__sitecomposed:
-                self.__sitecomposed = np.concatenate((self.__sitecomposed,
-                                                      cmporbs),
-                                                     axis=2)
+                self.__sitecomposed[0] = np.concatenate(
+                    (self.__sitecomposed[0], cmporbs_mT),
+                    axis=2)
+                self.__sitecomposed[1] = np.concatenate(
+                    (self.__sitecomposed[1], cmporbs_mX),
+                    axis=2)
+                self.__sitecomposed[2] = np.concatenate(
+                    (self.__sitecomposed[2], cmporbs_mY),
+                    axis=2)
+                self.__sitecomposed[3] = np.concatenate(
+                    (self.__sitecomposed[3], cmporbs_mZ),
+                    axis=2)
             else:
-                self.__sitecomposed = cmporbs
+                self.__sitecomposed = [cmporbs_mT, cmporbs_mX, cmporbs_mY,
+                                       cmporbs_mZ]
 
     def check_orb_name(self, orb):
         '''Check if the argument org is feasible name for composed orbital
