@@ -122,25 +122,13 @@ class TestPROCAR(unittest.TestCase):
     def siteCompose_band_from_procar_std_test(self):
         testBand = self.procar_std.band()
         testBand.compose_sites((0, 2))
-        self.assertEqual((3, 2, 4, 9), testBand.orbitals.shape)
-        np.testing.assert_array_almost_equal(np.array([[0.    ,  0.0001,  0.0002,  0.0003,  0.0004,
-                                                         0.0005,  0.0006, 0.0007,  0.0008],
-                                                       [0.001 ,  0.0011,  0.0012,  0.0013,  0.0014,
-                                                         0.0015,  0.0016, 0.0017,  0.0018],
-                                                       [0.002 ,  0.0021,  0.0022,  0.0023,  0.0024,
-                                                         0.0025,  0.0026, 0.0027,  0.0028],
-                                                       [0.002 ,  0.0022,  0.0024,  0.0026,  0.0028,
+        self.assertEqual((3, 2, 1, 9), testBand.sitecomposed.shape)
+        np.testing.assert_array_almost_equal(np.array([[0.002 ,  0.0022,  0.0024,  0.0026,  0.0028,
                                                          0.0030 ,  0.0032, 0.0034,  0.0036]]),
-                                             testBand.orbitals[0,0])
-        np.testing.assert_array_almost_equal(np.array([[0.009 ,  0.0091,  0.0092,  0.0093,  0.0094,
-                                                         0.0095,  0.0096, 0.0097,  0.0098],
-                                                       [0.01  ,  0.0101,  0.0102,  0.0103,  0.0104,
-                                                         0.0105,  0.0106, 0.0107,  0.0108],
-                                                       [0.011 ,  0.0111,  0.0112,  0.0113,  0.0114,
-                                                         0.0115,  0.0116, 0.0117,  0.0118],
-                                                       [0.02  ,  0.0202,  0.0204,  0.0206,  0.0208,
+                                             testBand.sitecomposed[0,0])
+        np.testing.assert_array_almost_equal(np.array([[0.02  ,  0.0202,  0.0204,  0.0206,  0.0208,
                                                          0.021 ,  0.0212, 0.0214,  0.0216]]),
-                                             testBand.orbitals[1,1])
+                                             testBand.sitecomposed[1,1])
 
 
         
