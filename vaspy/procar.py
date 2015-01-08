@@ -225,7 +225,6 @@ class BandStructure(object):
 
         This method is used before when orbitals, phases, energies
         are set.'''
-
         if not hasattr(self, "numk"):
             raise ValueError("numk is not defined")
         if self.numk == 0:
@@ -310,7 +309,7 @@ class BandStructure(object):
         if self.isready():
             if len(self.spininfo) == 1 or len(self.spininfo) == 4:
                 self.__phases = \
-                    phases.reshape(self.numk, self.nBands,
+                        phases.reshape(self.numk, self.nBands,
                                    self.nAtoms,
                                    len(self.orb_names))
             elif len(self.spininfo) == 2:
@@ -352,10 +351,10 @@ class BandStructure(object):
     def energies(self, arg):
         if self.isready():
             if len(self.spininfo) == 1 or len(self.spininfo) == 4:
-                self.__energies = arg
+                self.__energies = np.array(arg).reshape(self.numk, self.nBands)
             elif len(self.spininfo) == 2:
-                self.__energies = (arg[:len(self.available_band)],
-                                   arg[len(self.available_band):])
+                self.__energies = (np.array(arg[:self.numk * len(self.available_band)]).reshape(self.numk, self.nBands),
+                                   np.array(arg[self.numk * len(self.available_band):]).reshape(self.numk, self.nBands))
 
     def compose_sites(self, site_number_list):
         pass
