@@ -287,7 +287,7 @@ class BandStructure(object):
     @property
     def sitecomposed(self):
         return self.__sitecomposed
- 
+
     @property
     def phases(self):
         return self.__phases
@@ -355,17 +355,25 @@ class BandStructure(object):
             if len(self.spininfo) == 1 or len(self.spininfo) == 4:
                 self.__energies = np.array(arg).reshape(self.numk, self.nBands)
             elif len(self.spininfo) == 2:
-                self.__energies = (np.array(arg[:self.numk * len(self.available_band)]).reshape(self.numk, self.nBands),
-                                   np.array(arg[self.numk * len(self.available_band):]).reshape(self.numk, self.nBands))
+                self.__energies = (
+                    np.array(
+                        arg[:self.numk * len(self.available_band)]).reshape(
+                            self.numk, self.nBands),
+                    np.array(
+                        arg[self.numk * len(self.available_band):]).reshape(
+                            self.numk, self.nBands))
 
     def compose_sites(self, arg):
         # the element of site_number_list must be unique.
         site_numbers = tuple(set(arg))
         self.isready()  # if not ready, raise Error.
         if len(self.spininfo) == 1:
-            cmporbs = np.array([[[np.sum([y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers], axis=0)]
-                                for j in range(len(self.available_band))]
-                                for i in range(self.numk)])
+            cmporbs = np.array([[[np.sum(
+                [y for x, y in enumerate(self.orbitals[i, j])
+                 if x in site_numbers],
+                axis=0)]
+                for j in range(len(self.available_band))]
+                for i in range(self.numk)])
             if self.__sitecomposed:
                 self.__sitecomposed = np.concatenate((self.__sitecomposed,
                                                       cmporbs),
@@ -375,12 +383,18 @@ class BandStructure(object):
         if len(self.spininfo) == 2:
             upspin_orbitals = self.orbitals[0]
             downspin_orbitals = self.orbitals[1]
-            cmporbsUp = np.array([[[np.sum([y for x, y in enumerate(upspin_orbitals[i, j]) if x in site_numbers], axis=0)]
-                                 for j in range(len(self.available_band))]
-                                 for i in range(self.numk)])
-            cmporbsDown = np.array([[[np.sum([y for x, y in enumerate(downspin_orbitals[i, j]) if x in site_numbers], axis=0)]
-                                     for j in range(len(self.available_band))]
-                                    for i in range(self.numk)])
+            cmporbsUp = np.array([[[np.sum(
+                [y for x, y in enumerate(upspin_orbitals[i, j])
+                 if x in site_numbers],
+                axis=0)]
+                for j in range(len(self.available_band))]
+                for i in range(self.numk)])
+            cmporbsDown = np.array([[[np.sum(
+                [y for x, y in enumerate(downspin_orbitals[i, j])
+                 if x in site_numbers],
+                axis=0)]
+                for j in range(len(self.available_band))]
+                for i in range(self.numk)])
             self.__orbitals[0] = np.concatenate((self.__orbitals[0],
                                                  cmporbsUp),
                                                 axis=2)
@@ -388,12 +402,12 @@ class BandStructure(object):
                                                  cmporbsDown),
                                                 axis=2)
             if self.__sitecomposed:
-                self.__sitecomposed[0] = np.concatenate((self.__sitecomposed[0],
-                                                         cmporbsUp),
-                                                        axis=2)
-                self.__sitecomposed[1] = np.concatenate((self.__sitecomposed[1],
-                                                         cmporbsDown),
-                                                        axis=2)
+                self.__sitecomposed[0] = np.concatenate(
+                    (self.__sitecomposed[0], cmporbsUp),
+                    axis=2)
+                self.__sitecomposed[1] = np.concatenate(
+                    (self.__sitecomposed[1], cmporbsDown),
+                    axis=2)
             else:
                 self.__sitecomposed = (cmporbsUp, cmporbsDown)
         if len(self.spininfo) == 4:
