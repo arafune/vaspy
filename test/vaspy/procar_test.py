@@ -16,7 +16,7 @@ class TestPROCAR(unittest.TestCase):
         f = open(filePROCAR[1], 'w')
         f.write(procar_single)
         f.close()
-        self.procar_single = procar.PROCAR(filePROCAR[1],phase_read = True)
+        self.procar_single = procar.PROCAR(filePROCAR[1], phase_read=True)
         os.remove(filePROCAR[1])
         # without Spi/Spin
         global procar_woSpi
@@ -24,7 +24,7 @@ class TestPROCAR(unittest.TestCase):
         f = open(filePROCAR[1], 'w')
         f.write(procar_woSpi)
         f.close()
-        self.procar_std = procar.PROCAR(filePROCAR[1], phase_read = True)
+        self.procar_std = procar.PROCAR(filePROCAR[1], phase_read=True)
         os.remove(filePROCAR[1])
         # with Spin
         global procar_Spin
@@ -32,7 +32,7 @@ class TestPROCAR(unittest.TestCase):
         f = open(filePROCAR[1], 'w')
         f.write(procar_Spin)
         f.close()
-        self.procar_spin = procar.PROCAR(filePROCAR[1], phase_read = True)
+        self.procar_spin = procar.PROCAR(filePROCAR[1], phase_read=True)
         os.remove(filePROCAR[1])
         # with SOI (noncollinear)
         global procar_SOI
@@ -40,7 +40,7 @@ class TestPROCAR(unittest.TestCase):
         f = open(filePROCAR[1], 'w')
         f.write(procar_SOI)
         f.close()
-        self.procar_soi = procar.PROCAR(filePROCAR[1], phase_read = True)
+        self.procar_soi = procar.PROCAR(filePROCAR[1], phase_read=True)
         os.remove(filePROCAR[1])
         #
         # Band object
@@ -51,7 +51,7 @@ class TestPROCAR(unittest.TestCase):
         pass
 
     def procar_std_print_test(self):
-        self.assertEqual(output_print_procar_std, self.procar_std.__str__())   
+        self.assertEqual(output_print_procar_std, self.procar_std.__str__())
 
     def procar_spin_print_test(self):
         self.assertEqual(output_print_procar_spin, self.procar_spin.__str__())
@@ -71,8 +71,8 @@ class TestPROCAR(unittest.TestCase):
                                        np.array([0.5, 0.5, 0.])],
                                       self.nullband.kvectors)
         self.assertEqual([0.0,
-                          np.sqrt(0.25**2+ 0.25**2),
-                          np.sqrt(0.5**2+ 0.5**2)],
+                          np.sqrt(0.25**2 + 0.25**2),
+                          np.sqrt(0.5**2 + 0.5**2)],
                          self.nullband.kdistance)
         self.assertEqual(3, self.nullband.numk)
 
@@ -92,9 +92,8 @@ class TestPROCAR(unittest.TestCase):
         self.assertEqual(1, testBand.nBands)
         np.testing.assert_array_equal([np.array([0.0, 0.0, 0.0])],
                                       testBand.kvectors)
-        np.testing.assert_array_equal(np.array([[[[0.0000, 0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008], [0.0010, 0.0011, 0.0012, 0.0013, 0.0014, 0.0015, 0.0016, 0.0017, 0.0018], [0.0020, 0.0021, 0.0022, 0.0023, 0.0024, 0.0025, 0.0026, 0.0027, 0.0028]]]]), testBand.orbitals )
-        np.testing.assert_array_equal(np.array([[[[0.0000 + 0.0010J, 0.0001 + 0.0011J, 0.0002 + 0.0012J, 0.0003 + 0.0013J, 0.0004 + 0.0014J, 0.0005 + 0.0015J, 0.0006 + 0.0016J, 0.0007 + 0.0017J, 0.0008 + 0.0018J],[0.0020 + 0.0030J, 0.0021 + 0.0031J, 0.0022 + 0.0032J,  0.0023 + 0.0033J, 0.0024 + 0.0034J, 0.0025 + 0.0035J,0.0026 + 0.0036J, 0.0027 + 0.0037J, 0.0028 + 0.0038J],[0.0040 + 0.0050J, 0.0041 + 0.0051J, 0.0042 + 0.0052J, 0.0043 + 0.0053J, 0.0044 + 0.0054J, 0.0045 +  0.0055J, 0.0046 + 0.0056J, 0.0047+ 0.0057J, 0.0048 + 0.0058J]]]]), testBand.phases)
-
+        np.testing.assert_array_equal(np.array([[[[0.0000, 0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008], [0.0010, 0.0011, 0.0012, 0.0013, 0.0014, 0.0015, 0.0016, 0.0017, 0.0018], [0.0020, 0.0021, 0.0022, 0.0023, 0.0024, 0.0025, 0.0026, 0.0027, 0.0028]]]]), testBand.orbitals)
+        np.testing.assert_array_equal(np.array([[[[0.0000 + 0.0010J, 0.0001 + 0.0011J, 0.0002 + 0.0012J, 0.0003 + 0.0013J, 0.0004 + 0.0014J, 0.0005 + 0.0015J, 0.0006 + 0.0016J, 0.0007 + 0.0017J, 0.0008 + 0.0018J], [0.0020 + 0.0030J, 0.0021 + 0.0031J, 0.0022 + 0.0032J, 0.0023 + 0.0033J, 0.0024 + 0.0034J, 0.0025 + 0.0035J,0.0026 + 0.0036J, 0.0027 + 0.0037J, 0.0028 + 0.0038J], [0.0040 + 0.0050J, 0.0041 + 0.0051J, 0.0042 + 0.0052J, 0.0043 + 0.0053J, 0.0044 + 0.0054J, 0.0045 + 0.0055J, 0.0046 + 0.0056J, 0.0047+ 0.0057J, 0.0048 + 0.0058J]]]]), testBand.phases)
 
     def BScreation_from_procar_spin_test(self):
         testBand = self.procar_spin.band()
@@ -105,10 +104,10 @@ class TestPROCAR(unittest.TestCase):
                                        np.array([0.25, 0.25, 0.]),
                                        np.array([0.5, 0.5, 0.])],
                                       testBand.kvectors)
-        self.assertEqual((3,2,3,9), testBand.phases[0].shape)
-        self.assertEqual((3,2,3,9), testBand.phases[1].shape)
-        self.assertEqual((3,2,3,9), testBand.orbitals[0].shape)
-        self.assertEqual((3,2,3,9), testBand.orbitals[1].shape)
+        self.assertEqual((3, 2, 3, 9), testBand.phases[0].shape)
+        self.assertEqual((3, 2, 3, 9), testBand.phases[1].shape)
+        self.assertEqual((3, 2, 3, 9), testBand.orbitals[0].shape)
+        self.assertEqual((3, 2, 3, 9), testBand.orbitals[1].shape)
 
     def BScreation_from_procar_soi_test(self):
         testBand = self.procar_soi.band()
@@ -119,6 +118,30 @@ class TestPROCAR(unittest.TestCase):
                                        np.array([0.25, 0.25, 0.]),
                                        np.array([0.5, 0.5, 0.])],
                                       testBand.kvectors)
+
+    def siteCompose_band_from_procar_std_test(self):
+        testBand = self.procar_std.band()
+        testBand.compose_sites((0, 2))
+        self.assertEqual((3, 2, 4, 9), testBand.orbitals.shape)
+        np.testing.assert_array_almost_equal(np.array([[0.    ,  0.0001,  0.0002,  0.0003,  0.0004,
+                                                         0.0005,  0.0006, 0.0007,  0.0008],
+                                                       [0.001 ,  0.0011,  0.0012,  0.0013,  0.0014,
+                                                         0.0015,  0.0016, 0.0017,  0.0018],
+                                                       [0.002 ,  0.0021,  0.0022,  0.0023,  0.0024,
+                                                         0.0025,  0.0026, 0.0027,  0.0028],
+                                                       [0.002 ,  0.0022,  0.0024,  0.0026,  0.0028,
+                                                         0.0030 ,  0.0032, 0.0034,  0.0036]]),
+                                             testBand.orbitals[0,0])
+        np.testing.assert_array_almost_equal(np.array([[0.009 ,  0.0091,  0.0092,  0.0093,  0.0094,
+                                                         0.0095,  0.0096, 0.0097,  0.0098],
+                                                       [0.01  ,  0.0101,  0.0102,  0.0103,  0.0104,
+                                                         0.0105,  0.0106, 0.0107,  0.0108],
+                                                       [0.011 ,  0.0111,  0.0112,  0.0113,  0.0114,
+                                                         0.0115,  0.0116, 0.0117,  0.0118],
+                                                       [0.02  ,  0.0202,  0.0204,  0.0206,  0.0208,
+                                                         0.021 ,  0.0212, 0.0214,  0.0216]]),
+                                             testBand.orbitals[1,1])
+
 
         
         

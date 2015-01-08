@@ -308,15 +308,13 @@ class BandStructure(object):
             phases = phase_re + phase_im * (0.0 + 1.0J)
         if self.isready():
             if len(self.spininfo) == 1 or len(self.spininfo) == 4:
-                self.__phases = \
-                        phases.reshape(self.numk, self.nBands,
-                                   self.nAtoms,
-                                   len(self.orb_names))
+                self.__phases = phases.reshape(self.numk, self.nBands,
+                                               self.nAtoms,
+                                               len(self.orb_names))
             elif len(self.spininfo) == 2:
-                self.__phases = \
-                    phases.reshape(2, self.numk, self.nBands,
-                                   self.nAtoms,
-                                   len(self.orb_names))
+                self.__phases = phases.reshape(2, self.numk, self.nBands,
+                                               self.nAtoms,
+                                               len(self.orb_names))
                 self.__phases = (self.__phases[0], self.__phases[1])
 
     @property
@@ -360,51 +358,55 @@ class BandStructure(object):
         # the element of site_number_list must be unique.
         site_numbers = tuple(set(arg))
         self.isready()  # if not ready, raise Error.
-        if len(self.spininfo)==1:
-            cmporbs = np.array([[[np.sum([ y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers], axis=0)]
-                                 for j in range(len(self.available_band))]
-                                 for i in range(self.numk)])
+        if len(self.spininfo) == 1:
+            cmporbs = np.array([[[np.sum([y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers], axis=0)]
+                                for j in range(len(self.available_band))]
+                                for i in range(self.numk)])
             self.__orbitals = np.concatenate((self.__orbitals, cmporbs),
-                                             axis = 2)
-        if len(self.spininfo)==2:
+                                             axis=2)
+        if len(self.spininfo) == 2:
             upspin_orbitals = self.orbitals[0]
             downspin_orbitals = self.orbitals[1]
-            cmporbsUp = np.array([[[np.sum([ y for x, y in enumerate(upspin_orbitals[i, j]) if x in site_numbers], axis=0)]
+            cmporbsUp = np.array([[[np.sum([y for x, y in enumerate(upspin_orbitals[i, j]) if x in site_numbers], axis=0)]
                                  for j in range(len(self.available_band))]
                                  for i in range(self.numk)])
-            cmporbsDown = np.array([[[np.sum([ y for x, y in enumerate(downspin_orbitals[i, j]) if x in site_numbers], axis=0)]
-                                 for j in range(len(self.available_band))]
-                                 for i in range(self.numk)])
+            cmporbsDown = np.array([[[np.sum([y for x, y in enumerate(downspin_orbitals[i, j]) if x in site_numbers], axis=0)]
+                                     for j in range(len(self.available_band))]
+                                    for i in range(self.numk)])
             self.__orbitals[0] = np.concatenate((self.__orbitals[0],
                                                  cmporbsUp),
-                                                axis = 2)
+                                                axis=2)
             self.__orbitals[1] = np.concatenate((self.__orbitals[1],
                                                  cmporbsDown),
-                                                axis = 2)
-            cmporbs_mT = np.array([[[np.sum([ y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers], axis=0)]
-                                 for j in range(len(self.available_band))]
-                                 for i in range(self.numk)])
-            cmporbs_mX = np.array([[[np.sum([ y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers_mX], axis=0)]
+                                                axis=2)
         if len(self.spininfo) == 4:
             site_numbers_mT = tuple(x + self.nAtoms * 0 for x in site_numbers)
             site_numbers_mX = tuple(x + self.nAtoms * 1 for x in site_numbers)
             site_numbers_mY = tuple(x + self.nAtoms * 2 for x in site_numbers)
             site_numbers_mZ = tuple(x + self.nAtoms * 3 for x in site_numbers)
-                                 for j in range(len(self.available_band))]
-                                 for i in range(self.numk)])
-            cmporbs_mY = np.array([[[np.sum([ y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers_mY], axis=0)]
-                                 for j in range(len(self.available_band))]
-                                 for i in range(self.numk)])
-            cmporbs_mZ = np.array([[[np.sum([ y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers_mZ], axis=0)]
-                                 for j in range(len(self.available_band))]
-                                 for i in range(self.numk)])
+            #
+            cmporbs_mT = np.array([[[np.sum([y for x, y in enumerate(
+                self.orbitals[i, j]) if x in site_numbers_mT], axis=0)]
+                for j in range(len(self.available_band))]
+                for i in range(self.numk)])
+            cmporbs_mX = np.array([[[np.sum([y for x, y in enumerate(
+                self.orbitals[i, j]) if x in site_numbers_mX], axis=0)]
+                for j in range(len(self.available_band))]
+                for i in range(self.numk)])
+            cmporbs_mY = np.array([[[np.sum([y for x, y in enumerate(
+                self.orbitals[i, j]) if x in site_numbers_mY], axis=0)]
+                for j in range(len(self.available_band))]
+                for i in range(self.numk)])
+            cmporbs_mZ = np.array([[[np.sum([y for x, y in enumerate(
+                self.orbitals[i, j]) if x in site_numbers_mZ], axis=0)]
+                for j in range(len(self.available_band))]
+                for i in range(self.numk)])
             cmporbs = np.concatenate((cmporbs_mT,
                                       cmporbs_mX,
                                       cmporbs_mY,
-                                      cmporbs_mZ),
-                                     axis = 2)
+                                      cmporbs_mZ), axis=2)
             self.__orbitals = np.concatenate((self.__orbitals, cmporbs),
-                                             axis = 2)
+                                             axis=2)
 
     def check_orb_name(self, orb):
         '''Check if the argument org is feasible name for composed orbital
