@@ -272,31 +272,20 @@ class BandStructure(object):
         '''
         if type(arg) == np.ndarray and arg.ndim == 4:
             self.__orbitals = arg
-        elif not hasattr(self, "numk"):
-            raise ValueError ("numk is not defind")
-        elif not hasattr(self, "nAtoms"):
-            raise ValueError ("nAtoms is not defind")
-        elif not hasattr(self, "nBands"):
-            raise ValueError ("nAtoms is not defind")
-        elif 's' not in self.orb_names:
-            raise ValueError ("orbital name does not seem to be correctly defined.")
-        elif not hasattr(self, "spininfo"):
-            raise ValueError ("spininfo is not defined")
-        elif len(self.spininfo) == 1 or len(self.spininfo) == 4:
-            self.__orbitals = \
-                np.array(arg).reshape(self.numk,
-                                      self.nBands,
-                                      self.nAtoms * len(self.spininfo),
-                                      len(self.orb_names))
-            self.available_band = list(range(self.nBands))
-        elif len(self.spininfo) == 2:
-            self.__orbitals = \
-                np.array(arg).reshape(2, self.numk,
-                                      self.nBands,
-                                      self.nAtoms,
-                                      len(self.orb_names))
-            self.available_band = list(range(self.nBands))
-            self.__orbitals = (self.__orbitals[0], self.__orbitals[1]) 
+        elif self.isready():
+            if len(self.spininfo) == 1 or len(self.spininfo) == 4:
+                self.__orbitals = \
+                    np.array(arg).reshape(self.numk,
+                                          self.nBands,
+                                          self.nAtoms * len(self.spininfo),
+                                          len(self.orb_names))
+            elif len(self.spininfo) == 2:
+                self.__orbitals = \
+                    np.array(arg).reshape(2, self.numk,
+                                          self.nBands,
+                                          self.nAtoms,
+                                          len(self.orb_names))
+                self.__orbitals = (self.__orbitals[0], self.__orbitals[1])
 
     @property
     def phases(self):
@@ -313,28 +302,24 @@ class BandStructure(object):
         arg must be the list of the list.
         Two elements convert into the single complex ndarray.
         '''
-        phase_re = np.array(arg[::2])
-        phase_im = np.array(arg[1::2])
-        phases = phase_re + phase_im * (0.0 + 1.0J) 
-        if not hasattr(self, "numk"):
-            raise ValueError ("numk is not defind")
-        elif not hasattr(self, "nAtoms"):
-            raise ValueError ("nAtoms is not defind")
-        elif not hasattr(self, "nBands"):
-            raise ValueError ("nAtoms is not defind")
-        elif 's' not in self.orb_names:
-            raise ValueError ("orbital name does not seem to be correctly defined.")
-        elif  len(self.spininfo) == 1 or len(self.spininfo) == 4:
-            self.__phases = \
-                            phases.reshape(self.numk, self.nBands,
-                                           self.nAtoms,
-                                           len(self.orb_names))
-        elif  len(self.spininfo) == 2:
-            self.__phases = \
-                            phases.reshape(2, self.numk, self.nBands,
-                                           self.nAtoms,
-                                           len(self.orb_names))
-            self.__phases = (self.__phases[0], self.__phases[1])
+        if len(arg) == 0:
+            self.__phases = list()
+        else:
+            phase_re = np.array(arg[::2])
+            phase_im = np.array(arg[1::2])
+            phases = phase_re + phase_im * (0.0 + 1.0J)
+        if self.isready():
+            if len(self.spininfo) == 1 or len(self.spininfo) == 4:
+                self.__phases = \
+                    phases.reshape(self.numk, self.nBands,
+                                   self.nAtoms,
+                                   len(self.orb_names))
+            elif len(self.spininfo) == 2:
+                self.__phases = \
+                    phases.reshape(2, self.numk, self.nBands,
+                                   self.nAtoms,
+                                   len(self.orb_names))
+                self.__phases = (self.__phases[0], self.__phases[1])
 
     @property
     def kvectors(self):
