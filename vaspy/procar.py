@@ -358,9 +358,9 @@ class BandStructure(object):
 
     def compose_sites(self, arg):
         # the element of site_number_list must be unique.
-        site_numbers = tuple(set(a))
+        site_numbers = tuple(set(arg))
         self.isready()  # if not ready, raise Error.
-        if len(self.spininfo)==0:
+        if len(self.spininfo)==1:
             cmporbs = np.array([[[np.sum([ y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers], axis=0)]
                                  for j in range(len(self.available_band))]
                                  for i in range(self.numk)])
@@ -381,14 +381,15 @@ class BandStructure(object):
             self.__orbitals[1] = np.concatenate((self.__orbitals[1],
                                                  cmporbsDown),
                                                 axis = 2)
-        if len(self.spininfo)==4:
-            site_numbers_mX = (x + self.nAtoms for x in site_numbers)
-            site_numbers_mY = (x + self.nAtoms * 2 for x in site_numbers)
-            site_numbers_mZ = (x + self.nAtoms * 3 for x in site_numbers)
             cmporbs_mT = np.array([[[np.sum([ y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers], axis=0)]
                                  for j in range(len(self.available_band))]
                                  for i in range(self.numk)])
             cmporbs_mX = np.array([[[np.sum([ y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers_mX], axis=0)]
+        if len(self.spininfo) == 4:
+            site_numbers_mT = tuple(x + self.nAtoms * 0 for x in site_numbers)
+            site_numbers_mX = tuple(x + self.nAtoms * 1 for x in site_numbers)
+            site_numbers_mY = tuple(x + self.nAtoms * 2 for x in site_numbers)
+            site_numbers_mZ = tuple(x + self.nAtoms * 3 for x in site_numbers)
                                  for j in range(len(self.available_band))]
                                  for i in range(self.numk)])
             cmporbs_mY = np.array([[[np.sum([ y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers_mY], axis=0)]
