@@ -356,8 +356,54 @@ class BandStructure(object):
                 self.__energies = (np.array(arg[:self.numk * len(self.available_band)]).reshape(self.numk, self.nBands),
                                    np.array(arg[self.numk * len(self.available_band):]).reshape(self.numk, self.nBands))
 
-    def compose_sites(self, site_number_list):
-        pass
+    def compose_sites(self, arg):
+        # the element of site_number_list must be unique.
+        site_numbers = tuple(set(a))
+        self.isready()  # if not ready, raise Error.
+        if len(self.spininfo)==0:
+            cmporbs = np.array([[[np.sum([ y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers], axis=0)]
+                                 for j in range(len(self.available_band))]
+                                 for i in range(self.numk)])
+            self.__orbitals = np.concatenate((self.__orbitals, cmporbs),
+                                             axis = 2)
+        if len(self.spininfo)==2:
+            upspin_orbitals = self.orbitals[0]
+            downspin_orbitals = self.orbitals[1]
+            cmporbsUp = np.array([[[np.sum([ y for x, y in enumerate(upspin_orbitals[i, j]) if x in site_numbers], axis=0)]
+                                 for j in range(len(self.available_band))]
+                                 for i in range(self.numk)])
+            cmporbsDown = np.array([[[np.sum([ y for x, y in enumerate(downspin_orbitals[i, j]) if x in site_numbers], axis=0)]
+                                 for j in range(len(self.available_band))]
+                                 for i in range(self.numk)])
+            self.__orbitals[0] = np.concatenate((self.__orbitals[0],
+                                                 cmporbsUp),
+                                                axis = 2)
+            self.__orbitals[1] = np.concatenate((self.__orbitals[1],
+                                                 cmporbsDown),
+                                                axis = 2)
+        if len(self.spininfo)==4:
+            site_numbers_mX = (x + self.nAtoms for x in site_numbers)
+            site_numbers_mY = (x + self.nAtoms * 2 for x in site_numbers)
+            site_numbers_mZ = (x + self.nAtoms * 3 for x in site_numbers)
+            cmporbs_mT = np.array([[[np.sum([ y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers], axis=0)]
+                                 for j in range(len(self.available_band))]
+                                 for i in range(self.numk)])
+            cmporbs_mX = np.array([[[np.sum([ y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers_mX], axis=0)]
+                                 for j in range(len(self.available_band))]
+                                 for i in range(self.numk)])
+            cmporbs_mY = np.array([[[np.sum([ y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers_mY], axis=0)]
+                                 for j in range(len(self.available_band))]
+                                 for i in range(self.numk)])
+            cmporbs_mZ = np.array([[[np.sum([ y for x, y in enumerate(self.orbitals[i, j]) if x in site_numbers_mZ], axis=0)]
+                                 for j in range(len(self.available_band))]
+                                 for i in range(self.numk)])
+            cmporbs = np.concatenate((cmporbs_mT,
+                                      cmporbs_mX,
+                                      cmporbs_mY,
+                                      cmporbs_mZ),
+                                     axis = 2)
+            self.__orbitals = np.concatenate((self.__orbitals, cmporbs),
+                                             axis = 2)
 
     def check_orb_name(self, orb):
         '''Check if the argument org is feasible name for composed orbital
@@ -416,6 +462,17 @@ class BandStructure(object):
 
     def isconsistent(self):
         pass
+
+
+class states(object):
+    '''
+    .. py:class:: states class
+    '''
+    pass
+
+#
+# ----------------------------
+#
 
 
 class Band(object):  # Version safety
