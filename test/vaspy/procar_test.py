@@ -94,11 +94,11 @@ class TestPROCAR(unittest.TestCase):
                                       testBand.kvectors)
         np.testing.assert_array_equal(
             np.array([[[[0.0000, 0.0001, 0.0002, 0.0003, 0.0004,
-                         0.0005, 0.0006, 0.0007, 0.0008],
+                         0.0005, 0.0006, 0.0007, 0.0008, 0.0036],
                         [0.0010, 0.0011, 0.0012, 0.0013, 0.0014,
-                         0.0015, 0.0016, 0.0017, 0.0018],
+                         0.0015, 0.0016, 0.0017, 0.0018, 0.0126],
                         [0.0020, 0.0021, 0.0022, 0.0023, 0.0024,
-                         0.0025, 0.0026, 0.0027, 0.0028]]]]),
+                         0.0025, 0.0026, 0.0027, 0.0028, 0.0216]]]]),
             testBand.orbitals)
         np.testing.assert_array_equal(
             np.array([[[[0.0000 + 0.0010J, 0.0001 + 0.0011J,
@@ -129,8 +129,8 @@ class TestPROCAR(unittest.TestCase):
                                       testBand.kvectors)
         self.assertEqual((3, 2, 3, 9), testBand.phases[0].shape)
         self.assertEqual((3, 2, 3, 9), testBand.phases[1].shape)
-        self.assertEqual((3, 2, 3, 9), testBand.orbitals[0].shape)
-        self.assertEqual((3, 2, 3, 9), testBand.orbitals[1].shape)
+        self.assertEqual((3, 2, 3, 10), testBand.orbitals[0].shape)
+        self.assertEqual((3, 2, 3, 10), testBand.orbitals[1].shape)
 
     def BScreation_from_procar_soi_test(self):
         testBand = self.procar_soi.band()
@@ -145,15 +145,15 @@ class TestPROCAR(unittest.TestCase):
     def siteCompose_band_from_procar_std_test(self):
         testBand = self.procar_std.band()
         testBand.compose_sites((0, 2))
-        self.assertEqual((3, 2, 1, 9), testBand.sitecomposed.shape)
+        self.assertEqual((3, 2, 1, 10), testBand.sitecomposed[0].shape)
         np.testing.assert_array_almost_equal(
             np.array([[0.0020, 0.0022, 0.0024, 0.0026, 0.0028,
-                       0.0030, 0.0032, 0.0034, 0.0036]]),
-            testBand.sitecomposed[0, 0])
+                       0.0030, 0.0032, 0.0034, 0.0036, 0.0252]]),
+            testBand.sitecomposed[0][0, 0])
         np.testing.assert_array_almost_equal(
             np.array([[0.020, 0.0202,  0.0204, 0.0206, 0.0208,
-                       0.021, 0.0212, 0.0214, 0.0216]]),
-            testBand.sitecomposed[1, 1])
+                       0.021, 0.0212, 0.0214, 0.0216, 0.1872]]),
+            testBand.sitecomposed[0][1, 1])
 
 # -------------------------------------------------
 
@@ -168,7 +168,7 @@ output_print_procar_std="""The properties of this procar:
     ((# of k-points) * (# of bands) * (# of ions) =
         3*2*3=18)
   # of phase component: 36
-  Orbitals are: ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2']
+  Orbitals are: ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot']
   spininfo: ('',)
 """
 
@@ -183,7 +183,7 @@ output_print_procar_spin="""The properties of this procar:
     ((# of k-points) * (# of bands) * (# of ions) =
         3*2*3=18)
   # of phase component: 72
-  Orbitals are: ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2']
+  Orbitals are: ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot']
   spininfo: ('_up', '_down')
 """
 

@@ -130,14 +130,14 @@ class PROCAR(object):  # Version safety
                 elif "ion" in line:
                     if "tot" in line:
                         section = ['orbital']
-                        self.__orb_names = line.split()[1:-1]
+                        self.__orb_names = line.split()[1:]
                     else:
                         section = ['phase']
                 else:
                     if section == ['orbital']:
                         if "tot " in line[0:4]:
                             continue
-                        tmp = [float(i) for i in line.split()[1:-1]]
+                        tmp = [float(i) for i in line.split()[1:]]
                         self.__orbital.append(tmp)
                     elif section == ['phase']:
                         if not phase_read:
@@ -314,11 +314,11 @@ class BandStructure(object):
             if len(self.spininfo) == 1 or len(self.spininfo) == 4:
                 self.__phases = phases.reshape(self.numk, self.nBands,
                                                self.nAtoms,
-                                               len(self.orb_names))
+                                               len(self.orb_names) - 1)
             elif len(self.spininfo) == 2:
                 self.__phases = phases.reshape(2, self.numk, self.nBands,
                                                self.nAtoms,
-                                               len(self.orb_names))
+                                               len(self.orb_names) - 1)
                 self.__phases = (self.__phases[0], self.__phases[1])
 
     @property
