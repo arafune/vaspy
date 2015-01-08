@@ -194,11 +194,10 @@ class PROCAR(object):  # Version safety
         band.spininfo = self.spininfo
         band.orb_names = self.orb_names
         #
-        band.energies = self.energies
         band.orbitals = self.orbital
         band.phases = self.phase
+        band.energies = self.energies
         return band
-
 
 
 class BandStructure(object):
@@ -261,7 +260,6 @@ class BandStructure(object):
     @orbitals.setter
     def orbitals(self, arg):
         '''Setter for orbitals
-
         When standard (i.e. ISPIN = 0) or SOI, return is 4-rank tensor
         When spin-resolved (i.e. ISPIN = 2 but w/o SOI),
         return tuple that consists of 4-rank tensor
@@ -344,6 +342,19 @@ class BandStructure(object):
     @property
     def kdistance(self):
         return self.__kdistance
+
+    @property
+    def energies(self):
+        return self.__energies
+
+    @energies.setter
+    def energies(self, arg):
+        if self.isready():
+            if len(self.spininfo) == 1 or len(self.spininfo) == 4:
+                self.__energies = arg
+            elif len(self.spininfo) == 2:
+                self.__energies = (arg[:len(self.available_band)],
+                                   arg[len(self.available_band):])
 
     def compose_sites(self, site_number_list):
         pass
