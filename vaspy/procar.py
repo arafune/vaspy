@@ -301,7 +301,7 @@ class BandStructure(object):
 
         Return is 4-rank tensor for the standard (i.e. ISPIN = 0) or SOI
         calculations.
-        Return the tuple that consists of 4-rank tensor for the 
+        Return the tuple that consists of 4-rank tensor for the
         spin-resolved (i.e. ISPIN = 2 but w/o SOI),
 
         arg must be the list of the list.
@@ -373,7 +373,7 @@ class BandStructure(object):
         When sitecomposed ndarray has elements, the values remain.
         :param arg: a list (tuple, set) describes the site to be composed.
         it contains unique numbers.
-        :type arg: list, tuple, set 
+        :type arg: list, tuple, set
         '''
         # the element of site_number_list must be unique.
         site_numbers = tuple(set(arg))
@@ -440,7 +440,7 @@ class BandStructure(object):
                 for j in range(len(self.available_band))]
                 for i in range(self.numk)])
             cmporbs_mY = np.array([[[np.sum(
-                [y for x, y in enumerate( self.orbitals[i, j])
+                [y for x, y in enumerate(self.orbitals[i, j])
                  if x in site_numbers_mY],
                 axis=0)]
                 for j in range(len(self.available_band))]
@@ -483,7 +483,7 @@ class BandStructure(object):
                           'pypzpx': 'p', 'pzpxpy': 'p', 'pzpypx': 'p',
                           'spd': 'tot'}
         proper_orb_name_list = self.orb_names + [
-                'sp', 'p', 'pxpy', 'pxpz', 'pypz', 'spd', 'd']
+            'sp', 'p', 'pxpy', 'pxpz', 'pypz', 'spd', 'd']
         if arg in translate_dict.keys():
             arg = translate_dict[arg]
         if arg in proper_orb_name_list:
@@ -497,28 +497,27 @@ class BandStructure(object):
         orbitan name.
 
         This function returns the orbital number in self.orb_names.  (i.e.
-        self.orb_names.index(orbitalname).  If the orbital name has not 
+        self.orb_names.index(orbitalname).  If the orbital name has not
         been defined yet but the orbital name is proper as the composed
-        orbital ((ex.) sp, pxpy), returns the indexes of the orbitals to be 
+        orbital ((ex.) sp, pxpy), returns the indexes of the orbitals to be
         composed as the tuple.
 
         :param arg: name of (composed) orbital
         :type arg: str
-        :returns: tuple of the number corresponding to the (composed) 
+        :returns: tuple of the number corresponding to the (composed)
         orbital name.
-        :rtype: tuple        
+        :rtype: tuple
         '''
         orbnums = list()
         orbname = self.check_orb_name(arg)
         if (orbname in self.orb_names and
-            self.orb_names.index(orbname) <= self.orb_names.index('tot')):
+                self.orb_names.index(orbname) <= self.orb_names.index('tot')):
             orbnums.append(self.orb_names.index(orbname))
         elif orbname == 'p':
             orbnums.append((self.orb_names.index('px'),
                             self.orb_names.index('py'),
                             self.orb_names.index('pz')))
         elif orbname == 'd':
-            print ('here')
             orbnums.append((self.orb_names.index('dxy'),
                             self.orb_names.index('dyz'),
                             self.orb_names.index('dx2'),
@@ -545,7 +544,7 @@ class BandStructure(object):
         return tuple(orbnums)
 
     def compose_orbital(self, arg):
-        '''adds composed orbital contribution in each 'sites' stored in 
+        '''adds composed orbital contribution in each 'sites' stored in
         BandStructure.sitecomposed.
 
         Firstly, check if "composed_orbital_name" can change preferable name
@@ -565,7 +564,7 @@ class BandStructure(object):
             if ':' in arg:
                 arg = arg.split(':')
             else:
-                arg = [arg]            
+                arg = [arg]
         for orb in arg:
             orb = self.check.orb_name(orb)
             if orb in self.orb_names:
@@ -573,7 +572,7 @@ class BandStructure(object):
             else:
                 self.orb_names.append(orb)
                 orbindex = self.get_orb_index(orb)
-                #calculate composed orbital...
+                # calculate composed orbital...
                 for i in orbindex:
                     pass
 
