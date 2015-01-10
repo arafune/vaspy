@@ -508,40 +508,39 @@ class BandStructure(object):
         orbital name.
         :rtype: tuple
         '''
-        orbnums = list()
         orbname = self.check_orb_name(arg)
         if (orbname in self.orb_names and
                 self.orb_names.index(orbname) <= self.orb_names.index('tot')):
-            orbnums.append(self.orb_names.index(orbname))
+            orbnums=(self.orb_names.index(orbname),)
         elif orbname == 'p':
-            orbnums.append((self.orb_names.index('px'),
-                            self.orb_names.index('py'),
-                            self.orb_names.index('pz')))
+            orbnums = (self.orb_names.index('px'),
+                       self.orb_names.index('py'),
+                       self.orb_names.index('pz'))
         elif orbname == 'd':
-            orbnums.append((self.orb_names.index('dxy'),
-                            self.orb_names.index('dyz'),
-                            self.orb_names.index('dx2'),
-                            self.orb_names.index('dxz'),
-                            self.orb_names.index('dz2')))
+            orbnums = (self.orb_names.index('dxy'),
+                       self.orb_names.index('dyz'),
+                       self.orb_names.index('dx2'),
+                       self.orb_names.index('dxz'),
+                       self.orb_names.index('dz2'))
         elif orbname == 'sp':
-            orbnums.append((self.orb_names.index('s'),
-                            self.orb_names.index('px'),
-                            self.orb_names.index('py'),
-                            self.orb_names.index('pz')))
+            orbnums = (self.orb_names.index('s'),
+                       self.orb_names.index('px'),
+                       self.orb_names.index('py'),
+                       self.orb_names.index('pz'))
         elif orbname == 'pxpy':
-            orbnums.append((self.orb_names.index('px'),
-                            self.orb_names.index('py')))
+            orbnums = (self.orb_names.index('px'),
+                       self.orb_names.index('py'))
         elif orbname == 'pypz':
-            orbnums.append((self.orb_names.index('py'),
-                            self.orb_names.index('pz')))
+            orbnums = (self.orb_names.index('py'),
+                       self.orb_names.index('pz'))
         elif orbname == 'pxpz':
-            orbnums.append((self.orb_names.index('px'),
-                            self.orb_names.index('pz')))
+            orbnums = (self.orb_names.index('px'),
+                       self.orb_names.index('pz'))
         else:
             err = str(orbame)+" is not a proper (composed) orbital name."
             raise RunetimeError(err)
 
-        return tuple(orbnums)
+        return orbnums
 
     def compose_orbital(self, arg):
         '''adds composed orbital contribution in each 'sites' stored in

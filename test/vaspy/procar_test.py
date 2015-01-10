@@ -83,11 +83,11 @@ class TestPROCAR(unittest.TestCase):
                                        np.array([0.5, 0.5, 0.])],
                                       testBand.kvectors)
         self.assertEqual((0,), testBand.get_orb_index('s',))
-        self.assertEqual(((3, 1),), testBand.get_orb_index(('pxpy')))
-        self.assertEqual(((3, 2),), testBand.get_orb_index(('pzpx')))
-        self.assertEqual((9,), testBand.get_orb_index(('spd')))
-        self.assertEqual(((0, 3, 1, 2),),
-                         testBand.get_orb_index(('sp')))
+        self.assertEqual((3, 1), testBand.get_orb_index('pxpy'))
+        self.assertEqual((3, 2), testBand.get_orb_index('pzpx'))
+        self.assertEqual((9,), testBand.get_orb_index('spd'))
+        self.assertEqual((0, 3, 1, 2),
+                         testBand.get_orb_index('sp'))
 
     def BScreation_from_procar_single_test(self):
         testBand = self.procar_single.band()
