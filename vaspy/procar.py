@@ -496,9 +496,10 @@ class BandStructure(object):
         '''returns tuple that consists of the indexes corresponding
         orbitan name.
 
-        This function returns the orbital number in self.orb_names.  (i.e.
-        self.orb_names.index(orbitalname).  If the orbital name has not
-        been defined yet but the orbital name is proper as the composed
+        This function returns the tuple of orbital number in self.orb_names.
+        (i.e. self.orb_names.index(orbitalname).  If the orbital name has not
+        been in self.orb_names (i.e. if the orbital name is not used in
+        PROCAR file) but the orbital name is proper as the composed
         orbital ((ex.) sp, pxpy), returns the indexes of the orbitals to be
         composed as the tuple.
 
@@ -511,7 +512,7 @@ class BandStructure(object):
         orbname = self.check_orb_name(arg)
         if (orbname in self.orb_names and
                 self.orb_names.index(orbname) <= self.orb_names.index('tot')):
-            orbnums=(self.orb_names.index(orbname),)
+            orbnums = (self.orb_names.index(orbname),)
         elif orbname == 'p':
             orbnums = (self.orb_names.index('px'),
                        self.orb_names.index('py'),
