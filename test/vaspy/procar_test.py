@@ -168,7 +168,7 @@ output_print_procar_std="""The properties of this procar:
     ((# of k-points) * (# of bands) * (# of ions) =
         3*2*3=18)
   # of phase component: 36
-  Orbitals are: ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot']
+  Orbitals are: ('s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot')
   spininfo: ('',)
 """
 
@@ -183,7 +183,7 @@ output_print_procar_spin="""The properties of this procar:
     ((# of k-points) * (# of bands) * (# of ions) =
         3*2*3=18)
   # of phase component: 72
-  Orbitals are: ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot']
+  Orbitals are: ('s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot')
   spininfo: ('_up', '_down')
 """
 

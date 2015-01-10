@@ -48,7 +48,6 @@ class PROCAR(object):  # Version safety
     '''
     def __init__(self, arg=None, phase_read=False):
         self.__orbital = list()
-        self.__orb_names = list()
         self.__phase = list()
         self.__spininfo = 0   # nospin: 1, spinresolved: 2, soi: 4
         self.__numk = 0
@@ -130,7 +129,7 @@ class PROCAR(object):  # Version safety
                 elif "ion" in line:
                     if "tot" in line:
                         section = ['orbital']
-                        self.__orb_names = line.split()[1:]
+                        self.__orb_names = tuple(line.split()[1:])
                     else:
                         section = ['phase']
                 else:
