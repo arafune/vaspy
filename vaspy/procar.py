@@ -191,7 +191,7 @@ class PROCAR(object):  # Version safety
         band.nBands = self.nBands
         band.nAtoms = self.nAtoms
         band.spininfo = self.spininfo
-        band.orb_names = self.orb_names
+        band.orb_names = list(self.orb_names)
         # BandStructure.isready() must be True
         band.orbitals = self.orbital
         band.phases = self.phase
@@ -216,6 +216,9 @@ class BandStructure(object):
         self.__orbitals = 0
         self.__phases = 0
         self.__energies = 0
+        self.orb_names = ['s', 'py', 'pz', 'px',
+                          'dxy',  'dyz', 'dz2', 'dxz', 'dx2',
+                          'tot']
         pass
 
     def isready(self):
@@ -448,26 +451,50 @@ class BandStructure(object):
                 self.__sitecomposed = [cmporbs_mT, cmporbs_mX, cmporbs_mY,
                                        cmporbs_mZ]
 
-    def check_orb_name(self, orb):
-        '''Check if the argument org is feasible name for composed orbital
+    def check_orb_name(self, arg):
+        '''returns the arg without change when arg is a member of the
+        'orbital name'.  i.e., if arg is an alias of the (more proper)
+        orbital name, return it.  If arg is neither the proper orbital
+        name nor the alias, raise ValueError.
+
+        :param arg: the string to be checked as the orbital name
+        :type arg: str
+        :rtype: str
         '''
         translate_dict = {'pypx': 'pxpy', 'pzpx': 'pxpz', 'pzpy': 'pypz',
                           'pxpypz': 'p', 'pxpzpy': 'p', 'pypxpz': 'p',
-                          'pypzpx': 'p', 'pzpxpy': 'p', 'pzpypx': 'p'}
-        if hasattr(self, "orb_names"):
-            proper_orb_name_list = self.orb_names + ['sp', 'pxpy', 'spd', 'd']
-        else:
-            proper_orb_name_list = ['sp', 'pxpy', 'spd', 'd']
-        if orb in translate_dict.keys():
-            orb = translate_dict[orb]
-        if orb in proper_orb_name_list:
-            return orb
+                          'pypzpx': 'p', 'pzpxpy': 'p', 'pzpypx': 'p',
+                          'spd': 'tot'}
+#        if hasattr(self, "orb_names"):
+        proper_orb_name_list = self.orb_names + [
+                'sp', 'p', 'pxpy', 'pxpz', 'pypz', 'spd', 'd']
+#        else:
+#            proper_orb_name_list = ['sp', 'pxpy', 'spd', 'd', 'p']
+        if arg in translate_dict.keys():
+            arg = translate_dict[arg]
+        if arg in proper_orb_name_list:
+            return arg
         else:
             errmsg = "Such (composed) orbital name was not defined."
             raise ValueError(errmsg)
 
-    def compose_orbital(self, composed_orbital_name):
-        '''add composed orbital contribution in each 'sites' stored in 
+    def get_orb_index(self, arg):
+        '''returns tuple that consists of the indexes corresponding
+        orbitan name.
+
+        This function returns the orbital number in self.orb_names.  (i.e.
+        self.orb_names.index(orbitalname).  If the orbital name has not 
+        been defined yet but the orbital name is proper as the composed
+        orbital ((ex.) sp, pxpy), returns the indexes of the orbitals to be 
+        composed as the tuple.
+
+        :param arg: name of (composed) orbital
+        :type arg: str
+        :returns: tuple of the number corresponding to the (composed) 
+        orbital name.
+        :rtype: tuple
+        
+        add composed orbital contribution in each 'sites' stored in 
         BandStructure.sitecomposed.
 
         Firstly, check if "composed_orbital_name" can change preferable name
@@ -476,39 +503,72 @@ class BandStructure(object):
         note::
         special orbital names are :  sp, p, spd, d
         '''
-        if not self.sitecomposed:
-            err = "This method operates with on sitecomposed attribute,
-            but it's null"
+        orbnums = list()
+        orbname = self.check_orb_name(arg)
+        if (orbname in self.orb_names and
+            self.orb_names.index(orbname) <= self.orb_names.index('tot')):
+            orbnums.append(self.orb_names.index(orbname))
+        elif orbname == 'p':
+            orbnums.append((self.orb_names.index('px'),
+                            self.orb_names.index('py'),
+                            self.orb_names.index('pz')))
+        elif orbname == 'd':
+            print ('here')
+            orbnums.append((self.orb_names.index('dxy'),
+                            self.orb_names.index('dyz'),
+                            self.orb_names.index('dx2'),
+                            self.orb_names.index('dxz'),
+                            self.orb_names.index('dz2')))
+        elif orbname == 'sp':
+            orbnums.append((self.orb_names.index('s'),
+                            self.orb_names.index('px'),
+                            self.orb_names.index('py'),
+                            self.orb_names.index('pz')))
+        elif orbname == 'pxpy':
+            orbnums.append((self.orb_names.index('px'),
+                            self.orb_names.index('py')))
+        elif orbname == 'pypz':
+            orbnums.append((self.orb_names.index('py'),
+                            self.orb_names.index('pz')))
+        elif orbname == 'pxpz':
+            orbnums.append((self.orb_names.index('px'),
+                            self.orb_names.index('pz')))
+        else:
+            err = str(orbame)+" is not a proper (composed) orbital name."
             raise RunetimeError(err)
-        composed_orbital_name = self.check_orb_name(composed_orbital_name)
-        if composed_orbital_name in self.orb_names:
-            pass
-        elif composed_orbital_name == 'p':
-            self.__orb_names = self.orb_names + ['p']
-            pass
-        elif composed_orbital_name == 'd':
-            self.__orb_names = self.orb_names + ['d']
-            pass
-        elif composed_orbital_name == 'sp':
-            self.__orb_names = self.orb_names + ['sp']
-            pass
-        elif composed_orbital_name == 'spd':
-            self.__orb_names = self.orb_names + ['spd']
-            pass
-        elif composed_orbital_name == 'pxpy':
-            self.__orb_names = self.orb_names + ['pxpy']
-            pass
-        elif composed_orbital_name == 'pypz':
-            self.__orb_names = self.orb_names + ['pypz']
-            pass
-        elif composed_orbital_name == 'pxpz':
-            self.__orb_names = self.orb_names + ['pxpz']
-            pass
 
+        return tuple(orbnums)
+
+    def compose_orbital(self, arg):
+        '''Add composed orbitals to sitecomposed ndarray
+        
+        :param arg: orbital names
+        :type arg: str, list, tuple
+        '''
+        if not self.sitecomposed:
+            err = "This method operates with on sitecomposed attribute,"
+            err += " but it's null"
+            raise RunetimeError(err)
+        if type(arg) == str and ':' in arg:
+            arg = arg.split(':')
+        for orb in arg:
+            orb = self.check.orb_name(orb)
+            if orb in self.orb_names:
+                continue
+            else:
+                self.orb_names.append(orb)
+                orbindex = self.get_orb_index(orb)
+                #calculate composed orbital...
+                for i in orbindex:
+                    pass
+                
+        
+    
+
+    
     def del_band(self, band_indexes):
         if not self.sitecomposed:
-            err = "This method operates with on sitecomposed attribute,
-            but it's null"
+            err = "This method operates with on sitecomposed attribute, but it's null"
             raise RunetimeError(err)
 
 
