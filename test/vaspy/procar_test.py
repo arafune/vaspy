@@ -60,9 +60,6 @@ class TestPROCAR(unittest.TestCase):
         self.assertEqual('sp', self.nullband.check_orb_name('sp'))
         self.assertEqual('pxpy', self.nullband.check_orb_name('pypx'))
         self.assertRaises(ValueError, self.nullband.check_orb_name, 'nonexist')
-        self.assertRaises(ValueError, self.nullband.check_orb_name, 'px')
-        self.nullband.orb_names = self.procar_std.orb_names
-        self.assertEqual('px', self.nullband.check_orb_name('px'))
 
     def BScreation_fromnull_test(self):
         self.nullband.kvectors = self.procar_std.kvectors
@@ -85,6 +82,12 @@ class TestPROCAR(unittest.TestCase):
                                        np.array([0.25, 0.25, 0.]),
                                        np.array([0.5, 0.5, 0.])],
                                       testBand.kvectors)
+        self.assertEqual((0,), testBand.get_orb_index('s',))
+        self.assertEqual(((3, 1),), testBand.get_orb_index(('pxpy')))
+        self.assertEqual(((3, 2),), testBand.get_orb_index(('pzpx')))
+        self.assertEqual((9,), testBand.get_orb_index(('spd')))
+        self.assertEqual(((0, 3, 1, 2),),
+                         testBand.get_orb_index(('sp')))
 
     def BScreation_from_procar_single_test(self):
         testBand = self.procar_single.band()

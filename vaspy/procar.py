@@ -261,9 +261,10 @@ class BandStructure(object):
     @orbitals.setter
     def orbitals(self, arg):
         '''Setter for orbitals
+
         When standard (i.e. ISPIN = 0) or SOI, return is 4-rank tensor
         When spin-resolved (i.e. ISPIN = 2 but w/o SOI),
-        return tuple that consists of 4-rank tensor
+        returns tuple that consists of 4-rank tensor (np.ndarray)
         arg is usually listlike object that can smoothly convert to ndarray.
         for testing, 4-rank tensor (ndarray) is accepted.
         (But this option is not so entirely tested.
@@ -298,9 +299,10 @@ class BandStructure(object):
     def phases(self, arg):
         '''Setter for phases
 
-        When standard (i.e. ISPIN = 0) or SOI, return is 4-rank tensor
-        When spin-resolved (i.e. ISPIN = 2 but w/o SOI),
-        return tuple that consists of 4-rank tensor
+        Return is 4-rank tensor for the standard (i.e. ISPIN = 0) or SOI
+        calculations.
+        Return the tuple that consists of 4-rank tensor for the 
+        spin-resolved (i.e. ISPIN = 2 but w/o SOI),
 
         arg must be the list of the list.
         Two elements convert into the single complex ndarray.
@@ -366,6 +368,13 @@ class BandStructure(object):
                             self.numk, self.nBands))
 
     def compose_sites(self, arg):
+        ''' make sitecomposed ndarray
+
+        When sitecomposed ndarray has elements, the values remain.
+        :param arg: a list (tuple, set) describes the site to be composed.
+        it contains unique numbers.
+        :type arg: list, tuple, set 
+        '''
         # the element of site_number_list must be unique.
         site_numbers = tuple(set(arg))
         self.isready()  # if not ready, raise Error.
