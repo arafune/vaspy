@@ -482,11 +482,8 @@ class BandStructure(object):
                           'pxpypz': 'p', 'pxpzpy': 'p', 'pypxpz': 'p',
                           'pypzpx': 'p', 'pzpxpy': 'p', 'pzpypx': 'p',
                           'spd': 'tot'}
-#        if hasattr(self, "orb_names"):
         proper_orb_name_list = self.orb_names + [
                 'sp', 'p', 'pxpy', 'pxpz', 'pypz', 'spd', 'd']
-#        else:
-#            proper_orb_name_list = ['sp', 'pxpy', 'spd', 'd', 'p']
         if arg in translate_dict.keys():
             arg = translate_dict[arg]
         if arg in proper_orb_name_list:
@@ -509,16 +506,7 @@ class BandStructure(object):
         :type arg: str
         :returns: tuple of the number corresponding to the (composed) 
         orbital name.
-        :rtype: tuple
-        
-        add composed orbital contribution in each 'sites' stored in 
-        BandStructure.sitecomposed.
-
-        Firstly, check if "composed_orbital_name" can change preferable name
-        ('pypx' should be 'pxpy', for example), and then check if
-        "composed_orbital_name" already exists in orb_name.
-        note::
-        special orbital names are :  sp, p, spd, d
+        :rtype: tuple        
         '''
         orbnums = list()
         orbname = self.check_orb_name(arg)
@@ -557,8 +545,15 @@ class BandStructure(object):
         return tuple(orbnums)
 
     def compose_orbital(self, arg):
-        '''Add composed orbitals to sitecomposed ndarray
-        
+        '''adds composed orbital contribution in each 'sites' stored in 
+        BandStructure.sitecomposed.
+
+        Firstly, check if "composed_orbital_name" can change preferable name
+        ('pypx' should be 'pxpy', for example), and then check if
+        "composed_orbital_name" already exists in orb_name.
+        note::
+        special orbital names are :  sp, p, spd, d
+
         :param arg: orbital names
         :type arg: str, list, tuple
         '''
@@ -566,8 +561,11 @@ class BandStructure(object):
             err = "This method operates with on sitecomposed attribute,"
             err += " but it's null"
             raise RunetimeError(err)
-        if type(arg) == str and ':' in arg:
-            arg = arg.split(':')
+        if type(arg) == str:
+            if ':' in arg:
+                arg = arg.split(':')
+            else:
+                arg = [arg]            
         for orb in arg:
             orb = self.check.orb_name(orb)
             if orb in self.orb_names:
@@ -578,14 +576,11 @@ class BandStructure(object):
                 #calculate composed orbital...
                 for i in orbindex:
                     pass
-                
-        
-    
 
-    
     def del_band(self, band_indexes):
         if not self.sitecomposed:
-            err = "This method operates with on sitecomposed attribute, but it's null"
+            err = "This method operates with on sitecomposed attribute,"
+            err += " but it's null"
             raise RunetimeError(err)
 
 
