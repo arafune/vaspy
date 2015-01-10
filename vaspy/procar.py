@@ -418,20 +418,28 @@ class BandStructure(object):
             site_numbers_mY = tuple(x + self.nAtoms * 2 for x in site_numbers)
             site_numbers_mZ = tuple(x + self.nAtoms * 3 for x in site_numbers)
             #
-            cmporbs_mT = np.array([[[np.sum([y for x, y in enumerate(
-                self.orbitals[i, j]) if x in site_numbers_mT], axis=0)]
+            cmporbs_mT = np.array([[[np.sum(
+                [y for x, y in enumerate(self.orbitals[i, j])
+                 if x in site_numbers_mT],
+                axis=0)]
                 for j in range(len(self.available_band))]
                 for i in range(self.numk)])
-            cmporbs_mX = np.array([[[np.sum([y for x, y in enumerate(
-                self.orbitals[i, j]) if x in site_numbers_mX], axis=0)]
+            cmporbs_mX = np.array([[[np.sum(
+                [y for x, y in enumerate(self.orbitals[i, j])
+                 if x in site_numbers_mX],
+                axis=0)]
                 for j in range(len(self.available_band))]
                 for i in range(self.numk)])
-            cmporbs_mY = np.array([[[np.sum([y for x, y in enumerate(
-                self.orbitals[i, j]) if x in site_numbers_mY], axis=0)]
+            cmporbs_mY = np.array([[[np.sum(
+                [y for x, y in enumerate( self.orbitals[i, j])
+                 if x in site_numbers_mY],
+                axis=0)]
                 for j in range(len(self.available_band))]
                 for i in range(self.numk)])
-            cmporbs_mZ = np.array([[[np.sum([y for x, y in enumerate(
-                self.orbitals[i, j]) if x in site_numbers_mZ], axis=0)]
+            cmporbs_mZ = np.array([[[np.sum(
+                [y for x, y in enumerate(self.orbitals[i, j])
+                 if x in site_numbers_mZ],
+                axis=0)]
                 for j in range(len(self.available_band))]
                 for i in range(self.numk)])
             if self.__sitecomposed:
