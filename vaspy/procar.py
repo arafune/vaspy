@@ -366,6 +366,7 @@ class BandStructure(object):
                     np.array(
                         arg[self.numk * len(self.available_band):]).reshape(
                             self.numk, self.nBands))
+                self.__energies = np.array(self.__energies)
 
     def compose_sites(self, arg):
         '''make sitecomposed ndarray
