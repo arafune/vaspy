@@ -547,12 +547,6 @@ class BandStructure(object):
         '''adds composed orbital contribution in each 'sites' stored in
         BandStructure.sitecomposed.
 
-        Firstly, check if "composed_orbital_name" can change preferable name
-        ('pypx' should be 'pxpy', for example), and then check if
-        "composed_orbital_name" already exists in orb_name.
-        note::
-        special orbital names are :  sp, p, spd, d
-
         :param arg: orbital names
         :type arg: str, list, tuple
         '''
@@ -566,15 +560,24 @@ class BandStructure(object):
             else:
                 arg = [arg]
         for orb in arg:
-            orb = self.check.orb_name(orb)
+            orb = self.check_orb_name(orb)
             if orb in self.orb_names:
                 continue
             else:
-                self.orb_names.append(orb)
                 orbindex = self.get_orb_index(orb)
                 # calculate composed orbital...
-                for i in orbindex:
-                    pass
+                for l in range(len(self.sitecomposed)):
+                    numk, numband, numsite, norbs = self.sitecomposed[l].shape
+                    orbitalcomposed = np.array([[[[np.sum(
+                        [y for x, y in enumerate(self.sitecomposed[l][i, j, k])
+                         if x in orbindex])]
+                        for k in range(numsite)]
+                        for j in range(numband)]
+                        for i in range(numk)])
+                    self.sitecomposed[l] = np.concatenate(
+                        (self.sitecomposed[l], orbitalcomposed),
+                        axis=3)
+                self.orb_names.append(orb)
 
     def del_band(self, band_indexes):
         if not self.sitecomposed:
