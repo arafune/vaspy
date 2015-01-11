@@ -580,17 +580,38 @@ class BandStructure(object):
                 self.orb_names.append(orb)
 
     def del_band(self, band_indexes):
+        '''not yet impremented'''
         if not self.sitecomposed:
             err = "This method operates with on sitecomposed attribute,"
             err += " but it's null"
             raise RunetimeError(err)
 
+    def header(self, sitenames, orbnames):
+        '''returns header of table
 
-class states(object):
-    '''
-    .. py:class:: states class
-    '''
-    pass
+        :param sitenames: site names e.g., 'Ag', 'Graphene', '2ndLayer'...
+        :type sitenames: tuple, list
+        :orbnames: orbital names e.g., (('s', 'pxpy',), ('pxpy', 'p'))
+        :type orbnames: tuple, list
+        '''
+        if len(sitenames) != len(orbnames):
+            raise ValueError("Length of sitenames and orbnames is not same.")
+        numk, numband, numsite, norbs = self.sitecomposed[0].shape
+        if numsite != len(sitenames):
+            err = "Number of sitename is different with"
+            err += "the size of sitecomposed."
+            raise ValueError(err)
+        if not self.sitecomposed:
+            err = "This method operates with on sitecomposed attribute,"
+            err += " but it's null"
+            raise RunetimeError(err)
+        header = "#k"+"\t"+"energy"
+        for i, spin in enumerate(self.spininfo):
+            for site, orbs in zip(sitenames, orbnames):
+                for orb in orbs:
+                    header += "\t"+site+"_"+orb+spin
+        return header
+
 
 #
 # ----------------------------
