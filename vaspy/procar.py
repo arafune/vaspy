@@ -605,12 +605,27 @@ class BandStructure(object):
             err = "This method operates with on sitecomposed attribute,"
             err += " but it's null"
             raise RunetimeError(err)
-        header = ["#k","energy"]
+        header = ["#k", "energy"]
         for i, spin in enumerate(self.spininfo):
             for site, orbs in zip(sitenames, orbnames):
                 for orb in orbs:
                     header.append(site+"_"+orb+spin)
         return header
+
+    def orbnums(self, orbnames):
+        '''returns tuple whose size is same as that of arg, but
+        the element is number determied from orb_names
+
+        :param orbnames: orbital names
+        e.g., (('s','pxpy','tot'),('s','p'))
+        :type orbnames: list, tuple
+        :rtype: tuple
+        '''
+        print(orbnames)
+        return tuple(
+            tuple(
+                self.orb_names.index(orb) for orb in orbs)
+            for orbs in orbnames)
 
     def sitecomposed2list(self, orbnames):
         '''returns list of sitecomposed attribute to 2D-list
