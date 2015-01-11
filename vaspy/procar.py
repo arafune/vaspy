@@ -496,7 +496,7 @@ class BandStructure(object):
         '''returns tuple that consists of the indexes corresponding
         orbitan name.
 
-        This function returns the tuple of orbital number in self.orb_names.
+        This method returns the tuple of orbital number in self.orb_names.
         (i.e. self.orb_names.index(orbitalname).  If the orbital name has not
         been in self.orb_names (i.e. if the orbital name is not used in
         PROCAR file) but the orbital name is proper as the composed
