@@ -657,7 +657,23 @@ class BandStructure(object):
                                     sitecomposed[k, b, site, o])
                     table.append(sitelist)
         elif len(self.spininfo) == 2:
-            pass
+            for b in range(numband):
+                for k in range(numk):
+                    sitelist = list()
+                    sitelist.append(self.kdistance[k])
+                    sitelist.append(self.energies[0][k, b])
+                    for site, norbs in zip(list(range(len(numsite))),
+                                           orbnums):
+                        for o in norbs:
+                            sitelist.append(
+                                self.sitecomposed[0][k, b, site, o])
+                    sitelist.append(self.energies[1][k, b])
+                    for site, norbs in zip(list(range(len(numsite))),
+                                           orbnums):
+                        for o in norbs:
+                            sitelist.append(
+                                self.sitecomposed[1][k, b, site, o])
+                    table.append(sitelist)
         else:
             raise RuntimeError("spininfo is incorrect")
         return table
