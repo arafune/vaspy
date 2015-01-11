@@ -605,11 +605,19 @@ class BandStructure(object):
             err = "This method operates with on sitecomposed attribute,"
             err += " but it's null"
             raise RunetimeError(err)
-        header = ["#k", "energy"]
-        for i, spin in enumerate(self.spininfo):
-            for site, orbs in zip(sitenames, orbnames):
-                for orb in orbs:
-                    header.append(site+"_"+orb+spin)
+        if len(self.spininfo) == 1 or len(self.spininfo) == 4:
+            header = ["#k", "energy"]
+            for i, spin in enumerate(self.spininfo):
+                for site, orbs in zip(sitenames, orbnames):
+                    for orb in orbs:
+                        header.append(site+"_"+orb+spin)
+        elif len(self.spininfo) == 2:
+            header = ["#k"]
+            for i, spin in enumerate(self.spininfo):
+                header.append("energy"+spin)
+                for site, orbs in zip(sitenames, orbnames):
+                    for orb in orbs:
+                        header.append(site+"_"+orb+spin)
         return header
 
     def orbnums(self, orbnames):
@@ -621,9 +629,7 @@ class BandStructure(object):
         :type orbnames: list, tuple
         :rtype: tuple
         '''
-        print(orbnames)
-        return tuple(
-            tuple(
+        return tuple(tuple(
                 self.orb_names.index(orb) for orb in orbs)
             for orbs in orbnames)
 
