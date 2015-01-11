@@ -640,23 +640,22 @@ class BandStructure(object):
         e.g., (('s','pxpy','p'),('s','pxpy','p'))
         :type orbnames: list, tuple
         '''
+        orbnums = self.orbnums(orbnames)
         numk, numband, numsite, norbs = self.sitecomposed[0].shape
-
         table = list()
         if len(self.spininfo) == 1 or len(self.spininfo) == 4:
-            for orbs in orbnames:
-                norbs = list(self.orb_names.index(o) for o in orbs)
-                for b in range(numband):
-                    for k in range(numk):
-                        sitelist=list()
-                        sitelist.append(self.kdistance[k])
-                        sitelist.append(self.energies[k, b])
-                        for sitecomposed in self.sitecomposed:
-                            for site in range(numsite):
-                                for o in norbs:
-                                    sitelist.append(
-                                        sitecomposed[k, b, site, o])
-                        table.append(sitelist)
+            for b in range(numband):
+                for k in range(numk):
+                    sitelist = list()
+                    sitelist.append(self.kdistance[k])
+                    sitelist.append(self.energies[k, b])
+                    for sitecomposed in self.sitecomposed:
+                        for site, norbs in zip(list(range(len(numsite))),
+                                               orbnums)
+                            for o in norbs:
+                                sitelist.append(
+                                    sitecomposed[k, b, site, o])
+                    table.append(sitelist)
         elif len(self.spininfo) == 2:
             pass
         else:
