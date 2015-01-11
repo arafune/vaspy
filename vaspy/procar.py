@@ -368,7 +368,7 @@ class BandStructure(object):
                             self.numk, self.nBands))
 
     def compose_sites(self, arg):
-        ''' make sitecomposed ndarray
+        '''make sitecomposed ndarray
 
         When sitecomposed ndarray has elements, the values remain.
         :param arg: a list (tuple, set) describes the site to be composed.
@@ -651,7 +651,7 @@ class BandStructure(object):
                     sitelist.append(self.energies[k, b])
                     for sitecomposed in self.sitecomposed:
                         for site, norbs in zip(list(range(len(numsite))),
-                                               orbnums)
+                                               orbnums):
                             for o in norbs:
                                 sitelist.append(
                                     sitecomposed[k, b, site, o])
