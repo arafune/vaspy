@@ -285,7 +285,7 @@ class BandStructure(object):
                                           self.nBands,
                                           self.nAtoms,
                                           len(self.orb_names))
-                self.__orbitals = (self.__orbitals[0], self.__orbitals[1])
+                self.__orbitals = [self.__orbitals[0], self.__orbitals[1]]
 
     @property
     def sitecomposed(self):
