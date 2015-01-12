@@ -708,7 +708,7 @@ Band-calculation may NOT be reliable.''')
                         help='''Fermi level correction
 Energy shifts by this value
 if --outcar is set, this option is ignored''')
-    parser.add_argument('--site', metavar='atom_indices', dest='atomname',
+    parser.add_argument('--site', metavar='atom_indices', dest='atomindex',
                         action='append',
                         type=tools.parse_AtomselectionNum,
                         help='''atom index specifed with range.
