@@ -41,11 +41,9 @@ class PROCAR(object): # Version safety
 
     :author: Ryuichi Arafune
     '''
-    #attr_reader :orbital, :phase, :spininfo, :numk,
-    #:nBands, :nAtoms, :kvectors, :energies, :oritalname
     def __init__(self, arg=None, phase_read=False):
         self.__orbital = list()
-        self.__orbitalname = list()
+        self.__orb_names = list()
         self.__phase = list()
         self.__spininfo = 0 # nospin: 1, spinresolved: 2, soi: 4
         self.__numk = 0
@@ -56,8 +54,8 @@ class PROCAR(object): # Version safety
 
         if isinstance(arg, str):
             self.load_from_file(arg, phase_read)
-        elif isinstance(arg, (list, tuple)):
-            self.load_from_array(arg, phase_read)
+        else:
+            raise RuntimeError("the arg of PROCAR() should be the filename")
 
     @property
     def orbital(self):
@@ -92,42 +90,41 @@ class PROCAR(object): # Version safety
         return self.__energies
 
     @property
-    def orbitalname(self):
-        return self.__orbitalname
+    def orb_names(self):
+        return self.__orb_names
 
     def load_from_file(self, file, phase_read=False):
-        '''PROCAR#load_from_file
+        '''..py:method::  load_fromfile(file, [phase_read=False])
+
         A virtual parser of PROCAR
-        @param [String] file filename of *PROCAR* file
-        @param [Boolian] phase_read Switch for loading phase characters
+
+        :param str file: filename of *PROCAR* file
+        :param Boolian phase_read: Switch for loading phase characters
         '''
-        f= open(file)
-        line=f.readline()
-        if "PROCAR lm decomposed + phase" not in line:
-            raise RuntimeError("Check your PROCAR and INCAR\nThe format of PROCAR does not suit with this script.")
+        f = open(file)
+        first_line=f.readline()
+        if 'PROCAR lm decomposed + phase' not in first_line:
+            close(f)
+            raise RuntimeError("This PROCAR is not a proper format\nSee INCAR in the calculation.\n")
         section = list()
-        separator_to_orbital = None
-        separator_to_phase = None
-        with  f:
+        with f:
             for line in f:
                 if line.isspace(): continue
                 elif "k-points: " in line:
                     self.__numk, self.__nBands, self.__nAtoms = [
                         int(i) for i in line.split() if i.isdigit()]
                 elif "k-point " in line:
-                    self.__kvectors.append(np.asarray(
-                        [list(float(i) for i in line.split()[3:6])]))
+                    self.__kvectors.append(np.array(
+                        [float(i) for i in line.split()[3:6]]))
                     section = []
                 elif "band " in line:
                     self.__energies.append(float(line.split()[4]))
                     section = []
-                elif "ion " in line:
-                    separator_to_orbital = separator_to_orbital or line.rstrip('\n')
-                    separator_to_phase = separator_to_phase or separator_to_orbital[0:-7]
-                    self.__orbitalname = self.orbitalname or separator_to_orbital.split()
-                    if " tot" in line:
+                elif "ion" in line:
+                    if "tot" in line:
                         section = ['orbital']
-                    else:
+                        self.__orb_names=line.split()[1:-1]
+                    else: 
                         section = ['phase']
                 else:
                     if section == ['orbital']:
@@ -137,73 +134,18 @@ class PROCAR(object): # Version safety
                         self.__orbital.append(tmp)
                     elif section == ['phase']:
                         if not phase_read: continue
-                        tmp = [float(i) for i in line.split()]
-                        tmp[0] = int(tmp[0])
+                        tmp = [float(i) for i in line.split()[1:]]
                         self.__phase.append(tmp)
-        self.__spininfo = len(self.orbital) // (self.numk * self.nBands * self.nAtoms)
-        if len(self.orbital) % (self.numk * self.nBands * self.nAtoms) != 0:
-            raise RuntimeError("PROCAR file may be broken")
-        if self.spininfo == 1:
-            self.__spininfo = ('',)
-        elif self.spininfo == 2:
-            self.__spininfo = ('_up', '_down')
-        elif self.spininfo == 4:
-            self.__spininfo = ('_mT', '_mX', '_mY', '_mZ')
-        # orbitalname
-        tmpOrb = Orbital()
-        tmpOrb.redefine_orbital_list(self.orbitalname)
 
-    def load_from_array(self, procar, phase_read=False):
-        '''This method effectively acts as a parser of PROCAR.
-        @param [Array] procar Array of PROCAR file (IO.readlines(procar file))
-        @param [Boolian] phase_read Switch for loading phase characters
-        @deprecated Too sloooow!! (about 10 times slower than load_from_file)
-        '''
-        section = list()
-        #
-        self.__numk, self.__nBands, self.__nAtoms = [
-            int(i) for i in procar[1].split() if i.isdigit()]
-        separator_to_orbital = procar[7].rstrip('\n')
-        self.__orbitalname = separator_to_orbital.split()
-        separator_to_phase = separator_to_orbital[0:-7]
-        for line in procar:
-            if re.findall(r'^[\s]*$', line): continue
-            elif re.findall(r'^#', line): continue
-            elif re.findall(r'\bk-points\b', line):
-                self.__kvectors.append(np.asarray(
-                        [list(float(i) for i in line.split()[3:6])]))
-                section = []
-            elif re.findall(r'^band\b', line):
-                self.__energies.append(float(line.split()[4]))
-                section = []
-            elif re.findall(separator_to_orbital, line):
-                section = ['orbital']
-            elif re.findall(separator_to_phase, line):
-                section = ['phase']
-            else:
-                if section == ['orbital']:
-                    if re.findall(r'\btot\b', line): continue
-                    tmp = [float(i) for i in line.split()]
-                    tmp[0] = int(tmp[0])
-                    self.__orbital.append(tmp)
-                elif section == ['phase']:
-                    if re.findall(r'\btot\b', line): continue
-                    if not phase_read: continue
-                    tmp = [float(i) for i in line.split()]
-                    tmp[0] = int(tmp[0])
-                    self.__phase.append(tmp)
         self.__spininfo = len(self.orbital) // (self.numk * self.nBands * self.nAtoms)
         if len(self.orbital) % (self.numk * self.nBands * self.nAtoms) != 0:
             raise RuntimeError("PROCAR file may be broken")
         if self.spininfo == 1:
-            self.__spininfo = ('',)
+            self.__spininfo = ('',)    #standard
         elif self.spininfo == 2:
-            self.__spininfo = ('_up', '_down')
+            self.__spininfo = ('_up', '_down')   #collinear 
         elif self.spininfo == 4:
-            self.__spininfo = ('_mT', '_mX', '_mY', '_mZ')
-        # orbitalname
-        tmpOrb = Orbital()
-        tmpOrb.redefine_orbital_list(self.orbitalname)
+            self.__spininfo = ('_mT', '_mX', '_mY', '_mZ')  #non-collinear
 
     def __str__(self):
         '''x.__str__() <=> str(x)
@@ -220,7 +162,7 @@ class PROCAR(object): # Version safety
   # of orbital component: {4}
      ((# of k-points) * (# of bands) * (# of ions) = {0.numk}*{0.nBands}*{0.nAtoms}={5})
   # of phase component: {6}
-  Orbitals are: {0.orbitalname}
+  Orbitals are: {0.orb_names}
   spininfo: {0.spininfo}
 '''
         return template.format(self,
