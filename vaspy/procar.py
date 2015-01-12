@@ -650,11 +650,12 @@ class BandStructure(object):
                     sitelist.append(self.kdistance[k])
                     sitelist.append(self.energies[k, b])
                     for sitecomposed in self.sitecomposed:
-                        for site, norbs in zip(list(range(len(numsite))),
+                        for site, norbs in zip(list(range(numsite)),
                                                orbnums):
                             for o in norbs:
                                 sitelist.append(
                                     sitecomposed[k, b, site, o])
+                    sitelist.append([])
                     table.append(sitelist)
         elif len(self.spininfo) == 2:
             for b in range(numband):
@@ -662,22 +663,28 @@ class BandStructure(object):
                     sitelist = list()
                     sitelist.append(self.kdistance[k])
                     sitelist.append(self.energies[0][k, b])
-                    for site, norbs in zip(list(range(len(numsite))),
+                    for site, norbs in zip(list(range(numsite)),
                                            orbnums):
                         for o in norbs:
                             sitelist.append(
                                 self.sitecomposed[0][k, b, site, o])
                     sitelist.append(self.energies[1][k, b])
-                    for site, norbs in zip(list(range(len(numsite))),
+                    for site, norbs in zip(list(range(numsite)),
                                            orbnums):
                         for o in norbs:
                             sitelist.append(
                                 self.sitecomposed[1][k, b, site, o])
+                    sitelist.append([])
                     table.append(sitelist)
         else:
             raise RuntimeError("spininfo is incorrect")
         return table
 
+    def get_sitecomposed_data(self, sitenames, orbnames):
+        header = [self.set_header(sitenames, orbnames)]
+        lists = self.list_sitecomposed_data(orbnames)
+        lists = header + lists
+        pass
 #
 # ----------------------------
 #
