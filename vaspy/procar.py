@@ -219,10 +219,9 @@ class BandStructure(object):
         self.orb_names = ['s', 'py', 'pz', 'px',
                           'dxy',  'dyz', 'dz2', 'dxz', 'dx2',
                           'tot']
-        pass
 
     def isready(self):
-        '''Return True if numk, nBands, nAtoms, spininfo,
+        '''returns True if numk, nBands, nAtoms, spininfo,
         orb_names are set, otherwise raise ValueError.
 
         This method is used before when orbitals, phases, energies
@@ -262,7 +261,7 @@ class BandStructure(object):
     def orbitals(self, arg):
         '''Setter for orbitals
 
-        When standard (i.e. ISPIN = 0) or SOI, return is 4-rank tensor
+        When standard (i.e. ISPIN = 0) or SOI, returns 4-rank tensor.
         When spin-resolved (i.e. ISPIN = 2 but w/o SOI),
         returns tuple that consists of 4-rank tensor (np.ndarray)
         arg is usually listlike object that can smoothly convert to ndarray.
@@ -741,8 +740,10 @@ s, p, pxpy, pz, d, dxy, dyz, dz2, dxz, dx2
     else:
         fermi = 0.0
 
-        sitenames = tuple(set([ e for inner in args.atomsetname for e in inner]))
-        flat_orbitals = tuple(set([ e for inner in args.orbital for e in inner]))
+        sitenames = tuple(
+            set([ e for inner in args.atomsetname for e in inner]))
+        flat_orbitals = tuple(
+            set([ e for inner in args.orbital for e in inner]))
 
         # As atomindex used here begins with "1", but siteindex used
         #  in procar.py internaly begins with "0".
