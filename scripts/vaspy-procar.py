@@ -1,7 +1,7 @@
 #!/usr/bin/env python 
 # -*- coding: utf-8 -*-
 """
-script to use (demonstrate) vaspy.procar module.
+script to use (demonstrate) vaspy.procar (Ver.3) module.
 """
 
 import re
@@ -9,7 +9,7 @@ import functools as ft
 import argparse
 from vaspy import tools
 from vaspy.outcar import OUTCAR
-from vaspy.procar import PROCAR, Band
+import vaspy.procar as procar
 
 parser = argparse.ArgumentParser(
         formatter_class=argparse.RawTextHelpFormatter)
@@ -22,7 +22,7 @@ parser.add_argument('--fermi', metavar='value', type=float,
                     help='''Fermi level correction
 Energy shifts by this value
 if --outcar is set, this option is ignored''')
-parser.add_argument('--site', metavar='atom_indices', dest='atomname',
+parser.add_argument('--site', metavar='atom_indices', dest='atomindex',
                     action='append',
                     type=tools.parse_AtomselectionNum,
                     help='''atom index specifed with range.
@@ -45,7 +45,7 @@ parser.add_argument('procar', metavar='PROCAR_file',
 args = parser.parse_args()
 
 # ---
-if not (len(args.atomname) == len(args.orbital) == len(args.atomsetname)):
+if not (len(args.atomindex) == len(args.orbital) == len(args.atomsetname)):
     raise parser.error("--atom, --as and --orbital are mismatched.")
 # ---
 
@@ -57,19 +57,19 @@ elif args.fermi is not None:
 else:
     fermi = 0.0
 
-procar = PROCAR(args.procar)
-band = procar.to_band()
-    
+sitenames = tuple(set([ e for inner in args.atomsetname for e in inner]))
+flat_orbitals = tuple(set([ e for inner in args.orbital for e in inner]))
+
+# As atomindex used here begins with "1", but siteindex used in procar.py
+# internaly begins with "0".  (This is because VASP is fortran program !)
+siteindex = [[ i-1 for i in internal] for internal in args.atomindex]
+
+procar = procar.PROCAR(args.procar)
+band = procar.band()
+del procar  # for memory saving
 if fermi != 0.0:
-    band.fermilevel_correction(fermi)
-    
-output_band = Band()
-for site, name, orbital in zip(args.atomname,
-                               args.atomsetname,
-                               args.orbital):
-    tmpBand = band.site_integrate(site)
-    tmpBand.rename_site(*name)
-    tmpBand.extract_orbitals_in_place(orbital)
-    output_band += tmpBand
-output_band.sort()
-print(output_band)
+    band.energies -= fermi
+for sites in siteindex:
+    band.compose_sites(sites)
+band.compose_orbital(flat_orbitals)
+print (band.get_sitecomposed_data(sitenames, args.orbital))
