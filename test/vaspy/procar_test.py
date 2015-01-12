@@ -158,6 +158,80 @@ class TestPROCAR(unittest.TestCase):
                        0.021, 0.0212, 0.0214, 0.0216, 0.1872]]),
             testBand.sitecomposed[0][1, 1])
 
+    def composeOrbital_test_from_procar_std(self):
+        testband = self.procar_std.band()
+        testband.compose_sites((0,1))
+        testband.compose_sites((1,2))
+        testband.compose_orbital(('s', 'pxpy', 'd'))
+        self.assertEqual((3,2,2,12), testband.sitecomposed[0].shape)
+        np.testing.assert_array_almost_equal(np.array([0.021, 0.0212, 0.0214,
+                                                       0.0216, 0.0218, 0.022,
+                                                       0.0222, 0.0224, 0.0226,
+                                                       0.1962, 0.0428, 0.111 ]),
+                                             testband.sitecomposed[0][1, 1, 1])
+        testheader = testband.set_header(('Ag', '1st'),
+                                         (('s', 'pxpy', 'tot'), ('d','pxpy')))
+        self.assertEqual(testheader, ['#k', 'energy',
+                                      'Ag_s', 'Ag_pxpy', 'Ag_tot',
+                                      '1st_d', '1st_pxpy'])
+        testlist = testband.list_sitecomposed_data((('s', 'pxpy', 'tot'),
+                                                    ('d','pxpy')))
+        self.assertEqual(len(testlist[0]), 7) 
+
+    def composeOrbital_test_from_procar_spin(self):
+        testband = self.procar_spin.band()
+        testband.compose_sites((0,1))
+        testband.compose_sites((1,2))
+        testband.compose_orbital(('s', 'pxpy', 'd'))
+        self.assertEqual((3,2,2,12), testband.sitecomposed[0].shape)
+        self.assertEqual((3,2,2,12), testband.sitecomposed[1].shape)
+        np.testing.assert_array_almost_equal(np.array([0.021, 0.0212, 0.0214,
+                                                       0.0216, 0.0218, 0.022,
+                                                       0.0222, 0.0224, 0.0226,
+                                                       0.1962, 0.0428, 0.111 ]),
+                                             testband.sitecomposed[0][1, 1, 1])
+        testheader = testband.set_header(('Ag', '1st'),
+                                         (('s', 'pxpy', 'tot'), ('d','pxpy')))
+        self.assertEqual(testheader, ['#k', 'energy_up',
+                                      'Ag_s_up', 'Ag_pxpy_up', 'Ag_tot_up',
+                                      '1st_d_up', '1st_pxpy_up',
+                                      'energy_down',
+                                      'Ag_s_down', 'Ag_pxpy_down', 'Ag_tot_down',
+                                      '1st_d_down', '1st_pxpy_down'])
+        testlist = testband.list_sitecomposed_data((('s', 'pxpy', 'tot'),
+                                                    ('d','pxpy')))
+        self.assertEqual(len(testlist[0]), 13) 
+
+
+    def composeOrbital_test_from_procar_soi(self):
+        testband = self.procar_soi.band()
+        testband.compose_sites((0,1))
+        testband.compose_sites((1,2))
+        testband.compose_orbital(('s', 'pxpy', 'd'))
+        self.assertEqual((3,2,2,12), testband.sitecomposed[0].shape)
+        self.assertEqual((3,2,2,12), testband.sitecomposed[1].shape)
+        self.assertEqual((3,2,2,12), testband.sitecomposed[2].shape)
+        self.assertEqual((3,2,2,12), testband.sitecomposed[3].shape)
+        np.testing.assert_array_almost_equal(np.array([0.021, 0.0212, 0.0214,
+                                                       0.0216, 0.0218, 0.022,
+                                                       0.0222, 0.0224, 0.0226,
+                                                       0.1962, 0.0428, 0.111 ]),
+                                             testband.sitecomposed[0][1, 1, 1])
+        testheader = testband.set_header(('Ag', '1st'),
+                                         (('s', 'pxpy', 'tot'), ('d','pxpy')))
+        self.assertEqual(testheader, ['#k', 'energy',
+                                      'Ag_s_mT', 'Ag_pxpy_mT', 'Ag_tot_mT',
+                                      '1st_d_mT', '1st_pxpy_mT',
+                                      'Ag_s_mX', 'Ag_pxpy_mX', 'Ag_tot_mX',
+                                      '1st_d_mX', '1st_pxpy_mX',
+                                      'Ag_s_mY', 'Ag_pxpy_mY', 'Ag_tot_mY',
+                                      '1st_d_mY', '1st_pxpy_mY',
+                                      'Ag_s_mZ', 'Ag_pxpy_mZ', 'Ag_tot_mZ',
+                                      '1st_d_mZ', '1st_pxpy_mZ'])
+        testlist = testband.list_sitecomposed_data((('s', 'pxpy', 'tot'),
+                                                    ('d','pxpy')))
+        self.assertEqual(len(testlist[0]), 22)
+
 # -------------------------------------------------
 
 output_print_procar_std="""The properties of this procar:

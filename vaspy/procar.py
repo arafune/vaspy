@@ -586,7 +586,7 @@ class BandStructure(object):
             err += " but it's null"
             raise RunetimeError(err)
 
-    def header(self, sitenames, orbnames):
+    def set_header(self, sitenames, orbnames):
         '''returns header of table
 
         :param sitenames: site names e.g., 'Ag', 'Graphene', '2ndLayer'...
@@ -620,7 +620,7 @@ class BandStructure(object):
                         header.append(site+"_"+orb+spin)
         return header
 
-    def orbnums(self, orbnames):
+    def get_orbnums(self, orbnames):
         '''returns tuple whose size is same as that of arg, but
         the element is number determied from orb_names
 
@@ -629,18 +629,17 @@ class BandStructure(object):
         :type orbnames: list, tuple
         :rtype: tuple
         '''
-        return tuple(tuple(
-                self.orb_names.index(orb) for orb in orbs)
-            for orbs in orbnames)
+        return tuple(tuple(self.orb_names.index(orb) for orb in orbs)
+                     for orbs in orbnames)
 
-    def sitecomposed2list(self, orbnames):
+    def list_sitecomposed_data(self, orbnames):
         '''returns list of sitecomposed attribute to 2D-list
 
         :param orbnames: orbital names
         e.g., (('s','pxpy','p'),('s','pxpy','p'))
         :type orbnames: list, tuple
         '''
-        orbnums = self.orbnums(orbnames)
+        orbnums = self.get_orbnums(orbnames)
         numk, numband, numsite, norbs = self.sitecomposed[0].shape
         table = list()
         if len(self.spininfo) == 1 or len(self.spininfo) == 4:
