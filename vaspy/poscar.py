@@ -83,7 +83,8 @@ class POSCAR(object):
     '''
     def __init__(self, arg=None):
         '''
-        :param arg string: POSCAR file name, or list of POSCAR text.
+        :param arg: POSCAR file name, or list of POSCAR text.
+        :type arg: str
         '''
         self.system_name = ""
         self.scaling_factor = 0.
@@ -219,8 +220,10 @@ class POSCAR(object):
 
     def pos_replace(self, i, vector):
         '''
-        :param int i: site #
-        :param vector vector: list of the i-th atom position.
+        :param i: site #
+        :param vector: list of the i-th atom position.
+        :type i: int
+        :type vector: list, tuple, np.array
         :note: the first site # is "1", not "0".
         (follow VESTA's and VASP's way.)
 '''
@@ -235,7 +238,8 @@ class POSCAR(object):
 
     def rotateX(self, theta):
         '''
-        :param float theta: angle of rotation (Degrees)
+        :param theta: angle of rotation (Degrees)
+        :type theta: float
         :return: rotation matrix
         :rtype: np.array
         >>> t = POSCAR()
@@ -281,8 +285,10 @@ class POSCAR(object):
     # class method? or independent function?
     def nearest(self, array, point):
         '''
-        :param list-of-np.array array:
-        :param np.array point:
+        :param array:
+        :param point:
+        :type array: list
+        :type point: np.array 
         :return: np.array
         :rtype: np.array
 '''
@@ -440,7 +446,7 @@ class POSCAR(object):
 
     def tune_scaling_factor(self, new_scaling_factor=1.0):
         '''
-        change scaling factor to new value.
+        changes scaling factor to new value.
 
         :param float new_scaling_factor:
         :note:  **The Braves lattice are corrected (to be equal size).**
@@ -456,7 +462,7 @@ class POSCAR(object):
 
     def to_Cartesian(self):
         '''
-        change the coordinate to cartesian from direct.
+        changes the coordinate to cartesian from direct.
 
         :return: true if POSCAR file is cartesian coordinate
         :rtype: Boolean
@@ -481,7 +487,7 @@ class POSCAR(object):
 
     def guess_molecule(self, site_list, center=None):
         '''
-        arrange atom position to form a molecule.
+        arranges atom position to form a molecule.
         This method is effective for molecular rotation.
 
         :param site_list: list of site number
@@ -527,7 +533,7 @@ class POSCAR(object):
 
     def guess_molecule2(self, site_list):
         '''
-        arrange atom position to form a molecule.  poscar updates
+        arranges atom position to form a molecule.  poscar updates
         :param Array<Fixnum> site_list: list of site #
 '''
         molecule = self.guess_molecule(site_list)
@@ -536,10 +542,12 @@ class POSCAR(object):
 
     def translate(self, vector, atomlist):
         '''
-        Translate the selected atom(s) by vector
+        translates the selected atom(s) by vector
 
-        :param Vector vector: translational vector
-        :param Array atomlist: list of the atome for moving
+        :param vector: translational vector
+        :param atomlist: list of the atom for moving
+        :type vector: list, tuple, np.array
+        :type atomlist: list
         :note: the first atom is "1", not "0".
         :return: Array
         :rtype: Array
@@ -556,9 +564,10 @@ class POSCAR(object):
 
     def translate_all(self, vector):
         '''
-        Translate **all** atoms by vector
+        translates **all** atoms by vector
 
-        :param Vector vector: translational vector
+        :param vector: translational vector
+        :type vector: list, np.array
         :return: Array
         :rtype: Array
 '''
