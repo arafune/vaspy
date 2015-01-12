@@ -149,6 +149,8 @@ class TestPOSCAR(unittest.TestCase):
         self.assertEqual('#4:C1', tmp[11][3])
 
     def to_str_test(self):
+        global tmpstr_original
+        global tmpstr_after_rotate
         self.assertEqual(tmpstr_original, self.testposcar.__str__())
         self.testposcar.atom_rotate(1, "z", 90, (0, 0, 0))
         self.testposcar.to_Direct()
@@ -162,7 +164,6 @@ class TestPOSCAR(unittest.TestCase):
         pass
         
     def guess_molecule_test(self):
-#        self.testposcar.guess_molecule(
         pass
         
     def atom_rotate_test(self):
