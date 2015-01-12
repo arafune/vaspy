@@ -682,7 +682,7 @@ class BandStructure(object):
 
     def get_sitecomposed_data(self, sitenames, orbnames):
         header = map(str, self.set_header(sitenames, orbnames))
-        output= "\t".join(header)+"\n"
+        output = "\t".join(header)+"\n"
         lists = self.list_sitecomposed_data(orbnames)
         for l in lists:
             l = map(str, l)
