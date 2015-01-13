@@ -539,8 +539,8 @@ class BandStructure(object):
             orb_indexes = (self.orb_names.index('px'),
                            self.orb_names.index('pz'))
         else:
-            err = str(orbame)+" is not a proper (composed) orbital name."
-            raise RunetimeError(err)
+            err = str(orbname) + " is not a proper (composed) orbital name."
+            raise RuntimeError(err)
         return orb_indexes
 
     def compose_orbital(self, arg):
@@ -553,7 +553,7 @@ class BandStructure(object):
         if not self.sitecomposed:
             err = "This method operates with on sitecomposed attribute,"
             err += " but it's null"
-            raise RunetimeError(err)
+            raise RuntimeError(err)
         if type(arg) == str:
             if ':' in arg:
                 arg = arg.split(':')
@@ -584,7 +584,7 @@ class BandStructure(object):
         if not self.sitecomposed:
             err = "This method operates with on sitecomposed attribute,"
             err += " but it's null"
-            raise RunetimeError(err)
+            raise RuntimeError(err)
 
     def set_header(self, sitenames, orbnames):
         '''returns header of table
@@ -604,20 +604,20 @@ class BandStructure(object):
         if not self.sitecomposed:
             err = "This method operates with on sitecomposed attribute,"
             err += " but it's null"
-            raise RunetimeError(err)
+            raise RuntimeError(err)
         if len(self.spininfo) == 1 or len(self.spininfo) == 4:
             header = ["#k", "energy"]
             for i, spin in enumerate(self.spininfo):
                 for site, orbs in zip(sitenames, orbnames):
                     for orb in orbs:
-                        header.append(site+"_"+orb+spin)
+                        header.append(site + "_" + orb + spin)
         elif len(self.spininfo) == 2:
             header = ["#k"]
             for i, spin in enumerate(self.spininfo):
-                header.append("energy"+spin)
+                header.append("energy" + spin)
                 for site, orbs in zip(sitenames, orbnames):
                     for orb in orbs:
-                        header.append(site+"_"+orb+spin)
+                        header.append(site + "_" + orb + spin)
         return header
 
     def get_orbnums(self, orbnames):
@@ -682,11 +682,11 @@ class BandStructure(object):
 
     def get_sitecomposed_data(self, sitenames, orbnames):
         header = map(str, self.set_header(sitenames, orbnames))
-        output = "\t".join(header)+"\n"
+        output = "\t".join(header) + "\n"
         lists = self.list_sitecomposed_data(orbnames)
         for l in lists:
             l = map(str, l)
-            output += "\t".join(l)+"\n"
+            output += "\t".join(l) + "\n"
         return output
 
 # -------------------------------------------------------------
@@ -742,14 +742,14 @@ s, p, pxpy, pz, d, dxy, dyz, dz2, dxz, dx2
         fermi = 0.0
 
         sitenames = tuple(
-            set([ e for inner in args.atomsetname for e in inner]))
+            set([e for inner in args.atomsetname for e in inner]))
         flat_orbitals = tuple(
-            set([ e for inner in args.orbital for e in inner]))
+            set([e for inner in args.orbital for e in inner]))
 
         # As atomindex used here begins with "1", but siteindex used
         #  in procar.py internaly begins with "0".
         # (This is because VASP is fortran program !)
-        siteindex = [[ i-1 for i in internal] for internal in args.atomindex]
+        siteindex = [[i - 1 for i in internal] for internal in args.atomindex]
 
         procar = procar.PROCAR(args.procar)
         band = procar.band()
