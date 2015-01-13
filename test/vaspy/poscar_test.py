@@ -9,6 +9,7 @@ from vaspy.poscar import POSCAR
 
 
 class TestPOSCAR(unittest.TestCase):
+
     def setUp(self):
         global test_poscar_string
         filePOSCAR = tempfile.mkstemp()
@@ -19,23 +20,23 @@ class TestPOSCAR(unittest.TestCase):
         self.blancposcar = POSCAR()
         os.remove(filePOSCAR[1])
 
-    def system_name_test(self):
+    def test_system_name(self):
         # a=os.getcwd()  # return the directory where nose execute.
         self.assertEqual('NiC4S4', self.testposcar.system_name)
 
-    def latticeV1_test(self):
+    def test_latticeV1(self):
         np.testing.assert_array_equal(np.array([0.866025404, -0.5, 0.]),
                                       self.testposcar.latticeV1)
 
-    def latticeV2_test(self):
+    def test_latticeV2(self):
         np.testing.assert_array_equal(np.array([0.866025404, 0.5, 0.]),
                                       self.testposcar.latticeV2)
 
-    def latticeV3_test(self):
+    def test_latticeV3(self):
         np.testing.assert_array_equal(np.array([0.0, 0.0, 1.025290499]),
                                       self.testposcar.latticeV3)
 
-    def atom_identifer_test(self):
+    def test_atom_identifer(self):
         self.assertEqual(['#1:Ni1', '#2:Ni2', '#3:Ni3',
                           '#4:C1', '#5:C2', '#6:C3', '#7:C4',
                           '#8:C5', '#9:C6', '#10:C7', '#11:C8',
@@ -45,26 +46,26 @@ class TestPOSCAR(unittest.TestCase):
                           '#24:S9', '#25:S10', '#26:S11', '#27:S12'],
                          self.testposcar.atom_identifer)
 
-    def is_cartesian_test(self):
+    def test_is_cartesian(self):
         self.assertFalse(self.testposcar.is_cartesian)
         self.testposcar.to_Cartesian()
         self.assertTrue(self.testposcar.is_cartesian)
 
-    def is_direct_test(self):
+    def test_is_direct(self):
         self.assertTrue(self.testposcar.is_direct)
 
-    def is_selective_test(self):
+    def test_is_selective(self):
         self.assertTrue(self.testposcar.is_selective)
         self.assertFalse(self.blancposcar.is_selective)
 
-    def pos_test(self):
+    def test_pos(self):
         np.testing.assert_array_equal(np.array([0., 0.5, 0.5]),
                                       self.testposcar.pos(3))
         np.testing.assert_allclose(np.array([0.23764, 0.429027113, 0.5]),
                                    self.testposcar.pos(4),
                                    rtol=1e-04)
 
-    def pos_replace_test(self):
+    def test_pos_replace(self):
         np.testing.assert_array_equal(
             np.array([0.333333333, 0.237639553, 0.5]),
             self.testposcar.pos(6))
@@ -81,14 +82,14 @@ class TestPOSCAR(unittest.TestCase):
         np.testing.assert_array_equal(np.array([1, 3, 4]),
                                       self.testposcar.pos(7))
 
-    def tune_scaling_factor_test(self):
+    def test_tune_scaling_factor(self):
         self.testposcar.tune_scaling_factor(1.0)
         np.testing.assert_allclose(
             np.array([12.66995166052, -7.315, 0.0]),
             self.testposcar.latticeV1,
             rtol=1e-07)
 
-    def tune_scaling_factor_withCartesian_test(self):
+    def test_tune_scaling_factor_withCartesian(self):
         self.testposcar.to_Cartesian()
         self.testposcar.tune_scaling_factor(1.0)
         np.testing.assert_allclose(
@@ -104,7 +105,7 @@ class TestPOSCAR(unittest.TestCase):
             self.testposcar.pos(7),
             rtol=1e-06)
 
-    def to_Cartesian_test(self):
+    def test_to_Cartesian(self):
         tmp = self.testposcar.pos(6)
         self.testposcar.to_Cartesian()
         np.testing.assert_allclose(
@@ -117,12 +118,12 @@ class TestPOSCAR(unittest.TestCase):
             self.testposcar.pos(6),
             rtol=1e-05)
 
-    def to_Direct_test(self):
+    def test_to_Direct(self):
         tmp = self.testposcar.pos(6)
         self.testposcar.to_Direct()
         np.testing.assert_array_equal(tmp, self.testposcar.pos(6))
 
-    def to_list_test(self):
+    def test_to_list(self):
         tmp = self.testposcar.to_list()
         self.assertEqual("NiC4S4", tmp[0])
         self.assertEqual(14.63, tmp[1])
@@ -142,13 +143,13 @@ class TestPOSCAR(unittest.TestCase):
         self.assertEqual('T T T', tmp[10][0])
         self.assertEqual('T T T', tmp[10][1])
         self.assertEqual('T F T', tmp[10][2])
-        # ...
+        #
         self.assertEqual('#1:Ni1', tmp[11][0])
         self.assertEqual('#2:Ni2', tmp[11][1])
         self.assertEqual('#3:Ni3', tmp[11][2])
         self.assertEqual('#4:C1', tmp[11][3])
 
-    def to_str_test(self):
+    def test_to_str(self):
         global tmpstr_original
         global tmpstr_after_rotate
         self.assertEqual(tmpstr_original, self.testposcar.__str__())
@@ -157,23 +158,20 @@ class TestPOSCAR(unittest.TestCase):
         self.assertEqual(tmpstr_after_rotate,
                          self.testposcar.__str__())
 
-    def nearest_test(self):
+    def test_nearest(self):
         pass
 
-    def make27candidate(self):
+    def test_make27candidate(self):
         pass
-        
-    def guess_molecule_test(self):
+
+    def test_guess_molecule(self):
         pass
-        
-    def atom_rotate_test(self):
+
+    def test_atom_rotate(self):
         pass
-    
-    def plus_test(self):
+
+    def test_plus(self):
         pass
-    
-if __name__ == '__main__':
-    unittest.main()
 
 test_poscar_string = """NiC4S4
 14.63
@@ -213,7 +211,8 @@ Direct
 -0.333333333	-0.553429027	0.5  T  T  T
 """
 
-tmpstr_original="""NiC4S4
+
+tmpstr_original = """NiC4S4
 14.63
     0.86602540400000005   -0.50000000000000000    0.00000000000000000
     0.86602540400000005    0.50000000000000000    0.00000000000000000
@@ -251,7 +250,7 @@ Direct
   -0.33333333300000001   -0.55342902699999996    0.50000000000000000 T T T #27:S12
 """
 
-tmpstr_after_rotate="""NiC4S4
+tmpstr_after_rotate = """NiC4S4
 14.63
     0.86602540400000005   -0.50000000000000000    0.00000000000000000
     0.86602540400000005    0.50000000000000000    0.00000000000000000
@@ -288,3 +287,6 @@ Direct
   -0.55342902699999996   -0.33333333299999995    0.50000000000000000 T T T #26:S11
   -0.33333333299999995   -0.55342902699999996    0.50000000000000000 T T T #27:S12
 """
+
+if __name__ == '__main__':
+    unittest.main()
