@@ -58,9 +58,9 @@ class CHGCAR(poscar.POSCAR):
 
     def load_from_file(self, chgcarfile):
         '''
-     :param string chgcarfile: CHGCAR file name
-     :return: CHGCAR
-'''
+        :param string chgcarfile: CHGCAR file name
+        :return: CHGCAR
+        '''
         section = 'poscar'
         separator = None
         tmp = []
@@ -220,8 +220,7 @@ class CHGCAR(poscar.POSCAR):
         :note:
         in the returned CHGCAR :
         the charge distribution is just summantion of two CHGCARs,
-        and the atoms are also summantion of two CHGCARs.
-
+        and the atoms are also summantion of two CHGCARs.        
 '''
         # augend + aggend
         if not isinstance(other, CHGCAR):
@@ -271,7 +270,9 @@ class CHGCAR(poscar.POSCAR):
 
     def __str__(self):
         '''x.__str__() <=> str(x)
-  # @return [String] return a string representation of CHGCAR.
+
+        :return: a string representation of CHGCAR.
+        :rtype: str
 '''
         outputstring = ''
         tmp = self.chgArray
