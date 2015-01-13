@@ -447,8 +447,7 @@ class POSCAR(object):
         return '\n'.join(tmp) + '\n'
 
     def tune_scaling_factor(self, new_scaling_factor=1.0):
-        '''
-        changes scaling factor to new value.
+        '''changes scaling factor to new value.
 
         :param float new_scaling_factor:
         :note:  **The Braves lattice are corrected (to be equal size).**
@@ -463,8 +462,7 @@ class POSCAR(object):
                              for i in self.position]
 
     def to_Cartesian(self):
-        '''
-        changes the coordinate to cartesian from direct.
+        '''changes the coordinate to cartesian from direct.
 
         :return: true if POSCAR file is cartesian coordinate
         :rtype: Boolean
@@ -477,8 +475,7 @@ class POSCAR(object):
             self.position = [m.dot(v) for v in self.position]
 
     def to_Direct(self):
-        '''
-        change the coordinate to direct from cartesian.
+        '''change the coordinate to direct from cartesian.
         '''
         if self.is_cartesian:
             self.coordinate_type = "Direct"
@@ -536,7 +533,9 @@ class POSCAR(object):
     def guess_molecule2(self, site_list):
         '''
         arranges atom position to form a molecule.  poscar updates
-        :param Array<Fixnum> site_list: list of site #
+
+        :param site_list: list of site number
+        :type site_list: list
 '''
         molecule = self.guess_molecule(site_list)
         for site, posVector in zip(site_list, molecule):
@@ -551,8 +550,8 @@ class POSCAR(object):
         :type vector: list, tuple, np.array
         :type atomlist: list
         :note: the first atom is "1", not "0".
-        :return: Array
-        :rtype: Array
+        :return: position
+        :rtype: numpy.array
 '''
         if self.is_cartesian:
             vector = _vectorize(vector)
@@ -570,8 +569,6 @@ class POSCAR(object):
 
         :param vector: translational vector
         :type vector: list, np.array
-        :return: Array
-        :rtype: Array
 '''
         atomrange = list(range(1, sum(self.ionnums) + 1))
         self.translate(vector, atomrange)
@@ -597,11 +594,10 @@ class POSCAR(object):
               x1 * y0 * z3 - x0 * y1 * z3) / (x3 * y2 * z1 - x2 * y3 * z1 -
                                               x3 * y1 * z2 + x1 * y3 * z2 +
                                               x2 * y1 * z3 - x1 * y2 * z3)
-        n = -(x2 * y1 * z0 - x1 * y2 * z0 - x2 * y0 * z1 +
-              x0 * y2 * z1 + x1 * y0 *
-              z2 - x0 * y1 * z2) / (-x3 * y2 * z1 + x2 * y3 * z1 +
-                                    x3 * y1 * z2 - x1 * y3 * z2 -
-                                    x2 * y1 * z3 + x1 * y2 * z3)
+        n = -(x2 * y1 * z0 - x1 * y2 * z0 - x2 * y0 * z1 + x0 * y2 * z1 +
+              x1 * y0 * z2 - x0 * y1 * z2) / (-x3 * y2 * z1 + x2 * y3 * z1 +
+                                              x3 * y1 * z2 - x1 * y3 * z2 -
+                                              x2 * y1 * z3 + x1 * y2 * z3)
         return all((0 <= q <= 1) for q in (l, m, n))
 
 

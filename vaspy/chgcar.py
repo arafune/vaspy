@@ -22,6 +22,7 @@ _re_aug_occ = re.compile(r'\baugmentation occupancies')
 
 
 class CHGCAR(poscar.POSCAR):
+
     '''
     class for CHGCAR format
 
@@ -46,6 +47,7 @@ class CHGCAR(poscar.POSCAR):
 
 '''
     # accessor: chgArray, meshX-Y-Z
+
     def __init__(self, arg=None):
         super(CHGCAR, self).__init__(None)
         self.__meshX = 0
@@ -129,11 +131,12 @@ class CHGCAR(poscar.POSCAR):
         '''
         CHGCAR#magnetization(direction=nil)
 
-        For spinpolarized calculations (``ISPIN=2`` but ``LSORBIT=.FALSE.``),
+        For spinpolarized calculations 
+        (``ISPIN=2`` but ``LSORBIT=.FALSE.``),
         two sets of data can be found in the CHGCAR file. The first set
         contains the total charge density (spin up plus spin down),
         the second one the magnetization density (spin up minus spin down).
-        For non collinear calculations (``ISPIN=2`` but ``LSORBIT=.TRUE.``)
+        For non collinear calculations (``ISPIN=2`` and ``LSORBIT=.TRUE.``)
         the CHGCAR file contains the total charge density and the
         magnetisation density in the x, y and z direction in this order.
 
@@ -277,7 +280,7 @@ class CHGCAR(poscar.POSCAR):
         outputstring = ''
         tmp = self.chgArray
         for tmp in tools.each_slice(self.chgArray,
-                                    self.meshX*self.meshY*self.meshZ):
+                                    self.meshX * self.meshY * self.meshZ):
             output = []
             outputstring += '\n  {0}  {1}  {2}\n'.format(self.meshX,
                                                          self.meshY,

@@ -47,6 +47,7 @@ class PROCAR(object):  # Version safety
 
     :author: Ryuichi Arafune
     '''
+
     def __init__(self, arg=None, phase_read=False):
         self.__orbital = list()
         self.__phase = list()
@@ -201,6 +202,7 @@ class PROCAR(object):  # Version safety
 
 
 class BandStructure(object):
+
     '''
     .. py:class:: BandStructure class
 
@@ -209,6 +211,7 @@ class BandStructure(object):
     :class variables: kvectors, energies, states, spin, orb_names
     Finally, Band, Orbital, State classes can be removed ?
     '''
+
     def __init__(self, arg=None):
         self.__nBands = 0
         self.__kvectors = list()
