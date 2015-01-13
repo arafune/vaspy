@@ -9,6 +9,7 @@ import vaspy.procar as procar
 
 
 class TestPROCAR(unittest.TestCase):
+
     def setUp(self):
         # single state
         global procar_single
@@ -47,33 +48,33 @@ class TestPROCAR(unittest.TestCase):
         #
         self.nullband = procar.BandStructure()
 
-    def procar_load_test(self):
+    def test_procar_load(self):
         pass
 
-    def procar_std_print_test(self):
+    def test_procar_std_print(self):
         self.assertEqual(output_print_procar_std, self.procar_std.__str__())
 
-    def procar_spin_print_test(self):
+    def test_procar_spin_print(self):
         self.assertEqual(output_print_procar_spin, self.procar_spin.__str__())
 
-    def band_check_orb_name_test(self):
+    def test_band_check_orb_name(self):
         self.assertEqual('sp', self.nullband.check_orb_name('sp'))
         self.assertEqual('pxpy', self.nullband.check_orb_name('pypx'))
         self.assertRaises(ValueError, self.nullband.check_orb_name, 'nonexist')
 
-    def BScreation_fromnull_test(self):
+    def test_BScreation_fromnull(self):
         self.nullband.kvectors = self.procar_std.kvectors
         np.testing.assert_array_equal([np.array([0.0, 0.0, 0.0]),
                                        np.array([0.25, 0.25, 0.]),
                                        np.array([0.5, 0.5, 0.])],
                                       self.nullband.kvectors)
         self.assertEqual([0.0,
-                          np.sqrt(0.25**2 + 0.25**2),
-                          np.sqrt(0.5**2 + 0.5**2)],
+                          np.sqrt(0.25 ** 2 + 0.25 ** 2),
+                          np.sqrt(0.5 ** 2 + 0.5 ** 2)],
                          self.nullband.kdistance)
         self.assertEqual(3, self.nullband.numk)
 
-    def BScreation_from_procar_std_test(self):
+    def test_BScreation_from_procar_std(self):
         testBand = self.procar_std.band()
         self.assertEqual(3, testBand.nAtoms)
         self.assertEqual(2, testBand.nBands)
@@ -89,7 +90,7 @@ class TestPROCAR(unittest.TestCase):
         self.assertEqual((0, 3, 1, 2),
                          testBand.get_orb_index('sp'))
 
-    def BScreation_from_procar_single_test(self):
+    def test_BScreation_from_procar_single(self):
         testBand = self.procar_single.band()
         self.assertEqual(3, testBand.nAtoms)
         self.assertEqual(1, testBand.nBands)
@@ -121,7 +122,7 @@ class TestPROCAR(unittest.TestCase):
                          0.0048 + 0.0058J]]]]),
             testBand.phases)
 
-    def BScreation_from_procar_spin_test(self):
+    def test_BScreation_from_procar_spin(self):
         testBand = self.procar_spin.band()
         self.assertEqual(3, testBand.nAtoms)
         self.assertEqual(2, testBand.nBands)
@@ -135,7 +136,7 @@ class TestPROCAR(unittest.TestCase):
         self.assertEqual((3, 2, 3, 10), testBand.orbitals[0].shape)
         self.assertEqual((3, 2, 3, 10), testBand.orbitals[1].shape)
 
-    def BScreation_from_procar_soi_test(self):
+    def test_BScreation_from_procar_soi(self):
         testBand = self.procar_soi.band()
         self.assertEqual(3, testBand.nAtoms)
         self.assertEqual(2, testBand.nBands)
@@ -145,7 +146,7 @@ class TestPROCAR(unittest.TestCase):
                                        np.array([0.5, 0.5, 0.])],
                                       testBand.kvectors)
 
-    def siteCompose_band_from_procar_std_test(self):
+    def test_siteCompose_band_from_procar_std(self):
         testBand = self.procar_std.band()
         testBand.compose_sites((0, 2))
         self.assertEqual((3, 2, 1, 10), testBand.sitecomposed[0].shape)
@@ -158,7 +159,7 @@ class TestPROCAR(unittest.TestCase):
                        0.021, 0.0212, 0.0214, 0.0216, 0.1872]]),
             testBand.sitecomposed[0][1, 1])
 
-    def composeOrbital_test_from_procar_std(self):
+    def test_composeOrbital_from_procar_std(self):
         testband = self.procar_std.band()
         testband.compose_sites((0, 1))
         testband.compose_sites((1, 2))
@@ -178,7 +179,7 @@ class TestPROCAR(unittest.TestCase):
                                                     ('d', 'pxpy')))
         self.assertEqual(len(testlist[0]), 7)
 
-    def composeOrbital_test_from_procar_spin(self):
+    def test_composeOrbital_from_procar_spin(self):
         testband = self.procar_spin.band()
         testband.compose_sites((0, 1))
         testband.compose_sites((1, 2))
@@ -203,7 +204,7 @@ class TestPROCAR(unittest.TestCase):
                                                     ('d', 'pxpy')))
         self.assertEqual(len(testlist[0]), 13)
 
-    def composeOrbital_test_from_procar_soi(self):
+    def test_composeOrbital_from_procar_soi(self):
         testband = self.procar_soi.band()
         testband.compose_sites((0, 1))
         testband.compose_sites((1, 2))
@@ -234,7 +235,7 @@ class TestPROCAR(unittest.TestCase):
 
 # -------------------------------------------------
 
-output_print_procar_std="""The properties of this procar:
+output_print_procar_std = """The properties of this procar:
   # of k-points: 3
   # of bands: 2
   # of ions: 3
@@ -249,7 +250,7 @@ output_print_procar_std="""The properties of this procar:
   spininfo: ('',)
 """
 
-output_print_procar_spin="""The properties of this procar:
+output_print_procar_spin = """The properties of this procar:
   # of k-points: 3
   # of bands: 2
   # of ions: 3
@@ -264,8 +265,6 @@ output_print_procar_spin="""The properties of this procar:
   spininfo: ('_up', '_down')
 """
 
-if __name__ == '__main__':
-    unittest.main()
 
 procar_single = '''PROCAR lm decomposed + phase
 # of k-points:     1        # of bands: 1         # of ions: 3
@@ -286,7 +285,7 @@ ion       s      py      pz      px     dxy     dyz     dz2     dxz     dx2
   2  0.0030  0.0031  0.0032  0.0033  0.0034  0.0035  0.0036  0.0037  0.0038
   3  0.0040  0.0041  0.0042  0.0043  0.0044  0.0045  0.0046  0.0047  0.0048
   3  0.0050  0.0051  0.0052  0.0053  0.0054  0.0055  0.0056  0.0057  0.0058'''
-   
+
 procar_woSpi = """PROCAR lm decomposed + phase
 # of k-points:    3         # of bands: 2         # of ions: 3
 
@@ -585,7 +584,7 @@ ion       s      py      pz      px     dxy     dyz     dz2     dxz     dx2
   3  1.0000  1.0000  1.0000  1.0000  1.0000  1.0000  1.0000  1.0000  1.0000
 """
 
-procar_SOI='''PROCAR lm decomposed + phase
+procar_SOI = '''PROCAR lm decomposed + phase
 # of k-points:    3         # of bands: 2         # of ions: 3
 
  k-point    1 :    0.00000000 0.00000000 0.00000000     weight = 0.33333333
@@ -756,3 +755,6 @@ ion       s      py      pz      px     dxy     dyz     dz2     dxz     dx2
   3  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000
   3  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000
 '''
+
+if __name__ == '__main__':
+    unittest.main()

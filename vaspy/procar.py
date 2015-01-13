@@ -24,6 +24,7 @@ except ImportError:
 
 
 class PROCAR(object):  # Version safety
+
     '''
     Class for PROCAR file
 
