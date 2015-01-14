@@ -5,12 +5,13 @@ import os
 from vaspy.locpot import LOCPOT
 import numpy as np
 
+
 class TestLOCPOT(unittest.TestCase):
 
     def setUp(self):
         currentpath = (os.path.abspath(os.path.dirname(__file__)))
-        fullpath_1 = currentpath+"/LOCPOT.dummy"
-        fullpath_2 = currentpath+"/LOCPOT.dummy2"
+        fullpath_1 = currentpath + "/LOCPOT.dummy"
+        fullpath_2 = currentpath + "/LOCPOT.dummy2"
         self.testlocpot1 = LOCPOT(fullpath_1)
         self.testlocpot2 = LOCPOT(fullpath_2)
 
