@@ -62,7 +62,7 @@ LOCPOT format is essentially same as CHGCAR but simpler.
                     self.__potlist.extend(map(float, line.split()))
             self.__potarray = np.array(self.__potlist).reshape(
                 self.meshZ, self.meshY, self.meshX)
-            
+
     @property
     def meshX(self):
         return self.__meshX
@@ -84,17 +84,17 @@ LOCPOT format is essentially same as CHGCAR but simpler.
         return self.__potarray
 
     def get_mesh(self):
-        return self.__meshX, self.__meshY, self.__meshZ 
+        return self.__meshX, self.__meshY, self.__meshZ
 
     def average_along_axis(self, axis_name):
         axis_name = axis_name.capitalize()
         if axis_name == 'X':
             pot = np.sum(np.sum(
-                np.transpose(self.potarray, (2,0,1)), axis=2), axis=1)
+                np.transpose(self.potarray, (2, 0, 1)), axis=2), axis=1)
             pot /= (self.meshY * self.meshZ)
         if axis_name == 'Y':
-            pot= np.sum(np.sum(
-                np.transpose(self.potarray, (1,0,2)), axis=2), axis=1)
+            pot = np.sum(np.sum(
+                np.transpose(self.potarray, (1, 0, 2)), axis=2), axis=1)
             pot /= (self.meshX * self.meshZ)
         if axis_name == 'Z':
             pot = np.sum(np.sum(self.potarray, axis=2), axis=1)
@@ -105,10 +105,10 @@ LOCPOT format is essentially same as CHGCAR but simpler.
         axis_name = axis_name.capitalize()
         if axis_name == 'X':
             pot = np.min(np.min(
-                np.transpose(self.potarray, (2,0,1)), axis=2), axis=1)
+                np.transpose(self.potarray, (2, 0, 1)), axis=2), axis=1)
         if axis_name == 'Y':
-            pot= np.min(np.min(
-                np.transpose(self.potarray, (1,0,2)), axis=2), axis=1)
+            pot = np.min(np.min(
+                np.transpose(self.potarray, (1, 0, 2)), axis=2), axis=1)
         if axis_name == 'Z':
             pot = np.min(np.min(self.potarray, axis=2), axis=1)
         return pot
@@ -117,10 +117,10 @@ LOCPOT format is essentially same as CHGCAR but simpler.
         axis_name = axis_name.capitalize()
         if axis_name == 'X':
             pot = np.max(np.max(
-                np.transpose(self.potarray, (2,0,1)), axis=2), axis=1)
+                np.transpose(self.potarray, (2, 0, 1)), axis=2), axis=1)
         if axis_name == 'Y':
-            pot= np.max(np.max(
-                np.transpose(self.potarray, (1,0,2)), axis=2), axis=1)
+            pot = np.max(np.max(
+                np.transpose(self.potarray, (1, 0, 2)), axis=2), axis=1)
         if axis_name == 'Z':
             pot = np.max(np.max(self.potarray, axis=2), axis=1)
         return pot
@@ -129,14 +129,13 @@ LOCPOT format is essentially same as CHGCAR but simpler.
         axis_name = axis_name.capitalize()
         if axis_name == 'X':
             pot = np.median(np.median(
-                np.transpose(self.potarray, (2,0,1)), axis=2), axis=1)
+                np.transpose(self.potarray, (2, 0, 1)), axis=2), axis=1)
         if axis_name == 'Y':
-            pot= np.median(np.median(
-                np.transpose(self.potarray, (1,0,2)), axis=2), axis=1)
+            pot = np.median(np.median(
+                np.transpose(self.potarray, (1, 0, 2)), axis=2), axis=1)
         if axis_name == 'Z':
             pot = np.median(np.median(self.potarray, axis=2), axis=1)
         return pot
-
 
     def get_axes_lengthes(self):
         x = self.latticeV1 * self.scaling_factor
