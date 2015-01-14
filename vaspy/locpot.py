@@ -59,7 +59,7 @@ LOCPOT format is essentially same as CHGCAR but simpler.
                         section = 'grid'
                 elif section == 'grid':
                     line = line.rstrip('\n')
-                    self.__potlist.extend(map(float, line.split()))
+                    self.__potlist.extend(map(np.float64, line.split()))
             self.__potarray = np.array(self.__potlist).reshape(
                 self.meshZ, self.meshY, self.meshX)
 
@@ -89,16 +89,13 @@ LOCPOT format is essentially same as CHGCAR but simpler.
     def average_along_axis(self, axis_name):
         axis_name = axis_name.capitalize()
         if axis_name == 'X':
-            pot = np.sum(np.sum(
+            pot = np.average(np.average(
                 np.transpose(self.potarray, (2, 0, 1)), axis=2), axis=1)
-            pot /= (self.meshY * self.meshZ)
         if axis_name == 'Y':
-            pot = np.sum(np.sum(
+            pot = np.average(np.average(
                 np.transpose(self.potarray, (1, 0, 2)), axis=2), axis=1)
-            pot /= (self.meshX * self.meshZ)
         if axis_name == 'Z':
-            pot = np.sum(np.sum(self.potarray, axis=2), axis=1)
-            pot /= (self.meshX * self.meshY)
+            pot = np.average(np.average(self.potarray, axis=2), axis=1)
         return pot
 
     def max_along_axis(self, axis_name):
