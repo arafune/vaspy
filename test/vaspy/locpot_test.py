@@ -24,11 +24,11 @@ class TestLOCPOT(unittest.TestCase):
 
     def test_average_along_axisX(self):
         np.testing.assert_almost_equal(
-            np.array([34.5,  35.5,  36.5]),
+            np.array([34.5, 35.5, 36.5]),
             self.testlocpot2.average_along_axis('x'))
 
     def test_average_along_axisY(self):
-        np.testing.assert_equal(np.array([31.,  34.,  37.,  40.]),
+        np.testing.assert_equal(np.array([31., 34., 37., 40.]),
                                 self.testlocpot2.average_along_axis('Y'))
 
     def test_axis_length(self):
