@@ -152,14 +152,26 @@ LOCPOT format is essentially same as CHGCAR but simpler.
         axesLength = self.get_axes_lengthes()
         if axis_name == 'X':
             X = np.linspace(0, axesLength[0], self.meshX)
+            plt.clf()
+            plt.xlim(xmax=axesLength[0])
         if axis_name == 'Y':
             X = np.linspace(0, axesLength[1], self.meshY)
+            plt.clf()
+            plt.xlim(xmax=axesLength[1])
         if axis_name == 'Z':
             X = np.linspace(0, axesLength[2], self.meshZ)
+            plt.clf()
+            plt.xlim(xmax=axesLength[2])
         Y1 = self.average_along_axis(axis_name)
         Y2 = self.max_along_axis(axis_name)
         Y3 = self.min_along_axis(axis_name)
         Y4 = self.median_along_axis(axis_name)
-        plt.plot(X, Y1, Y2, Y3, Y4)
-
-    
+        plt.plot(X, Y1)
+        plt.plot(X, Y2)
+        plt.plot(X, Y3)
+        plt.plot(X, Y4)
+        xlabel = "Position along " + axis_name + "-axis (A)"
+        title = "Local potential (" + axis_name + ")"
+        plt.title(title)
+        plt.xlabel(xlabel)
+        plt.ylabel("Energy  ( eV )")
