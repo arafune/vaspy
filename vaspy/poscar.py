@@ -290,7 +290,7 @@ class POSCAR(object):
         :param array:
         :param point:
         :type array: list
-        :type point: np.array 
+        :type point: np.array
         :return: np.array
         :rtype: np.array
 '''
@@ -520,7 +520,8 @@ class POSCAR(object):
                     # can be detemined from the position list,
                     # guess_molecule method does not require
                     # the "center" option.
-                    # (molecule.product(molecule)).inject(0.0) do | s, vectors |
+                    # (molecule.
+                    #     product(molecule)).inject(0.0) do | s, vectors |
                     # s+ (vectors[0]-vectors[1]).magnitude
                     s = 0.0
                     for vectors in it.product(molecule, molecule):
@@ -616,7 +617,7 @@ if __name__ == '__main__':
     arg = argparse.ArgumentParser(
         formatter_class=argparse.RawTextHelpFormatter,
         epilog="""NOTE: When you running this script
-on Windows Power Shell, 
+on Windows Power Shell,
 commas are regarded as delimiter of values.
 So you must enclose values which
 contains commas with quotations.

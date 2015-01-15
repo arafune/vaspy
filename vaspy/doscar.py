@@ -32,7 +32,7 @@ class DOSCAR(object):  # Version safety
     def load_from_file(self, doscar_file):
         """
         :param doscar_file: doscar_file file name of "DOSCAR"
-        :type doscar_file: str 
+        :type doscar_file: str
         """
         with open(doscar_file) as f:
             separate_text = ""

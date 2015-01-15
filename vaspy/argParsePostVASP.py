@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import argparse, re
+import argparse
+import re
+
 
 class APPV(argparse.ArgumentParser):
     __doc__ = '''
@@ -10,9 +12,9 @@ class APPV(argparse.ArgumentParser):
 ''' + argparse.ArgumentParser.__doc__
 
     def parse_Atomselection(self, l):
-        '''Takes a string for the range of the ions, which 
+        '''Takes a string for the range of the ions, which
         consists of the numbers deliminated by "-" or ",".
-        :return:  [Array<String>] Returns the array that consists 
+        :return:  [Array<String>] Returns the array that consists
         of the ordered "String" represents the number.
         >>> a = APPV()
         >>> a.parse_Atomselection("1-5,8,9,11-15")
@@ -25,13 +27,13 @@ class APPV(argparse.ArgumentParser):
         for i in a:
             if re.search(reRange, i):
                 start, stop = re.findall(reRange, i)[0]
-                output |= {str(i) for i in range(int(start), int(stop)+1)}
+                output |= {str(i) for i in range(int(start), int(stop) + 1)}
             elif re.search(reSingle, i):
                 output.add(i)
         return sorted(output)
 
     def parse_AtomselectionNum(self, l):
-        '''Very similar with parse_Atomselection but returns the array 
+        '''Very similar with parse_Atomselection but returns the array
         of the number not array of the string.
         >>> a = APPV()
         >>> a.parse_AtomselectionNum("1-5,8,9,11-15")
@@ -47,5 +49,3 @@ if __name__ == '__main__':
     opt.add_argument('--atom', dest='atomrange', help='atom#')
     args = opt.parse_args()
     print(opt.parse_Atomselection(args.atomrange))
-        
-                

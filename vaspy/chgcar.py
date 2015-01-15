@@ -131,7 +131,7 @@ class CHGCAR(poscar.POSCAR):
         '''
         CHGCAR#magnetization(direction=nil)
 
-        For spinpolarized calculations 
+        For spinpolarized calculations
         (``ISPIN=2`` but ``LSORBIT=.FALSE.``),
         two sets of data can be found in the CHGCAR file. The first set
         contains the total charge density (spin up plus spin down),
@@ -223,7 +223,7 @@ class CHGCAR(poscar.POSCAR):
         :note:
         in the returned CHGCAR :
         the charge distribution is just summantion of two CHGCARs,
-        and the atoms are also summantion of two CHGCARs.        
+        and the atoms are also summantion of two CHGCARs.
 '''
         # augend + aggend
         if not isinstance(other, CHGCAR):

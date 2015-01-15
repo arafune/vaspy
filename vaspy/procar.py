@@ -719,7 +719,7 @@ Use "-" or ","
  (ex.) --site 1,2,7-9''')
     parser.add_argument('--as', metavar='name', nargs='+', dest='atomsetname',
                         action='append',
-                        help='''the name of the sites identified 
+                        help='''the name of the sites identified
 by --site option
 the name is used in the title of the column''')
     parser.add_argument('--orbital', metavar='orbitals', action='append',
@@ -762,4 +762,4 @@ s, p, pxpy, pz, d, dxy, dyz, dz2, dxz, dx2
         for sites in siteindex:
             band.compose_sites(sites)
             band.compose_orbital(flat_orbitals)
-        print (band.get_sitecomposed_data(sitenames, args.orbital))
+        print(band.get_sitecomposed_data(sitenames, args.orbital))
