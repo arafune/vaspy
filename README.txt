@@ -8,7 +8,7 @@ Requirement
     Python (2.6 or newer)
     NumPy (any version)
     argparse (for Python 2.6, 3.0, 3.1)
-    matplotlib (only when using outcar script)
+    matplotlib (only when using outcar and locpot script)
 
 Installation
     In this directory type following command:
