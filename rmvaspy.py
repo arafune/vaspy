@@ -7,7 +7,8 @@ Created on Sun Mar 30 13:25:29 2014
 """
 
 if __name__ == '__main__':
-    import sys, os
+    import sys
+    import os
     logfile = sys.argv[1] if len(sys.argv) > 1 else 'install-vaspy.txt'
     file = open(logfile)
     for line in file:
@@ -20,4 +21,3 @@ if __name__ == '__main__':
             os.removedirs(os.path.dirname(line))
         except OSError:
             pass
-        
