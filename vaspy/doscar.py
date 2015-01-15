@@ -5,8 +5,8 @@ from __future__ import print_function  # Version safety
 from __future__ import division  # Version safety
 import copy as _copy
 import csv as _csv
-import re as _re
 import sys as _sys
+import numpy as np
 from numbers import Number as _Number
 if _sys.version_info[0] >= 3:  # Version safety
     from io import StringIO as _StringIO
