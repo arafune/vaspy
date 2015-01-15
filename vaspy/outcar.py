@@ -16,7 +16,7 @@ class OUTCAR(object):  # Version safety
     """
     Author: Ryuichi Arafune
     python class for OUTCAR file.
-    Extract calculation details and/or calculation progress 
+    Extract calculation details and/or calculation progress
     """
 
     def __init__(self, arg=None):
@@ -88,10 +88,12 @@ class OUTCAR(object):  # Version safety
                     pass
 
         self.atom_identifer = [name + ":#" + str(index + 1)
-                               for (index, name) in enumerate([elm + str(j)
-                                                               for (elm, n) in zip(self.iontype,
-                                                                                   self.ionnums)
-                                                               for j in range(1, int(n) + 1)])]
+                               for (index, name)
+                               in enumerate(
+                                   [elm + str(j)
+                                    for (elm, n) in zip(self.iontype,
+                                                        self.ionnums)
+                                    for j in range(1, int(n) + 1)])]
         #            i=1
         #            for elm, n in zip(self.iontype, self.ionnums):
         #                for j in range(1, int(n)+1):
@@ -199,6 +201,6 @@ if __name__ == '__main__':
         plt.legend()
         plt.show()
     else:
-        print ("\t".join(headers))
+        print("\t".join(headers))
         for item in posforce:
-            print ("\t".join([str(i) for i in item]))
+            print("\t".join([str(i) for i in item]))

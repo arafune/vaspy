@@ -2,17 +2,18 @@
 # -*- coding: utf-8 -*-
 ''''''
 
-from __future__ import print_function, division # Version safety
+from __future__ import print_function, division  # Version safety
 import re
 import itertools as it
 from collections import Iterable
- # Version safety
+# Version safety
 ziplong = it.izip_longest if hasattr(it, 'izip_longest') else it.zip_longest
 
-if not hasattr(__builtins__, 'basestring'): # Version safety
+if not hasattr(__builtins__, 'basestring'):  # Version safety
     flatten_ignore = (dict, str, bytes, bytearray)
 else:
     flatten_ignore = (dict, basestring)
+
 
 def each_slice(iterable, n, fillvalue=None):
     '''each_slice(iterable, n[, fillvalue]) => iterator
@@ -20,13 +21,15 @@ def each_slice(iterable, n, fillvalue=None):
 make new iterator object which get n item from [iterable] at once.
 '''
     args = [iter(iterable)] * n
-    return ziplong(*args, fillvalue=fillvalue) # Version safety
+    return ziplong(*args, fillvalue=fillvalue)  # Version safety
+
 
 def removeall(L, value):
     'remove all *value* in [list] L'
     while L.count(value):
         L.remove(value)
     return L
+
 
 def flatten(nested, target=Iterable, ignore=flatten_ignore):
     '''flatten(iterable) => list
@@ -51,22 +54,23 @@ defualt *ignore* is dict() and str-like objects.
                 i -= 1
                 break
             else:
-                nested[i:i+1] = nested[i]
+                nested[i:i + 1] = nested[i]
         i += 1
     return nested
 
 _rerange = re.compile(r'(\d+)-(\d+)')
 _resingle = re.compile(r'\d+')
 
+
 def parse_Atomselection(L):
     '''
-  # @param [String] l String to represent the range
-  #   of the numbers deliminated by "-" or ",". 
-  #   (ex.) "1-5,8,9,11-15" 
-  #   @example l="1-5,8,8,9-15,10" 
-  #=>>["1", "10", "11", "12", "13", "14", "15", "2", "3", "4", "5", "8", "9"]}
-  # @return [Array<String>] Returns the array that consists 
-  #   of the ordered "String" represents the number.
+    :param l: range of the atoms. the numbers deliminated by "-" or ",".
+    (ex.) "1-5,8,9,11-15"
+    :type l: str
+    :return: ordered "String" represents the number.
+    :rtype: list
+    >>> parse_Atomselection("1-5,8,8,9-15,10")
+    ["1", "10", "11", "12", "13", "14", "15", "2", "3", "4", "5", "8", "9"]
 '''
     array = L.split(',')
     output = set()
@@ -74,12 +78,22 @@ def parse_Atomselection(L):
         if re.search(_rerange, each):
             start, stop = re.findall(_rerange, each)[0]
             # Version safety
-            output |= set(str(i) for i in range(int(start), int(stop)+1))
+            output |= set(str(i) for i in range(int(start), int(stop) + 1))
         elif re.search(_resingle, each):
             output.add(each)
     return sorted(output)
 
+
 def parse_AtomselectionNum(L):
+    '''
+    :param l: range of the atoms. the numbers deliminated by "-" or ",".
+    (ex.) "1-5,8,9,11-15"
+    :type l: str
+    :return: ordered int represents the number.
+    :rtype: list
+    >>> parse_Atomselection("1-5,8,8,9-15,10")
+    [1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15]
+    '''
     return sorted(int(i) for i in parse_Atomselection(L))
 
 if __name__ == '__main__':
@@ -87,8 +101,8 @@ if __name__ == '__main__':
     each_slice_demo = lambda L, n: list(each_slice(L, n))
     demo = {'each_slice_demo': (range(10), 3),
             'removeall': ([1, 0, 0, 1, 0, 1, 0, 0], 0),
-            'flatten': ((1, [range(2), 3, set([4, 5]), [6]], #Version safety
-                             frozenset([7, 8])),),
+            'flatten': ((1, [range(2), 3, set([4, 5]), [6]],  # Version safety
+                         frozenset([7, 8])),),
             'parse_Atomselection': ('1-5,8,9,11-15',),
             }
     argcounts = {'each_slice_demo': 2,
@@ -97,9 +111,9 @@ if __name__ == '__main__':
                  'parse_Atomselection': 1}
     available = ['all'] + list(demo.keys())
     parser = argparse.ArgumentParser(
-                description='''collection of tools used in this package.''',
-                formatter_class=argparse.RawTextHelpFormatter,
-                epilog='''-a/--args option arguments are interpleted by eval().
+        description='''collection of tools used in this package.''',
+        formatter_class=argparse.RawTextHelpFormatter,
+        epilog='''-a/--args option arguments are interpleted by eval().
 so strings must be given with quotations("" or '').
 Because command line regards spaces as break,
 list argument must be written without any space.
@@ -116,7 +130,7 @@ Otherwise use prepared argument(s).''')
 You have to use this option for each function.
 See epilog for notices for argument notation.''')
     args = parser.parse_args()
-    
+
     if 'all' in args.choice:
         choices = demo.keys()
     else:
