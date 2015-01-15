@@ -47,7 +47,7 @@ class DOSCAR(object):  # Version safety
                     self.__nEnergypoints = int(separate_text.split()[2])
                     continue
                 else:  # idx >= 7
-                    if _re.search(separate_text, line):
+                    if separate_text in line:
                         self.dos_container.append(aDOS)
                         aDOS = list()
                     else:
