@@ -5,7 +5,7 @@
 
     modules made for VASP pre\postprocess.
 """
-#import os
+# import os
 
 __all__ = ['chgcar',
            'doscar',
@@ -17,5 +17,3 @@ __all__ = ['chgcar',
            ]
 
 from vaspy import *
-
-
