@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, division  # Version safety
+from __future__ import print_function  # Version safety
+from __future__ import division  # Version safety
 import copy as _copy
 import csv as _csv
 import re as _re
@@ -15,8 +16,8 @@ else:
 
 class DOSCAR(object):  # Version safety
 
-    '''# class for DOSCAR file
-       # @author Ryuichi Arafune
+    '''class for DOSCAR file
+       :author: Ryuichi Arafune
     '''
     # attr_accessor :nAtom, :dos_container
 
@@ -29,7 +30,10 @@ class DOSCAR(object):  # Version safety
             self.load_from_file(arg)
 
     def load_from_file(self, doscar_file):
-        """# @param [String] doscar_file file name of "DOSCAR"."""
+        """
+        :param doscar_file: doscar_file file name of "DOSCAR"
+        :type doscar_file: str 
+        """
         with open(doscar_file) as f:
             separate_text = ""
             aDOS = list()
@@ -86,16 +90,18 @@ class DOS(object):  # Version safety
             yield ith_point
 
     def append(self, dos_data):
-        '''# @param [Array] dos_data
+        '''
+        :param dos_data: dos_data
+        :rtype dos_data: np.array
         '''
         self.dos.append(_filter_dos_data(dos_data))
 
     def pop(self, i=-1):
         '''
-        :return: return and remove the last element 
+        :return: return and remove the last element
         :rtype: np.array
 
-    (the highest energy data) of the DOS object.
+        (the highest energy data) of the DOS object.
         '''
         return self.dos.pop(i)
 
@@ -123,12 +129,12 @@ class DOS(object):  # Version safety
         self.dos = [(each[0] - fermi, each[1]) for each in self.dos]
 
     def energies(self, i=None):
-        '''@param [Fixnum] i 
-           @return [Float, Array] if i is set, return the energy value of the i-th point.
-              if not, return the all energies in DOS object by Array representation.
-            @param [Fixnum] i 
-            @return [Float, Array] if i is set, return the energy value of the i-th point.
-              if not, return the all energies in DOS object by Array representation.
+        '''
+        :param i:
+        :type i: int
+        :return: the energy value of the i-th point when i set.
+        if arg is null, return the all energies in DOS object.
+        :rtype: np.ndarray
         '''
         if i is None:
             return [each[0] for each in self.dos]
@@ -147,7 +153,8 @@ class DOS(object):  # Version safety
             return self.dos[i][1]
 
     def export_csv(self, file, **kwargs):
-        """Export data to file object (or file-like object) as csv format.
+        """
+        Export data to file object (or file-like object) as csv format.
         kwargs are keyword options of csv.writer().
         see help(csv.writer) for detail.
         """
@@ -155,9 +162,11 @@ class DOS(object):  # Version safety
         csvwriter.writerows([line[0]] + line[1] for line in self.dos)
 
     def __str__(self):
-        """x.__str__() <=> str(x)
-           # @return [String] returns string representation of DOS object.
-           # csv-like (tab-deliminated) format.
+        """
+        x.__str__() <=> str(x)
+        :return: string representation of DOS object (tab deliminated).
+        :rtype: str
+
         """
         with _StringIO() as stream:
             self.export_csv(stream, delimiter='\t', lineterminator='\n')
@@ -177,8 +186,9 @@ def _filter_dos_data(data):
 
 class TDOS(DOS):
 
-    """# Class for total DOS:
-       # @author Ryuichi Arafune
+    """
+    Class for total DOS:
+    :author: Ryuichi Arafune
     """
 
     def __init__(self, array):
@@ -201,8 +211,9 @@ class TDOS(DOS):
 
 class PDOS(DOS):
 
-    '''# Class for partial DOS
-       # @author Ryuichi Arafune
+    '''
+    Class for partial DOS
+    :author: Ryuichi Arafune
     '''
     # attr_accessor :site, :orbital_spin
 
@@ -242,9 +253,11 @@ class PDOS(DOS):
 
     def __add__(self, other):
         """x.__add__(y) <-> x+y
-        # @param [PDOS] addend
-        #   addend.energies.length must be equal to self.energies.length.
-        # @return [PDOS] 
+        :param addend: addend.energies.length must be equal to
+        self.energies.length.
+        :type addend: PDOS
+        :return: PDOS
+        :rtype: PDOS
         """
         if not isinstance(other, PDOS):
             return NotImplemented
@@ -280,9 +293,11 @@ class PDOS(DOS):
 
     def __str__(self, site=None):
         """x.__str__() <-> str(x)
-        # Returns String representation of PDOS object.
-        # @param [String]  site   Site name to overwrite.
-        # @return [String]  String representation of PDOS object.
+
+        Returns String representation of PDOS object.
+        :param site: Site name to overwrite.
+        :return: String representation of PDOS object.
+        :rtype: str
         """
         with _StringIO() as stream:
             self.export_csv(stream, site=site,
@@ -299,7 +314,6 @@ if __name__ == '__main__':
     from outcar import OUTCAR as _OUTCAR
     import tools as _tools
 
-    #------
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('doscar', metavar='DOSCAR_file')
@@ -327,7 +341,6 @@ Use "-" or ","
                         help="""the name of the range identified by --site.
 (ex.) --as layer1
 the name is used in the output filename.""")
-    #-----
 
     args = parser.parse_args()
 
@@ -356,7 +369,7 @@ the name is used in the output filename.""")
             for site, name in zip(args.atomset, args.atomsetname):
                 each = PDOS()
                 for atomNo in site:
-                    #print(repr(each.dos), repr(each.site))
+                    # print(repr(each.dos), repr(each.site))
                     each += d[atomNo]
                 each.site = name
                 sumPDOSs.append(each)
@@ -427,5 +440,5 @@ in the parallel version if NPAR tex2html_wrap_inline5201 1.
 Mind: For relaxations the DOSCAR is usually useless.
 If you want to get an accurate DOS for the final configuration
 copy CONTCAR to POSCAR and make another static (ISTART=1; NSW=0)
-calculation. 
+calculation.
 """
