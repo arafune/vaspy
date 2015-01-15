@@ -3,9 +3,8 @@
 
 import unittest
 import os
-import tempfile
 import numpy as np
-from vaspy.doscar import DOSCAR, DOS,  TDOS,  PDOS
+from vaspy.doscar import DOSCAR, DOS, TDOS, PDOS
 
 
 class TestDOSCAR(unittest.TestCase):
