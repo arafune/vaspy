@@ -65,24 +65,24 @@ class OUTCAR(object):  # Version safety
         f = open(arg)
         for line in f:
             if section == ["force"]:
-                if re.search(r"\btotal drift\b", line):
+                if "total drift" in line:
                     section.pop()
-                elif re.search(r"[\s]*---------------", line):
+                elif "---------------" in line:
                     pass
-                elif re.search(r"[-]??[\d]*.[\d]+[\s]+[-]??[\d]*.[\d]+[\s]+[-]??[\d]*.[\d]+[\s]+[-]??[\d]*.[\d]+[\s]+[-]??[\d]*.[\d]+[\s]+[-]??[\d]*.[\d]+", line):
-                    posforce.append([float(x) for x in line.split()])
+                elif "total drift:" in line:
+                    section.pop()
                 else:
-                    pass
+                    posforce.append([float(x) for x in line.split()])
             else:
-                if re.search(r"\bnumber of dos\b", line):
+                if "number of dos" in line:
                     self.nions = int(line.split()[-1])
-                elif re.search(r"\bTITEL  =", line):
+                elif "TITEL  =" in line:
                     self.iontype.append(line.split()[3])
-                elif re.search(r"\bions per type\b", line):
+                elif "ions per type " in line:
                     self.ionnums = [int(x) for x in line.split()[4:]]
-                elif re.search(r"\bPOSITION\b", line):
+                elif "POSITION" in line and "TOTAL-FORCE" in line:
                     section.append("force")
-                elif re.search(r"\E-fermi\b", line):
+                elif "E-fermi" in line:
                     self.fermi = float(line.split()[2])
                 else:
                     pass
