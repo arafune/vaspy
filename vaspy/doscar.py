@@ -1,21 +1,23 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, division # Version safety
+from __future__ import print_function  # Version safety
+from __future__ import division  # Version safety
 import copy as _copy
 import csv as _csv
 import re as _re
 import sys as _sys
 from numbers import Number as _Number
-if _sys.version_info[0] >= 3: # Version safety
+if _sys.version_info[0] >= 3:  # Version safety
     from io import StringIO as _StringIO
 else:
     from cStringIO import StringIO as _StringIO
 
 
-class DOSCAR(object): # Version safety
-    '''# class for DOSCAR file
-       # @author Ryuichi Arafune
+class DOSCAR(object):  # Version safety
+
+    '''class for DOSCAR file
+       :author: Ryuichi Arafune
     '''
     # attr_accessor :nAtom, :dos_container
 
@@ -23,26 +25,28 @@ class DOSCAR(object): # Version safety
         self.nAtom = 0
         self.__nEnergypoints = 0
         self.dos_container = list()
-        
+
         if arg is not None:
             self.load_from_file(arg)
 
-    
     def load_from_file(self, doscar_file):
-        """# @param [String] doscar_file file name of "DOSCAR"."""
+        """
+        :param doscar_file: doscar_file file name of "DOSCAR"
+        :type doscar_file: str
+        """
         with open(doscar_file) as f:
             separate_text = ""
             aDOS = list()
             for idx, line in enumerate(f, 1):
                 if idx == 1:
                     self.nAtom = int(line.split()[0])
-                elif 2<= idx <= 5:
+                elif 2 <= idx <= 5:
                     continue
                 elif idx == 6:
                     separate_text = line.rstrip('\n')
                     self.__nEnergypoints = int(separate_text.split()[2])
                     continue
-                else: # idx >= 7
+                else:  # idx >= 7
                     if _re.search(separate_text, line):
                         self.dos_container.append(aDOS)
                         aDOS = list()
@@ -52,64 +56,62 @@ class DOSCAR(object): # Version safety
                 self.dos_container.append(aDOS)
 
 
+class DOS(object):  # Version safety
 
-class DOS(object): # Version safety
-    '''# Class for DOS
-       #
-       #  attribute : dos
-       #       Array object.  that consists arrays of two elements.
-       #       the first element is the float representing the energy.
-       #       the other element is still array that contains the density.
-       #
-       # @author Ryuichi Arafune
+    '''Class for DOS
+
+    attribute : dos
+    Array object.  that consists arrays of two elements.
+    the first element is the float representing the energy.
+    the other element is still array that contains the density.
+
+    :author: Ryuichi Arafune
     '''
     # attr_accessor :dos
+
     def __init__(self, array=None):
         self.dos = list()
         if array is not None:
             for a in array:
                 a_float = [float(i) for i in a]
                 self.dos.append((a_float[0], a_float[1:]))
-    
-    
+
     def __deepcopy__(self, memo):
         "x.__deepcopy__() <-> copy.deepcopy(x)"
         dest = DOS()
         dest.dos = _copy.deepcopy(self.dos, memo)
         return dest
-    
 
     def deepcopy(self):
         return _copy.deepcopy(self)
 
-    
     def __iter__(self):
         for ith_point in self.dos:
             yield ith_point
-    
 
     def append(self, dos_data):
-        '''# @param [Array] dos_data
+        '''
+        :param dos_data: dos_data
+        :rtype dos_data: np.array
         '''
         self.dos.append(_filter_dos_data(dos_data))
-    
 
     def pop(self, i=-1):
-        '''# @return [Array] return and remove the last element 
-           #    (the highest energy data) of the DOS object.
+        '''
+        :return: return and remove the last element
+        :rtype: np.array
+
+        (the highest energy data) of the DOS object.
         '''
         return self.dos.pop(i)
-    
 
     # self.unshift(X) => self.[0:0] = X
     # self.shift => self.pop(0)
-    
 
     def __len__(self):
         """x.__len__() <=> len(x)"""
         return len(self.dos)
 
-    
     def __setitem__(self, idx, value):
         """x.__setitem__(i, y) <=> x[i]=y"""
         if isinstance(idx, int):
@@ -118,54 +120,53 @@ class DOS(object): # Version safety
             value = [_filter_dos_data(each) for each in value]
         self.dos.__setitem__(idx, value)
 
-    
     def __getitem__(self, idx):
         """x.__getitem__(i) <=> x[i]"""
         self.dos.__getitem__(idx)
 
-    
     def fermilevel_correction(self, fermi):
         '# @param [Float] fermi fermi level'
-        self.dos = [(each[0]-fermi, each[1]) for each in self.dos]
+        self.dos = [(each[0] - fermi, each[1]) for each in self.dos]
 
-    
     def energies(self, i=None):
-        '''# @param [Fixnum] i 
-           # @return [Float, Array] if i is set, return the energy value of the i-th point.
-           #   if not, return the all energies in DOS object by Array representation.
-           # @param [Fixnum] i 
-           # @return [Float, Array] if i is set, return the energy value of the i-th point.
-           #   if not, return the all energies in DOS object by Array representation.
+        '''
+        :param i:
+        :type i: int
+        :return: the energy value of the i-th point when i set.
+        if arg is null, return the all energies in DOS object.
+        :rtype: np.ndarray
         '''
         if i is None:
             return [each[0] for each in self.dos]
         else:
             return self.dos[i][0]
 
-
     def densities(self, i=None):
-        '''# @param [Fixnum] i 
-           # @return [Array]
+        '''
+        :param i:
+        :type i: int
+        :rtype: numpy.array
         '''
         if i is None:
             return [each[1] for each in self.dos]
         else:
             return self.dos[i][1]
 
-
     def export_csv(self, file, **kwargs):
-        """Export data to file object (or file-like object) as csv format.
+        """
+        Export data to file object (or file-like object) as csv format.
         kwargs are keyword options of csv.writer().
         see help(csv.writer) for detail.
         """
         csvwriter = _csv.writer(file, **kwargs)
         csvwriter.writerows([line[0]] + line[1] for line in self.dos)
 
-    
     def __str__(self):
-        """x.__str__() <=> str(x)
-           # @return [String] returns string representation of DOS object.
-           # csv-like (tab-deliminated) format.
+        """
+        x.__str__() <=> str(x)
+        :return: string representation of DOS object (tab deliminated).
+        :rtype: str
+
         """
         with _StringIO() as stream:
             self.export_csv(stream, delimiter='\t', lineterminator='\n')
@@ -184,9 +185,12 @@ def _filter_dos_data(data):
 
 
 class TDOS(DOS):
-    """# Class for total DOS:
-       # @author Ryuichi Arafune
+
     """
+    Class for total DOS:
+    :author: Ryuichi Arafune
+    """
+
     def __init__(self, array):
         super(TDOS, self).__init__(array)
         if len(self.dos[0][1]) == 2:
@@ -195,7 +199,6 @@ class TDOS(DOS):
             self.header = ("TDOS_up", "intTDOS_up",
                            "TDOS_down", "intTDOS_down")
 
-    
     def export_csv(self, file, **kwargs):
         """Export data to file object (or file-like object) as csv format.
         kwargs are keyword options of csv.writer().
@@ -207,10 +210,13 @@ class TDOS(DOS):
 
 
 class PDOS(DOS):
-    '''# Class for partial DOS
-       # @author Ryuichi Arafune
+
+    '''
+    Class for partial DOS
+    :author: Ryuichi Arafune
     '''
     # attr_accessor :site, :orbital_spin
+
     def __init__(self, array=None, site=None):
         super(PDOS, self).__init__(array)
         self.site = "" if site is None else site
@@ -218,22 +224,22 @@ class PDOS(DOS):
         orbitalname = ("s", "px", "py", "pz", "dxy",
                        "dyz", "dz", "dxz", "dxy2")
         soi = ("mT", "mX", "mY", "mZ")
-        spin = ("up","down")
+        spin = ("up", "down")
         if array is not None:
             flag = len(self.dos[0][1])
             if flag == 9:
                 self.orbital_spin = orbitalname
-            elif flag == 18: # Spin resolved
+            elif flag == 18:  # Spin resolved
                 self.orbital_spin = [
-                    orb+"_"+spn for orb in orbitalname
-                                for spn in spin]
-            elif flag == 36: # SOI
+                    orb + "_" + spn for orb in orbitalname
+                    for spn in spin]
+            elif flag == 36:  # SOI
                 self.orbital_spin = [
-                    orb+"_"+spn for orb in orbitalname
-                                for spn in soi]
+                    orb + "_" + spn for orb in orbitalname
+                    for spn in soi]
             else:
                 self.orbital_spin = []
-    
+
     def __deepcopy__(self, memo):
         "x.__deepcopy__() <-> copy.deepcopy(x)"
         dest = PDOS()
@@ -242,16 +248,16 @@ class PDOS(DOS):
         dest.orbital_spin = _copy.deepcopy(self.orbital_spin, memo)
         return dest
 
-        
     def deepcopy(self):
         return _copy.deepcopy(self)
-    
-    
+
     def __add__(self, other):
         """x.__add__(y) <-> x+y
-        # @param [PDOS] addend
-        #   addend.energies.length must be equal to self.energies.length.
-        # @return [PDOS] 
+        :param addend: addend.energies.length must be equal to
+        self.energies.length.
+        :type addend: PDOS
+        :return: PDOS
+        :rtype: PDOS
         """
         if not isinstance(other, PDOS):
             return NotImplemented
@@ -266,8 +272,7 @@ class PDOS(DOS):
             sumPDOS.site = self.site + other.site
             sumPDOS.orbital_spin = self.orbital_spin
             return sumPDOS
-    
-    
+
     def export_csv(self, file, site=None, **kwargs):
         """Export data to file object (or file-like object) as csv format.
         kwargs are keyword options of csv.writer().
@@ -277,27 +282,28 @@ class PDOS(DOS):
         tmp = ["#energy"]
         for i in self.orbital_spin:
             if site is not None:
-                tmp.append(site+"_"+i)
+                tmp.append(site + "_" + i)
             elif self.site == "":
                 tmp.append(i)
             else:
-                tmp.append(self.site+"_"+i)
+                tmp.append(self.site + "_" + i)
         csvwriter.writerow(tmp)
-        
+
         super(PDOS, self).export_csv(file, **kwargs)
-    
-    
+
     def __str__(self, site=None):
         """x.__str__() <-> str(x)
-        # Returns String representation of PDOS object.
-        # @param [String]  site   Site name to overwrite.
-        # @return [String]  String representation of PDOS object.
+
+        Returns String representation of PDOS object.
+        :param site: Site name to overwrite.
+        :return: String representation of PDOS object.
+        :rtype: str
         """
         with _StringIO() as stream:
             self.export_csv(stream, site=site,
                             delimiter='\t', lineterminator='\n')
             return stream.getvalue()
-        
+
 
 if __name__ == '__main__':
     import argparse
@@ -307,10 +313,9 @@ if __name__ == '__main__':
     _sys.path.append(_path.dirname(_path.abspath(mypath)))
     from outcar import OUTCAR as _OUTCAR
     import tools as _tools
-    
-    #------
+
     parser = argparse.ArgumentParser(
-                    formatter_class=argparse.RawTextHelpFormatter)
+        formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('doscar', metavar='DOSCAR_file')
     parser.add_argument('-o', '--outcar', metavar='OUTCAR_file',
                         nargs='?', default=NotImplemented,
@@ -336,10 +341,9 @@ Use "-" or ","
                         help="""the name of the range identified by --site.
 (ex.) --as layer1
 the name is used in the output filename.""")
-    #-----
-    
+
     args = parser.parse_args()
-    
+
     doscar = DOSCAR(args.doscar)
     atomlist = list()
     if args.outcar is not NotImplemented:
@@ -348,57 +352,57 @@ the name is used in the output filename.""")
         outcar = _OUTCAR(args.outcar)
         atomlist = outcar.atom_names
         args.fermi = outcar.fermi
-    #    
+    #
     if atomlist == []:
-        atomlist.extend("atom"+str(i) for i in range(1, doscar.nAtom+1))
+        atomlist.extend("atom" + str(i) for i in range(1, doscar.nAtom + 1))
     #
     # construct TDOS & PDOS objects
     #
     tmp = doscar.dos_container
     d = [TDOS(tmp.pop(0))]
     #
-    d.extend(PDOS(*each) for each in zip(tmp, atomlist)) # tmp[1:] ?
-    #    
+    d.extend(PDOS(*each) for each in zip(tmp, atomlist))  # tmp[1:] ?
+    #
     if args.atomset is not None:
         if len(args.atomset) == len(args.atomsetname):
             sumPDOSs = list()
             for site, name in zip(args.atomset, args.atomsetname):
                 each = PDOS()
                 for atomNo in site:
-                    #print(repr(each.dos), repr(each.site))
+                    # print(repr(each.dos), repr(each.site))
                     each += d[atomNo]
                 each.site = name
                 sumPDOSs.append(each)
             for summedPDOS in sumPDOSs:
-                filename = summedPDOS.site+".dat"
-                try: # Version safety
+                filename = summedPDOS.site + ".dat"
+                try:  # Version safety
                     file = open(filename, mode='w', newline='')
                 except TypeError:
                     file = open(filename, mode='wb')
                 with file:
                     summedPDOS.export_csv(file, delimiter='\t')
-                    #file.write(str(summedPDOS))
+                    # file.write(str(summedPDOS))
     #
-    try: # Version safety
+    try:  # Version safety
         file = open("total.dat", mode='w', newline='')
     except TypeError:
         file = open("total.dat", mode='wb')
     with file:
         d[0].fermilevel_correction(args.fermi)
         d[0].export_csv(file, delimiter='\t')
-        #file.write(str(d[0]))
+        # file.write(str(d[0]))
     for i, n in zip(d[1:], atomlist):
         i.fermilevel_correction(args.fermi)
         if isinstance(i, PDOS) and i.site == "":
             i.site = n
         filename = n + "_dos.dat"
-        try: # Version safety
+        try:  # Version safety
             file = open(filename, mode='w', newline='')
         except TypeError:
             file = open(filename, mode='wb')
         with file:
             i.export_csv(file, delimiter='\t')
-            #file.write(str(i))
+            # file.write(str(i))
 
 
 """
@@ -436,5 +440,5 @@ in the parallel version if NPAR tex2html_wrap_inline5201 1.
 Mind: For relaxations the DOSCAR is usually useless.
 If you want to get an accurate DOS for the final configuration
 copy CONTCAR to POSCAR and make another static (ISTART=1; NSW=0)
-calculation. 
+calculation.
 """

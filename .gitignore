@@ -1,0 +1,6 @@
+docs
+*.pyc
+build
+install-vaspy.txt
+testPOSCAR
+*.ipynb

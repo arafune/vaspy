@@ -1,40 +1,53 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 
-from __future__ import division, print_function # Version safety
-import re, copy, os, sys
+from __future__ import division, print_function  # Version safety
+import re
+import copy
+import os
+import sys
 
 try:
     from vaspy import poscar, tools
 except ImportError:
     mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
     sys.path.append(os.path.dirname(os.path.abspath(mypath)))
-    import poscar, tools
+    import poscar
+    import tools
 
 
 _re_blank = re.compile(r'^[\s]*$')
 _re_aug_occ = re.compile(r'\baugmentation occupancies')
 
+
 class CHGCAR(poscar.POSCAR):
+
     '''
     class for CHGCAR format
-    @version 1.0.0
-    @note the current verstion does not take account "augmentation occupacies".
 
-     An example of the first few line of the CHGCAR. :
-      hBN-Cu                                  #1st line   @poscar[0]
-      1.00000000000000                        #2nd line   @poscar[1]
-        6.762964    0.000000    0.000000      #3rd line   @poscar[2]
-        3.381482    5.856898    0.000000      #4th line   @poscar[3]
-        0.000000    0.000000   29.004836      #5th line   @poscar[4]
-      B    Cu   N    Si                       #6th line   @poscar[5]
-        7    21     7     6                   #7th line   @poscar[6]
-      Direct                                  #8th line   @poscar[7]
-        0.047680  0.261795  0.361962          #9th line   @poscar[8]
-        ....
+
+     An example of the first few line of the CHGCAR. ::
+
+           hBN-Cu                                  #1st line   @poscar[0]
+           1.00000000000000                        #2nd line   @poscar[1]
+             6.762964    0.000000    0.000000      #3rd line   @poscar[2]
+             3.381482    5.856898    0.000000      #4th line   @poscar[3]
+             0.000000    0.000000   29.004836      #5th line   @poscar[4]
+           B    Cu   N    Si                       #6th line   @poscar[5]
+             7    21     7     6                   #7th line   @poscar[6]
+           Direct                                  #8th line   @poscar[7]
+             0.047680  0.261795  0.361962          #9th line   @poscar[8]
+             ....
+
+    :todo: fit the above description with python style
+    :version: 1.0.0
+    :note: the current verstion does not take account
+           "augmentation occupacies".
+
 '''
     # accessor: chgArray, meshX-Y-Z
+
     def __init__(self, arg=None):
         super(CHGCAR, self).__init__(None)
         self.__meshX = 0
@@ -47,9 +60,9 @@ class CHGCAR(poscar.POSCAR):
 
     def load_from_file(self, chgcarfile):
         '''
-    @param [String] chgcarfile CHGCAR file name
-    @return [CHGCAR]
-'''
+        :param string chgcarfile: CHGCAR file name
+        :return: CHGCAR
+        '''
         section = 'poscar'
         separator = None
         tmp = []
@@ -65,15 +78,16 @@ class CHGCAR(poscar.POSCAR):
                 elif section == 'define_separator':
                     separator = line if separator is None else separator
                     if self.meshX == self.meshY == self.meshZ == 0:
-                        self.__meshX, self.__meshY, self.__meshZ = list(map(int, line.split()))
+                        self.__meshX, self.__meshY, self.__meshZ = \
+                            list(map(int, line.split()))
                     section = 'grid'
                 elif section == 'aug':
                     if re.search(r'#{0}'.format(separator), line):
                         section = 'grid'
                     elif re.search(_re_aug_occ, line):
-                        pass # not implemented
+                        pass  # not implemented
                     else:
-                        pass # not implemented
+                        pass  # not implemented
                 elif section == 'grid':
                     if re.search(_re_aug_occ, line):
                         section = 'aug'
@@ -81,7 +95,9 @@ class CHGCAR(poscar.POSCAR):
                         self.__chgArray.extend(map(float, line.split()))
         if len(self.chgArray) % (self.meshX * self.meshY * self.meshZ) != 0:
             raise RuntimeError('Failed: Construction')
-        self.__spininfo = len(self.chgArray) // (self.meshX * self.meshY * self.meshZ)
+        self.__spininfo = len(self.chgArray) // (self.meshX *
+                                                 self.meshY *
+                                                 self.meshZ)
         if self.spininfo == 1:
             self.__spininfo = [""]
         elif self.spininfo == 2:
@@ -113,29 +129,37 @@ class CHGCAR(poscar.POSCAR):
 
     def magnetization(self, direction=None):
         '''
-  # CHGCAR#magnetization(direction=nil)
-  # @return [CHGCAR] returns CHGCAR of the spin-distribution 
-  #
-  #   For spinpolarized calculations, two sets of data can be found in
-  #   the CHGCAR file. The first set contains the total charge density
-  #   (spin up plus spin down), the second one the magnetization
-  #   density (spin up minus spin down). For non collinear
-  #   calculations the CHGCAR file contains the total charge density
-  #   and the magnetisation density in the x, y and z direction in
-  #   this order.
+        CHGCAR#magnetization(direction=nil)
 
-  # for spinpolarized calculation the argument does not make a sense.
-  # For non collinear CHGCAR direction should be one of 'x', 'y' 'z'
+        For spinpolarized calculations
+        (``ISPIN=2`` but ``LSORBIT=.FALSE.``),
+        two sets of data can be found in the CHGCAR file. The first set
+        contains the total charge density (spin up plus spin down),
+        the second one the magnetization density (spin up minus spin down).
+        For non collinear calculations (``ISPIN=2`` and ``LSORBIT=.TRUE.``)
+        the CHGCAR file contains the total charge density and the
+        magnetisation density in the x, y and z direction in this order.
+
+        For spinpolarized calculation the argument does not make a sense.
+        For non collinear CHGCAR direction should be one of 'x', 'y' 'z'
+
+        :param direction:
+        :type direction: str
+        :return: CHGCAR of the spin-distribution
+        :rtype: CHGCAR
+
 '''
         if len(self.spininfo) == 1:
             raise RuntimeError("This CHGCAR is not spinresolved version")
         destCHGCAR = copy.deepcopy(self)
-        s1, s2, s3, s4 = tools.each_slice(self.chgArray, self.meshX * self.meshY * self.meshZ)
+        s1, s2, s3, s4 = tools.each_slice(self.chgArray,
+                                          self.meshX * self.meshY * self.meshZ)
         if len(self.spininfo) == 2:
             destCHGCAR.__chgArray = list(s2)
             destCHGCAR.__spininfo = ["up-down"]
         elif len(self.spininfo) == 4:
-            if direction is None: direction = 'x'
+            if direction is None:
+                direction = 'x'
             if direction == 'x':
                 destCHGCAR.__chgArray = list(s2)
                 destCHGCAR.__spininfo = ["mX"]
@@ -149,51 +173,65 @@ class CHGCAR(poscar.POSCAR):
 
     def majorityspin(self):
         '''
-  # CHGCAR#majorityspin
-  # @return [CHGCAR] returns CHGCAR for the majority spin charge
-  #   from CHGCAR given by ISPIN=2 but not-SOI calculations.
-  #   According to Dr. Minamitani, the former part of charge 
-  #   distribution corresponds for majority spin + minority spin,
-  #   the latter part for  majority - minority
+        CHGCAR#majorityspin
+
+        From CHGCAR given by ISPIN=2 but not-SOI calculations.
+        According to Dr. Minamitani, the former part of charge
+        distribution corresponds for majority spin + minority spin,
+        the latter part for  majority - minority
+
+        :return: CHGCAR for the majority spin charge
+        :rtype:  CHGCAR
 '''
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         destCHGCAR = copy.deepcopy(self)
-        s1, s2 = tools.each_slice(self.chgArray, self.meshX * self.meshY * self.meshZ)
+        s1, s2 = tools.each_slice(self.chgArray,
+                                  self.meshX * self.meshY * self.meshZ)
         destCHGCAR.__chgArray = [(up + down) / 2 for up, down in zip(s1, s2)]
         destCHGCAR.__spininfo = ["up"]
         return destCHGCAR
 
     def minorityspin(self):
-        '''  # CHGCAR#minorityspin
-  # @return [CHGCAR] returns CHGCAR for the minority  spin charge
-  #   from CHGCAR given by ISPIN=2 but not-SOI calculations.
-  #   According to Dr. Minamitani, the former part of charge 
-  #   distribution corresponds for majority spin + minority spin,
-  #   the latter part for  majority - minority
+        '''
+        CHGCAR#minorityspin
+
+        from CHGCAR given by ISPIN=2 but not-SOI calculations.
+        According to Dr. Minamitani, the former part of charge distribution
+        corresponds for majority spin + minority spin, the latter part for
+        majority - minority
+
+        :return: CHGCAR for the minority  spin charge
+        :rtype: CHGCAR
 '''
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         destCHGCAR = copy.deepcopy(self)
-        s1, s2 = tools.each_slice(self.chgArray, self.meshX * self.meshY * self.meshZ)
+        s1, s2 = tools.each_slice(self.chgArray,
+                                  self.meshX * self.meshY * self.meshZ)
         destCHGCAR.__chgArray = [(up - down) / 2 for up, down in zip(s1, s2)]
         destCHGCAR.__spininfo = ["down"]
         return destCHGCAR
 
     def __add__(self, other):
-        '''x.__add__(y) <=> x + y
-    @param [CHGCAR] other addition CHGCAR object
-    @return [CHGCAR] returns CHGCAR of the result by summing two CHGCARs:
-    @note
-      in the returned CHGCAR :
-      the charge distribution is just summantion of two CHGCARs,
-      and the atoms are also summantion of two CHGCARs.
+        '''
+        x.__add__(y) <=> x + y
+
+        :param CHGCAR: other addition CHGCAR object
+        :return: CHGCAR of the result by summing two CHGCARs:
+        :rtype: CHGCAR
+        :note:
+        in the returned CHGCAR :
+        the charge distribution is just summantion of two CHGCARs,
+        and the atoms are also summantion of two CHGCARs.
 '''
         # augend + aggend
         if not isinstance(other, CHGCAR):
             return NotImplemented
         addCHGCAR = super(CHGCAR, self).__add__(other)
-        if any([self.meshX != other.meshX, self.meshY != other.meshY, self.meshZ != other.meshZ]):
+        if any([self.meshX != other.meshX,
+                self.meshY != other.meshY,
+                self.meshZ != other.meshZ]):
             raise RuntimeError('Mesh sizes are inconsistent')
         augend = self.chgArray
         addend = other.chgArray
@@ -205,50 +243,61 @@ class CHGCAR(poscar.POSCAR):
 
     def __sub__(self, other):
         '''x.__sub__y <=> x - y
-    @param [CHGCAR] other difference CHGCAR object
-    @return [CHGCAR] returns CHGCAR of the result 
-      of difference between two CHGCARs:
-    @note
-      in the returned CHGCAR :
-      the charge distribution is just difference 
-      of two CHGCARs, and the atoms are used 
-      for "munuend" CHGCAR, not difference.  
-      The atoms in subtrahend CHGCAR are totally ignored.
+
+        :param other: difference CHGCAR object
+        :type other: CHGCAR
+        :return: CHGCAR of the result of difference between two CHGCARs:
+        :rtype: CHGCAR
+        :note:  in the returned CHGCAR :
+        the charge distribution is just difference
+        of two CHGCARs, and the atoms are used
+        for "munuend" CHGCAR, not difference.
+        The atoms in subtrahend CHGCAR are totally ignored.
 '''
         # minuend - subtrahend
         if not isinstance(other, CHGCAR):
             return NotImplemented
         diffCHGCAR = copy.deepcopy(self)
-        if any([self.meshX != other.meshX, self.meshY != other.meshY, self.meshZ != other.meshZ]):
+        if any([self.meshX != other.meshX,
+                self.meshY != other.meshY,
+                self.meshZ != other.meshZ]):
             raise RuntimeError('Mesh sizes are incinsistent')
         minuend = self.chgArray
         subtrahend = other.chgArray
         if len(minuend) == len(subtrahend):
-            diffCHGCAR.__chgArray = [x - y for x, y in zip(minuend, subtrahend)]
+            diffCHGCAR.__chgArray = [x - y for x, y in
+                                     zip(minuend, subtrahend)]
         else:
             raise RuntimeError('the mesh sies are different.')
         return diffCHGCAR
 
     def __str__(self):
         '''x.__str__() <=> str(x)
-  # @return [String] return a string representation of CHGCAR.
+
+        :return: a string representation of CHGCAR.
+        :rtype: str
 '''
         outputstring = ''
         tmp = self.chgArray
-        for tmp in tools.each_slice(self.chgArray, self.meshX*self.meshY*self.meshZ):
+        for tmp in tools.each_slice(self.chgArray,
+                                    self.meshX * self.meshY * self.meshZ):
             output = []
-            outputstring += '\n  {0}  {1}  {2}\n'.format(self.meshX, self.meshY, self.meshZ)
+            outputstring += '\n  {0}  {1}  {2}\n'.format(self.meshX,
+                                                         self.meshY,
+                                                         self.meshZ)
             for array in tools.each_slice(tmp, 5):
-                output.append(''.join('  {0:18.11E}'.format(i) for i in array if i is not None))
+                output.append(''.join('  {0:18.11E}'.format(i)
+                                      for i in array if i is not None))
             outputstring += '\n'.join(output)
         return super(CHGCAR, self).__str__() + outputstring + '\n'
 
     def save(self, filename):
         '''
-    @param [String] filename
-    save operated CHGCAR to the file.
+        :param filename: filename
+        :type filename: str
+        save operated CHGCAR to the file.
 '''
-        try: # Version safety
+        try:  # Version safety
             file = open(filename, mode='w', newline='\n')
         except TypeError:
             file = open(filename, mode='wb')
@@ -258,14 +307,15 @@ class CHGCAR(poscar.POSCAR):
 # ------------------------- Main
 if __name__ == '__main__':
     import argparse
-    arg = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+    arg = argparse.ArgumentParser(
+        formatter_class=argparse.RawTextHelpFormatter)
     group = arg.add_mutually_exclusive_group(required=True)
     group.add_argument('--add', action='store_true', default=False,
-                     help="Add two CHGCAR files")
+                       help="Add two CHGCAR files")
     group.add_argument('--diff', action='store_true', default=False,
-                     help="Get difference of two CHGCAR files")
+                       help="Get difference of two CHGCAR files")
     group.add_argument('--spin', metavar='spin_operation',
-                     help="""spin-relatated operation.
+                       help="""spin-relatated operation.
 when this option is set --add, -diff are ignored,
 and CHGCAR_file_2 must not be set.
 spin operation is one of the followings:
@@ -287,7 +337,7 @@ if not specified, use standard output""")
     arg.add_argument('CHGCAR_file_1', type=CHGCAR)
     arg.add_argument('CHGCAR_file_2', type=CHGCAR, nargs='?')
     # if CHGCAR_file_2 is not specified,
-    #*None* is stored in arguments.CHGCAR_file_2, not CHGCAR(None)
+    # *None* is stored in arguments.CHGCAR_file_2, not CHGCAR(None)
     arguments = arg.parse_args()
     #
     if arguments.spin is not None:
@@ -315,9 +365,8 @@ if not specified, use standard output""")
             c = arguments.CHGCAR_file_1 + arguments.CHGCAR_file_2
         else:
             c = arguments.CHGCAR_file_1 - arguments.CHGCAR_file_2
-    # 
+    #
     if arguments.output is not None:
         c.save(arguments.output)
     else:
         print(c)
-
