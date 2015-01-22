@@ -562,7 +562,7 @@ class POSCAR(object):
         else:
             ###
             print('line is not correct')
-        return self.postion
+        return self.position
 
     def translate_all(self, vector):
         '''
