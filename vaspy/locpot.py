@@ -60,9 +60,30 @@ LOCPOT format is essentially same as CHGCAR but simpler.
                 elif section == 'grid':
                     line = line.rstrip('\n')
                     self.__potlist.extend(map(np.float64, line.split()))
-            self.__potarray = np.array(self.__potlist).reshape(
-                self.meshZ, self.meshY, self.meshX)
-
+            print(len(self.__potlist))
+            if len(self.__potlist) == self.meshX * self.meshY * self.meshZ: 
+                self.__potarray = np.array(self.__potlist).reshape(
+                    self.meshZ, self.meshY, self.meshX)
+            elif len(self.__potlist) == 2 * (self.meshX *
+            self.meshY * self.meshZ) + 3 + sum(self.ionnums):  # LVHAR
+                self.__potarray = np.array(
+                    self.__potlist[:self.meshX *
+                                   self.meshY *
+                                   self.meshZ]).reshape(self.meshZ,
+                                                        self.meshY,
+                                                        self.meshX)
+                self.__potarray2 = np.array(
+                    self.__potlist[self.meshX *
+                                   self.meshY *
+                                   self.meshZ : self.meshX *
+                                   self.meshY *
+                                   self.meshZ + sum(self.ionnums)])
+                self.__potarray3 = np.array(
+                    self.__potlist[- self.meshX *
+                                   self.meshY *
+                                   self.meshZ:]).reshape(self.meshZ,
+                                                          self.meshY,
+                                                          self.meshX)
     @property
     def meshX(self):
         return self.__meshX
@@ -82,6 +103,14 @@ LOCPOT format is essentially same as CHGCAR but simpler.
     @property
     def potarray(self):
         return self.__potarray
+
+    @property
+    def potarray3(self):
+        return self.__potarray2
+
+    @property
+    def potarray2(self):
+        return self.__potarray3
 
     def get_mesh(self):
         return self.__meshX, self.__meshY, self.__meshZ
