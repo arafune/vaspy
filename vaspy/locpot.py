@@ -140,7 +140,7 @@ LOCPOT format is essentially same as CHGCAR but simpler.
             raise RuntimeError("invalid pottype option")
         return pot
 
-    def max_along_axis(self, axis_name, pottype='former'):
+    def min_along_axis(self, axis_name, pottype='former'):
         axis_name = axis_name.capitalize()
         if pottype == 'former':
             if axis_name == 'X':
@@ -164,7 +164,7 @@ LOCPOT format is essentially same as CHGCAR but simpler.
             raise RuntimeError("invalid pottype option")
         return pot
 
-    def min_along_axis(self, axis_name, pottype='former'):
+    def max_along_axis(self, axis_name, pottype='former'):
         axis_name = axis_name.capitalize()
         if pottype == 'former':
             if axis_name == 'X':
