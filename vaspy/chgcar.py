@@ -82,18 +82,24 @@ class CHGCAR(poscar.POSCAR):
                             list(map(int, line.split()))
                     section = 'grid'
                 elif section == 'aug':
-                    if re.search(r'#{0}'.format(separator), line):
+                    if separator in line:
                         section = 'grid'
-                    elif re.search(_re_aug_occ, line):
+                    elif "augmentation occupancies " in line:
                         pass  # not implemented
                     else:
                         pass  # not implemented
                 elif section == 'grid':
-                    if re.search(_re_aug_occ, line):
+                    if "augmentation occupancies " in line:
                         section = 'aug'
+                    elif separator in line:
+                        pass
                     else:
                         self.__chgArray.extend(map(float, line.split()))
         if len(self.chgArray) % (self.meshX * self.meshY * self.meshZ) != 0:
+            print(len(self.chgArray), ": Should be ",
+                  self.meshX * self.meshY * self.meshZ, "x 1, 2, 4")
+            print(len(self.chgArray) % (self.meshX * self.meshY * self.meshZ),
+                  ": Should be zero")
             raise RuntimeError('Failed: Construction')
         self.__spininfo = len(self.chgArray) // (self.meshX *
                                                  self.meshY *
