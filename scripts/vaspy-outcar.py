@@ -26,7 +26,7 @@ parser.add_argument("-Z", "--forcez", action="store_true",
                     help="Force along Z-axis", default=False)
 parser.add_argument("--site", type=tools.parse_AtomselectionNum,
                     help="""numbers deliminated by comma and hyphen
-for SITE you want to see""")
+for SITE you want to see.  If not specified, all atoms are selected""")
 parser.add_argument("outcarfiles", type=OUTCAR, nargs="+", metavar="OUTCAR",
                     help="OUTCAR_file(s)")
 parser.add_argument("--plot", action="store_true", default=False,
@@ -42,6 +42,9 @@ if not any(pff):
     pff = [True] * 6
 
 outcar = args.outcarfiles.pop(0)
+if args.site == None:
+    args.site = list(range(1, outcar.nions + 1))
+
 headers = outcar.select_posforce_header(pff, args.site)
 posforce = outcar.select_posforce(pff, args.site)
 for outcar in args.outcarfiles:
