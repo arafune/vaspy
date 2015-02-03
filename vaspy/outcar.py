@@ -35,9 +35,19 @@ class OUTCAR(object):  # Version safety
         """
         build atom_names (the list of atomname_with_index) property
         """
-        self.atom_names = [elm + str(j) for
-                           (elm, n) in zip(self.iontype, self.ionnums)
-                           for j in range(1, n + 1)]
+        self.atom_names = []
+        for elm, n in zip(self.iontype, self.ionnums):
+            for j in range(1, n + 1):
+                tmp = elm + str(j)
+                if tmp not in self.atom_names:
+                    self.atom_names.append(tmp)
+                else:
+                    #                    jj = j
+                    while tmp in self.atom_names:
+                        j = j + 1
+                        tmp = elm + str(j)
+                    else:
+                        self.atom_names.append(tmp)
         return self.atom_names
 
     def set_posforce_title(self):
