@@ -221,8 +221,9 @@ class PDOS(DOS):
         super(PDOS, self).__init__(array)
         self.site = "" if site is None else site
         self.orbital_spin = list()
-        orbitalname = ["s", "px", "py", "pz", "dxy",
-                       "dyz", "dz", "dxz", "dxy2"]
+        orbitalname = ["s", "py", "pz", "px", "dxy", "dyz", "dz2",
+                       "dxz", "dx2"]
+        # this order above is refered from sphpro.F of vasp source
         soi = ("mT", "mX", "mY", "mZ")
         spin = ("up", "down")
         spininfo = None
