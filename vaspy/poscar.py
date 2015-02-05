@@ -330,7 +330,7 @@ class POSCAR(object):
         :param center: center position for rotation.
         :type site: int
         :type axis_name: str
-        :type theat: float
+        :type theta: float
         :type center: np.array, list, tuple
         :todo:  check the center in the Braves lattice.
         :todo:  take into account the periodic boundary.
@@ -363,7 +363,7 @@ class POSCAR(object):
         :param center: center position for rotation.
         (Does `Vector` class exists in python?)
         :type site_list_pack: list, tuple
-        :type theat: float
+        :type theta: float
         :type axis_name: str
         :type center: np.array, list, tuple
 '''
@@ -477,7 +477,7 @@ class POSCAR(object):
         '''changes scaling factor to new value.
 
         :param float new_scaling_factor:
-        :note:  **The Braves lattice are corrected (to be equal size).**
+        :note:  **The Braves lattice are corrected (to be equal size)**
 '''
         old = self.scaling_factor
         self.__latticeV1 *= (old / new_scaling_factor)
@@ -491,7 +491,7 @@ class POSCAR(object):
     def to_Cartesian(self):
         '''changes the coordinate to cartesian from direct.
 
-        :return: true if POSCAR file is cartesian coordinate
+        :return: True if POSCAR file is cartesian coordinate
         :rtype: Boolean
 '''
         if self.is_direct:
@@ -610,6 +610,13 @@ class POSCAR(object):
             file.write(str(self))
 
     def point_in_box(self, point, l1, l2, l3):
+        '''Return True if point is located in the box defined by three vectors
+        l1, l2, and l3
+        :param point: vecotr representing the "point"
+        :type point: numpy.ndarray, numpy.matrix, list, tuple
+        :param l1, l2, l3: vector representing the "box"
+        :type l1, l2, l3: numpy.ndarray, numpy.matrix, list, tuple
+        '''
         x0, y0, z0 = _vectorize(point).flatten()
         x1, y1, z1 = _vectorize(l1).flatten()
         x2, y2, z2 = _vectorize(l2).flatten()
