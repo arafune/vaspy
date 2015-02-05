@@ -371,6 +371,33 @@ class POSCAR(object):
             for site in site_list:
                 self.atom_rotate(site, axis_name, theta, center)
 
+    def cell_rotate(self, theta, axis_name='Z'):
+        '''Cell rotation (rotation angle is set by degree.)
+        :param theta: rotation angle
+        :type theta: float
+        :param axis_name: axis name for rotation (x, y, or z)
+        :type axis_name: str
+        :return: None'''
+        original_is_cartesian = False
+        if self.is_cartesian:
+            original_is_cartesian = True
+            self.to_Direct()
+        axis_name = axis_name.capitalize()
+        if axis_name == 'X':
+            self.__latticeV1 = np.dot(self.rotateX(theta), self.latticeV1)
+            self.__latticeV2 = np.dot(self.rotateX(theta), self.latticeV2)
+            self.__latticeV3 = np.dot(self.rotateX(theta), self.latticeV3)
+        elif axis_name == 'Y':
+            self.__latticeV1 = np.dot(self.rotateY(theta), self.latticeV1)
+            self.__latticeV2 = np.dot(self.rotateY(theta), self.latticeV2)
+            self.__latticeV3 = np.dot(self.rotateY(theta), self.latticeV3)
+        elif axis_name == 'Z':
+            self.__latticeV1 = np.dot(self.rotateZ(theta), self.latticeV1)
+            self.__latticeV2 = np.dot(self.rotateZ(theta), self.latticeV2)
+            self.__latticeV3 = np.dot(self.rotateZ(theta), self.latticeV3)
+        if original_is_cartesian:
+            self.to_Cartesian()
+
     def __add__(self, other):
         '''
         :param other:
