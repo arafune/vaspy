@@ -445,6 +445,33 @@ class POSCAR(object):
 
         return destPOSCAR
 
+    def merge(self, other):
+        '''lazy __add__
+
+        Even if the cell vectors and scaling factors are different,
+        the 'merged' POSCAR is created.
+        Use the cell vectors of the first POSCAR.
+        '''
+        if not isinstance(other, POSCAR):
+            return NotImplemented
+        destPOSCAR = copy.deepcopy(self)
+        original_is_direct = False
+        if destPOSCAR.is_direct:
+            original_is_direct = True
+            destPOSCAR.to_Cartesian()
+        otherPOSCAR = copy.deepcopy(other)
+        original_scaling_factor = destPOSCAR.scaling_factor
+        otherPOSCAR.tune_scaling_factor(original_scaling_factor)
+        otherPOSCAR.to_Cartesian()
+        destPOSCAR.iontype.extend(other.iontype)
+        destPOSCAR.ionnums.extend(other.ionnums)
+        destPOSCAR.position.extend(other.position)
+        destPOSCAR.coordinate_changeflags.extend(other.coordinate_changeflags)
+        destPOSCAR.atom_identifer
+        if original_is_direct:
+            destPOSCAR.to_Direct()
+        return destPOSCAR
+
     def to_list(self):
         '''
         :return: a list representation of POSCAR.
