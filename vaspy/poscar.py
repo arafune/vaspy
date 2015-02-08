@@ -573,9 +573,9 @@ class POSCAR(object):
         '''
         translates the selected atom(s) by vector
 
-        :param vector: translational vector
+        :param vector: translational vector (in Cartesian frame)
         :param atomlist: list of the atom for moving
-        :type vector: list, tuple, np.array
+        :type vector: list, tuple, numpy.array
         :type atomlist: list
         :note: the first atom is "1", not "0".
         :return: position
@@ -587,8 +587,12 @@ class POSCAR(object):
                 self.position[i - 1] = (self.position[i - 1] +
                                         vector / self.scaling_factor)
         else:
-            ###
-            print('line is not correct')
+            vector = _vectorize(vector)
+            self.to_Cartesian()
+            for i in atomlist:
+                self.position[i - 1] = (self.position[i - 1] +
+                                        vector / self.scaling_factor)
+            self.to_Direct()
         return self.position
 
     def translate_all(self, vector):
@@ -596,7 +600,7 @@ class POSCAR(object):
         translates **all** atoms by vector
 
         :param vector: translational vector
-        :type vector: list, np.array
+        :type vector: list, numpy.array
 '''
         atomrange = list(range(1, sum(self.ionnums) + 1))
         self.translate(vector, atomrange)
