@@ -398,6 +398,25 @@ class POSCAR(object):
         if original_is_cartesian:
             self.to_Cartesian()
 
+    def repack_in_cell(self):
+        '''Repack all atoms in the unit cell
+
+        (No negative values in DIRECT coordinate.)
+        '''
+        original_is_cartesian = False
+        if self.is_cartesian:
+            original_is_cartesian = True
+            self.to_Direct
+        for pos in self.position:
+            for i in (0, 1, 2):
+                while pos[i] < 0.0 or pos[i] > 1.0:
+                    if pos[i] < 0.0:
+                        pos[i] += 1.0
+                    elif pos[i] > 1.0:
+                        pos[i] -= 1.0
+        if original_is_cartesian:
+            self.to_Cartesian()
+
     def __add__(self, other):
         '''
         :param other:
