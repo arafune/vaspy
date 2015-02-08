@@ -406,7 +406,7 @@ class POSCAR(object):
         original_is_cartesian = False
         if self.is_cartesian:
             original_is_cartesian = True
-            self.to_Direct
+            self.to_Direct()
         for pos in self.position:
             for i in (0, 1, 2):
                 while pos[i] < 0.0 or pos[i] > 1.0:
