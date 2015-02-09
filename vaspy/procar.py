@@ -209,6 +209,7 @@ class BandStructure(object):
     The "Band structure" object deduced from PROCAR file.
 
     :class variables: kvectors, energies, states, spin, orb_names
+
     Finally, Band, Orbital, State classes can be removed ?
     '''
 
@@ -375,8 +376,8 @@ class BandStructure(object):
         '''make sitecomposed ndarray
 
         When sitecomposed ndarray has elements, the values remain.
-        :param arg: a list (tuple, set) describes the site to be composed.
-        it contains unique numbers.
+
+        :param arg: a list (tuple, set) describes the site to be composed. it contains unique numbers.
         :type arg: list, tuple, set
         '''
         # the element of site_number_list must be unique.

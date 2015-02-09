@@ -317,11 +317,11 @@ class POSCAR(object):
     # class method? or independent function?
     def nearest(self, array, point):
         '''
+
         :param array:
         :param point:
         :type array: list
         :type point: np.array
-        :return: np.array
         :rtype: np.array
 '''
         return min(array, key=lambda pos: np.linalg.norm(pos - point))
@@ -329,10 +329,11 @@ class POSCAR(object):
     # class method? or independent function?
     def make27candidate(self, position):
         '''
-        :param position: atom position defined in the coordinated
-        by latticeV1, latticeV2, latticeV3 ( scaling facter is not accounted).
+
+        :param position: atom position defined in the coordinated by latticeV1, latticeV2, latticeV3 ( scaling facter is not accounted).
         :param type: np.array, list
-        :return: list-of-np.array
+        :return: list of np.array
+        :rtype: list 
 '''
         position = _vectorize(position)
         candidates27 = []
@@ -386,8 +387,7 @@ class POSCAR(object):
     def atoms_rotate(self, site_list_pack, axis_name, theta, center):
         '''Rotate atoms
 
-        :param site_list_pack: list array of the  list array
-        (not typo!) of site for rotation   (The first atom is "1".).
+        :param site_list_pack: list array of the  list array (not typo!) of site for rotation   (The first atom is "1".).
         :param axis_name: "X", "x", "Y", "y", "Z",or "z". Rotation axis.
         :param theta: Rotation angle (Degrees).
         :param center: center position for rotation.
@@ -482,9 +482,11 @@ class POSCAR(object):
         Even if the cell vectors and scaling factors are different,
         the 'merged' POSCAR is created.
         Use the cell vectors of the first POSCAR.
-        :param other:
+
+        :param other: POSCAR object
         :type other:  POSCAR
-        :return: POSCAR
+        :return: added poscar object
+        :rtype: POSCAR
         '''
         if not isinstance(other, POSCAR):
             return NotImplemented
@@ -639,8 +641,7 @@ class POSCAR(object):
         return molecule
 
     def guess_molecule2(self, site_list):
-        '''
-        arranges atom position to form a molecule.  poscar updates
+        '''Arranges atom position to form a molecule.  poscar updates
 
         :param site_list: list of site number
         :type site_list: list
@@ -653,7 +654,7 @@ class POSCAR(object):
         '''Translate the selected atom(s) by vector
 
         :param vector: translational vector (in Cartesian frame)
-        :param atomlist: list of the atom for moving
+        :param atomlist: list of the atom to be moved
         :type vector: list, tuple, numpy.array
         :type atomlist: list
         :note: the first atom is "1", not "0".
@@ -694,10 +695,12 @@ class POSCAR(object):
     def point_in_box(self, point, l1, l2, l3):
         '''Return True if point is located in the box defined by three vectors
         l1, l2, and l3
+
         :param point: vecotr representing the "point"
         :type point: numpy.ndarray, numpy.matrix, list, tuple
         :param l1, l2, l3: vector representing the "box"
         :type l1, l2, l3: numpy.ndarray, numpy.matrix, list, tuple
+        :rtype: Boolean
         '''
         x0, y0, z0 = _vectorize(point).flatten()
         x1, y1, z1 = _vectorize(l1).flatten()

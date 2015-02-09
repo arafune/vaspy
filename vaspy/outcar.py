@@ -13,10 +13,10 @@ import re
 
 class OUTCAR(object):  # Version safety
 
-    """
-    Author: Ryuichi Arafune
-    python class for OUTCAR file.
+    """python class for OUTCAR file.
     Extract calculation details and/or calculation progress
+
+    :Author: Ryuichi Arafune
     """
 
     def __init__(self, arg=None):
@@ -32,8 +32,7 @@ class OUTCAR(object):  # Version safety
             self.load_from_file(arg)
 
     def set_atom_names(self):
-        """
-        build atom_names (the list of atomname_with_index) property
+        """ build atom_names (the list of atomname_with_index) property
         """
         self.atom_names = []
         for elm, n in zip(self.iontype, self.ionnums):
@@ -51,8 +50,7 @@ class OUTCAR(object):  # Version safety
         return self.atom_names
 
     def set_posforce_title(self):
-        """
-        build posforce_title property
+        """build posforce_title property
         """
         self.set_atom_names()
         self.posforce_title = [[i + "_x",
@@ -64,8 +62,7 @@ class OUTCAR(object):  # Version safety
                                for i in self.atom_names]
 
     def load_from_file(self, arg):
-        """
-        Effectively, this is a constructor of OUTCAR object.
+        """Effectively, this is a constructor of OUTCAR object.
         arg is the file object of "OUTCAR"
         """
         # local variables
@@ -128,8 +125,7 @@ class OUTCAR(object):  # Version safety
 # correct?
 
     def select_posforce(self, posforce_flag, *sites):
-        """
-        posforce_flag: An 6-element True/False list that indicates the output
+        """posforce_flag: An 6-element True/False list that indicates the output
         [True, True, False, True, True, False]
         Return the posforce corresponding the posforce_flag
         """

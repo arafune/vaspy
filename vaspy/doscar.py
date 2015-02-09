@@ -93,7 +93,7 @@ class DOS(object):  # Version safety
     def append(self, dos_data):
         '''
         :param dos_data: dos_data
-        :rtype dos_data: np.array
+        :type dos_data: np.array
         '''
         self.dos.append(_filter_dos_data(dos_data))
 
