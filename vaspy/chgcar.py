@@ -29,15 +29,15 @@ class CHGCAR(poscar.POSCAR):
 
      An example of the first few line of the CHGCAR. ::
 
-           hBN-Cu                                  #1st line   @poscar[0]
-           1.00000000000000                        #2nd line   @poscar[1]
-             6.762964    0.000000    0.000000      #3rd line   @poscar[2]
-             3.381482    5.856898    0.000000      #4th line   @poscar[3]
-             0.000000    0.000000   29.004836      #5th line   @poscar[4]
-           B    Cu   N    Si                       #6th line   @poscar[5]
-             7    21     7     6                   #7th line   @poscar[6]
-           Direct                                  #8th line   @poscar[7]
-             0.047680  0.261795  0.361962          #9th line   @poscar[8]
+           hBN-Cu                                  #1st line   poscar.POSCAR[0]
+           1.00000000000000                        #2nd line   poscar.POSCAR[1]
+             6.762964    0.000000    0.000000      #3rd line   poscar.POSCAR[2]
+             3.381482    5.856898    0.000000      #4th line   poscar.POSCAR[3]
+             0.000000    0.000000   29.004836      #5th line   poscar.POSCAR[4]
+           B    Cu   N    Si                       #6th line   poscar.POSCAR[5]
+             7    21     7     6                   #7th line   poscar.POSCAR[6]
+           Direct                                  #8th line   poscar.POSCAR[7]
+             0.047680  0.261795  0.361962          #9th line   poscar.POSCAR[8]
              ....
 
     :todo: fit the above description with python style
@@ -59,9 +59,10 @@ class CHGCAR(poscar.POSCAR):
             self.load_from_file(arg)
 
     def load_from_file(self, chgcarfile):
-        '''
-        :param string chgcarfile: CHGCAR file name
-        :return: CHGCAR
+        '''Parse CHGCAR file to make CHGCAR object
+
+        :param chgcarfile: CHGCAR file name
+        :type chgcarfile: str
         '''
         section = 'poscar'
         separator = None
@@ -142,14 +143,14 @@ class CHGCAR(poscar.POSCAR):
         two sets of data can be found in the CHGCAR file. The first set
         contains the total charge density (spin up plus spin down),
         the second one the magnetization density (spin up minus spin down).
-        For non collinear calculations (``ISPIN=2`` and ``LSORBIT=.TRUE.``)
+        For non collinear calculations (``ISPIN=2`` and ``LSORBIT=.TRUE.``),
         the CHGCAR file contains the total charge density and the
         magnetisation density in the x, y and z direction in this order.
 
         For spinpolarized calculation the argument does not make a sense.
         For non collinear CHGCAR direction should be one of 'x', 'y' 'z'
 
-        :param direction:
+        :param direction: specify x, y, or z in noncollinear calculation
         :type direction: str
         :return: CHGCAR of the spin-distribution
         :rtype: CHGCAR
@@ -180,10 +181,9 @@ class CHGCAR(poscar.POSCAR):
         return destCHGCAR
 
     def majorityspin(self):
-        '''
-        CHGCAR#majorityspin
+        '''Return CHGCAR for majority spin
 
-        From CHGCAR given by ISPIN=2 but not-SOI calculations.
+        From CHGCAR given by ``ISPIN=2`` but not-SOI calculations.
         According to Dr. Minamitani, the former part of charge
         distribution corresponds for majority spin + minority spin,
         the latter part for  majority - minority
@@ -201,10 +201,9 @@ class CHGCAR(poscar.POSCAR):
         return destCHGCAR
 
     def minorityspin(self):
-        '''
-        CHGCAR#minorityspin
+        '''Return CHGCAR for minority spin
 
-        from CHGCAR given by ISPIN=2 but not-SOI calculations.
+        From CHGCAR given by ``ISPIN=2`` but not-SOI calculations.
         According to Dr. Minamitani, the former part of charge distribution
         corresponds for majority spin + minority spin, the latter part for
         majority - minority
@@ -300,10 +299,10 @@ class CHGCAR(poscar.POSCAR):
         return super(CHGCAR, self).__str__() + outputstring + '\n'
 
     def save(self, filename):
-        '''
-        :param filename: filename
+        '''Save CHGCAR object as CHGCAR file style
+
+        :param filename: file name
         :type filename: str
-        save operated CHGCAR to the file.
 '''
         try:  # Version safety
             file = open(filename, mode='w', newline='\n')
