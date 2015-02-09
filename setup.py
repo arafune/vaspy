@@ -8,7 +8,7 @@ if sys.hexversion <= 0x20600f0 or 0x30000f0 <= sys.hexversion < 0x30200f0:
     reqpkgs.append('argparse')
 
 setup(name='VASPy',
-      version='1.1.0b',
+      version='1.2.0',
       author='Mao Kanno',
       author_email='0643839020@mail.ecc.u-tokyo.ac.jp',
       description='VASP postprocessing scripts',

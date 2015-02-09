@@ -272,6 +272,9 @@ class POSCAR(object):
         :type theta: float
         :return: rotation matrix
         :rtype: np.array
+
+        :Example:
+
         >>> t = POSCAR()
         >>> t.rotateX(60)
         array([[ 1.       ,  0.       ,  0.       ],
@@ -287,6 +290,8 @@ class POSCAR(object):
     def rotateY(self, theta):
         '''Rotation matrix around Y-axis
 
+        :Example:
+
         >>> t = POSCAR()
         >>> t.rotateY(60)
         array([[ 0.5      ,  0.       ,  0.8660254],
@@ -301,6 +306,8 @@ class POSCAR(object):
 
     def rotateZ(self, theta):
         '''Rotation matrix around Z-axis
+
+        :Example:
 
         >>> t = POSCAR()
         >>> t.rotateZ(60)
@@ -391,11 +398,12 @@ class POSCAR(object):
         :param axis_name: "X", "x", "Y", "y", "Z",or "z". Rotation axis.
         :param theta: Rotation angle (Degrees).
         :param center: center position for rotation.
-        (Does `Vector` class exists in python?)
         :type site_list_pack: list, tuple
         :type theta: float
         :type axis_name: str
         :type center: np.array, list, tuple
+
+        .. note:: Does `Vector` class exists in python?
 '''
         for site_list in site_list_pack:
             for site in site_list:
@@ -432,7 +440,7 @@ class POSCAR(object):
     def repack_in_cell(self):
         '''Repack all atoms in the unit cell
 
-        (No negative values in DIRECT coordinate.)
+        No negative values in DIRECT coordinate.
         '''
         original_is_cartesian = False
         if self.is_cartesian:
@@ -557,10 +565,12 @@ class POSCAR(object):
         return '\n'.join(tmp) + '\n'
 
     def tune_scaling_factor(self, new_scaling_factor=1.0):
-        '''Change scaling factor to new value.
+        '''Change scaling factor to new value
 
-        :param float new_scaling_factor:
-        :note:  **The Braves lattice are corrected (to be equal size)**
+        :param new_scaling_factor:
+        :type new_scaling_factor: float  
+
+        ..note::  **The Braves lattice are corrected (to be equal size)**
 '''
         old = self.scaling_factor
         self.__latticeV1 *= (old / new_scaling_factor)
@@ -572,7 +582,7 @@ class POSCAR(object):
                              for i in self.position]
 
     def to_Cartesian(self):
-        '''Change the coordinate to cartesian from direct.
+        '''Change the coordinate to cartesian from direct
 
         :return: True if POSCAR file is cartesian coordinate
         :rtype: Boolean
@@ -641,7 +651,9 @@ class POSCAR(object):
         return molecule
 
     def guess_molecule2(self, site_list):
-        '''Arranges atom position to form a molecule.  poscar updates
+        '''Arranges atom position to form a molecule.  
+
+        poscar updates
 
         :param site_list: list of site number
         :type site_list: list
@@ -693,13 +705,18 @@ class POSCAR(object):
             file.write(str(self))
 
     def point_in_box(self, point, l1, l2, l3):
-        '''Return True if point is located in the box defined by three vectors
-        l1, l2, and l3
+        '''Return True if point is located in the box
 
-        :param point: vecotr representing the "point"
+        .. note:: The box is defined by three vectors (l1, l2, and l3)
+
+        :param point: vector representing the "point"
         :type point: numpy.ndarray, numpy.matrix, list, tuple
-        :param l1, l2, l3: vector representing the "box"
-        :type l1, l2, l3: numpy.ndarray, numpy.matrix, list, tuple
+        :param l1: vector representing the "box"
+        :param l2: vector representing the "box"
+        :param l3: vector representing the "box"
+        :type l1: numpy.ndarray, numpy.matrix, list, tuple
+        :type l2: numpy.ndarray, numpy.matrix, list, tuple
+        :type l3: numpy.ndarray, numpy.matrix, list, tuple
         :rtype: Boolean
         '''
         x0, y0, z0 = _vectorize(point).flatten()
