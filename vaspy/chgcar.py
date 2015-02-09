@@ -158,12 +158,14 @@ class CHGCAR(poscar.POSCAR):
         if len(self.spininfo) == 1:
             raise RuntimeError("This CHGCAR is not spinresolved version")
         destCHGCAR = copy.deepcopy(self)
-        s1, s2, s3, s4 = tools.each_slice(self.chgArray,
-                                          self.meshX * self.meshY * self.meshZ)
         if len(self.spininfo) == 2:
+            s1, s2 = tools.each_slice(self.chgArray,
+                                      self.meshX * self.meshY * self.meshZ)
             destCHGCAR.__chgArray = list(s2)
             destCHGCAR.__spininfo = ["up-down"]
         elif len(self.spininfo) == 4:
+            s1, s2, s3, s4 = tools.each_slice(self.chgArray,
+                                              self.meshX * self.meshY * self.meshZ)
             if direction is None:
                 direction = 'x'
             if direction == 'x':
