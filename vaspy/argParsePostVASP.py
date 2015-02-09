@@ -12,10 +12,12 @@ ArgumentParser class ''' + argparse.ArgumentParser.__doc__
     def parse_Atomselection(self, l):
         '''Return list of ordered "String" represents the number
 
-        :param l: String for the range of the ions (deliminator: "-" or ",")
+        :param l: Range of the ions (deliminator is "-" or ",")
         :type l: str
-        :return: list of the ordered "String" represents the number.
+        :return: list of the ordered 'string' that represents the number.
         :rtype: list
+
+        :Example:
 
         >>> a = APPV()
         >>> a.parse_Atomselection("1-5,8,9,11-15")
@@ -37,10 +39,12 @@ ArgumentParser class ''' + argparse.ArgumentParser.__doc__
         '''Very similar with parse_Atomselection but returns the array
         of the number not array of the string.
 
-        :param l: String for the range of the ions (deliminator: "-" or ",")
+        :param l: Range of the ions (deliminator is "-" or ",")
         :type l: str
-        :return: list of the ordered 'integer' represents the number.
+        :return: list of the ordered 'integer' that epresents the number.
         :rtype: list
+
+        :Example:
 
         >>> a = APPV()
         >>> a.parse_AtomselectionNum("1-5,8,9,11-15")
