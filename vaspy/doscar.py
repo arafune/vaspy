@@ -18,9 +18,9 @@ else:
 class DOSCAR(object):  # Version safety
 
     '''class for DOSCAR file
-       :author: Ryuichi Arafune
+
+    :author: Ryuichi Arafune
     '''
-    # attr_accessor :nAtom, :dos_container
 
     def __init__(self, arg=None):
         self.nAtom = 0
@@ -31,9 +31,11 @@ class DOSCAR(object):  # Version safety
             self.load_from_file(arg)
 
     def load_from_file(self, doscar_file):
-        """
-        :param doscar_file: doscar_file file name of "DOSCAR"
+        """Parse DOSCAR file to create dos_container
+
+        :param doscar_file: file name of "DOSCAR"
         :type doscar_file: str
+        :rtype: DOSCAR
         """
         with open(doscar_file) as f:
             separate_text = ""
@@ -55,20 +57,20 @@ class DOSCAR(object):  # Version safety
                         aDOS.append([float(i) for i in line.split()])
             else:
                 self.dos_container.append(aDOS)
+                return self.dos_container.append(aDOS)
 
 
 class DOS(object):  # Version safety
 
     '''Class for DOS
 
-    attribute : dos
-    Array object.  that consists arrays of two elements.
+    list object consisting list of two elements.
     the first element is the float representing the energy.
     the other element is still array that contains the density.
 
     :author: Ryuichi Arafune
+    :attribute: dos
     '''
-    # attr_accessor :dos
 
     def __init__(self, array=None):
         self.dos = list()
@@ -188,7 +190,8 @@ def _filter_dos_data(data):
 class TDOS(DOS):
 
     """
-    Class for total DOS:
+    Class for total DOS
+
     :author: Ryuichi Arafune
     """
 
@@ -214,6 +217,7 @@ class PDOS(DOS):
 
     '''
     Class for partial DOS
+
     :author: Ryuichi Arafune
     '''
 
@@ -262,6 +266,7 @@ class PDOS(DOS):
 
     def plot_dos(self, orbitals, fermi=0.0):
         """plot DOS spectra with matplotlib.pyplot
+
         :param orbitals: orbital name
         :type orbitals: str
         """
@@ -272,6 +277,7 @@ class PDOS(DOS):
 
     def __add__(self, other):
         """x.__add__(y) <-> x+y
+
         :param addend: addend.energies.length must be equal to
         self.energies.length.
         :type addend: PDOS

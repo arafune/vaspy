@@ -30,20 +30,22 @@ class PROCAR(object):  # Version safety
 
     .. py:class:: PROCAR(object)
 
-    PROCAR consists of these lines.  Appeer once per file.
+    PROCAR consists of these lines.  Appear once per file.
 
-    1. # the first line
-     ex.)   PROCAR lm decomposed + phase
+    1. the first line
+      ex.)   PROCAR lm decomposed + phase
     2. set number of k-points, bands and ions.
-    Appear once when spin-integrated, twice when spin-resolved.
-    ex.)   # of k-points:   50         # of bands: 576         # of ions:  98
+      Appear once when spin-integrated, twice when spin-resolved.
+
+      ex.)   # of k-points:   50         # of bands: 576         # of ions:  98
     3.  k-point character
-    ex.)  k-point    1 :    0.00000 0.00000 0.00000 weight = 0.02000000
-    note that the first character is "blank".
+      ex.)  k-point    1 :    0.00000 0.00000 0.00000 weight = 0.02000000
+
+      note that the first character is "blank".
     4. band character
-    ex.)  band   1 # energy  -11.87868466 # occ.  2.00000000
+      ex.)  band   1 # energy  -11.87868466 # occ.  2.00000000
     5. orbital contribution.
-    ex.)1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
+      ex.)1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
 
     :author: Ryuichi Arafune
     '''
@@ -510,8 +512,7 @@ class BandStructure(object):
 
         :param arg: name of (composed) orbital
         :type arg: str
-        :returns: tuple of the number corresponding to the (composed)
-        orbital name.
+        :returns: number corresponding to (composed) orbital name.
         :rtype: tuple
         '''
         orbname = self.check_orb_name(arg)
@@ -595,7 +596,7 @@ class BandStructure(object):
 
         :param sitenames: site names e.g., 'Ag', 'Graphene', '2ndLayer'...
         :type sitenames: tuple, list
-        :orbnames: orbital names e.g., (('s', 'pxpy',), ('pxpy', 'p'))
+        :param orbnames: orbital names e.g., (('s', 'pxpy',), ('pxpy', 'p'))
         :type orbnames: tuple, list
         '''
         if len(sitenames) != len(orbnames):
@@ -628,8 +629,7 @@ class BandStructure(object):
         '''returns tuple whose size is same as that of arg, but
         the element is number determied from orb_names
 
-        :param orbnames: orbital names
-        e.g., (('s','pxpy','tot'),('s','p'))
+        :param orbnames: orbital names e.g., (('s','pxpy','tot'),('s','p'))
         :type orbnames: list, tuple
         :rtype: tuple
         '''
@@ -639,8 +639,7 @@ class BandStructure(object):
     def list_sitecomposed_data(self, orbnames):
         '''returns list of sitecomposed attribute to 2D-list
 
-        :param orbnames: orbital names
-        e.g., (('s','pxpy','p'),('s','pxpy','p'))
+        :param orbnames: orbital names  e.g., (('s','pxpy','p'),('s','pxpy','p'))
         :type orbnames: list, tuple
         '''
         orbnums = self.get_orbnums(orbnames)

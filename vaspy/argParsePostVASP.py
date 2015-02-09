@@ -6,16 +6,17 @@ import re
 
 
 class APPV(argparse.ArgumentParser):
-    __doc__ = '''
-# Add methods parse_Atomselection, parse_AtonselectionNum
-#   to ArgumentParser class
-''' + argparse.ArgumentParser.__doc__
+    __doc__ = '''Add methods parse_Atomselection, parse_AtonselectionNum to
+ArgumentParser class ''' + argparse.ArgumentParser.__doc__
 
     def parse_Atomselection(self, l):
-        '''Takes a string for the range of the ions, which
-        consists of the numbers deliminated by "-" or ",".
-        :return:  [Array<String>] Returns the array that consists
-        of the ordered "String" represents the number.
+        '''Return list of ordered "String" represents the number
+
+        :param l: String for the range of the ions (deliminator: "-" or ",")
+        :type l: str
+        :return: list of the ordered "String" represents the number.
+        :rtype: list
+
         >>> a = APPV()
         >>> a.parse_Atomselection("1-5,8,9,11-15")
         ['1', '11', '12', '13', '14', '15', '2', '3', '4', '5', '8', '9']
@@ -35,6 +36,12 @@ class APPV(argparse.ArgumentParser):
     def parse_AtomselectionNum(self, l):
         '''Very similar with parse_Atomselection but returns the array
         of the number not array of the string.
+
+        :param l: String for the range of the ions (deliminator: "-" or ",")
+        :type l: str
+        :return: list of the ordered 'integer' represents the number.
+        :rtype: list
+
         >>> a = APPV()
         >>> a.parse_AtomselectionNum("1-5,8,9,11-15")
         [1, 2, 3, 4, 5, 8, 9, 11, 12, 13, 14, 15]
