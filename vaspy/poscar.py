@@ -138,11 +138,22 @@ class POSCAR(object):
         else:
             self.ionnums = list(
                 map(int, next(poscar).split()))  # Version safety
-        ii = 1
+        self.__atom_identifer = []
+        atomnames = []
         for elm, n in zip(self.iontype, self.ionnums):
-            self.__atom_identifer.extend(
-                '#{0}:{1}{2}'.format(ii + m, elm, m + 1) for m in range(n))
-            ii += n
+            for j in range(1, n + 1):
+                tmp = elm + str(j)
+                if tmp not in atomnames:
+                    atomnames.append(tmp)
+                else:
+                    while tmp in atomnames:
+                        j = j + 1
+                        tmp = elm + str(j)
+                    else:
+                        atomnames.append(tmp)
+        self.__atom_identifer = [
+            "#" + str(s) + ":" + a for s, a in
+            zip(range(1, len(atomnames) + 1), atomnames)]
         line7 = next(poscar)
         if re.search(r'^[\s]*Selective\b', line7, re.I):
             self.__selective = True
@@ -160,13 +171,31 @@ class POSCAR(object):
 
     @property
     def atom_identifer(self):
+        # self.__atom_identifer = []
+        # ii = 1
+        # for elm, n in zip(self.iontype, self.ionnums):
+        #     self.__atom_identifer.extend(
+        #         '#{0}:{1}{2}'.format(ii + m, elm, m + 1) for m in range(n))
+        #     ii += n
+        # return self.__atom_identifer
         self.__atom_identifer = []
-        ii = 1
+        atomnames = []
         for elm, n in zip(self.iontype, self.ionnums):
-            self.__atom_identifer.extend(
-                '#{0}:{1}{2}'.format(ii + m, elm, m + 1) for m in range(n))
-            ii += n
+            for j in range(1, n + 1):
+                tmp = elm + str(j)
+                if tmp not in atomnames:
+                    atomnames.append(tmp)
+                else:
+                    while tmp in atomnames:
+                        j = j + 1
+                        tmp = elm + str(j)
+                    else:
+                        atomnames.append(tmp)
+        self.__atom_identifer = [
+            "#" + str(s) + ":" + a for s, a in
+            zip(range(1, len(atomnames) + 1), atomnames)]
         return self.__atom_identifer
+
     # attribute self.atom_identifer reader
     # return [list] self.__atom_identifer
     #   To display self.atom_identifer, the value is calculated,
@@ -451,6 +480,9 @@ class POSCAR(object):
         Even if the cell vectors and scaling factors are different,
         the 'merged' POSCAR is created.
         Use the cell vectors of the first POSCAR.
+        :param other:
+        :type other:  POSCAR
+        :return: POSCAR
         '''
         if not isinstance(other, POSCAR):
             return NotImplemented
