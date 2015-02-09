@@ -1,4 +1,4 @@
-#! /usr/bin/env python 
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 script to use(demonstrate) vaspy.poscar functions.
@@ -19,19 +19,19 @@ def split_to_float(string, n, name):
 
 
 parser = argparse.ArgumentParser(
-                     formatter_class=argparse.RawTextHelpFormatter,
-                     epilog="""
+    formatter_class=argparse.RawTextHelpFormatter,
+    epilog="""
 NOTE: When you run this script on Windows Power Shell,
 commas are regarded as delimiter of values.
 So you must enclose values which contains commas with quotations.
-(ex.) --atom 1,2,3 -> failure / --atom "1,2,3" -> OK""")
-parser.add_argument('--atom', metavar='atoms', action='append',
+(ex.) --site 1,2,3 -> failure / --site "1,2,3" -> OK""")
+parser.add_argument('--site', metavar='atoms', action='append',
                     type=tools.parse_AtomselectionNum,
                     help='''atoms specified with range using "-"
 or comma-delimnated numbers.
- (ex.) --atom 1,2,7-9''')
+ (ex.) --site 1,2,7-9''')
 
-group = parser.add_mutually_exclusive_group(required=True)
+group = parser.add_mutually_exclusive_group(required=False)
 group.add_argument('--translate', metavar='x,y,z', action='append',
                    type=ft.partial(split_to_float, n=3, name='translate'),
                    help='''displacement (AA unit) by three numbers
@@ -72,9 +72,9 @@ if (args.rotateX, args.rotateY, args.rotateZ).count(None) < 2:
 
 ############
 
-#print(args.poscar) #DEBUG
+# print(args.poscar) #DEBUG
 args.poscar.to_Cartesian()
-#print(args.poscar) #DEBUG
+# print(args.poscar) #DEBUG
 
 #
 #  if "atom" option is not set, all atoms are concerned.
@@ -95,7 +95,7 @@ if args.translate:
 #
 if any([args.rotateX, args.rotateY, args.rotateZ]):
     if len(args.atom) != 1:
-        parser.error("--atom option set once!")
+        parser.error("--site option set once!")
     if args.rotateX:
         axis_name = 'X'
         theta = args.rotateX[0]

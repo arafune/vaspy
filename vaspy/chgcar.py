@@ -29,15 +29,15 @@ class CHGCAR(poscar.POSCAR):
 
      An example of the first few line of the CHGCAR. ::
 
-           hBN-Cu                                  #1st line   @poscar[0]
-           1.00000000000000                        #2nd line   @poscar[1]
-             6.762964    0.000000    0.000000      #3rd line   @poscar[2]
-             3.381482    5.856898    0.000000      #4th line   @poscar[3]
-             0.000000    0.000000   29.004836      #5th line   @poscar[4]
-           B    Cu   N    Si                       #6th line   @poscar[5]
-             7    21     7     6                   #7th line   @poscar[6]
-           Direct                                  #8th line   @poscar[7]
-             0.047680  0.261795  0.361962          #9th line   @poscar[8]
+           hBN-Cu                                  #1st line   poscar.POSCAR[0]
+           1.00000000000000                        #2nd line   poscar.POSCAR[1]
+             6.762964    0.000000    0.000000      #3rd line   poscar.POSCAR[2]
+             3.381482    5.856898    0.000000      #4th line   poscar.POSCAR[3]
+             0.000000    0.000000   29.004836      #5th line   poscar.POSCAR[4]
+           B    Cu   N    Si                       #6th line   poscar.POSCAR[5]
+             7    21     7     6                   #7th line   poscar.POSCAR[6]
+           Direct                                  #8th line   poscar.POSCAR[7]
+             0.047680  0.261795  0.361962          #9th line   poscar.POSCAR[8]
              ....
 
     :todo: fit the above description with python style
@@ -59,9 +59,10 @@ class CHGCAR(poscar.POSCAR):
             self.load_from_file(arg)
 
     def load_from_file(self, chgcarfile):
-        '''
-        :param string chgcarfile: CHGCAR file name
-        :return: CHGCAR
+        '''Parse CHGCAR file to make CHGCAR object
+
+        :param chgcarfile: CHGCAR file name
+        :type chgcarfile: str
         '''
         section = 'poscar'
         separator = None
@@ -82,18 +83,24 @@ class CHGCAR(poscar.POSCAR):
                             list(map(int, line.split()))
                     section = 'grid'
                 elif section == 'aug':
-                    if re.search(r'#{0}'.format(separator), line):
+                    if separator in line:
                         section = 'grid'
-                    elif re.search(_re_aug_occ, line):
+                    elif "augmentation occupancies " in line:
                         pass  # not implemented
                     else:
                         pass  # not implemented
                 elif section == 'grid':
-                    if re.search(_re_aug_occ, line):
+                    if "augmentation occupancies " in line:
                         section = 'aug'
+                    elif separator in line:
+                        pass
                     else:
                         self.__chgArray.extend(map(float, line.split()))
         if len(self.chgArray) % (self.meshX * self.meshY * self.meshZ) != 0:
+            print(len(self.chgArray), ": Should be ",
+                  self.meshX * self.meshY * self.meshZ, "x 1, 2, 4")
+            print(len(self.chgArray) % (self.meshX * self.meshY * self.meshZ),
+                  ": Should be zero")
             raise RuntimeError('Failed: Construction')
         self.__spininfo = len(self.chgArray) // (self.meshX *
                                                  self.meshY *
@@ -136,14 +143,14 @@ class CHGCAR(poscar.POSCAR):
         two sets of data can be found in the CHGCAR file. The first set
         contains the total charge density (spin up plus spin down),
         the second one the magnetization density (spin up minus spin down).
-        For non collinear calculations (``ISPIN=2`` and ``LSORBIT=.TRUE.``)
+        For non collinear calculations (``ISPIN=2`` and ``LSORBIT=.TRUE.``),
         the CHGCAR file contains the total charge density and the
         magnetisation density in the x, y and z direction in this order.
 
         For spinpolarized calculation the argument does not make a sense.
         For non collinear CHGCAR direction should be one of 'x', 'y' 'z'
 
-        :param direction:
+        :param direction: specify x, y, or z in noncollinear calculation
         :type direction: str
         :return: CHGCAR of the spin-distribution
         :rtype: CHGCAR
@@ -152,12 +159,14 @@ class CHGCAR(poscar.POSCAR):
         if len(self.spininfo) == 1:
             raise RuntimeError("This CHGCAR is not spinresolved version")
         destCHGCAR = copy.deepcopy(self)
-        s1, s2, s3, s4 = tools.each_slice(self.chgArray,
-                                          self.meshX * self.meshY * self.meshZ)
         if len(self.spininfo) == 2:
+            s1, s2 = tools.each_slice(self.chgArray,
+                                      self.meshX * self.meshY * self.meshZ)
             destCHGCAR.__chgArray = list(s2)
             destCHGCAR.__spininfo = ["up-down"]
         elif len(self.spininfo) == 4:
+            s1, s2, s3, s4 = tools.each_slice(self.chgArray,
+                                              self.meshX * self.meshY * self.meshZ)
             if direction is None:
                 direction = 'x'
             if direction == 'x':
@@ -172,10 +181,9 @@ class CHGCAR(poscar.POSCAR):
         return destCHGCAR
 
     def majorityspin(self):
-        '''
-        CHGCAR#majorityspin
+        '''Return CHGCAR for majority spin
 
-        From CHGCAR given by ISPIN=2 but not-SOI calculations.
+        From CHGCAR given by ``ISPIN=2`` but not-SOI calculations.
         According to Dr. Minamitani, the former part of charge
         distribution corresponds for majority spin + minority spin,
         the latter part for  majority - minority
@@ -193,10 +201,9 @@ class CHGCAR(poscar.POSCAR):
         return destCHGCAR
 
     def minorityspin(self):
-        '''
-        CHGCAR#minorityspin
+        '''Return CHGCAR for minority spin
 
-        from CHGCAR given by ISPIN=2 but not-SOI calculations.
+        From CHGCAR given by ``ISPIN=2`` but not-SOI calculations.
         According to Dr. Minamitani, the former part of charge distribution
         corresponds for majority spin + minority spin, the latter part for
         majority - minority
@@ -292,10 +299,10 @@ class CHGCAR(poscar.POSCAR):
         return super(CHGCAR, self).__str__() + outputstring + '\n'
 
     def save(self, filename):
-        '''
-        :param filename: filename
+        '''Save CHGCAR object as CHGCAR file style
+
+        :param filename: file name
         :type filename: str
-        save operated CHGCAR to the file.
 '''
         try:  # Version safety
             file = open(filename, mode='w', newline='\n')

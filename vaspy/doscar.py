@@ -5,8 +5,9 @@ from __future__ import print_function  # Version safety
 from __future__ import division  # Version safety
 import copy as _copy
 import csv as _csv
-import re as _re
 import sys as _sys
+import numpy as np
+import matplotlib.pyplot as plt
 from numbers import Number as _Number
 if _sys.version_info[0] >= 3:  # Version safety
     from io import StringIO as _StringIO
@@ -17,9 +18,9 @@ else:
 class DOSCAR(object):  # Version safety
 
     '''class for DOSCAR file
-       :author: Ryuichi Arafune
+
+    :author: Ryuichi Arafune
     '''
-    # attr_accessor :nAtom, :dos_container
 
     def __init__(self, arg=None):
         self.nAtom = 0
@@ -30,9 +31,11 @@ class DOSCAR(object):  # Version safety
             self.load_from_file(arg)
 
     def load_from_file(self, doscar_file):
-        """
-        :param doscar_file: doscar_file file name of "DOSCAR"
+        """Parse DOSCAR file to create dos_container
+
+        :param doscar_file: file name of "DOSCAR"
         :type doscar_file: str
+        :rtype: DOSCAR
         """
         with open(doscar_file) as f:
             separate_text = ""
@@ -47,34 +50,34 @@ class DOSCAR(object):  # Version safety
                     self.__nEnergypoints = int(separate_text.split()[2])
                     continue
                 else:  # idx >= 7
-                    if _re.search(separate_text, line):
+                    if separate_text in line:
                         self.dos_container.append(aDOS)
                         aDOS = list()
                     else:
                         aDOS.append([float(i) for i in line.split()])
             else:
                 self.dos_container.append(aDOS)
+                return self.dos_container.append(aDOS)
 
 
 class DOS(object):  # Version safety
 
     '''Class for DOS
 
-    attribute : dos
-    Array object.  that consists arrays of two elements.
+    list object consisting list of two elements.
     the first element is the float representing the energy.
     the other element is still array that contains the density.
 
     :author: Ryuichi Arafune
+    :attribute: dos
     '''
-    # attr_accessor :dos
 
     def __init__(self, array=None):
         self.dos = list()
         if array is not None:
             for a in array:
                 a_float = [float(i) for i in a]
-                self.dos.append((a_float[0], a_float[1:]))
+                self.dos.append([a_float[0], a_float[1:]])
 
     def __deepcopy__(self, memo):
         "x.__deepcopy__() <-> copy.deepcopy(x)"
@@ -92,7 +95,7 @@ class DOS(object):  # Version safety
     def append(self, dos_data):
         '''
         :param dos_data: dos_data
-        :rtype dos_data: np.array
+        :type dos_data: np.array
         '''
         self.dos.append(_filter_dos_data(dos_data))
 
@@ -187,7 +190,8 @@ def _filter_dos_data(data):
 class TDOS(DOS):
 
     """
-    Class for total DOS:
+    Class for total DOS
+
     :author: Ryuichi Arafune
     """
 
@@ -213,32 +217,44 @@ class PDOS(DOS):
 
     '''
     Class for partial DOS
+
     :author: Ryuichi Arafune
     '''
-    # attr_accessor :site, :orbital_spin
 
     def __init__(self, array=None, site=None):
         super(PDOS, self).__init__(array)
         self.site = "" if site is None else site
         self.orbital_spin = list()
-        orbitalname = ("s", "px", "py", "pz", "dxy",
-                       "dyz", "dz", "dxz", "dxy2")
+        orbitalname = ["s", "py", "pz", "px", "dxy", "dyz", "dz2",
+                       "dxz", "dx2"]
+        # this order above is refered from sphpro.F of vasp source
         soi = ("mT", "mX", "mY", "mZ")
         spin = ("up", "down")
+        spininfo = None
         if array is not None:
             flag = len(self.dos[0][1])
             if flag == 9:
                 self.orbital_spin = orbitalname
             elif flag == 18:  # Spin resolved
+                spininfo = ['up', 'down']
                 self.orbital_spin = [
                     orb + "_" + spn for orb in orbitalname
                     for spn in spin]
             elif flag == 36:  # SOI
+                spininfo = ['mT', 'mX', 'mY', 'mZ']
                 self.orbital_spin = [
                     orb + "_" + spn for orb in orbitalname
                     for spn in soi]
             else:
                 self.orbital_spin = []
+
+        if len(spininfo) == 2:  # In collinear spin calculation.
+                                    # DOS of down-spin is set by
+                                    # negative value.
+            for line in self.dos:
+                for index, density in enumerate(line[1]):
+                    if index % 2 != 0:
+                        line[1][index] = -density
 
     def __deepcopy__(self, memo):
         "x.__deepcopy__() <-> copy.deepcopy(x)"
@@ -248,11 +264,20 @@ class PDOS(DOS):
         dest.orbital_spin = _copy.deepcopy(self.orbital_spin, memo)
         return dest
 
+    def plot_dos(self, orbitals, fermi=0.0):
+        """plot DOS spectra with matplotlib.pyplot
+
+        :param orbitals: orbital name
+        :type orbitals: str
+        """
+        pass
+
     def deepcopy(self):
         return _copy.deepcopy(self)
 
     def __add__(self, other):
         """x.__add__(y) <-> x+y
+
         :param addend: addend.energies.length must be equal to
         self.energies.length.
         :type addend: PDOS
@@ -304,6 +329,7 @@ class PDOS(DOS):
                             delimiter='\t', lineterminator='\n')
             return stream.getvalue()
 
+# -----------------------------------------------------------------------
 
 if __name__ == '__main__':
     import argparse
