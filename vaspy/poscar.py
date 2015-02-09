@@ -69,7 +69,7 @@ Direct
 class POSCAR(object):
 
     '''
-..    .. py:class:: POSCAR(object)
+    py:class:: POSCAR(object)
 
     class for POSCAR (CONTCAR) format
 
@@ -119,6 +119,7 @@ class POSCAR(object):
         return self.__latticeV3
 
     def load_from_array(self, poscar):
+        '''POSCAR parser'''
         poscar = iter(map(str.rstrip, poscar))  # Version safety
         self.system_name = next(poscar)
         self.scaling_factor = float(next(poscar))
@@ -171,6 +172,7 @@ class POSCAR(object):
 
     @property
     def atom_identifer(self):
+        '''Return list style of "atom_identifer" (e.g.  "#1:Ag1")'''
         # self.__atom_identifer = []
         # ii = 1
         # for elm, n in zip(self.iontype, self.ionnums):
@@ -196,12 +198,6 @@ class POSCAR(object):
             zip(range(1, len(atomnames) + 1), atomnames)]
         return self.__atom_identifer
 
-    # attribute self.atom_identifer reader
-    # return [list] self.__atom_identifer
-    #   To display self.atom_identifer, the value is calculated,
-    #   by using self.iontype and self.ionnums,
-    #   not just showing self.__atom_identifer
-
     @atom_identifer.setter
     def atom_identifer(self, value):
         self.__atom_identifer = value
@@ -212,7 +208,8 @@ class POSCAR(object):
 
     @property
     def is_cartesian(self):
-        '''
+        '''Return True if Cartesian coordinate is set
+
         :return: True if coordinate is cartesian
         :rtype: Boolean
         '''
@@ -220,7 +217,8 @@ class POSCAR(object):
 
     @property
     def is_direct(self):
-        '''
+        '''Return True if DIRECT coordinate is set
+
         :return: True if coordinate is direct (not cartesian)
         :rtype: Boolean
         '''
@@ -228,15 +226,15 @@ class POSCAR(object):
 
     @property
     def is_selective(self):
-        '''
+        '''Return True if "Selective Dynamcis" is set
+
         :return: True if "Selective Dynamics" switch on.
         :rtype: Boolean
         '''
         return self.__selective
 
     def pos(self, i):
-        '''
-        POSCAR.pos(i): An accessor of POSCAR.position.
+        '''POSCAR.pos(i): An accessor of POSCAR.position.
 
         As in VASP, the atom index starts with "1",
         not "0".   This method follows this manner.
@@ -268,7 +266,8 @@ class POSCAR(object):
         self.position[i - 1] = vector
 
     def rotateX(self, theta):
-        '''
+        '''Rotation matrix around X-axis
+
         :param theta: angle of rotation (Degrees)
         :type theta: float
         :return: rotation matrix
@@ -286,7 +285,8 @@ class POSCAR(object):
              [0.0, np.sin(theta * degree),  np.cos(theta * degree)]])
 
     def rotateY(self, theta):
-        '''
+        '''Rotation matrix around Y-axis
+
         >>> t = POSCAR()
         >>> t.rotateY(60)
         array([[ 0.5      ,  0.       ,  0.8660254],
@@ -300,7 +300,8 @@ class POSCAR(object):
              [-np.sin(theta * degree), 0.0, np.cos(theta * degree)]])
 
     def rotateZ(self, theta):
-        '''
+        '''Rotation matrix around Z-axis
+
         >>> t = POSCAR()
         >>> t.rotateZ(60)
         array([[ 0.5      , -0.8660254,  0.       ],
@@ -350,8 +351,7 @@ class POSCAR(object):
         return candidates27
 
     def atom_rotate(self, site, axis_name, theta, center):
-        '''
-        Rotate atom under periodic boundary condition
+        '''Rotate atom (single atom!) under periodic boundary condition
 
         :param site: site # for rotation (The first atom is "1".).
         :param axis_name: "X", "x", "Y", "y", "Z", or "z". Rotation axis.
@@ -384,7 +384,8 @@ class POSCAR(object):
         self.pos_replace(site, position)
 
     def atoms_rotate(self, site_list_pack, axis_name, theta, center):
-        '''
+        '''Rotate atoms
+
         :param site_list_pack: list array of the  list array
         (not typo!) of site for rotation   (The first atom is "1".).
         :param axis_name: "X", "x", "Y", "y", "Z",or "z". Rotation axis.
@@ -401,7 +402,8 @@ class POSCAR(object):
                 self.atom_rotate(site, axis_name, theta, center)
 
     def cell_rotate(self, theta, axis_name='Z'):
-        '''Cell rotation (rotation angle is set by degree.)
+        '''Rotate unit-cell (rotation angle is set by degree.)
+
         :param theta: rotation angle
         :type theta: float
         :param axis_name: axis name for rotation (x, y, or z)
@@ -475,7 +477,7 @@ class POSCAR(object):
         return destPOSCAR
 
     def merge(self, other):
-        '''lazy __add__
+        '''lazy __add__: Return POSCAR generated with two poscars
 
         Even if the cell vectors and scaling factors are different,
         the 'merged' POSCAR is created.
@@ -505,7 +507,8 @@ class POSCAR(object):
         return destPOSCAR
 
     def to_list(self):
-        '''
+        '''Return POSCAR object by list-style
+
         :return: a list representation of POSCAR.
         :rtype: list
 '''
@@ -552,7 +555,7 @@ class POSCAR(object):
         return '\n'.join(tmp) + '\n'
 
     def tune_scaling_factor(self, new_scaling_factor=1.0):
-        '''changes scaling factor to new value.
+        '''Change scaling factor to new value.
 
         :param float new_scaling_factor:
         :note:  **The Braves lattice are corrected (to be equal size)**
@@ -567,7 +570,7 @@ class POSCAR(object):
                              for i in self.position]
 
     def to_Cartesian(self):
-        '''changes the coordinate to cartesian from direct.
+        '''Change the coordinate to cartesian from direct.
 
         :return: True if POSCAR file is cartesian coordinate
         :rtype: Boolean
@@ -580,7 +583,7 @@ class POSCAR(object):
             self.position = [m.dot(v) for v in self.position]
 
     def to_Direct(self):
-        '''change the coordinate to direct from cartesian.
+        '''Change the coordinate to direct from cartesian.
         '''
         if self.is_cartesian:
             self.coordinate_type = "Direct"
@@ -590,8 +593,7 @@ class POSCAR(object):
             self.position = [m.dot(v) for v in self.position]
 
     def guess_molecule(self, site_list, center=None):
-        '''
-        arranges atom position to form a molecule.
+        '''Arrange atom position to form a molecule.
         This method is effective for molecular rotation.
 
         :param site_list: list of site number
@@ -607,7 +609,7 @@ class POSCAR(object):
         As the algorithm for mimizing the total length is not
         exhaustive, the resultant atom arrangement  may different
         from what you expect, in spite of time-waste.
-        So, the center option is highly recommended to form a molecule.
+        The center option is highly recommended to form a molecule.
 '''
         # list for atom positions for "molecule"
         molecule = [self.pos(j) for j in site_list]
@@ -648,8 +650,7 @@ class POSCAR(object):
             self.pos_replace(site, posVector)
 
     def translate(self, vector, atomlist):
-        '''
-        translates the selected atom(s) by vector
+        '''Translate the selected atom(s) by vector
 
         :param vector: translational vector (in Cartesian frame)
         :param atomlist: list of the atom for moving
@@ -674,8 +675,7 @@ class POSCAR(object):
         return self.position
 
     def translate_all(self, vector):
-        '''
-        translates **all** atoms by vector
+        '''Translate **all** atoms by vector
 
         :param vector: translational vector
         :type vector: list, numpy.array

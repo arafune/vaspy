@@ -35,9 +35,19 @@ class OUTCAR(object):  # Version safety
         """
         build atom_names (the list of atomname_with_index) property
         """
-        self.atom_names = [elm + str(j) for
-                           (elm, n) in zip(self.iontype, self.ionnums)
-                           for j in range(1, n + 1)]
+        self.atom_names = []
+        for elm, n in zip(self.iontype, self.ionnums):
+            for j in range(1, n + 1):
+                tmp = elm + str(j)
+                if tmp not in self.atom_names:
+                    self.atom_names.append(tmp)
+                else:
+                    #                    jj = j
+                    while tmp in self.atom_names:
+                        j = j + 1
+                        tmp = elm + str(j)
+                    else:
+                        self.atom_names.append(tmp)
         return self.atom_names
 
     def set_posforce_title(self):
@@ -65,24 +75,24 @@ class OUTCAR(object):  # Version safety
         f = open(arg)
         for line in f:
             if section == ["force"]:
-                if re.search(r"\btotal drift\b", line):
+                if "total drift" in line:
                     section.pop()
-                elif re.search(r"[\s]*---------------", line):
+                elif "---------------" in line:
                     pass
-                elif re.search(r"[-]??[\d]*.[\d]+[\s]+[-]??[\d]*.[\d]+[\s]+[-]??[\d]*.[\d]+[\s]+[-]??[\d]*.[\d]+[\s]+[-]??[\d]*.[\d]+[\s]+[-]??[\d]*.[\d]+", line):
-                    posforce.append([float(x) for x in line.split()])
+                elif "total drift:" in line:
+                    section.pop()
                 else:
-                    pass
+                    posforce.append([float(x) for x in line.split()])
             else:
-                if re.search(r"\bnumber of dos\b", line):
+                if "number of dos" in line:
                     self.nions = int(line.split()[-1])
-                elif re.search(r"\bTITEL  =", line):
+                elif "TITEL  =" in line:
                     self.iontype.append(line.split()[3])
-                elif re.search(r"\bions per type\b", line):
+                elif "ions per type " in line:
                     self.ionnums = [int(x) for x in line.split()[4:]]
-                elif re.search(r"\bPOSITION\b", line):
+                elif "POSITION" in line and "TOTAL-FORCE" in line:
                     section.append("force")
-                elif re.search(r"\E-fermi\b", line):
+                elif "E-fermi" in line:
                     self.fermi = float(line.split()[2])
                 else:
                     pass
@@ -90,10 +100,10 @@ class OUTCAR(object):  # Version safety
         self.atom_identifer = [name + ":#" + str(index + 1)
                                for (index, name)
                                in enumerate(
-                                   [elm + str(j)
-                                    for (elm, n) in zip(self.iontype,
-                                                        self.ionnums)
-                                    for j in range(1, int(n) + 1)])]
+            [elm + str(j)
+             for (elm, n) in zip(self.iontype,
+                                 self.ionnums)
+             for j in range(1, int(n) + 1)])]
         #            i=1
         #            for elm, n in zip(self.iontype, self.ionnums):
         #                for j in range(1, int(n)+1):
