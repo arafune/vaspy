@@ -79,7 +79,7 @@ args.poscar.to_Cartesian()
 #
 #  if "atom" option is not set, all atoms are concerned.
 #
-if not args.atom:
+if not args.site:
     nAtoms = sum(args.poscar.ionnums)
     args.atom = [tools.parse_AtomselectionNum('1-{0}'.format(nAtoms))]
 #
