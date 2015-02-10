@@ -128,7 +128,11 @@ class DOS(object):  # Version safety
         self.dos.__getitem__(idx)
 
     def fermilevel_correction(self, fermi):
-        '# @param [Float] fermi fermi level'
+        '''Fermi level Correction
+
+        :param fermi: fermi level
+        :type fermi: float
+        '''
         self.dos = [(each[0] - fermi, each[1]) for each in self.dos]
 
     def energies(self, i=None):
@@ -230,7 +234,7 @@ class PDOS(DOS):
         # this order above is refered from sphpro.F of vasp source
         soi = ("mT", "mX", "mY", "mZ")
         spin = ("up", "down")
-        spininfo = None
+        spininfo = []
         if array is not None:
             flag = len(self.dos[0][1])
             if flag == 9:
