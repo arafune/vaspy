@@ -81,20 +81,20 @@ args.poscar.to_Cartesian()
 #
 if not args.site:
     nAtoms = sum(args.poscar.ionnums)
-    args.atom = [tools.parse_AtomselectionNum('1-{0}'.format(nAtoms))]
+    args.site = [tools.parse_AtomselectionNum('1-{0}'.format(nAtoms))]
 #
 #  Translation
 #
 if args.translate:
-    if len(args.atom) != len(args.translate):
+    if len(args.site) != len(args.translate):
         parser.error()
-    for v, a in zip(args.translate, args.atom):
+    for v, a in zip(args.translate, args.site):
         args.poscar.translate(v, a)
 #
 #  Rotation
 #
 if any([args.rotateX, args.rotateY, args.rotateZ]):
-    if len(args.atom) != 1:
+    if len(args.site) != 1:
         parser.error("--site option set once!")
     if args.rotateX:
         axis_name = 'X'
@@ -108,7 +108,7 @@ if any([args.rotateX, args.rotateY, args.rotateZ]):
         axis_name = 'Z'
         theta = args.rotateZ[0]
         center = args.rotateZ[1:]
-    args.poscar.atoms_rotate(args.atom, axis_name, theta, center)
+    args.poscar.atoms_rotate(args.site, axis_name, theta, center)
 
 #
 #  Output result
