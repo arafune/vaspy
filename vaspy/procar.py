@@ -24,13 +24,11 @@ except ImportError:
 
 
 class PROCAR(object):  # Version safety
-
-    '''
-    Class for PROCAR file
+    '''Class for PROCAR
 
     .. py:class:: PROCAR(object)
 
-    PROCAR consists of these lines.  Appear once per file.
+    PROCAR consists of these lines.  Appear once per file. 
 
     1. the first line
       ex.)   PROCAR lm decomposed + phase
@@ -75,34 +73,41 @@ class PROCAR(object):  # Version safety
 
     @property
     def spininfo(self):
+        '''spin-related information'''
         return self.__spininfo
 
     @property
     def numk(self):
+        '''Number of k-points'''
         return self.__numk
 
     @property
     def nBands(self):
+        '''Number of Bands'''
         return self.__nBands
 
     @property
     def nAtoms(self):
+        '''Number of atoms'''
         return self.__nAtoms
 
     @property
     def kvectors(self):
+        '''k-vectors'''
         return self.__kvectors
 
     @property
     def energies(self):
+        '''Energies'''
         return self.__energies
 
     @property
     def orb_names(self):
+        '''Name of orbitals'''
         return self.__orb_names
 
     def load_from_file(self, file, phase_read=False):
-        '''..py:method::  load_fromfile(file, [phase_read=False])
+        '''.. py:method::  load_fromfile(file, [phase_read=False])
 
         A virtual parser of PROCAR
 
@@ -190,6 +195,10 @@ class PROCAR(object):  # Version safety
         return iter(self.__orbital)
 
     def band(self):
+        '''Return BandStructure object
+        
+        :rtype: BandStructure
+        '''
         band = BandStructure()
         band.kvectors = self.kvectors[0:self.numk]
         band.nBands = self.nBands
@@ -212,7 +221,7 @@ class BandStructure(object):
 
     :class variables: kvectors, energies, states, spin, orb_names
 
-    Finally, Band, Orbital, State classes can be removed ?
+    .. note:: Finally, Band, Orbital, State classes can be removed ?
     '''
 
     def __init__(self, arg=None):
@@ -253,6 +262,7 @@ class BandStructure(object):
 
     @property
     def nBands(self):
+        '''Number of bands'''
         return self.__nBands
 
     @nBands.setter
@@ -262,6 +272,7 @@ class BandStructure(object):
 
     @property
     def orbitals(self):
+        '''Number of bands'''
         return self.__orbitals
 
     @orbitals.setter
@@ -379,7 +390,7 @@ class BandStructure(object):
 
         When sitecomposed ndarray has elements, the values remain.
 
-        :param arg: a list (tuple, set) describes the site to be composed. it contains unique numbers.
+        :param arg: site indexes to be composed. it contains unique numbers.
         :type arg: list, tuple, set
         '''
         # the element of site_number_list must be unique.
@@ -476,7 +487,7 @@ class BandStructure(object):
                                        cmporbs_mZ]
 
     def check_orb_name(self, arg):
-        '''returns the arg without change when arg is a member of the
+        '''returns arg without change when arg is a member of the
         'orbital name'.  i.e., if arg is an alias of the (more proper)
         orbital name, return it.  If arg is neither the proper orbital
         name nor the alias, raise ValueError.
