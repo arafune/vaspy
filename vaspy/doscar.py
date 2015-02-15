@@ -280,9 +280,6 @@ class PDOS(DOS):
         """
         pass
 
-    def deepcopy(self):
-        return _copy.deepcopy(self)
-
     def __add__(self, other):
         """x.__add__(y) <-> x+y
 
