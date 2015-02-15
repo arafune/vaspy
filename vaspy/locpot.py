@@ -18,10 +18,11 @@ except ImportError:
 
 
 class LOCPOT(poscar.POSCAR):
-
-    '''class for LOCPOT format.
+    '''Class for LOCPOT
 
 LOCPOT format is essentially same as CHGCAR but simpler.
+
+    :attribute: meshX, meshY, meshZ, potlist
 '''
 
     def __init__(self, arg=None):
@@ -34,7 +35,7 @@ LOCPOT format is essentially same as CHGCAR but simpler.
             self.load_from_file(arg)
 
     def load_from_file(self, locpotfile):
-        '''Parse LOCPOT file to make LOCPOT object
+        '''Parse LOCPOT file to construct LOCPOT object
 
         :param locpotfile: file name of 'LOCPOT'
         :type locpotfile: str
@@ -89,33 +90,59 @@ LOCPOT format is essentially same as CHGCAR but simpler.
 
     @property
     def meshX(self):
+        '''Number of mesh along the first axis of the cell'''
         return self.__meshX
 
     @property
     def meshY(self):
+        '''Number of mesh along the second axis of the cell'''
         return self.__meshY
 
     @property
     def meshZ(self):
+        '''Number of mesh along the second axis of the cell'''
         return self.__meshZ
 
     @property
     def potlist(self):
+        '''Potential data (Array style)
+'''
         return self.__potlist
 
     @property
     def potarray(self):
+        '''Potential data (Array style)
+
+        Usually this data should be used.  I (RA) have not understand the meaning of the potarray 2 and 3...
+        '''
         return self.__potarray
 
     @property
     def potarray3(self):
+        '''(maybe) Potential data (Array style)
+
+        Usually this data should NOT be used.  I (RA) have not understand the meaning of the potarray 2 and 3...
+        
+        .. warning:: Do not use this attribute if you do not know what you treated
+'''
         return self.__potarray2
 
     @property
     def potarray2(self):
+        '''(maybe) Potential data (Array style)
+
+        Usually this data should NOT be used.  I (RA) have not understand the meaning of the potarray 2 and 3...
+        
+        .. warning:: Do not use this attribute if you do not know what you treated
+'''
         return self.__potarray3
 
     def get_mesh(self):
+        '''Return mesh size
+        
+        :return: (meshX, meshY, meshZ)
+        :rtype: tuple 
+        '''
         return self.__meshX, self.__meshY, self.__meshZ
 
     def average_along_axis(self, axis_name, pottype='former'):
