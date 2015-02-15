@@ -236,19 +236,32 @@ class POSCAR(object):
         '''
         return self.__selective
 
-    def pos(self, i):
+    def pos(self, *i):
         '''POSCAR.pos(i): An accessor of POSCAR.position.
 
         As in VASP, the atom index starts with "1",
         not "0".   This method follows this manner.
 
-        :param i: site #
-        :param type: int
-        :note: the first site # is "1", not "0". (Follow VESTA's way.)
-        :return: *i* -th atom's position by Vector representation.
-        :rtype: numpy.array
+        :param i: site index (index range can be set by tuple (from, to))
+        :param type: int, or tuple of two int        
+        :return: list of atom's position  (When single value is set as i, return just an atom position)
+        :rtype: np.array or list of np.array
+        
+        .. note:: You can set the index range by using tuple. e.g., (20, 25) means the index from site# 20 to site# 25.
+
+        .. warning:: the first site # is "1", not "0". (Follow VESTA's way.)
 '''
-        return self.position[i - 1]
+        if type(i[0]) == int:
+            dest = []
+            for ii in i:
+                dest.append(self.position[ii -1])
+            if len(dest) == 1:
+                dest = dest[0]
+        elif type(i[0]) == tuple:
+            if i[0] > i[1]:
+                raise ValueError
+            dest = self.positions[i[0]-1: i[1]-1]           
+        return dest
 
     def pos_replace(self, i, vector):
         '''
@@ -608,6 +621,7 @@ class POSCAR(object):
 
     def guess_molecule(self, site_list, center=None):
         '''Arrange atom position to form a molecule.
+
         This method is effective to rotate a molecule.
 
         :param site_list: list of site number
@@ -616,16 +630,9 @@ class POSCAR(object):
         :type center: list
         :return: Array of Vector that represents "molecule".
         :rtype: numpy.array
-        :note: When the optional argument, center, is set,
-        the  atoms are re-arranged as to minimize the distance
-        from this center.  If not the   center is not set, atoms
-        are re-arranged to minimize  the total bonding length.
-        As the algorithm for mimizing the total length is not
-        exhaustive, the resultant atom arrangement  may different
-        from what you expect, in spite of time-waste.
-        The center option is highly recommended to form a molecule.
-'''
-        # list for atom positions for "molecule"
+
+        .. note:: When the optional argument, center, is set, the  atoms are re-arranged as to minimize the distance from this center.  If not the   center is not set, atoms are re-arranged to minimize  the total bonding length.   As the algorithm for mimizing the total length is not exhaustive, the resultant atom arrangement  may different from what you expect, in spite of time-waste.  The center option is highly recommended to form a molecule.
+        '''
         molecule = [self.pos(j) for j in site_list]
         for index, site in enumerate(site_list):
             target_atom = self.pos(site)
