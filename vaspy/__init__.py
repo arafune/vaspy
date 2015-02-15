@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-    VASPy
+   VASPy
    ======
 
-    modules made for VASP pre\postprocess.
+    modules made for VASP pre\postprocess
 """
 # import os
 
@@ -13,7 +13,6 @@ __all__ = ['chgcar',
            'poscar',
            'procar',
            'locpot',
-           'argParsePostVASP',
            ]
 
 from vaspy import *
