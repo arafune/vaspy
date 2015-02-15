@@ -107,11 +107,11 @@ LOCPOT format is essentially same as CHGCAR but simpler.
     def potarray(self):
         return self.__potarray
 
-    @property
+    @property  # <= Fixme!!!
     def potarray3(self):
         return self.__potarray2
 
-    @property
+    @property  # <= Fixme!!!
     def potarray2(self):
         return self.__potarray3
 
@@ -137,13 +137,13 @@ LOCPOT format is essentially same as CHGCAR but simpler.
             if axis_name == 'Z':
                 pot = np.average(np.average(self.potarray, axis=2), axis=1)
         elif pottype == 'latter':
-            if axis_name == 'X':
+            if axis_name == 'X':  # <= Fixme!!!
                 pot = np.average(np.average(
                     np.transpose(self.potarray2, (2, 0, 1)), axis=2), axis=1)
-            if axis_name == 'Y':
+            if axis_name == 'Y':  # <= Fixme!!!
                 pot = np.average(np.average(
                     np.transpose(self.potarray2, (1, 0, 2)), axis=2), axis=1)
-            if axis_name == 'Z':
+            if axis_name == 'Z':  # <= Fixme!!!
                 pot = np.average(np.average(self.potarray2, axis=2), axis=1)
         else:
             raise RuntimeError("invalid pottype option")
@@ -168,13 +168,13 @@ LOCPOT format is essentially same as CHGCAR but simpler.
             if axis_name == 'Z':
                 pot = np.min(np.min(self.potarray, axis=2), axis=1)
         elif pottype == 'latter':
-            if axis_name == 'X':
+            if axis_name == 'X':  # <= Fixme!!!
                 pot = np.min(np.min(
                     np.transpose(self.potarray2, (2, 0, 1)), axis=2), axis=1)
-            if axis_name == 'Y':
+            if axis_name == 'Y':  # <= Fixme!!!
                 pot = np.min(np.min(
                     np.transpose(self.potarray2, (1, 0, 2)), axis=2), axis=1)
-            if axis_name == 'Z':
+            if axis_name == 'Z':  # <= Fixme!!!
                 pot = np.min(np.min(self.potarray2, axis=2), axis=1)
         else:
             raise RuntimeError("invalid pottype option")
@@ -199,13 +199,13 @@ LOCPOT format is essentially same as CHGCAR but simpler.
             if axis_name == 'Z':
                 pot = np.max(np.max(self.potarray, axis=2), axis=1)
         elif pottype == 'latter':
-            if axis_name == 'X':
+            if axis_name == 'X':  # <= Fixme!!!
                 pot = np.max(np.max(
                     np.transpose(self.potarray2, (2, 0, 1)), axis=2), axis=1)
-            if axis_name == 'Y':
+            if axis_name == 'Y':  # <= Fixme!!!
                 pot = np.max(np.max(
                     np.transpose(self.potarray2, (1, 0, 2)), axis=2), axis=1)
-            if axis_name == 'Z':
+            if axis_name == 'Z':  # <= Fixme!!!
                 pot = np.max(np.max(self.potarray2, axis=2), axis=1)
         else:
             raise RuntimeError("invalid pottype option")
@@ -230,13 +230,13 @@ LOCPOT format is essentially same as CHGCAR but simpler.
             if axis_name == 'Z':
                 pot = np.median(np.median(self.potarray, axis=2), axis=1)
         elif pottype == 'latter':
-            if axis_name == 'X':
+            if axis_name == 'X':  # <= Fixme!!!
                 pot = np.median(np.median(
                     np.transpose(self.potarray2, (2, 0, 1)), axis=2), axis=1)
-            if axis_name == 'Y':
+            if axis_name == 'Y':  # <= Fixme!!!
                 pot = np.median(np.median(
                     np.transpose(self.potarray2, (1, 0, 2)), axis=2), axis=1)
-            if axis_name == 'Z':
+            if axis_name == 'Z':  # <= Fixme!!!
                 pot = np.median(np.median(self.potarray2, axis=2), axis=1)
         else:
             raise RuntimeError("invalid pottype option")
