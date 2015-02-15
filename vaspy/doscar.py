@@ -17,8 +17,9 @@ else:
 
 class DOSCAR(object):  # Version safety
 
-    '''class for DOSCAR file
+    '''Class for DOSCAR file
 
+    A container of DOS object
     :author: Ryuichi Arafune
     '''
 
@@ -65,8 +66,8 @@ class DOS(object):  # Version safety
     '''Class for DOS
 
     list object consisting list of two elements.
-    the first element is the float representing the energy.
-    the other element is still array that contains the density.
+    The first element is the float representing the energy.
+    The other element is still array that contains the density.
 
     :author: Ryuichi Arafune
     :attribute: dos
@@ -86,6 +87,7 @@ class DOS(object):  # Version safety
         return dest
 
     def deepcopy(self):
+        '''call copy.deepcopy'''
         return _copy.deepcopy(self)
 
     def __iter__(self):
@@ -136,11 +138,11 @@ class DOS(object):  # Version safety
         self.dos = [(each[0] - fermi, each[1]) for each in self.dos]
 
     def energies(self, i=None):
-        '''
-        :param i:
+        '''Return energy
+
+        :param i: index #
         :type i: int
-        :return: the energy value of the i-th point when i set.
-        if arg is null, return the all energies in DOS object.
+        :return: the energy value of the i-th point when i set.  If arg is null, return the all energies in DOS object.
         :rtype: np.ndarray
         '''
         if i is None:
@@ -149,9 +151,11 @@ class DOS(object):  # Version safety
             return self.dos[i][0]
 
     def densities(self, i=None):
-        '''
-        :param i:
+        '''Return density
+
+        :param i: index #
         :type i: int
+        :return: the density of states for the i-th point when i set.  If arg is null, return the all energies in DOS object.
         :rtype: numpy.array
         '''
         if i is None:
@@ -160,20 +164,19 @@ class DOS(object):  # Version safety
             return self.dos[i][1]
 
     def export_csv(self, file, **kwargs):
-        """
-        Export data to file object (or file-like object) as csv format.
+        """Export data to file object (or file-like object) as csv format.
         kwargs are keyword options of csv.writer().
-        see help(csv.writer) for detail.
+
+        See help(csv.writer) for detail.
         """
         csvwriter = _csv.writer(file, **kwargs)
         csvwriter.writerows([line[0]] + line[1] for line in self.dos)
 
     def __str__(self):
-        """
-        x.__str__() <=> str(x)
+        """x.__str__() <=> str(x)
+
         :return: string representation of DOS object (tab deliminated).
         :rtype: str
-
         """
         with _StringIO() as stream:
             self.export_csv(stream, delimiter='\t', lineterminator='\n')
@@ -192,9 +195,7 @@ def _filter_dos_data(data):
 
 
 class TDOS(DOS):
-
-    """
-    Class for total DOS
+    """Class for total DOS
 
     :author: Ryuichi Arafune
     """
@@ -204,8 +205,8 @@ class TDOS(DOS):
         if len(self.dos[0][1]) == 2:
             self.header = ("TDOS", "intTDOS")
         else:
-            self.header = ("TDOS_up", "intTDOS_up",
-                           "TDOS_down", "intTDOS_down")
+            self.header = ("TDOS_up", "TDOS_down",
+                           "intTDOS_up","intTDOS_down")
 
     def export_csv(self, file, **kwargs):
         """Export data to file object (or file-like object) as csv format.
@@ -273,6 +274,9 @@ class PDOS(DOS):
 
         :param orbitals: orbital name
         :type orbitals: str
+
+        .. warning:: not implemented yet!!
+
         """
         pass
 

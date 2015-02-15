@@ -69,9 +69,9 @@ Direct
 class POSCAR(object):
 
     '''
-    py:class:: POSCAR(object)
+    .. py:class:: POSCAR(object)
 
-    class for POSCAR (CONTCAR) format
+    Class for POSCAR (CONTCAR) format
 
     This script does *NOT* support for constructing POSCAR
     from scratch. (Use ASE for this purpose.)
@@ -79,7 +79,7 @@ class POSCAR(object):
     It provides a way to slightly modify the POSCAR or
     CONTCAR, which has already works well.
 
-    :methods list: to_Cartesian, translate, translate_all
+    :attribute: latticeV1, latticeV1, latticeV3
     :version: 2.0
     '''
 
@@ -108,14 +108,17 @@ class POSCAR(object):
 
     @property
     def latticeV1(self):
+        '''The vector of the first axis of the unit cell'''
         return self.__latticeV1
 
     @property
     def latticeV2(self):
+        '''The vector of the second axis of the unit cell'''
         return self.__latticeV2
 
     @property
     def latticeV3(self):
+        '''The vector of the third axis of the unit cell'''
         return self.__latticeV3
 
     def load_from_array(self, poscar):
@@ -253,8 +256,7 @@ class POSCAR(object):
         :param vector: list of the i-th atom position.
         :type i: int
         :type vector: list, tuple, np.array
-        :note: the first site # is "1", not "0".
-        (follow VESTA's and VASP's way.)
+        :note: the first site # is "1", not "0". (To follow VESTA's and VASP's way.)
 '''
         vector = _vectorize(vector)
         if not isinstance(i, int):
@@ -359,7 +361,7 @@ class POSCAR(object):
         return candidates27
 
     def atom_rotate(self, site, axis_name, theta, center):
-        '''Rotate atom (single atom!) under periodic boundary condition
+        '''Rotate atom (single atom!) 
 
         :param site: site # for rotation (The first atom is "1".).
         :param axis_name: "X", "x", "Y", "y", "Z", or "z". Rotation axis.
@@ -402,8 +404,6 @@ class POSCAR(object):
         :type theta: float
         :type axis_name: str
         :type center: np.array, list, tuple
-
-        .. note:: Does `Vector` class exists in python?
 '''
         for site_list in site_list_pack:
             for site in site_list:
@@ -570,7 +570,9 @@ class POSCAR(object):
         :param new_scaling_factor:
         :type new_scaling_factor: float  
 
-        ..note::  **The Braves lattice are corrected (to be equal size)**
+        .. note::  **The Braves lattice are corrected (to be equal size)**
+
+        .. warning:: If you change the cell size, change  scaling_factor attribute directly
 '''
         old = self.scaling_factor
         self.__latticeV1 *= (old / new_scaling_factor)
@@ -606,7 +608,7 @@ class POSCAR(object):
 
     def guess_molecule(self, site_list, center=None):
         '''Arrange atom position to form a molecule.
-        This method is effective for molecular rotation.
+        This method is effective to rotate a molecule.
 
         :param site_list: list of site number
         :param center: center position of "molecule" (Optional).
