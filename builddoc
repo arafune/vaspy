@@ -1,0 +1,2 @@
+#!/bin/bash
+/usr/local/bin/sphinx-apidoc -f -F -A 'Mao Kanno, and Ryuichi Arafune' -V '1.0' -R '0.1' -o docs vaspy
