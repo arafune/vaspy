@@ -25,7 +25,7 @@ make new iterator object which get n item from [iterable] at once.
 
 
 def removeall(L, value):
-    'remove all *value* in [list] L'
+    '''remove all *value* in [list] L'''
     while L.count(value):
         L.remove(value)
     return L
@@ -34,14 +34,13 @@ def removeall(L, value):
 def flatten(nested, target=Iterable, ignore=flatten_ignore):
     '''flatten(iterable) => list
 
-flatten nested iterable.
-expand object which is included in *target*
-AND NOT included in *ignore*.
-default *include* is all iterable object.
-defualt *ignore* is dict() and str-like objects.
-  (i.e. str, bytes, unicode(2.x), bytearray(3.x))
+    flatten nested iterable.
+    expand object which is included in *target*
+    AND NOT included in *ignore*.
+    default *include* is all iterable object.
+    defualt *ignore* is dict() and str-like objects.
+    (i.e. str, bytes, unicode(2.x), bytearray(3.x))
 '''
-
     if (isinstance(nested, target) and
             not isinstance(nested, ignore)):
         nested = list(nested)
@@ -63,12 +62,15 @@ _resingle = re.compile(r'\d+')
 
 
 def parse_Atomselection(L):
-    '''
-    :param l: range of the atoms. the numbers deliminated by "-" or ",".
-    (ex.) "1-5,8,9,11-15"
-    :type l: str
+    '''Return list of ordered "String" represents the number
+    
+    :param L: range of the atoms. the numbers deliminated by "-" or ",". (ex.) "1-5,8,9,11-15"
+    :type L: str
     :return: ordered "String" represents the number.
     :rtype: list
+
+    :Example:
+
     >>> parse_Atomselection("1-5,8,8,9-15,10")
     ["1", "10", "11", "12", "13", "14", "15", "2", "3", "4", "5", "8", "9"]
 '''
@@ -85,12 +87,15 @@ def parse_Atomselection(L):
 
 
 def parse_AtomselectionNum(L):
-    '''
-    :param l: range of the atoms. the numbers deliminated by "-" or ",".
-    (ex.) "1-5,8,9,11-15"
-    :type l: str
+    '''Very similar with parse_Atomselection but returns the array of the number not array of the string.
+
+    :param L: range of the atoms. the numbers deliminated by "-" or ",".  (ex.) "1-5,8,9,11-15"
+    :type L: str
     :return: ordered int represents the number.
     :rtype: list
+
+    :Example:
+
     >>> parse_Atomselection("1-5,8,8,9-15,10")
     [1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15]
     '''

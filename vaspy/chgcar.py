@@ -24,8 +24,7 @@ _re_aug_occ = re.compile(r'\baugmentation occupancies')
 class CHGCAR(poscar.POSCAR):
 
     '''
-    class for CHGCAR format
-
+    Class for CHGCAR
 
      An example of the first few line of the CHGCAR. ::
 
@@ -40,10 +39,9 @@ class CHGCAR(poscar.POSCAR):
              0.047680  0.261795  0.361962          #9th line   poscar.POSCAR[8]
              ....
 
-    :todo: fit the above description with python style
+    :attribute: chgArray, meshX, meshY, meshZ, spininfo
     :version: 1.0.0
-    :note: the current verstion does not take account
-           "augmentation occupacies".
+    :note: the current verstion does not take account  "augmentation occupacies".
 
 '''
     # accessor: chgArray, meshX-Y-Z
@@ -116,18 +114,30 @@ class CHGCAR(poscar.POSCAR):
 
     @property
     def meshX(self):
+        '''Number of mesh along the first axis of the cell'''
         return self.__meshX
 
     @property
     def meshY(self):
+        '''Number of mesh along the second axis of the cell'''
         return self.__meshY
 
     @property
     def meshZ(self):
+        '''Number of mesh along the third axis of the cell'''
         return self.__meshZ
 
     @property
     def spininfo(self):
+        '''Spin property of CHGCAR
+
+        *  for ``ISPIN = 1``, [""]
+
+        *  for ``ISPIN = 2`` (but ``LSORBIT=.FALSE.``), ["up+down", "up-down"]
+
+        *  for ``ISPIN = 2`` (but ``LSORBIT=.TRUE.``),  ["mT", "mX", "mY", "mZ"]
+        
+        '''
         return self.__spininfo
 
     @property
@@ -136,25 +146,24 @@ class CHGCAR(poscar.POSCAR):
 
     def magnetization(self, direction=None):
         '''
-        CHGCAR#magnetization(direction=nil)
+        Return CHGCAR for magnetization 
 
         For spinpolarized calculations
         (``ISPIN=2`` but ``LSORBIT=.FALSE.``),
-        two sets of data can be found in the CHGCAR file. The first set
+        two sets of data are found in CHGCAR file. The first set
         contains the total charge density (spin up plus spin down),
         the second one the magnetization density (spin up minus spin down).
         For non collinear calculations (``ISPIN=2`` and ``LSORBIT=.TRUE.``),
-        the CHGCAR file contains the total charge density and the
+        CHGCAR file contains the total charge density and the
         magnetisation density in the x, y and z direction in this order.
 
         For spinpolarized calculation the argument does not make a sense.
-        For non collinear CHGCAR direction should be one of 'x', 'y' 'z'
+        For non-collinear CHGCAR, direction should be one of 'x', 'y', and 'z'
 
         :param direction: specify x, y, or z in noncollinear calculation
         :type direction: str
         :return: CHGCAR of the spin-distribution
         :rtype: CHGCAR
-
 '''
         if len(self.spininfo) == 1:
             raise RuntimeError("This CHGCAR is not spinresolved version")

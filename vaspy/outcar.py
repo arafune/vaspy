@@ -13,8 +13,7 @@ import re
 
 class OUTCAR(object):  # Version safety
 
-    """python class for OUTCAR file.
-    Extract calculation details and/or calculation progress
+    """Class for OUTCAR file that stores calculation details and/or calculation progress
 
     :Author: Ryuichi Arafune
     """
@@ -32,7 +31,7 @@ class OUTCAR(object):  # Version safety
             self.load_from_file(arg)
 
     def set_atom_names(self):
-        """ build atom_names (the list of atomname_with_index) property
+        """ build atom_names (the list of atomname_with_index)
         """
         self.atom_names = []
         for elm, n in zip(self.iontype, self.ionnums):
@@ -50,7 +49,7 @@ class OUTCAR(object):  # Version safety
         return self.atom_names
 
     def set_posforce_title(self):
-        """build posforce_title property
+        """build posforce_title
         """
         self.set_atom_names()
         self.posforce_title = [[i + "_x",
@@ -125,9 +124,9 @@ class OUTCAR(object):  # Version safety
 # correct?
 
     def select_posforce(self, posforce_flag, *sites):
-        """posforce_flag: An 6-element True/False list that indicates the output
-        [True, True, False, True, True, False]
-        Return the posforce corresponding the posforce_flag
+        """Return the posforce corresponding the posforce_flag
+
+        .. note:: posforce_flag: An 6-element True/False list that indicates the output (ex.) [True, True, False, True, True, False]
         """
 
         if sites == () or sites[0] == []:
