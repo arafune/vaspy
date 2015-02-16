@@ -246,21 +246,22 @@ class POSCAR(object):
         :param type: int, or tuple of two int        
         :return: list of atom's position  (When single value is set as i, return just an atom position)
         :rtype: np.array or list of np.array
-        
+
         .. note:: You can set the index range by using tuple. e.g., (20, 25) means the index from site# 20 to site# 25.
 
         .. warning:: the first site # is "1", not "0". (Follow VESTA's way.)
+        .. warning:: The last index is included.  (pos(20, 25) returns position[19:25], not position[19:24])
 '''
         if type(i[0]) == int:
             dest = []
             for ii in i:
-                dest.append(self.position[ii -1])
+                dest.append(self.position[ii - 1])
             if len(dest) == 1:
                 dest = dest[0]
         elif type(i[0]) == tuple:
             if i[0] > i[1]:
                 raise ValueError
-            dest = self.positions[i[0]-1: i[1]-1]           
+            dest = self.positions[i[0] - 1: i[1]]
         return dest
 
     def pos_replace(self, i, vector):
