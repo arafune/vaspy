@@ -281,6 +281,28 @@ class POSCAR(object):
             raise RuntimeError(message)
         self.position[i - 1] = vector
 
+    def sort(self, from_index, to_index):
+        '''sort positions attribute by coordinate
+
+        :param from_index: first index # for sort
+        :param to_index: last index # for sort
+        :type from_index: int
+        :type to_index: last index # for sort
+
+        .. warning:: not implemented yet.
+        '''
+        original_is_cartesian = False
+        if self.is_cartesian:
+            original_is_cartesian = True
+            self.to_Direct()
+        self.repack_in_cell()
+        poslists = self.pos((from_index, to_index))
+        poslists.sort(keys=lambda x: (x[0], x[1], x[2]))
+        for i in range(from_index, to_index + 1):
+            self.pos_replace(i, poslists.pop(0))
+        if original_is_cartesian:
+            self.to_Cartesian()
+
     def rotateX(self, theta):
         '''Rotation matrix around X-axis
 
