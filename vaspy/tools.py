@@ -43,6 +43,9 @@ def flatten(nested, target=Iterable, ignore=flatten_ignore):
     default *include* is all iterable object.
     defualt *ignore* is dict() and str-like objects.
     (i.e. str, bytes, unicode(2.x), bytearray(3.x))
+
+    >>> flatten((1, [range(2), 3, set([4, 5]), [6]], frozenset([7, 8])))
+    [1, 0, 1, 3, 4, 5, 6, 8, 7]
 '''
     if (isinstance(nested, target) and
             not isinstance(nested, ignore)):
@@ -75,7 +78,7 @@ def parse_Atomselection(L):
     :Example:
 
     >>> parse_Atomselection("1-5,8,8,9-15,10")
-    ["1", "10", "11", "12", "13", "14", "15", "2", "3", "4", "5", "8", "9"]
+    ['1', '10', '11', '12', '13', '14', '15', '2', '3', '4', '5', '8', '9']
 '''
     array = L.split(',')
     output = set()
@@ -99,7 +102,7 @@ def parse_AtomselectionNum(L):
 
     :Example:
 
-    >>> parse_Atomselection("1-5,8,8,9-15,10")
+    >>> parse_AtomselectionNum("1-5,8,8,9-15,10")
     [1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15]
     '''
     return sorted(int(i) for i in parse_Atomselection(L))
