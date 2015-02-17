@@ -133,10 +133,10 @@ class CHGCAR(poscar.POSCAR):
 
         *  for ``ISPIN = 1``, [""]
 
-        *  for ``ISPIN = 2`` (but ``LSORBIT=.FALSE.``), ["up+down", "up-down"]
+        *  for ``ISPIN = 2`` (and ``LSORBIT=.FALSE.``), ["up+down", "up-down"]
 
-        *  for ``ISPIN = 2`` (but ``LSORBIT=.TRUE.``),  ["mT", "mX", "mY", "mZ"]
-        
+        *  for ``ISPIN = 2`` (and ``LSORBIT=.TRUE.``),  ["mT", "mX", "mY", "mZ"]
+
         '''
         return self.__spininfo
 

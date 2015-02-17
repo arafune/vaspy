@@ -65,8 +65,8 @@ class DOS(object):  # Version safety
 
     '''Class for DOS
 
-    list object consisting list of two elements.
-    The first element is the float representing the energy.
+    List object consisting list of two elements.
+    The first element is the the energy.
     The other element is still array that contains the density.
 
     :author: Ryuichi Arafune
@@ -195,6 +195,7 @@ def _filter_dos_data(data):
 
 
 class TDOS(DOS):
+
     """Class for total DOS
 
     :author: Ryuichi Arafune
@@ -206,7 +207,7 @@ class TDOS(DOS):
             self.header = ("TDOS", "intTDOS")
         else:
             self.header = ("TDOS_up", "TDOS_down",
-                           "intTDOS_up","intTDOS_down")
+                           "intTDOS_up", "intTDOS_down")
 
     def export_csv(self, file, **kwargs):
         """Export data to file object (or file-like object) as csv format.

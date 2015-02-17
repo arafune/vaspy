@@ -25,7 +25,10 @@ make new iterator object which get n item from [iterable] at once.
 
 
 def removeall(L, value):
-    '''remove all *value* in [list] L'''
+    '''remove all *value* in [list] L
+
+    .. note:: Currently, this function is not used. (Obsolute?)
+    '''
     while L.count(value):
         L.remove(value)
     return L

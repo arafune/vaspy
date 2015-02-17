@@ -237,20 +237,21 @@ class POSCAR(object):
         return self.__selective
 
     def pos(self, *i):
-        '''POSCAR.pos(i): An accessor of POSCAR.position.
+        '''Accessor of POSCAR.position.
 
-        As in VASP, the atom index starts with "1",
-        not "0".   This method follows this manner.
+        As in VASP, the atom index starts with "1", not "0".   This method follows this manner.
 
         :param i: site index (index range can be set by tuple (from, to))
-        :param type: int, or tuple of two int        
-        :return: list of atom's position  (When single value is set as i, return just an atom position)
+        :type i: int, or tuple of two int        
+        :return: atom's position  (When single value is set as i, return just an atom position)
         :rtype: np.array or list of np.array
 
-        .. note:: You can set the index range by using tuple. e.g., (20, 25) means the index from site# 20 to site# 25.
+        .. note:: You can set the index range by using tuple. 
+
+        :Example: (20, 25) means the index from site# 20 to site# 25.
 
         .. warning:: the first site # is "1", not "0". (Follow VESTA's way.)
-        .. warning:: The last index is included.  (pos(20, 25) returns position[19:25], not position[19:24])
+        .. warning:: (to user who knows python's style of slice)  When set the range by tuple, the latter index is taken into account.   pos(20, 25) returns position[19:25], not position[19:24]
 '''
         if type(i[0]) == int:
             dest = []
@@ -270,7 +271,7 @@ class POSCAR(object):
         :param vector: list of the i-th atom position.
         :type i: int
         :type vector: list, tuple, np.array
-        :note: the first site # is "1", not "0". (To follow VESTA's and VASP's way.)
+        :note: the first site # is "1", not "0" to follow VESTA's way.
 '''
         vector = _vectorize(vector)
         if not isinstance(i, int):
@@ -289,7 +290,7 @@ class POSCAR(object):
         :type from_index: int
         :type to_index: last index # for sort
 
-        .. warning:: not implemented yet.
+        :note: the first site # is "1", not "0" to follow VESTA's way.
         '''
         original_is_cartesian = False
         if self.is_cartesian:
@@ -621,9 +622,6 @@ class POSCAR(object):
 
     def to_Cartesian(self):
         '''Change the coordinate to cartesian from direct
-
-        :return: True if POSCAR file is cartesian coordinate
-        :rtype: Boolean
 '''
         if self.is_direct:
             self.coordinate_type = "Cartesian"

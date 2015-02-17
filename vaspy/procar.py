@@ -10,7 +10,7 @@ import os
 import sys
 import csv
 import functools as ft
-if sys.version_info[0] >= 3:           # Version safety
+if sys.version_info[0] >= 3:     # Version safety
     from io import StringIO
 else:
     from cStringIO import StringIO
@@ -22,7 +22,6 @@ except ImportError:
     sys.path.append(os.path.dirname(os.path.abspath(mypath)))
     import tools
 
-
 class PROCAR(object):  # Version safety
     '''Class for PROCAR
 
@@ -31,19 +30,26 @@ class PROCAR(object):  # Version safety
     PROCAR consists of these lines.  Appear once per file. 
 
     1. the first line
-      ex.)   PROCAR lm decomposed + phase
-    2. set number of k-points, bands and ions.
-      Appear once when spin-integrated, twice when spin-resolved.
 
-      ex.)   # of k-points:   50         # of bands: 576         # of ions:  98
+      :Example:   PROCAR lm decomposed + phase
+
+    2. set number of k-points, bands and ions.  (Appear once when spin-integrated, twice when spin-resolved.)
+
+      :Example:   # of k-points:   50         # of bands: 576         # of ions:  98
+
     3.  k-point character
-      ex.)  k-point    1 :    0.00000 0.00000 0.00000 weight = 0.02000000
 
-      note that the first character is "blank".
+      :Example:  k-point    1 :    0.00000 0.00000 0.00000 weight = 0.02000000
+
+      .. note:: that the first character is "blank".
+
     4. band character
-      ex.)  band   1 # energy  -11.87868466 # occ.  2.00000000
+
+      :Example:  band   1 # energy  -11.87868466 # occ.  2.00000000
+
     5. orbital contribution.
-      ex.)1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
+
+      :Example: 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
 
     :author: Ryuichi Arafune
     '''
@@ -196,7 +202,7 @@ class PROCAR(object):  # Version safety
 
     def band(self):
         '''Return BandStructure object
-        
+
         :rtype: BandStructure
         '''
         band = BandStructure()
@@ -214,8 +220,7 @@ class PROCAR(object):  # Version safety
 
 class BandStructure(object):
 
-    '''
-    .. py:class:: BandStructure class
+    ''' .. py:class:: BandStructure class
 
     The "Band structure" object deduced from PROCAR file.
 
@@ -237,7 +242,7 @@ class BandStructure(object):
                           'tot']
 
     def isready(self):
-        '''returns True if numk, nBands, nAtoms, spininfo,
+        '''Return True if numk, nBands, nAtoms, spininfo,
         orb_names are set, otherwise raise ValueError.
 
         This method is used before when orbitals, phases, energies
@@ -386,7 +391,7 @@ class BandStructure(object):
                 self.__energies = np.array(self.__energies)
 
     def compose_sites(self, arg):
-        '''make sitecomposed ndarray
+        '''Make sitecomposed ndarray
 
         When sitecomposed ndarray has elements, the values remain.
 
@@ -487,7 +492,7 @@ class BandStructure(object):
                                        cmporbs_mZ]
 
     def check_orb_name(self, arg):
-        '''returns arg without change when arg is a member of the
+        '''Return arg without change if arg is a member of the
         'orbital name'.  i.e., if arg is an alias of the (more proper)
         orbital name, return it.  If arg is neither the proper orbital
         name nor the alias, raise ValueError.
@@ -511,8 +516,7 @@ class BandStructure(object):
             raise ValueError(errmsg)
 
     def get_orb_index(self, arg):
-        '''returns tuple that consists of the indexes corresponding
-        orbitan name.
+        '''Return the indexes corresponding orbitan name by tuple.
 
         This method returns the tuple of orbital number in self.orb_names.
         (i.e. self.orb_names.index(orbitalname).  If the orbital name has not
@@ -523,7 +527,7 @@ class BandStructure(object):
 
         :param arg: name of (composed) orbital
         :type arg: str
-        :returns: number corresponding to (composed) orbital name.
+        :return: number corresponding to (composed) orbital name.
         :rtype: tuple
         '''
         orbname = self.check_orb_name(arg)
@@ -560,8 +564,7 @@ class BandStructure(object):
         return orb_indexes
 
     def compose_orbital(self, arg):
-        '''adds composed orbital contribution in each 'sites' stored in
-        BandStructure.sitecomposed.
+        '''Add composed orbital contribution in each 'sites' stored in BandStructure.sitecomposed.
 
         :param arg: orbital names
         :type arg: str, list, tuple
@@ -603,7 +606,7 @@ class BandStructure(object):
             raise RuntimeError(err)
 
     def set_header(self, sitenames, orbnames):
-        '''returns header of table
+        '''Return header of table
 
         :param sitenames: site names e.g., 'Ag', 'Graphene', '2ndLayer'...
         :type sitenames: tuple, list
@@ -637,7 +640,7 @@ class BandStructure(object):
         return header
 
     def get_orbnums(self, orbnames):
-        '''returns tuple whose size is same as that of arg, but
+        '''Return tuple whose size is same as that of arg, but
         the element is number determied from orb_names
 
         :param orbnames: orbital names e.g., (('s','pxpy','tot'),('s','p'))
@@ -648,7 +651,7 @@ class BandStructure(object):
                      for orbs in orbnames)
 
     def list_sitecomposed_data(self, orbnames):
-        '''returns list of sitecomposed attribute to 2D-list
+        '''Return list of sitecomposed attribute to 2D-list
 
         :param orbnames: orbital names  e.g., (('s','pxpy','p'),('s','pxpy','p'))
         :type orbnames: list, tuple
