@@ -48,6 +48,7 @@ Direct
   0.00000000E+00  0.00000000E+00  0.00000000E+00
 '''
 
+
 class POSCAR(object):
 
     '''
@@ -634,7 +635,7 @@ class POSCAR(object):
         :return: Array of Vector that represents "molecule".
         :rtype: numpy.array
 
-        .. note:: When the optional argument, center, is set, the  atoms are re-arranged as to minimize the distance from this center.  If not the   center is not set, atoms are re-arranged to minimize  the total bonding length.   As the algorithm for mimizing the total length is not exhaustive, the resultant atom arrangement  may different from what you expect, in spite of time-waste.  The center option is highly recommended to form a molecule.
+        .. note:: When the optional argument, center, is set, the  atoms are re-arranged as to minimize the distance from this center.  If not, atoms are re-arranged to minimize the total bonding length.   As the algorithm for mimizing the total length is not exhaustive, the resultant atom arrangement  may different from what you expect, in spite of time-waste.  The center option is highly recommended to form a molecule.
         '''
         molecule = [self.pos(j) for j in site_list]
         for index, site in enumerate(site_list):

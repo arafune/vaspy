@@ -22,7 +22,9 @@ except ImportError:
     sys.path.append(os.path.dirname(os.path.abspath(mypath)))
     import tools
 
+
 class PROCAR(object):  # Version safety
+
     '''Class for PROCAR
 
     .. py:class:: PROCAR(object)
@@ -319,7 +321,7 @@ class BandStructure(object):
 
     @phases.setter
     def phases(self, arg):
-        '''Setter for phases
+        '''phases
 
         Return is 4-rank tensor for the standard (i.e. ISPIN = 0) or SOI
         calculations.
@@ -369,10 +371,13 @@ class BandStructure(object):
 
     @property
     def kdistance(self):
+        '''Distance of k.  This is used for the horizontal axis in the band
+structure drowing'''
         return self.__kdistance
 
     @property
     def energies(self):
+        '''Energies'''
         return self.__energies
 
     @energies.setter
@@ -492,14 +497,15 @@ class BandStructure(object):
                                        cmporbs_mZ]
 
     def check_orb_name(self, arg):
-        '''Return arg without change if arg is a member of the
-        'orbital name'.  i.e., if arg is an alias of the (more proper)
-        orbital name, return it.  If arg is neither the proper orbital
-        name nor the alias, raise ValueError.
+        '''Return arg without change if arg is a member of the 'orbital name'.
+        i.e., if arg is an alias of the (more appropriate) orbital
+        name, return it as is.  If arg is neither the appropriate
+        orbital name nor the alias, raise ValueError.
 
         :param arg: the string to be checked as the orbital name
         :type arg: str
         :rtype: str
+
         '''
         translate_dict = {'pypx': 'pxpy', 'pzpx': 'pxpz', 'pzpy': 'pypz',
                           'pxpypz': 'p', 'pxpzpy': 'p', 'pypxpz': 'p',
@@ -521,7 +527,7 @@ class BandStructure(object):
         This method returns the tuple of orbital number in self.orb_names.
         (i.e. self.orb_names.index(orbitalname).  If the orbital name has not
         been in self.orb_names (i.e. if the orbital name is not used in
-        PROCAR file) but the orbital name is proper as the composed
+        PROCAR file) but the orbital name is appropriate as the composed
         orbital ((ex.) sp, pxpy), returns the indexes of the orbitals to be
         composed as the tuple.
 
