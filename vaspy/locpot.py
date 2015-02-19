@@ -18,9 +18,10 @@ except ImportError:
 
 
 class LOCPOT(poscar.POSCAR):
+
     '''Class for LOCPOT
 
-LOCPOT format is essentially same as CHGCAR but simpler.
+    LOCPOT format is essentially same as that of CHGCAR
 
     :attribute: meshX, meshY, meshZ, potlist
 '''
@@ -106,6 +107,12 @@ LOCPOT format is essentially same as CHGCAR but simpler.
     @property
     def potlist(self):
         '''Potential data (Array style)
+
+        From Vasp Manual, the potential is written using the following commands in Fortran (as same as for charge density in CHGCAR)
+
+        .. code-block :: fortran
+
+           WRITE(IU, FORM) (((C(NX, NY, NZ), NX=1, NGXC), NY=1, NGYZ), NZ=1, NGZC)
 '''
         return self.__potlist
 
@@ -113,7 +120,9 @@ LOCPOT format is essentially same as CHGCAR but simpler.
     def potarray(self):
         '''Potential data (Array style)
 
-        Usually this data should be used.  I (RA) have not understand the meaning of the potarray 2 and 3...
+        This data should be used until its meaning is clear.  I (RA)
+        have not understand the meaning of the potarray 2 and 3...
+
         '''
         return self.__potarray
 
@@ -121,10 +130,13 @@ LOCPOT format is essentially same as CHGCAR but simpler.
     def potarray3(self):
         '''(maybe) Potential data (Array style)
 
-        Usually this data should NOT be used.  I (RA) have not understand the meaning of the potarray 2 and 3...
-        
+        This data should NOT be used until its meaning is clear.  I
+        (RA) have not understand the meaning of the potarray 2 and
+        3...
+
         .. warning:: Do not use this attribute if you do not know what you treated
-'''
+
+        '''
         return self.__potarray2
 
     @property  # <= Fixme!!!
@@ -132,14 +144,14 @@ LOCPOT format is essentially same as CHGCAR but simpler.
         '''(maybe) Potential data (Array style)
 
         Usually this data should NOT be used.  I (RA) have not understand the meaning of the potarray 2 and 3...
-        
+
         .. warning:: Do not use this attribute if you do not know what you treated
 '''
         return self.__potarray3
 
     def get_mesh(self):
         '''Return mesh size
-        
+
         :return: (meshX, meshY, meshZ)
         :rtype: tuple 
         '''
@@ -212,8 +224,8 @@ LOCPOT format is essentially same as CHGCAR but simpler.
 
         :param axis_name: 'X', 'Y', or 'Z'
         :type axis_name: str
-        :return: max potential
-        :rtype: 
+        :return: maximum potential
+        :rtype: np.ndarray
         '''
         axis_name = axis_name.capitalize()
         if pottype == 'former':
@@ -244,7 +256,7 @@ LOCPOT format is essentially same as CHGCAR but simpler.
         :param axis_name: 'X', 'Y', or 'Z'
         :type axis_name: str
         :return: median potential
-        :rtype: 
+        :rtype: np.ndarray
         '''
         axis_name = axis_name.capitalize()
         if pottype == 'former':

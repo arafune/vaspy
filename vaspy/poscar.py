@@ -59,7 +59,7 @@ class POSCAR(object):
     This script does *NOT* support for constructing POSCAR
     from scratch. (Use ASE for this purpose.)
 
-    It provides a way to slightly modify the POSCAR or
+    It provides a way to slightly modify POSCAR or
     CONTCAR, which has already works well.
 
     :attribute: latticeV1, latticeV1, latticeV3
@@ -222,7 +222,7 @@ class POSCAR(object):
     def pos(self, *i):
         '''Accessor of POSCAR.position.
 
-        As in VASP, the atom index starts with "1", not "0".   This method follows this manner.
+        As in VASP, the atom index starts with "1", not "0".
 
         :param i: site index (index range can be set by tuple (from, to))
         :type i: int, or tuple of two int        
@@ -234,7 +234,7 @@ class POSCAR(object):
         :Example: (20, 25) means the index from site# 20 to site# 25.
 
         .. warning:: the first site # is "1", not "0". (Follow VESTA's way.)
-        .. warning:: (to user who knows python's style of slice)  When set the range by tuple, the latter index is taken into account.   pos(20, 25) returns position[19:25], not position[19:24]
+        .. warning:: (to user who knows Python's style of list slice)  When set the site index range by tuple, the latter index is included.  (pos(20, 25) returns position[19:25], not position[19:24])
 '''
         if type(i[0]) == int:
             dest = []
@@ -266,7 +266,7 @@ class POSCAR(object):
         self.position[i - 1] = vector
 
     def sort(self, from_index, to_index):
-        '''sort positions attribute by coordinate
+        '''Sort positions attribute by coordinate
 
         :param from_index: first index # for sort
         :param to_index: last index # for sort
@@ -505,7 +505,7 @@ class POSCAR(object):
         return destPOSCAR
 
     def merge(self, other):
-        '''lazy __add__: Return POSCAR generated with two poscars
+        '''lazy __add__: Return POSCAR generated from two POSCARs
 
         Even if the cell vectors and scaling factors are different,
         the 'merged' POSCAR is created.
@@ -664,7 +664,7 @@ class POSCAR(object):
         return molecule
 
     def guess_molecule2(self, site_list):
-        '''Arranges atom position to form a molecule.  
+        '''Arranges atom positions to form a molecule.  
 
         poscar updates
 

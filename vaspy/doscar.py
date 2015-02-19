@@ -20,6 +20,7 @@ class DOSCAR(object):  # Version safety
     '''Class for DOSCAR file
 
     A container of DOS object
+
     :author: Ryuichi Arafune
     '''
 
@@ -65,9 +66,9 @@ class DOS(object):  # Version safety
 
     '''Class for DOS
 
-    List object consisting list of two elements.
+    List object consisting two elements.
     The first element is the the energy.
-    The other element is still array that contains the density.
+    The latter element is list for the density.
 
     :author: Ryuichi Arafune
     :attribute: dos
@@ -95,14 +96,16 @@ class DOS(object):  # Version safety
             yield ith_point
 
     def append(self, dos_data):
-        '''
+        '''wrapper of list.append()
+
         :param dos_data: dos_data
         :type dos_data: np.array
         '''
         self.dos.append(_filter_dos_data(dos_data))
 
     def pop(self, i=-1):
-        '''
+        '''Wrapper of list.pop()
+
         :return: return and remove the last element
         :rtype: np.array
 
@@ -138,7 +141,7 @@ class DOS(object):  # Version safety
         self.dos = [(each[0] - fermi, each[1]) for each in self.dos]
 
     def energies(self, i=None):
-        '''Return energy
+        '''Return the *i*-th energy of the object
 
         :param i: index #
         :type i: int
@@ -151,7 +154,7 @@ class DOS(object):  # Version safety
             return self.dos[i][0]
 
     def densities(self, i=None):
-        '''Return density
+        '''Return the *i*-th density of the object
 
         :param i: index #
         :type i: int

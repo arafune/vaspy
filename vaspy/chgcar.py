@@ -26,7 +26,7 @@ class CHGCAR(poscar.POSCAR):
     '''
     Class for CHGCAR
 
-     An example of the first few line of the CHGCAR. ::
+     An example of the first few lines of CHGCAR. ::
 
            hBN-Cu                                  #1st line   poscar.POSCAR[0]
            1.00000000000000                        #2nd line   poscar.POSCAR[1]
@@ -41,7 +41,7 @@ class CHGCAR(poscar.POSCAR):
 
     :attribute: chgArray, meshX, meshY, meshZ, spininfo
     :version: 1.0.0
-    :note: the current verstion does not take account  "augmentation occupacies".
+    :note: the current verstion ignores "augmentation occupacies"
 
 '''
     # accessor: chgArray, meshX-Y-Z
@@ -57,7 +57,7 @@ class CHGCAR(poscar.POSCAR):
             self.load_from_file(arg)
 
     def load_from_file(self, chgcarfile):
-        '''Parse CHGCAR file to make CHGCAR object
+        '''Parse CHGCAR file to construct CHGCAR object
 
         :param chgcarfile: CHGCAR file name
         :type chgcarfile: str
@@ -148,17 +148,19 @@ class CHGCAR(poscar.POSCAR):
         '''
         Return CHGCAR for magnetization 
 
-        For spinpolarized calculations
+        For collinear spin-polarized calculations
         (``ISPIN=2`` but ``LSORBIT=.FALSE.``),
         two sets of data are found in CHGCAR file. The first set
-        contains the total charge density (spin up plus spin down),
-        the second one the magnetization density (spin up minus spin down).
-        For non collinear calculations (``ISPIN=2`` and ``LSORBIT=.TRUE.``),
-        CHGCAR file contains the total charge density and the
+        is the total charge density (spin-up plus spin-down),
+        the second one the magnetization density (spin-up minus spin-down).
+        For non-collinear spin-polarized calculations 
+        (``ISPIN=2`` and ``LSORBIT=.TRUE.``),
+        CHGCAR file stores the total charge density and the
         magnetisation density in the x, y and z direction in this order.
 
-        For spinpolarized calculation the argument does not make a sense.
-        For non-collinear CHGCAR, direction should be one of 'x', 'y', and 'z'
+        For collinear spinpolarized calculation the argument does
+        not make a sense.  For non-collinear CHGCAR, direction 
+        should be one of 'x', 'y', and 'z'
 
         :param direction: specify x, y, or z in noncollinear calculation
         :type direction: str
@@ -192,14 +194,13 @@ class CHGCAR(poscar.POSCAR):
     def majorityspin(self):
         '''Return CHGCAR for majority spin
 
-        From CHGCAR given by ``ISPIN=2`` but not-SOI calculations.
-        According to Dr. Minamitani, the former part of charge
-        distribution corresponds for majority spin + minority spin,
-        the latter part for  majority - minority
+        This method is for CHGCAR given by ``ISPIN=2`` but not-SOI
+        calculations.
 
         :return: CHGCAR for the majority spin charge
         :rtype:  CHGCAR
-'''
+
+        '''
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         destCHGCAR = copy.deepcopy(self)
@@ -212,14 +213,13 @@ class CHGCAR(poscar.POSCAR):
     def minorityspin(self):
         '''Return CHGCAR for minority spin
 
-        From CHGCAR given by ``ISPIN=2`` but not-SOI calculations.
-        According to Dr. Minamitani, the former part of charge distribution
-        corresponds for majority spin + minority spin, the latter part for
-        majority - minority
+        This method is for CHGCAR given by ``ISPIN=2`` but not-SOI
+        calculations.
 
         :return: CHGCAR for the minority  spin charge
         :rtype: CHGCAR
-'''
+
+        '''
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         destCHGCAR = copy.deepcopy(self)

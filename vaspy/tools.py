@@ -69,8 +69,8 @@ _resingle = re.compile(r'\d+')
 
 def parse_Atomselection(L):
     '''Return list of ordered "String" represents the number
-    
-    :param L: range of the atoms. the numbers deliminated by "-" or ",". (ex.) "1-5,8,9,11-15"
+
+    :param L: range of the atoms. the numbers deliminated by "-" or ","
     :type L: str
     :return: ordered "String" represents the number.
     :rtype: list
@@ -95,7 +95,7 @@ def parse_Atomselection(L):
 def parse_AtomselectionNum(L):
     '''Very similar with parse_Atomselection but returns the array of the number not array of the string.
 
-    :param L: range of the atoms. the numbers deliminated by "-" or ",".  (ex.) "1-5,8,9,11-15"
+    :param L: range of the atoms. the numbers deliminated by "-" or ","
     :type L: str
     :return: ordered int represents the number.
     :rtype: list

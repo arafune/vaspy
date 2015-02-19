@@ -62,7 +62,8 @@ class OUTCAR(object):  # Version safety
 
     def load_from_file(self, arg):
         """Effectively, this is a constructor of OUTCAR object.
-        arg is the file object of "OUTCAR"
+
+        :param arg: File name of "OUTCAR"
         """
         # local variables
         section = []

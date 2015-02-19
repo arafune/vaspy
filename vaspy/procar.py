@@ -244,10 +244,10 @@ class BandStructure(object):
                           'tot']
 
     def isready(self):
-        '''Return True if numk, nBands, nAtoms, spininfo,
+        '''Return True if numk, nBands, nAtoms, spininfo, and
         orb_names are set, otherwise raise ValueError.
 
-        This method is used before when orbitals, phases, energies
+        This method is used for check before when orbitals, phases, energies
         are set.'''
         if not hasattr(self, "numk"):
             raise ValueError("numk is not defined")
@@ -317,6 +317,9 @@ class BandStructure(object):
 
     @property
     def phases(self):
+        '''phase data
+
+        .. note:: At present I have no idea about this parameter.  How to use it?'''
         return self.__phases
 
     @phases.setter
