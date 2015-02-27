@@ -29,13 +29,14 @@ class PROCAR(object):  # Version safety
 
     .. py:class:: PROCAR(object)
 
-    PROCAR consists of these lines.  Appear once per file. 
+    PROCAR consists of these lines.  Appear once per file.
 
     1. the first line
 
       :Example:   PROCAR lm decomposed + phase
 
-    2. set number of k-points, bands and ions.  (Appear once when spin-integrated, twice when spin-resolved.)
+    2. set number of k-points, bands and ions.
+       (Appear once when spin-integrated, twice when spin-resolved.)
 
       :Example:   # of k-points:   50         # of bands: 576         # of ions:  98
 
