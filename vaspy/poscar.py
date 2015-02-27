@@ -628,10 +628,10 @@ class POSCAR(object):
 '''
         if self.is_direct:
             self.coordinate_type = "Cartesian"
-            m = np.array([self.latticeV1,
-                          self.latticeV2,
-                          self.latticeV3]).transpose()
-            self.position = [m.dot(v) for v in self.position]
+            mat = np.array([self.latticeV1,
+                            self.latticeV2,
+                            self.latticeV3]).transpose()
+            self.position = [mat.dot(v) for v in self.position]
 
     def to_Direct(self):
         '''Change the coordinate to direct from cartesian.
