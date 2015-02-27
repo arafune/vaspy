@@ -80,8 +80,8 @@ class CHGCAR(poscar.POSCAR):
                 elif section == 'define_separator':
                     separator = line if separator is None else separator
                     if self.meshX == self.meshY == self.meshZ == 0:
-                        self.__meshX, self.__meshY, self.__meshZ = \
-                            list(map(int, line.split()))
+                        self.__meshX, self.__meshY, self.__meshZ = [
+                            int(str) for str in line.split()]
                     section = 'grid'
                 elif section == 'aug':
                     if separator in line:
