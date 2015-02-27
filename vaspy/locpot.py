@@ -16,8 +16,8 @@ try:
 except ImportError:
     mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
     sys.path.append(os.path.dirname(os.path.abspath(mypath)))
-    import poscar
-    import tools
+    import vaspy.poscar
+    import vaspy.tools
 
 
 class LOCPOT(poscar.POSCAR):
@@ -70,7 +70,9 @@ class LOCPOT(poscar.POSCAR):
                 self.__potarray = np.array(self.__potlist).reshape(
                     self.meshZ, self.meshY, self.meshX)
             elif len(self.__potlist) == 2 * (self.meshX *
-                                             self.meshY * self.meshZ) + 3 + sum(self.ionnums):  # LVHAR
+                                             self.meshY *
+                                             self.meshZ) + 3 + sum(
+                    self.ionnums):
                 self.__potarray = np.array(
                     self.__potlist[:
                                    self.meshX *

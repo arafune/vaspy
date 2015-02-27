@@ -95,10 +95,10 @@ class OUTCAR(object):  # Version safety
         self.atom_identifer = [name + ":#" + str(index + 1)
                                for (index, name)
                                in enumerate(
-            [elm + str(j)
-             for (elm, n) in zip(self.iontype,
-                                 self.ionnums)
-             for j in range(1, int(n) + 1)])]
+                                   [elm + str(j)
+                                    for (elm, n) in zip(self.iontype,
+                                                        self.ionnums)
+                                    for j in range(1, int(n) + 1)])]
         #            i=1
         #            for elm, n in zip(self.iontype, self.ionnums):
         #                for j in range(1, int(n)+1):
