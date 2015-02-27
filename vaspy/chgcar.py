@@ -175,27 +175,31 @@ class CHGCAR(poscar.POSCAR):
 '''
         if len(self.spininfo) == 1:
             raise RuntimeError("This CHGCAR is not spinresolved version")
-        destCHGCAR = copy.deepcopy(self)
+        dest_chgcar = copy.deepcopy(self)
         if len(self.spininfo) == 2:
-            s1, s2 = tools.each_slice(self.chgArray,
-                                      self.meshX * self.meshY * self.meshZ)
-            destCHGCAR.__chgArray = list(s2)
-            destCHGCAR.__spininfo = ["up-down"]
+            total, sd1 = tools.each_slice(self.chgArray,
+                                          self.meshX *
+                                          self.meshY *
+                                          self.meshZ)
+            dest_chgcar.__chgArray = list(sd1)
+            dest_chgcar.__spininfo = ["up-down"]
         elif len(self.spininfo) == 4:
-            s1, s2, s3, s4 = tools.each_slice(self.chgArray,
-                                              self.meshX * self.meshY * self.meshZ)
+            total, sd1, sd2, sd3 = tools.each_slice(self.chgArray,
+                                                    self.meshX *
+                                                    self.meshY *
+                                                    self.meshZ)
             if direction is None:
                 direction = 'x'
             if direction == 'x':
-                destCHGCAR.__chgArray = list(s2)
-                destCHGCAR.__spininfo = ["mX"]
+                dest_chgcar.__chgArray = list(sd1)
+                dest_chgcar.__spininfo = ["mX"]
             elif direction == 'y':
-                destCHGCAR.__chgArray = list(s3)
-                destCHGCAR.__spininfo = ["mY"]
+                dest_chgcar.__chgArray = list(sd2)
+                dest_chgcar.__spininfo = ["mY"]
             elif direction == 'z':
-                destCHGCAR.__chgArray = list(s4)
-                destCHGCAR.__spininfo = ["mZ"]
-        return destCHGCAR
+                dest_chgcar.__chgArray = list(sd3)
+                dest_chgcar.__spininfo = ["mZ"]
+        return dest_chgcar
 
     def majorityspin(self):
         '''Return CHGCAR for majority spin
@@ -209,12 +213,15 @@ class CHGCAR(poscar.POSCAR):
         '''
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
-        destCHGCAR = copy.deepcopy(self)
-        s1, s2 = tools.each_slice(self.chgArray,
-                                  self.meshX * self.meshY * self.meshZ)
-        destCHGCAR.__chgArray = [(up + down) / 2 for up, down in zip(s1, s2)]
-        destCHGCAR.__spininfo = ["up"]
-        return destCHGCAR
+        dest_chgcar = copy.deepcopy(self)
+        total, magnetization = tools.each_slice(self.chgArray,
+                                                self.meshX *
+                                                self.meshY *
+                                                self.meshZ)
+        dest_chgcar.__chgArray = [
+            (up + down) / 2 for up, down in zip(total, magnetization)]
+        dest_chgcar.__spininfo = ["up"]
+        return dest_chgcar
 
     def minorityspin(self):
         '''Return CHGCAR for minority spin
@@ -228,12 +235,15 @@ class CHGCAR(poscar.POSCAR):
         '''
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
-        destCHGCAR = copy.deepcopy(self)
-        s1, s2 = tools.each_slice(self.chgArray,
-                                  self.meshX * self.meshY * self.meshZ)
-        destCHGCAR.__chgArray = [(up - down) / 2 for up, down in zip(s1, s2)]
-        destCHGCAR.__spininfo = ["down"]
-        return destCHGCAR
+        dest_chgcar = copy.deepcopy(self)
+        total, magnetization = tools.each_slice(self.chgArray,
+                                                self.meshX *
+                                                self.meshY *
+                                                self.meshZ)
+        dest_chgcar.__chgArray = [
+            (up - down) / 2 for up, down in zip(total, magnetization)]
+        dest_chgcar.__spininfo = ["down"]
+        return dest_chgcar
 
     def __add__(self, other):
         '''
@@ -250,7 +260,7 @@ class CHGCAR(poscar.POSCAR):
         # augend + aggend
         if not isinstance(other, CHGCAR):
             return NotImplemented
-        addCHGCAR = super(CHGCAR, self).__add__(other)
+        add_chgcar = super(CHGCAR, self).__add__(other)
         if any([self.meshX != other.meshX,
                 self.meshY != other.meshY,
                 self.meshZ != other.meshZ]):
@@ -258,10 +268,10 @@ class CHGCAR(poscar.POSCAR):
         augend = self.chgArray
         addend = other.chgArray
         if len(augend) == len(addend):
-            addCHGCAR.__chgArray = [x + y for x, y in zip(augend, addend)]
+            add_chgcar.__chgArray = [x + y for x, y in zip(augend, addend)]
         else:
             raise RuntimeError('the mesh sies are different.')
-        return addCHGCAR
+        return add_chgcar
 
     def __sub__(self, other):
         '''x.__sub__y <=> x - y
@@ -279,7 +289,7 @@ class CHGCAR(poscar.POSCAR):
         # minuend - subtrahend
         if not isinstance(other, CHGCAR):
             return NotImplemented
-        diffCHGCAR = copy.deepcopy(self)
+        diff_chgcar = copy.deepcopy(self)
         if any([self.meshX != other.meshX,
                 self.meshY != other.meshY,
                 self.meshZ != other.meshZ]):
@@ -287,11 +297,11 @@ class CHGCAR(poscar.POSCAR):
         minuend = self.chgArray
         subtrahend = other.chgArray
         if len(minuend) == len(subtrahend):
-            diffCHGCAR.__chgArray = [x - y for x, y in
-                                     zip(minuend, subtrahend)]
+            diff_chgcar.__chgArray = [x - y for x, y in
+                                      zip(minuend, subtrahend)]
         else:
-            raise RuntimeError('the mesh sies are different.')
-        return diffCHGCAR
+            raise RuntimeError('the mesh sizes are different.')
+        return diff_chgcar
 
     def __str__(self):
         '''x.__str__() <=> str(x)
