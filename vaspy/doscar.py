@@ -145,7 +145,8 @@ class DOS(object):  # Version safety
 
         :param i: index #
         :type i: int
-        :return: the energy value of the i-th point when i set.  If arg is null, return the all energies in DOS object.
+        :return: the energy value of the i-th point when i set.
+                 If arg is null, return the all energies in DOS object.
         :rtype: np.ndarray
         '''
         if i is None:
@@ -158,7 +159,8 @@ class DOS(object):  # Version safety
 
         :param i: index #
         :type i: int
-        :return: the density of states for the i-th point when i set.  If arg is null, return the all energies in DOS object.
+        :return: the density of states for the i-th point when i set.
+                 If arg is null, return the all energies in DOS object.
         :rtype: numpy.array
         '''
         if i is None:

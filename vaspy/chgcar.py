@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
+'''
+Module for CHGCAR class
 
+translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
+'''
 from __future__ import division, print_function  # Version safety
 import re
 import copy
@@ -23,8 +26,7 @@ _re_aug_occ = re.compile(r'\baugmentation occupancies')
 
 class CHGCAR(poscar.POSCAR):
 
-    '''
-    Class for CHGCAR
+    '''Class for CHGCAR
 
      An example of the first few lines of CHGCAR. ::
 
@@ -41,8 +43,9 @@ class CHGCAR(poscar.POSCAR):
 
     :attribute: chgArray, meshX, meshY, meshZ, spininfo
     :version: 1.0.0
-    :note: the current verstion ignores "augmentation occupacies"
 
+    .. note:: the current verstion ignores
+              "augmentation occupacies".
 '''
     # accessor: chgArray, meshX-Y-Z
 
@@ -133,33 +136,36 @@ class CHGCAR(poscar.POSCAR):
 
         *  for ``ISPIN = 1``, [""]
 
-        *  for ``ISPIN = 2`` (and ``LSORBIT=.FALSE.``), ["up+down", "up-down"]
+        *  for ``ISPIN = 2`` (but ``LSORBIT=.FALSE.``),
+           ["up+down", "up-down"]
 
-        *  for ``ISPIN = 2`` (and ``LSORBIT=.TRUE.``),  ["mT", "mX", "mY", "mZ"]
+        *  for ``ISPIN = 2`` (but ``LSORBIT=.TRUE.``),
+           ["mT", "mX", "mY", "mZ"]
 
         '''
         return self.__spininfo
 
     @property
     def chgArray(self):
+        '''charge data'''
         return self.__chgArray
 
     def magnetization(self, direction=None):
         '''
-        Return CHGCAR for magnetization 
+        Return CHGCAR for magnetization
 
         For collinear spin-polarized calculations
         (``ISPIN=2`` but ``LSORBIT=.FALSE.``),
         two sets of data are found in CHGCAR file. The first set
         is the total charge density (spin-up plus spin-down),
         the second one the magnetization density (spin-up minus spin-down).
-        For non-collinear spin-polarized calculations 
+        For non-collinear spin-polarized calculations
         (``ISPIN=2`` and ``LSORBIT=.TRUE.``),
         CHGCAR file stores the total charge density and the
         magnetisation density in the x, y and z direction in this order.
 
         For collinear spinpolarized calculation the argument does
-        not make a sense.  For non-collinear CHGCAR, direction 
+        not make a sense.  For non-collinear CHGCAR, direction
         should be one of 'x', 'y', and 'z'
 
         :param direction: specify x, y, or z in noncollinear calculation

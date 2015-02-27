@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 # -*- conding: utf-8 -*-
-# python 3.3.2
-# translate from poscar.rb of 2014/2/26, master branch
+'''This mudule provides POSCAR class
 
+translate from poscar.rb of 2014/2/26, master branch
+'''
 from __future__ import division, print_function  # Version safety
 import numpy as np
 import itertools as it
@@ -225,17 +226,25 @@ class POSCAR(object):
         As in VASP, the atom index starts with "1", not "0".
 
         :param i: site index (index range can be set by tuple (from, to))
-        :type i: int, or tuple of two int        
-        :return: atom's position  (When single value is set as i, return just an atom position)
+        :type i: int, or tuple of two int
+
+        :return: atom's position (When single value is set as i,
+                 return just an atom position)
+
         :rtype: np.array or list of np.array
 
-        .. note:: You can set the index range by using tuple. 
+        .. note:: You can set the index range by using tuple.
 
         :Example: (20, 25) means the index from site# 20 to site# 25.
 
         .. warning:: the first site # is "1", not "0". (Follow VESTA's way.)
-        .. warning:: (to user who knows Python's style of list slice)  When set the site index range by tuple, the latter index is included.  (pos(20, 25) returns position[19:25], not position[19:24])
-'''
+
+        .. warning:: (to user who knows Python's style of list slice)
+                     When set the site index range by tuple, the
+                     latter index is included.  (pos(20, 25) returns
+                     position[19:25], not position[19:24])
+
+        '''
         if type(i[0]) == int:
             dest = []
             for ii in i:
@@ -357,13 +366,17 @@ class POSCAR(object):
 
     # class method? or independent function?
     def make27candidate(self, position):
-        '''
+        '''Return 27 vector sets correspond the neiboring
 
-        :param position: atom position defined in the coordinated by latticeV1, latticeV2, latticeV3 ( scaling facter is not accounted).
+        :param position: atom position defined in the coordinated by
+                         latticeV1, latticeV2, latticeV3 ( scaling
+                         facter is not accounted).
+
         :param type: np.array, list
         :return: list of np.array
-        :rtype: list 
-'''
+        :rtype: list
+
+        '''
         position = _vectorize(position)
         candidates27 = []
         if self.is_cartesian:
@@ -381,7 +394,7 @@ class POSCAR(object):
         return candidates27
 
     def atom_rotate(self, site, axis_name, theta, center):
-        '''Rotate atom (single atom!) 
+        '''Rotate atom (single atom!)
 
         :param site: site # for rotation (The first atom is "1".).
         :param axis_name: "X", "x", "Y", "y", "Z", or "z". Rotation axis.
@@ -416,15 +429,21 @@ class POSCAR(object):
     def atoms_rotate(self, site_list_pack, axis_name, theta, center):
         '''Rotate atoms
 
-        :param site_list_pack: list array of the  list array (not typo!) of site for rotation   (The first atom is "1".).
-        :param axis_name: "X", "x", "Y", "y", "Z",or "z". Rotation axis.
+        :param site_list_pack: list array of the list array (not
+                               typo!) of site for rotation (The first
+                               atom is "1".).
+
+        :param axis_name: "X", "x", "Y", "y", "Z",or "z".
+                          Rotation axis.
+
         :param theta: Rotation angle (Degrees).
         :param center: center position for rotation.
         :type site_list_pack: list, tuple
         :type theta: float
         :type axis_name: str
         :type center: np.array, list, tuple
-'''
+
+        '''
         for site_list in site_list_pack:
             for site in site_list:
                 self.atom_rotate(site, axis_name, theta, center)
@@ -588,11 +607,12 @@ class POSCAR(object):
         '''Change scaling factor to new value
 
         :param new_scaling_factor:
-        :type new_scaling_factor: float  
+        :type new_scaling_factor: float
 
         .. note::  **The Braves lattice are corrected (to be equal size)**
 
-        .. warning:: If you change the cell size, change  scaling_factor attribute directly
+        .. warning:: If you change the cell size, change
+                     scaling_factor attribute directly
 '''
         old = self.scaling_factor
         self.__latticeV1 *= (old / new_scaling_factor)
@@ -635,7 +655,15 @@ class POSCAR(object):
         :return: Array of Vector that represents "molecule".
         :rtype: numpy.array
 
-        .. note:: When the optional argument, center, is set, the  atoms are re-arranged as to minimize the distance from this center.  If not, atoms are re-arranged to minimize the total bonding length.   As the algorithm for mimizing the total length is not exhaustive, the resultant atom arrangement  may different from what you expect, in spite of time-waste.  The center option is highly recommended to form a molecule.
+        .. note:: When the optional argument, center, is set, the
+                  atoms are re-arranged as to minimize the distance
+                  from this center.  If not, atoms are re-arranged to
+                  minimize the total bonding length.  As the algorithm
+                  for mimizing the total length is not exhaustive, the
+                  resultant atom arrangement may different from what
+                  you expect, in spite of time-waste.  The center
+                  option is highly recommended to form a molecule.
+
         '''
         molecule = [self.pos(j) for j in site_list]
         for index, site in enumerate(site_list):
@@ -664,7 +692,7 @@ class POSCAR(object):
         return molecule
 
     def guess_molecule2(self, site_list):
-        '''Arranges atom positions to form a molecule.  
+        '''Arranges atom positions to form a molecule.
 
         poscar updates
 

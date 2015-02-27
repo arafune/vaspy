@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-''''''
+'''
+Module for tools used in vaspy
+'''
 
 from __future__ import print_function, division  # Version safety
 import re
@@ -93,7 +95,8 @@ def parse_Atomselection(L):
 
 
 def parse_AtomselectionNum(L):
-    '''Very similar with parse_Atomselection but returns the array of the number not array of the string.
+    '''Very similar with parse_Atomselection but returns the array of the
+    number not array of the string.
 
     :param L: range of the atoms. the numbers deliminated by "-" or ","
     :type L: str

@@ -1,19 +1,17 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-
 """
-
+This module provides OUTCAR class
 """
 
 from __future__ import unicode_literals  # Version safety
 from __future__ import print_function  # Version safety
-import re
 
 
 class OUTCAR(object):  # Version safety
 
-    """Class for OUTCAR file that stores calculation details and/or calculation progress
+    """Class for OUTCAR file that stores calculation details
+    and/or calculation progress
 
     :Author: Ryuichi Arafune
     """
@@ -127,7 +125,8 @@ class OUTCAR(object):  # Version safety
     def select_posforce(self, posforce_flag, *sites):
         """Return the posforce corresponding the posforce_flag
 
-        .. note:: posforce_flag: An 6-element True/False list that indicates the output (ex.) [True, True, False, True, True, False]
+        .. note:: posforce_flag: An 6-element True/False list that indicates
+                  the output (ex.) [True, True, False, True, True, False]
         """
 
         if sites == () or sites[0] == []:

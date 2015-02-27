@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+'''
+This module provides LOCPOT class
+'''
 #
 from __future__ import division
 from __future__ import print_function
@@ -108,12 +111,14 @@ class LOCPOT(poscar.POSCAR):
     def potlist(self):
         '''Potential data (Array style)
 
-        From Vasp Manual, the potential is written using the following commands in Fortran (as same as for charge density in CHGCAR)
+        From Vasp Manual, the potential is written using the following
+        commands in Fortran (as same as for charge density in CHGCAR)
 
         .. code-block :: fortran
 
            WRITE(IU, FORM) (((C(NX, NY, NZ), NX=1, NGXC), NY=1, NGYZ), NZ=1, NGZC)
-'''
+
+        '''
         return self.__potlist
 
     @property
@@ -143,17 +148,20 @@ class LOCPOT(poscar.POSCAR):
     def potarray2(self):
         '''(maybe) Potential data (Array style)
 
-        Usually this data should NOT be used.  I (RA) have not understand the meaning of the potarray 2 and 3...
+        Usually this data should NOT be used.  I (RA) have not
+        understand the meaning of the potarray 2 and 3...
 
-        .. warning:: Do not use this attribute if you do not know what you treated
-'''
+        .. warning:: Do not use this attribute if you do not know
+                     what you treated
+
+        '''
         return self.__potarray3
 
     def get_mesh(self):
         '''Return mesh size
 
         :return: (meshX, meshY, meshZ)
-        :rtype: tuple 
+        :rtype: tuple
         '''
         return self.__meshX, self.__meshY, self.__meshZ
 
@@ -163,7 +171,7 @@ class LOCPOT(poscar.POSCAR):
         :param axis_name: 'X', 'Y', or 'Z'
         :type axis_name: str
         :return: averaged potential
-        :rtype: 
+        :rtype: np.array
         '''
         axis_name = axis_name.capitalize()
         if pottype == 'former':
@@ -194,7 +202,7 @@ class LOCPOT(poscar.POSCAR):
         :param axis_name: 'X', 'Y', or 'Z'
         :type axis_name: str
         :return: min potential
-        :rtype: 
+        :rtype: np.array
         '''
         axis_name = axis_name.capitalize()
         if pottype == 'former':
