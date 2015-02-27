@@ -39,10 +39,10 @@ class DOSCAR(object):  # Version safety
         :type doscar_file: str
         :rtype: DOSCAR
         """
-        with open(doscar_file) as f:
+        with open(doscar_file) as the_doscar:
             separate_text = ""
             aDOS = list()
-            for idx, line in enumerate(f, 1):
+            for idx, line in enumerate(the_doscar, 1):
                 if idx == 1:
                     self.nAtom = int(line.split()[0])
                 elif 2 <= idx <= 5:
@@ -77,8 +77,8 @@ class DOS(object):  # Version safety
     def __init__(self, array=None):
         self.dos = list()
         if array is not None:
-            for a in array:
-                a_float = [float(i) for i in a]
+            for arr in array:
+                a_float = [float(i) for i in arr]
                 self.dos.append([a_float[0], a_float[1:]])
 
     def __deepcopy__(self, memo):

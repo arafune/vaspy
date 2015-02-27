@@ -67,8 +67,8 @@ class OUTCAR(object):  # Version safety
         section = []
         posforce = []
         # parse
-        f = open(arg)
-        for line in f:
+        thefile = open(arg)
+        for line in thefile:
             if section == ["force"]:
                 if "total drift" in line:
                     section.pop()

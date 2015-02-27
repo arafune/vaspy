@@ -49,15 +49,15 @@ class CHGCAR(poscar.POSCAR):
 '''
     # accessor: chgArray, meshX-Y-Z
 
-    def __init__(self, arg=None):
+    def __init__(self, chgcar_file=None):
         super(CHGCAR, self).__init__(None)
         self.__meshX = 0
         self.__meshY = 0
         self.__meshZ = 0
         self.__spininfo = 0
         self.__chgArray = []
-        if arg:
-            self.load_from_file(arg)
+        if chgcar_file:
+            self.load_from_file(chgcar_file)
 
     def load_from_file(self, chgcarfile):
         '''Parse CHGCAR file to construct CHGCAR object
@@ -68,8 +68,8 @@ class CHGCAR(poscar.POSCAR):
         section = 'poscar'
         separator = None
         tmp = []
-        with open(chgcarfile) as f:
-            for line in f:
+        with open(chgcarfile) as thefile:
+            for line in thefile:
                 line = line.rstrip('\n')
                 if section == 'poscar':
                     if re.search(_re_blank, line):
