@@ -316,7 +316,7 @@ class POSCAR(object):
         return np.array(
             [[1.0, 0.0, 0.0],
              [0.0, np.cos(theta * degree), -np.sin(theta * degree)],
-             [0.0, np.sin(theta * degree),  np.cos(theta * degree)]])
+             [0.0, np.sin(theta * degree), np.cos(theta * degree)]])
 
     def rotateY(self, theta):
         '''Rotation matrix around Y-axis
@@ -349,7 +349,7 @@ class POSCAR(object):
         degree = np.pi / 180.0
         return np.array(
             [[np.cos(theta * degree), -np.sin(theta * degree), 0.0],
-             [np.sin(theta * degree),  np.cos(theta * degree), 0.0],
+             [np.sin(theta * degree), np.cos(theta * degree), 0.0],
              [0.0, 0.0, 1.0]])
 
     # class method? or independent function?

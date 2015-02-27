@@ -241,7 +241,7 @@ class BandStructure(object):
         self.__phases = 0
         self.__energies = 0
         self.orb_names = ['s', 'py', 'pz', 'px',
-                          'dxy',  'dyz', 'dz2', 'dxz', 'dx2',
+                          'dxy', 'dyz', 'dz2', 'dxz', 'dx2',
                           'tot']
 
     def isready(self):

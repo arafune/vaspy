@@ -55,7 +55,7 @@ def flatten(nested, target=Iterable, ignore=flatten_ignore):
     i = 0
     while i < len(nested):
         while (isinstance(nested[i], target) and
-                not isinstance(nested[i], ignore)):
+               not isinstance(nested[i], ignore)):
             if not nested[i]:
                 nested.pop(i)
                 i -= 1
@@ -107,6 +107,7 @@ def parse_AtomselectionNum(L):
 
     >>> parse_AtomselectionNum("1-5,8,8,9-15,10")
     [1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15]
+
     '''
     return sorted(int(i) for i in parse_Atomselection(L))
 
@@ -117,8 +118,7 @@ if __name__ == '__main__':
             'removeall': ([1, 0, 0, 1, 0, 1, 0, 0], 0),
             'flatten': ((1, [range(2), 3, set([4, 5]), [6]],  # Version safety
                          frozenset([7, 8])),),
-            'parse_Atomselection': ('1-5,8,9,11-15',),
-            }
+            'parse_Atomselection': ('1-5,8,9,11-15',), }
     argcounts = {'each_slice_demo': 2,
                  'removeall': 2,
                  'flatten': 1,
@@ -156,8 +156,7 @@ See epilog for notices for argument notation.''')
         else:
             if argcounts[func] != len(args.values[index]):
                 print('''argument number not match (require {0}, given {1})
-use default values.'''.format(
-                      argcounts[func], len(args.values[index])))
+use default values.'''.format(argcounts[func], len(args.values[index])))
                 values = demo[func]
             else:
                 values = [eval(s) for s in args.values[index]]
