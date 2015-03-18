@@ -38,11 +38,15 @@ class PROCAR(object):  # Version safety
     2. set number of k-points, bands and ions.
        (Appear once when spin-integrated, twice when spin-resolved.)
 
-      :Example:   # of k-points:   50         # of bands: 576         # of ions:  98
+      :Example:
+
+        # of k-points:   50         # of bands: 576         # of ions:  98
 
     3.  k-point character
 
-      :Example:  k-point    1 :    0.00000 0.00000 0.00000 weight = 0.02000000
+      :Example:
+
+        k-point    1 :    0.00000 0.00000 0.00000 weight = 0.02000000
 
       .. note:: that the first character is "blank".
 
@@ -52,7 +56,8 @@ class PROCAR(object):  # Version safety
 
     5. orbital contribution.
 
-      :Example: 1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
+      :Example:
+    1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
 
     :author: Ryuichi Arafune
     '''

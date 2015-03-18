@@ -141,7 +141,8 @@ class LOCPOT(poscar.POSCAR):
         (RA) have not understand the meaning of the potarray 2 and
         3...
 
-        .. warning:: Do not use this attribute if you do not know what you treated
+        .. warning:: Do not use this attribute if you do not know
+                     what you treated
 
         '''
         return self.__potarray2
