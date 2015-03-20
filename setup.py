@@ -3,7 +3,7 @@
 from distutils.core import setup
 import sys
 
-reqpkgs = ['numpy']
+reqpkgs = ['numpy', 'matplotlib']
 if sys.hexversion < 0x20700f0 or 0x30000f0 <= sys.hexversion < 0x30200f0:
     reqpkgs.append('argparse')
 
