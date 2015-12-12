@@ -141,7 +141,7 @@ class PROCAR(object):  # Version safety
                     continue
                 elif "k-points: " in line:
                     self.__numk, self.__nBands, self.__nAtoms = [
-                        int(i) for i in line.split() if i.isdigit()]
+                        int(i) for i in re.split('\s|:',line) if i.isdigit()]
                 elif "k-point " in line:
                     self.__kvectors.append(np.array(
                         [float(i) for i in line.split()[3:6]]))
@@ -403,7 +403,10 @@ structure drowing'''
                         arg[self.numk * len(self.available_band):]).reshape(
                             self.numk, self.nBands))
                 self.__energies = np.array(self.__energies)
-
+                
+    def fermi_correction(self, fermi):
+        self.__energies -= fermi
+                        
     def compose_sites(self, arg):
         '''Make sitecomposed ndarray
 
