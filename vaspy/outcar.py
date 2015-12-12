@@ -1,19 +1,17 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-
 """
-
+This module provides OUTCAR class
 """
 
 from __future__ import unicode_literals  # Version safety
 from __future__ import print_function  # Version safety
-import re
 
 
 class OUTCAR(object):  # Version safety
 
-    """Class for OUTCAR file that stores calculation details and/or calculation progress
+    """Class for OUTCAR file that stores calculation details
+    and/or calculation progress
 
     :Author: Ryuichi Arafune
     """
@@ -62,14 +60,15 @@ class OUTCAR(object):  # Version safety
 
     def load_from_file(self, arg):
         """Effectively, this is a constructor of OUTCAR object.
-        arg is the file object of "OUTCAR"
+
+        :param arg: File name of "OUTCAR"
         """
         # local variables
         section = []
         posforce = []
         # parse
-        f = open(arg)
-        for line in f:
+        thefile = open(arg)
+        for line in thefile:
             if section == ["force"]:
                 if "total drift" in line:
                     section.pop()
@@ -96,10 +95,10 @@ class OUTCAR(object):  # Version safety
         self.atom_identifer = [name + ":#" + str(index + 1)
                                for (index, name)
                                in enumerate(
-            [elm + str(j)
-             for (elm, n) in zip(self.iontype,
-                                 self.ionnums)
-             for j in range(1, int(n) + 1)])]
+                                   [elm + str(j)
+                                    for (elm, n) in zip(self.iontype,
+                                                        self.ionnums)
+                                    for j in range(1, int(n) + 1)])]
         #            i=1
         #            for elm, n in zip(self.iontype, self.ionnums):
         #                for j in range(1, int(n)+1):
@@ -126,7 +125,8 @@ class OUTCAR(object):  # Version safety
     def select_posforce(self, posforce_flag, *sites):
         """Return the posforce corresponding the posforce_flag
 
-        .. note:: posforce_flag: An 6-element True/False list that indicates the output (ex.) [True, True, False, True, True, False]
+        .. note:: posforce_flag: An 6-element True/False list that indicates
+                  the output (ex.) [True, True, False, True, True, False]
         """
 
         if sites == () or sites[0] == []:
@@ -138,74 +138,3 @@ class OUTCAR(object):  # Version safety
                  if boolian
                  if index + 1 in sites]
                 for one_cycle in self.posforce]
-
-
-if __name__ == '__main__':
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description='Show position/force evolution in VASP calculation')
-
-    parser.add_argument("-x", "--posx", action="store_true", dest="posx",
-                        help="X-axis position", default=False)
-    parser.add_argument("-y", "--posy", action="store_true", dest="posy",
-                        help="Y-axis position", default=False)
-    parser.add_argument("-z", "--posz", action="store_true", dest="posz",
-                        help="Z-axis position", default=False)
-    parser.add_argument("-X", "--forcex", action="store_true", dest="forcex",
-                        help="Force along X-axis", default=False)
-    parser.add_argument("-Y", "--forcey", action="store_true", dest="forcey",
-                        help="Force along Y-axis", default=False)
-    parser.add_argument("-Z", "--forcez", action="store_true", dest="forcez",
-                        help="Force along Z-axis", default=False)
-    parser.add_argument("--site", action="store", dest="site",
-                        help="numbers deliminated by comma and hyphen for SITE you want to see", type=str)
-    parser.add_argument("outcarfiles", type=str, nargs="+", metavar="OUTCAR",
-                        help="OUTCAR_file")
-    parser.add_argument("--plot", action="store_true",
-                        help="show plot")
-    args = parser.parse_args()
-    pff = [args.posx, args.posy, args.posz,
-           args.forcex, args.forcey, args.forcez]  # pff is "posforce_flag"
-    if pff == [False, False, False, False, False, False]:
-        pff = [True, True, True, True, True, True, True]
-
-    def parse_SiteSelection(string):
-        if string is None:
-            return []
-        else:
-            array = string.split(",")
-            output = []
-            for i in array:
-                if re.findall(r"(\d+)-(\d+)", i):
-                    tmp = re.findall(r"(\d+)-(\d+)", i)
-                    a_range = range(int(tmp[0][0]), int(tmp[0][1]) + 1)
-                    for j in a_range:
-                        output.append(j)
-                elif re.findall(r"\d+", i):
-                    tmp = re.findall(r"\d+", i)
-                    output.append(int(tmp[0]))
-            output = list(set(output))
-            output.sort()
-            return output
-
-    sites = parse_SiteSelection(args.site)
-
-    o = OUTCAR(args.outcarfiles.pop(0))
-    headers = o.select_posforce_header(pff, sites)
-    posforce = o.select_posforce(pff, sites)
-    for outcarfile in args.outcarfiles:
-        o = OUTCAR(outcarfile)
-        posforce.extend(o.select_posforce(pff, sites))
-
-    if args.plot:
-        import matplotlib.pyplot as plt
-        data = map(list, zip(*posforce))
-        for i in zip(headers, data):
-            plt.plot(i[1], label=i[0])
-        plt.legend()
-        plt.show()
-    else:
-        print("\t".join(headers))
-        for item in posforce:
-            print("\t".join([str(i) for i in item]))

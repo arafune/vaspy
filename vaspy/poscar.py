@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 # -*- conding: utf-8 -*-
-# python 3.3.2
-# translate from poscar.rb of 2014/2/26, master branch
+'''This mudule provides POSCAR class
 
+translate from poscar.rb of 2014/2/26, master branch
+'''
 from __future__ import division, print_function  # Version safety
 import numpy as np
 import itertools as it
@@ -16,11 +17,6 @@ except ImportError:
     mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
     sys.path.append(os.path.dirname(os.path.abspath(mypath)))
     import tools
-
-# @example
-#  l=    " 0.7071067800000000    0.0000000000000000    0.0000000000000000"
-#  Vector.elements(l.split.map{|i| i.to_f}) # => Vector[0.70710678, 0.0, 0.0]
-
 
 '''
  fcc (111) surface
@@ -53,18 +49,6 @@ Direct
   0.00000000E+00  0.00000000E+00  0.00000000E+00
 '''
 
-'''
-  0.00000      0.00000      0.00000
-  0.00000      1.43703      2.03227
-  1.24451      0.71852      4.06454
-  0.00000      0.00000      6.09682
-  0.00000      1.43703      8.12909
-  0.00000      0.00000     10.16136
-  0.00000      1.43703     12.19363
-  1.24451      0.71852     14.22590
-  0.00000      0.00000     16.25818
-'''
-
 
 class POSCAR(object):
 
@@ -76,7 +60,7 @@ class POSCAR(object):
     This script does *NOT* support for constructing POSCAR
     from scratch. (Use ASE for this purpose.)
 
-    It provides a way to slightly modify the POSCAR or
+    It provides a way to slightly modify POSCAR or
     CONTCAR, which has already works well.
 
     :attribute: latticeV1, latticeV1, latticeV3
@@ -236,19 +220,42 @@ class POSCAR(object):
         '''
         return self.__selective
 
-    def pos(self, i):
-        '''POSCAR.pos(i): An accessor of POSCAR.position.
+    def pos(self, *i):
+        '''Accessor of POSCAR.position.
 
-        As in VASP, the atom index starts with "1",
-        not "0".   This method follows this manner.
+        As in VASP, the atom index starts with "1", not "0".
 
-        :param i: site #
-        :param type: int
-        :note: the first site # is "1", not "0". (Follow VESTA's way.)
-        :return: *i* -th atom's position by Vector representation.
-        :rtype: numpy.array
-'''
-        return self.position[i - 1]
+        :param i: site index (index range can be set by tuple (from, to))
+        :type i: int, or tuple of two int
+
+        :return: atom's position (When single value is set as i,
+                 return just an atom position)
+
+        :rtype: np.array or list of np.array
+
+        .. note:: You can set the index range by using tuple.
+
+        :Example: (20, 25) means the index from site# 20 to site# 25.
+
+        .. warning:: the first site # is "1", not "0". (Follow VESTA's way.)
+
+        .. warning:: (to user who knows Python's style of list slice)
+                     When set the site index range by tuple, the
+                     latter index is included.  (pos(20, 25) returns
+                     position[19:25], not position[19:24])
+
+        '''
+        if type(i[0]) == int:
+            dest = []
+            for ii in i:
+                dest.append(self.position[ii - 1])
+            if len(dest) == 1:
+                dest = dest[0]
+        elif type(i[0]) == tuple:
+            if i[0] > i[1]:
+                raise ValueError
+            dest = self.positions[i[0] - 1: i[1]]
+        return dest
 
     def pos_replace(self, i, vector):
         '''
@@ -256,7 +263,7 @@ class POSCAR(object):
         :param vector: list of the i-th atom position.
         :type i: int
         :type vector: list, tuple, np.array
-        :note: the first site # is "1", not "0". (To follow VESTA's and VASP's way.)
+        :note: the first site # is "1", not "0" to follow VESTA's way.
 '''
         vector = _vectorize(vector)
         if not isinstance(i, int):
@@ -266,6 +273,28 @@ class POSCAR(object):
             message += ' Cartesian coordinate'
             raise RuntimeError(message)
         self.position[i - 1] = vector
+
+    def sort(self, from_index, to_index):
+        '''Sort positions attribute by coordinate
+
+        :param from_index: first index # for sort
+        :param to_index: last index # for sort
+        :type from_index: int
+        :type to_index: last index # for sort
+
+        :note: the first site # is "1", not "0" to follow VESTA's way.
+        '''
+        original_is_cartesian = False
+        if self.is_cartesian:
+            original_is_cartesian = True
+            self.to_Direct()
+        self.repack_in_cell()
+        poslists = self.pos((from_index, to_index))
+        poslists.sort(keys=lambda x: (x[0], x[1], x[2]))
+        for i in range(from_index, to_index + 1):
+            self.pos_replace(i, poslists.pop(0))
+        if original_is_cartesian:
+            self.to_Cartesian()
 
     def rotateX(self, theta):
         '''Rotation matrix around X-axis
@@ -287,7 +316,7 @@ class POSCAR(object):
         return np.array(
             [[1.0, 0.0, 0.0],
              [0.0, np.cos(theta * degree), -np.sin(theta * degree)],
-             [0.0, np.sin(theta * degree),  np.cos(theta * degree)]])
+             [0.0, np.sin(theta * degree), np.cos(theta * degree)]])
 
     def rotateY(self, theta):
         '''Rotation matrix around Y-axis
@@ -320,7 +349,7 @@ class POSCAR(object):
         degree = np.pi / 180.0
         return np.array(
             [[np.cos(theta * degree), -np.sin(theta * degree), 0.0],
-             [np.sin(theta * degree),  np.cos(theta * degree), 0.0],
+             [np.sin(theta * degree), np.cos(theta * degree), 0.0],
              [0.0, 0.0, 1.0]])
 
     # class method? or independent function?
@@ -337,13 +366,17 @@ class POSCAR(object):
 
     # class method? or independent function?
     def make27candidate(self, position):
-        '''
+        '''Return 27 vector sets correspond the neiboring
 
-        :param position: atom position defined in the coordinated by latticeV1, latticeV2, latticeV3 ( scaling facter is not accounted).
+        :param position: atom position defined in the coordinated by
+                         latticeV1, latticeV2, latticeV3 ( scaling
+                         facter is not accounted).
+
         :param type: np.array, list
         :return: list of np.array
-        :rtype: list 
-'''
+        :rtype: list
+
+        '''
         position = _vectorize(position)
         candidates27 = []
         if self.is_cartesian:
@@ -361,7 +394,7 @@ class POSCAR(object):
         return candidates27
 
     def atom_rotate(self, site, axis_name, theta, center):
-        '''Rotate atom (single atom!) 
+        '''Rotate atom (single atom!)
 
         :param site: site # for rotation (The first atom is "1".).
         :param axis_name: "X", "x", "Y", "y", "Z", or "z". Rotation axis.
@@ -396,15 +429,21 @@ class POSCAR(object):
     def atoms_rotate(self, site_list_pack, axis_name, theta, center):
         '''Rotate atoms
 
-        :param site_list_pack: list array of the  list array (not typo!) of site for rotation   (The first atom is "1".).
-        :param axis_name: "X", "x", "Y", "y", "Z",or "z". Rotation axis.
+        :param site_list_pack: list array of the list array (not
+                               typo!) of site for rotation (The first
+                               atom is "1".).
+
+        :param axis_name: "X", "x", "Y", "y", "Z",or "z".
+                          Rotation axis.
+
         :param theta: Rotation angle (Degrees).
         :param center: center position for rotation.
         :type site_list_pack: list, tuple
         :type theta: float
         :type axis_name: str
         :type center: np.array, list, tuple
-'''
+
+        '''
         for site_list in site_list_pack:
             for site in site_list:
                 self.atom_rotate(site, axis_name, theta, center)
@@ -485,7 +524,7 @@ class POSCAR(object):
         return destPOSCAR
 
     def merge(self, other):
-        '''lazy __add__: Return POSCAR generated with two poscars
+        '''lazy __add__: Return POSCAR generated from two POSCARs
 
         Even if the cell vectors and scaling factors are different,
         the 'merged' POSCAR is created.
@@ -568,11 +607,12 @@ class POSCAR(object):
         '''Change scaling factor to new value
 
         :param new_scaling_factor:
-        :type new_scaling_factor: float  
+        :type new_scaling_factor: float
 
         .. note::  **The Braves lattice are corrected (to be equal size)**
 
-        .. warning:: If you change the cell size, change  scaling_factor attribute directly
+        .. warning:: If you change the cell size, change
+                     scaling_factor attribute directly
 '''
         old = self.scaling_factor
         self.__latticeV1 *= (old / new_scaling_factor)
@@ -585,16 +625,13 @@ class POSCAR(object):
 
     def to_Cartesian(self):
         '''Change the coordinate to cartesian from direct
-
-        :return: True if POSCAR file is cartesian coordinate
-        :rtype: Boolean
 '''
         if self.is_direct:
             self.coordinate_type = "Cartesian"
-            m = np.array([self.latticeV1,
-                          self.latticeV2,
-                          self.latticeV3]).transpose()
-            self.position = [m.dot(v) for v in self.position]
+            mat = np.array([self.latticeV1,
+                            self.latticeV2,
+                            self.latticeV3]).transpose()
+            self.position = [mat.dot(v) for v in self.position]
 
     def to_Direct(self):
         '''Change the coordinate to direct from cartesian.
@@ -608,6 +645,7 @@ class POSCAR(object):
 
     def guess_molecule(self, site_list, center=None):
         '''Arrange atom position to form a molecule.
+
         This method is effective to rotate a molecule.
 
         :param site_list: list of site number
@@ -616,16 +654,17 @@ class POSCAR(object):
         :type center: list
         :return: Array of Vector that represents "molecule".
         :rtype: numpy.array
-        :note: When the optional argument, center, is set,
-        the  atoms are re-arranged as to minimize the distance
-        from this center.  If not the   center is not set, atoms
-        are re-arranged to minimize  the total bonding length.
-        As the algorithm for mimizing the total length is not
-        exhaustive, the resultant atom arrangement  may different
-        from what you expect, in spite of time-waste.
-        The center option is highly recommended to form a molecule.
-'''
-        # list for atom positions for "molecule"
+
+        .. note:: When the optional argument, center, is set, the
+                  atoms are re-arranged as to minimize the distance
+                  from this center.  If not, atoms are re-arranged to
+                  minimize the total bonding length.  As the algorithm
+                  for mimizing the total length is not exhaustive, the
+                  resultant atom arrangement may different from what
+                  you expect, in spite of time-waste.  The center
+                  option is highly recommended to form a molecule.
+
+        '''
         molecule = [self.pos(j) for j in site_list]
         for index, site in enumerate(site_list):
             target_atom = self.pos(site)
@@ -653,7 +692,7 @@ class POSCAR(object):
         return molecule
 
     def guess_molecule2(self, site_list):
-        '''Arranges atom position to form a molecule.  
+        '''Arranges atom positions to form a molecule.
 
         poscar updates
 
@@ -747,118 +786,6 @@ def _vectorize(vector):
 
 _vector_acceptables = (np.ndarray, np.matrix, list, tuple)
 # --------------------------
-
-if __name__ == '__main__':
-    # $-w = true
-    import argparse
-    import functools as ft
-    arg = argparse.ArgumentParser(
-        formatter_class=argparse.RawTextHelpFormatter,
-        epilog="""NOTE: When you running this script
-on Windows Power Shell,
-commas are regarded as delimiter of values.
-So you must enclose values which
-contains commas with quotations.
-(ex.) --atom 1,2,3 -> failure / --atom "1,2,3" -> OK""")
-    arg.add_argument('--atom', metavar='atoms', action='append',
-                     type=tools.parse_AtomselectionNum,
-                     help='''atoms specified with range using "-"
-or comma-delimnated numbers.
- (ex.) --atom 1,2,7-9''')
-
-    def split_to_float(string, n, name):
-        lis = string.split(',')
-        if len(lis) != n:
-            message = '--{0} option requires {1} numbers'.format(name, n)
-            raise argparse.ArgumentTypeError(message)
-        return [float(i) for i in lis]
-    arg.add_argument('--translate', metavar='x,y,z', action='append',
-                     type=ft.partial(split_to_float, n=3, name='translate'),
-                     help='''displacement (AA unit) by three numbers
-separated by comma.''')
-    arg.add_argument('--rotateX', metavar='theta,x,y,z',
-                     type=ft.partial(split_to_float, n=4, name='rotateX'),
-                     help='''Rotation around X-axis by "theta" at (x,y,z)
-NOTE: this option is not taken into account
-the periodic boundary.''')
-    arg.add_argument('--rotateY', metavar='theta,x,y,z',
-                     type=ft.partial(split_to_float, n=4, name='rotateY'),
-                     help='''Rotation around Y-axis by "theta" at (x,y,z)
-NOTE: this option is not taken into account
-the periodic boundary.''')
-    arg.add_argument('--rotateZ', metavar='theta,x,y,z',
-                     type=ft.partial(split_to_float, n=4, name='rotateZ'),
-                     help='''Rotation around Z-axis by "theta" at (x,y,z)
-NOTE: this option is not taken into account
-the periodic boundary.''')
-    arg.add_argument('--output', metavar='file_name',
-                     help='''output file name
-if not specified, use standard output''')
-    arg.add_argument('poscar', metavar='POSCAR_file (or CONTCAR_file)',
-                     type=POSCAR)
-    arguments = arg.parse_args()
-    # translate option and rotate option are not set simulaneously.
-    if arguments.translate and any([arguments.rotateX,
-                                    arguments.rotateY,
-                                    arguments.rotateZ]):
-        raise RuntimeError(
-            "Cannot set --translate and rotate option simultanaously.")
-    # rotate options are not set multiply.
-    if (arguments.rotateX,
-            arguments.rotateY,
-            arguments.rotateZ).count(None) < 2:
-        raise RuntimeError(
-            "Cannot set multiple rotate options simultanaously.")
-    # print(arguments.poscar) #DEBUG
-    arguments.poscar.to_Cartesian()
-    # print(arguments.poscar) #DEBUG
-
-    #
-    # if "atom" option is not set, all atoms are concerned.
-    #
-    if not arguments.atom:
-        nAtoms = sum(arguments.poscar.ionnums)
-        arguments.atom = [tools.parse_AtomselectionNum('1-{0}'.format(nAtoms))]
-    #
-    #  Translation
-    #
-    if arguments.translate:
-        if len(arguments.atom) != len(arguments.translate):
-            raise RuntimeError
-        for v, a in zip(arguments.translate, arguments.atom):
-            arguments.poscar.translate(v, a)
-
-    #
-    #  Rotation
-    #
-    if any([arguments.rotateX, arguments.rotateY, arguments.rotateZ]):
-        if len(arguments.atom) != 1:
-            raise RuntimeError("--atom option set once!")
-        if arguments.rotateX:
-            axis_name = 'X'
-            theta = arguments.rotateX[0]
-            center = arguments.rotateX[1:]
-        elif arguments.rotateY:
-            axis_name = 'Y'
-            theta = arguments.rotateY[0]
-            center = arguments.rotateY[1:]
-        elif arguments.rotateZ:
-            axis_name = 'Z'
-            theta = arguments.rotateZ[0]
-            center = arguments.rotateZ[1:]
-        arguments.poscar.atoms_rotate(arguments.atom, axis_name, theta, center)
-
-    #
-    #  Output result
-    #
-    if arguments.output is not None:
-        arguments.poscar.save(arguments.output)
-    else:
-        print(arguments.poscar)
-
-##
-##
-##
 
 if __name__ == "__main__":
     import doctest

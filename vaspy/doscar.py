@@ -20,6 +20,7 @@ class DOSCAR(object):  # Version safety
     '''Class for DOSCAR file
 
     A container of DOS object
+
     :author: Ryuichi Arafune
     '''
 
@@ -38,10 +39,10 @@ class DOSCAR(object):  # Version safety
         :type doscar_file: str
         :rtype: DOSCAR
         """
-        with open(doscar_file) as f:
+        with open(doscar_file) as the_doscar:
             separate_text = ""
             aDOS = list()
-            for idx, line in enumerate(f, 1):
+            for idx, line in enumerate(the_doscar, 1):
                 if idx == 1:
                     self.nAtom = int(line.split()[0])
                 elif 2 <= idx <= 5:
@@ -65,9 +66,9 @@ class DOS(object):  # Version safety
 
     '''Class for DOS
 
-    list object consisting list of two elements.
-    The first element is the float representing the energy.
-    The other element is still array that contains the density.
+    List object consisting two elements.
+    The first element is the the energy.
+    The latter element is list for the density.
 
     :author: Ryuichi Arafune
     :attribute: dos
@@ -76,8 +77,8 @@ class DOS(object):  # Version safety
     def __init__(self, array=None):
         self.dos = list()
         if array is not None:
-            for a in array:
-                a_float = [float(i) for i in a]
+            for arr in array:
+                a_float = [float(i) for i in arr]
                 self.dos.append([a_float[0], a_float[1:]])
 
     def __deepcopy__(self, memo):
@@ -95,14 +96,16 @@ class DOS(object):  # Version safety
             yield ith_point
 
     def append(self, dos_data):
-        '''
+        '''wrapper of list.append()
+
         :param dos_data: dos_data
         :type dos_data: np.array
         '''
         self.dos.append(_filter_dos_data(dos_data))
 
     def pop(self, i=-1):
-        '''
+        '''Wrapper of list.pop()
+
         :return: return and remove the last element
         :rtype: np.array
 
@@ -138,11 +141,12 @@ class DOS(object):  # Version safety
         self.dos = [(each[0] - fermi, each[1]) for each in self.dos]
 
     def energies(self, i=None):
-        '''Return energy
+        '''Return the *i*-th energy of the object
 
         :param i: index #
         :type i: int
-        :return: the energy value of the i-th point when i set.  If arg is null, return the all energies in DOS object.
+        :return: the energy value of the i-th point when i set.
+                 If arg is null, return the all energies in DOS object.
         :rtype: np.ndarray
         '''
         if i is None:
@@ -151,11 +155,12 @@ class DOS(object):  # Version safety
             return self.dos[i][0]
 
     def densities(self, i=None):
-        '''Return density
+        '''Return the *i*-th density of the object
 
         :param i: index #
         :type i: int
-        :return: the density of states for the i-th point when i set.  If arg is null, return the all energies in DOS object.
+        :return: the density of states for the i-th point when i set.
+                 If arg is null, return the all energies in DOS object.
         :rtype: numpy.array
         '''
         if i is None:
@@ -195,6 +200,7 @@ def _filter_dos_data(data):
 
 
 class TDOS(DOS):
+
     """Class for total DOS
 
     :author: Ryuichi Arafune
@@ -206,7 +212,7 @@ class TDOS(DOS):
             self.header = ("TDOS", "intTDOS")
         else:
             self.header = ("TDOS_up", "TDOS_down",
-                           "intTDOS_up","intTDOS_down")
+                           "intTDOS_up", "intTDOS_down")
 
     def export_csv(self, file, **kwargs):
         """Export data to file object (or file-like object) as csv format.
@@ -279,9 +285,6 @@ class PDOS(DOS):
 
         """
         pass
-
-    def deepcopy(self):
-        return _copy.deepcopy(self)
 
     def __add__(self, other):
         """x.__add__(y) <-> x+y

@@ -10,7 +10,7 @@ import os
 import sys
 import csv
 import functools as ft
-if sys.version_info[0] >= 3:           # Version safety
+if sys.version_info[0] >= 3:     # Version safety
     from io import StringIO
 else:
     from cStringIO import StringIO
@@ -25,27 +25,39 @@ except ImportError:
 
 class PROCAR(object):  # Version safety
 
-    '''
-    Class for PROCAR file
+    '''Class for PROCAR
 
     .. py:class:: PROCAR(object)
 
     PROCAR consists of these lines.  Appear once per file.
 
     1. the first line
-      ex.)   PROCAR lm decomposed + phase
+
+      :Example:   PROCAR lm decomposed + phase
+
     2. set number of k-points, bands and ions.
-      Appear once when spin-integrated, twice when spin-resolved.
+       (Appear once when spin-integrated, twice when spin-resolved.)
 
-      ex.)   # of k-points:   50         # of bands: 576         # of ions:  98
+      :Example:
+
+        # of k-points:   50         # of bands: 576         # of ions:  98
+
     3.  k-point character
-      ex.)  k-point    1 :    0.00000 0.00000 0.00000 weight = 0.02000000
 
-      note that the first character is "blank".
+      :Example:
+
+        k-point    1 :    0.00000 0.00000 0.00000 weight = 0.02000000
+
+      .. note:: that the first character is "blank".
+
     4. band character
-      ex.)  band   1 # energy  -11.87868466 # occ.  2.00000000
+
+      :Example:  band   1 # energy  -11.87868466 # occ.  2.00000000
+
     5. orbital contribution.
-      ex.)1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
+
+      :Example:
+    1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
 
     :author: Ryuichi Arafune
     '''
@@ -75,34 +87,41 @@ class PROCAR(object):  # Version safety
 
     @property
     def spininfo(self):
+        '''spin-related information'''
         return self.__spininfo
 
     @property
     def numk(self):
+        '''Number of k-points'''
         return self.__numk
 
     @property
     def nBands(self):
+        '''Number of Bands'''
         return self.__nBands
 
     @property
     def nAtoms(self):
+        '''Number of atoms'''
         return self.__nAtoms
 
     @property
     def kvectors(self):
+        '''k-vectors'''
         return self.__kvectors
 
     @property
     def energies(self):
+        '''Energies'''
         return self.__energies
 
     @property
     def orb_names(self):
+        '''Name of orbitals'''
         return self.__orb_names
 
     def load_from_file(self, file, phase_read=False):
-        '''..py:method::  load_fromfile(file, [phase_read=False])
+        '''.. py:method::  load_fromfile(file, [phase_read=False])
 
         A virtual parser of PROCAR
 
@@ -190,6 +209,10 @@ class PROCAR(object):  # Version safety
         return iter(self.__orbital)
 
     def band(self):
+        '''Return BandStructure object
+
+        :rtype: BandStructure
+        '''
         band = BandStructure()
         band.kvectors = self.kvectors[0:self.numk]
         band.nBands = self.nBands
@@ -205,14 +228,13 @@ class PROCAR(object):  # Version safety
 
 class BandStructure(object):
 
-    '''
-    .. py:class:: BandStructure class
+    ''' .. py:class:: BandStructure class
 
     The "Band structure" object deduced from PROCAR file.
 
     :class variables: kvectors, energies, states, spin, orb_names
 
-    Finally, Band, Orbital, State classes can be removed ?
+    .. note:: Finally, Band, Orbital, State classes can be removed ?
     '''
 
     def __init__(self, arg=None):
@@ -224,14 +246,14 @@ class BandStructure(object):
         self.__phases = 0
         self.__energies = 0
         self.orb_names = ['s', 'py', 'pz', 'px',
-                          'dxy',  'dyz', 'dz2', 'dxz', 'dx2',
+                          'dxy', 'dyz', 'dz2', 'dxz', 'dx2',
                           'tot']
 
     def isready(self):
-        '''returns True if numk, nBands, nAtoms, spininfo,
+        '''Return True if numk, nBands, nAtoms, spininfo, and
         orb_names are set, otherwise raise ValueError.
 
-        This method is used before when orbitals, phases, energies
+        This method is used for check before when orbitals, phases, energies
         are set.'''
         if not hasattr(self, "numk"):
             raise ValueError("numk is not defined")
@@ -253,6 +275,7 @@ class BandStructure(object):
 
     @property
     def nBands(self):
+        '''Number of bands'''
         return self.__nBands
 
     @nBands.setter
@@ -262,6 +285,7 @@ class BandStructure(object):
 
     @property
     def orbitals(self):
+        '''Number of bands'''
         return self.__orbitals
 
     @orbitals.setter
@@ -299,11 +323,14 @@ class BandStructure(object):
 
     @property
     def phases(self):
+        '''phase data
+
+        .. note:: At present I have no idea about this parameter.  How to use it?'''
         return self.__phases
 
     @phases.setter
     def phases(self, arg):
-        '''Setter for phases
+        '''phases
 
         Return is 4-rank tensor for the standard (i.e. ISPIN = 0) or SOI
         calculations.
@@ -353,10 +380,13 @@ class BandStructure(object):
 
     @property
     def kdistance(self):
+        '''Distance of k.  This is used for the horizontal axis in the band
+structure drowing'''
         return self.__kdistance
 
     @property
     def energies(self):
+        '''Energies'''
         return self.__energies
 
     @energies.setter
@@ -375,11 +405,11 @@ class BandStructure(object):
                 self.__energies = np.array(self.__energies)
 
     def compose_sites(self, arg):
-        '''make sitecomposed ndarray
+        '''Make sitecomposed ndarray
 
         When sitecomposed ndarray has elements, the values remain.
 
-        :param arg: a list (tuple, set) describes the site to be composed. it contains unique numbers.
+        :param arg: site indexes to be composed. it contains unique numbers.
         :type arg: list, tuple, set
         '''
         # the element of site_number_list must be unique.
@@ -476,14 +506,15 @@ class BandStructure(object):
                                        cmporbs_mZ]
 
     def check_orb_name(self, arg):
-        '''returns the arg without change when arg is a member of the
-        'orbital name'.  i.e., if arg is an alias of the (more proper)
-        orbital name, return it.  If arg is neither the proper orbital
-        name nor the alias, raise ValueError.
+        '''Return arg without change if arg is a member of the 'orbital name'.
+        i.e., if arg is an alias of the (more appropriate) orbital
+        name, return it as is.  If arg is neither the appropriate
+        orbital name nor the alias, raise ValueError.
 
         :param arg: the string to be checked as the orbital name
         :type arg: str
         :rtype: str
+
         '''
         translate_dict = {'pypx': 'pxpy', 'pzpx': 'pxpz', 'pzpy': 'pypz',
                           'pxpypz': 'p', 'pxpzpy': 'p', 'pypxpz': 'p',
@@ -500,19 +531,18 @@ class BandStructure(object):
             raise ValueError(errmsg)
 
     def get_orb_index(self, arg):
-        '''returns tuple that consists of the indexes corresponding
-        orbitan name.
+        '''Return the indexes corresponding orbitan name by tuple.
 
         This method returns the tuple of orbital number in self.orb_names.
         (i.e. self.orb_names.index(orbitalname).  If the orbital name has not
         been in self.orb_names (i.e. if the orbital name is not used in
-        PROCAR file) but the orbital name is proper as the composed
+        PROCAR file) but the orbital name is appropriate as the composed
         orbital ((ex.) sp, pxpy), returns the indexes of the orbitals to be
         composed as the tuple.
 
         :param arg: name of (composed) orbital
         :type arg: str
-        :returns: number corresponding to (composed) orbital name.
+        :return: number corresponding to (composed) orbital name.
         :rtype: tuple
         '''
         orbname = self.check_orb_name(arg)
@@ -549,8 +579,7 @@ class BandStructure(object):
         return orb_indexes
 
     def compose_orbital(self, arg):
-        '''adds composed orbital contribution in each 'sites' stored in
-        BandStructure.sitecomposed.
+        '''Add composed orbital contribution in each 'sites' stored in BandStructure.sitecomposed.
 
         :param arg: orbital names
         :type arg: str, list, tuple
@@ -592,7 +621,7 @@ class BandStructure(object):
             raise RuntimeError(err)
 
     def set_header(self, sitenames, orbnames):
-        '''returns header of table
+        '''Return header of table
 
         :param sitenames: site names e.g., 'Ag', 'Graphene', '2ndLayer'...
         :type sitenames: tuple, list
@@ -626,7 +655,7 @@ class BandStructure(object):
         return header
 
     def get_orbnums(self, orbnames):
-        '''returns tuple whose size is same as that of arg, but
+        '''Return tuple whose size is same as that of arg, but
         the element is number determied from orb_names
 
         :param orbnames: orbital names e.g., (('s','pxpy','tot'),('s','p'))
@@ -637,7 +666,7 @@ class BandStructure(object):
                      for orbs in orbnames)
 
     def list_sitecomposed_data(self, orbnames):
-        '''returns list of sitecomposed attribute to 2D-list
+        '''Return list of sitecomposed attribute to 2D-list
 
         :param orbnames: orbital names  e.g., (('s','pxpy','p'),('s','pxpy','p'))
         :type orbnames: list, tuple
@@ -691,75 +720,3 @@ class BandStructure(object):
             l = map(str, l)
             output += "\t".join(l) + "\n"
         return output
-
-# -------------------------------------------------------------
-#
-# Main (test) routine
-#
-if __name__ == '__main__':
-    import argparse
-    from outcar import OUTCAR
-
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument('--outcar', metavar='outcar_file',
-                        help='''Use "OUTCAR" for the Fermi level correction.
-outcar_file must be specified.
-NOTE:  E-fermi of OUTCAR generated in
-Band-calculation may NOT be reliable.''')
-    parser.add_argument('--fermi', metavar='value', type=float,
-                        help='''Fermi level correction
-Energy shifts by this value
-if --outcar is set, this option is ignored''')
-    parser.add_argument('--site', metavar='atom_indices', dest='atomindex',
-                        action='append',
-                        type=tools.parse_AtomselectionNum,
-                        help='''atom index specifed with range.
-Use "-" or ","
- (ex.) --site 1,2,7-9''')
-    parser.add_argument('--as', metavar='name', nargs='+', dest='atomsetname',
-                        action='append',
-                        help='''the name of the sites identified
-by --site option
-the name is used in the title of the column''')
-    parser.add_argument('--orbital', metavar='orbitals', action='append',
-                        type=ft.partial(re.split, r'[,:]'),
-                        help='''orbital name deliminated by ":" or ",".
-orbital names are:
-s, p, pxpy, pz, d, dxy, dyz, dz2, dxz, dx2
-(ex.) --orbital s:pxpy:d''')
-    parser.add_argument('procar', metavar='PROCAR_file',
-                        help='''PROCAR file''')
-
-    args = parser.parse_args()
-    # ---
-    if not (len(args.atomindex) == len(args.orbital) == len(args.atomsetname)):
-        raise parser.error("--atom, --as and --orbital are mismatched.")
-    # ---
-    if args.outcar is not None:
-        outcar = OUTCAR(args.outcar)
-        fermi = outcar.fermi
-    elif args.fermi is not None:
-        fermi = args.fermi
-    else:
-        fermi = 0.0
-
-        sitenames = tuple(
-            set([e for inner in args.atomsetname for e in inner]))
-        flat_orbitals = tuple(
-            set([e for inner in args.orbital for e in inner]))
-
-        # As atomindex used here begins with "1", but siteindex used
-        #  in procar.py internaly begins with "0".
-        # (This is because VASP is fortran program !)
-        siteindex = [[i - 1 for i in internal] for internal in args.atomindex]
-
-        procar = procar.PROCAR(args.procar)
-        band = procar.band()
-        del procar  # for memory saving
-        if fermi != 0.0:
-            band.energies -= fermi
-        for sites in siteindex:
-            band.compose_sites(sites)
-            band.compose_orbital(flat_orbitals)
-        print(band.get_sitecomposed_data(sitenames, args.orbital))

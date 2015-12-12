@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-    VASPy
+   VASPy
    ======
 
-    modules made for VASP pre\postprocess.
+    modules made for VASP pre\postprocess
 """
 # import os
 

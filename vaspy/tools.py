@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-''''''
+'''
+Module for tools used in vaspy
+'''
 
 from __future__ import print_function, division  # Version safety
 import re
@@ -25,7 +27,10 @@ make new iterator object which get n item from [iterable] at once.
 
 
 def removeall(L, value):
-    '''remove all *value* in [list] L'''
+    '''remove all *value* in [list] L
+
+    .. note:: Currently, this function is not used. (Obsolute?)
+    '''
     while L.count(value):
         L.remove(value)
     return L
@@ -40,6 +45,9 @@ def flatten(nested, target=Iterable, ignore=flatten_ignore):
     default *include* is all iterable object.
     defualt *ignore* is dict() and str-like objects.
     (i.e. str, bytes, unicode(2.x), bytearray(3.x))
+
+    >>> flatten((1, [range(2), 3, set([4, 5]), [6]], frozenset([7, 8])))
+    [1, 0, 1, 3, 4, 5, 6, 8, 7]
 '''
     if (isinstance(nested, target) and
             not isinstance(nested, ignore)):
@@ -47,7 +55,7 @@ def flatten(nested, target=Iterable, ignore=flatten_ignore):
     i = 0
     while i < len(nested):
         while (isinstance(nested[i], target) and
-                not isinstance(nested[i], ignore)):
+               not isinstance(nested[i], ignore)):
             if not nested[i]:
                 nested.pop(i)
                 i -= 1
@@ -63,8 +71,8 @@ _resingle = re.compile(r'\d+')
 
 def parse_Atomselection(L):
     '''Return list of ordered "String" represents the number
-    
-    :param L: range of the atoms. the numbers deliminated by "-" or ",". (ex.) "1-5,8,9,11-15"
+
+    :param L: range of the atoms. the numbers deliminated by "-" or ","
     :type L: str
     :return: ordered "String" represents the number.
     :rtype: list
@@ -72,7 +80,7 @@ def parse_Atomselection(L):
     :Example:
 
     >>> parse_Atomselection("1-5,8,8,9-15,10")
-    ["1", "10", "11", "12", "13", "14", "15", "2", "3", "4", "5", "8", "9"]
+    ['1', '10', '11', '12', '13', '14', '15', '2', '3', '4', '5', '8', '9']
 '''
     array = L.split(',')
     output = set()
@@ -87,17 +95,19 @@ def parse_Atomselection(L):
 
 
 def parse_AtomselectionNum(L):
-    '''Very similar with parse_Atomselection but returns the array of the number not array of the string.
+    '''Very similar with parse_Atomselection but returns the array of the
+    number not array of the string.
 
-    :param L: range of the atoms. the numbers deliminated by "-" or ",".  (ex.) "1-5,8,9,11-15"
+    :param L: range of the atoms. the numbers deliminated by "-" or ","
     :type L: str
     :return: ordered int represents the number.
     :rtype: list
 
     :Example:
 
-    >>> parse_Atomselection("1-5,8,8,9-15,10")
+    >>> parse_AtomselectionNum("1-5,8,8,9-15,10")
     [1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15]
+
     '''
     return sorted(int(i) for i in parse_Atomselection(L))
 
@@ -108,8 +118,7 @@ if __name__ == '__main__':
             'removeall': ([1, 0, 0, 1, 0, 1, 0, 0], 0),
             'flatten': ((1, [range(2), 3, set([4, 5]), [6]],  # Version safety
                          frozenset([7, 8])),),
-            'parse_Atomselection': ('1-5,8,9,11-15',),
-            }
+            'parse_Atomselection': ('1-5,8,9,11-15',), }
     argcounts = {'each_slice_demo': 2,
                  'removeall': 2,
                  'flatten': 1,
@@ -147,8 +156,7 @@ See epilog for notices for argument notation.''')
         else:
             if argcounts[func] != len(args.values[index]):
                 print('''argument number not match (require {0}, given {1})
-use default values.'''.format(
-                      argcounts[func], len(args.values[index])))
+use default values.'''.format(argcounts[func], len(args.values[index])))
                 values = demo[func]
             else:
                 values = [eval(s) for s in args.values[index]]

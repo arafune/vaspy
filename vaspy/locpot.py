@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+'''
+This module provides LOCPOT class
+'''
 #
 from __future__ import division
 from __future__ import print_function
@@ -13,14 +16,15 @@ try:
 except ImportError:
     mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
     sys.path.append(os.path.dirname(os.path.abspath(mypath)))
-    import poscar
-    import tools
+    import vaspy.poscar
+    import vaspy.tools
 
 
 class LOCPOT(poscar.POSCAR):
+
     '''Class for LOCPOT
 
-LOCPOT format is essentially same as CHGCAR but simpler.
+    LOCPOT format is essentially same as that of CHGCAR
 
     :attribute: meshX, meshY, meshZ, potlist
 '''
@@ -66,7 +70,9 @@ LOCPOT format is essentially same as CHGCAR but simpler.
                 self.__potarray = np.array(self.__potlist).reshape(
                     self.meshZ, self.meshY, self.meshX)
             elif len(self.__potlist) == 2 * (self.meshX *
-                                             self.meshY * self.meshZ) + 3 + sum(self.ionnums):  # LVHAR
+                                             self.meshY *
+                                             self.meshZ) + 3 + sum(
+                    self.ionnums):
                 self.__potarray = np.array(
                     self.__potlist[:
                                    self.meshX *
@@ -106,42 +112,59 @@ LOCPOT format is essentially same as CHGCAR but simpler.
     @property
     def potlist(self):
         '''Potential data (Array style)
-'''
+
+        From Vasp Manual, the potential is written using the following
+        commands in Fortran (as same as for charge density in CHGCAR)
+
+        .. code-block :: fortran
+
+           WRITE(IU, FORM) (((C(NX, NY, NZ), NX=1, NGXC), NY=1, NGYZ), NZ=1, NGZC)
+
+        '''
         return self.__potlist
 
     @property
     def potarray(self):
         '''Potential data (Array style)
 
-        Usually this data should be used.  I (RA) have not understand the meaning of the potarray 2 and 3...
+        This data should be used until its meaning is clear.  I (RA)
+        have not understand the meaning of the potarray 2 and 3...
+
         '''
         return self.__potarray
 
-    @property
+    @property  # <= Fixme!!!
     def potarray3(self):
         '''(maybe) Potential data (Array style)
 
-        Usually this data should NOT be used.  I (RA) have not understand the meaning of the potarray 2 and 3...
-        
-        .. warning:: Do not use this attribute if you do not know what you treated
-'''
+        This data should NOT be used until its meaning is clear.  I
+        (RA) have not understand the meaning of the potarray 2 and
+        3...
+
+        .. warning:: Do not use this attribute if you do not know
+                     what you treated
+
+        '''
         return self.__potarray2
 
-    @property
+    @property  # <= Fixme!!!
     def potarray2(self):
         '''(maybe) Potential data (Array style)
 
-        Usually this data should NOT be used.  I (RA) have not understand the meaning of the potarray 2 and 3...
-        
-        .. warning:: Do not use this attribute if you do not know what you treated
-'''
+        Usually this data should NOT be used.  I (RA) have not
+        understand the meaning of the potarray 2 and 3...
+
+        .. warning:: Do not use this attribute if you do not know
+                     what you treated
+
+        '''
         return self.__potarray3
 
     def get_mesh(self):
         '''Return mesh size
-        
+
         :return: (meshX, meshY, meshZ)
-        :rtype: tuple 
+        :rtype: tuple
         '''
         return self.__meshX, self.__meshY, self.__meshZ
 
@@ -151,7 +174,7 @@ LOCPOT format is essentially same as CHGCAR but simpler.
         :param axis_name: 'X', 'Y', or 'Z'
         :type axis_name: str
         :return: averaged potential
-        :rtype: 
+        :rtype: np.array
         '''
         axis_name = axis_name.capitalize()
         if pottype == 'former':
@@ -164,13 +187,13 @@ LOCPOT format is essentially same as CHGCAR but simpler.
             if axis_name == 'Z':
                 pot = np.average(np.average(self.potarray, axis=2), axis=1)
         elif pottype == 'latter':
-            if axis_name == 'X':
+            if axis_name == 'X':  # <= Fixme!!!
                 pot = np.average(np.average(
                     np.transpose(self.potarray2, (2, 0, 1)), axis=2), axis=1)
-            if axis_name == 'Y':
+            if axis_name == 'Y':  # <= Fixme!!!
                 pot = np.average(np.average(
                     np.transpose(self.potarray2, (1, 0, 2)), axis=2), axis=1)
-            if axis_name == 'Z':
+            if axis_name == 'Z':  # <= Fixme!!!
                 pot = np.average(np.average(self.potarray2, axis=2), axis=1)
         else:
             raise RuntimeError("invalid pottype option")
@@ -182,7 +205,7 @@ LOCPOT format is essentially same as CHGCAR but simpler.
         :param axis_name: 'X', 'Y', or 'Z'
         :type axis_name: str
         :return: min potential
-        :rtype: 
+        :rtype: np.array
         '''
         axis_name = axis_name.capitalize()
         if pottype == 'former':
@@ -195,13 +218,13 @@ LOCPOT format is essentially same as CHGCAR but simpler.
             if axis_name == 'Z':
                 pot = np.min(np.min(self.potarray, axis=2), axis=1)
         elif pottype == 'latter':
-            if axis_name == 'X':
+            if axis_name == 'X':  # <= Fixme!!!
                 pot = np.min(np.min(
                     np.transpose(self.potarray2, (2, 0, 1)), axis=2), axis=1)
-            if axis_name == 'Y':
+            if axis_name == 'Y':  # <= Fixme!!!
                 pot = np.min(np.min(
                     np.transpose(self.potarray2, (1, 0, 2)), axis=2), axis=1)
-            if axis_name == 'Z':
+            if axis_name == 'Z':  # <= Fixme!!!
                 pot = np.min(np.min(self.potarray2, axis=2), axis=1)
         else:
             raise RuntimeError("invalid pottype option")
@@ -212,8 +235,8 @@ LOCPOT format is essentially same as CHGCAR but simpler.
 
         :param axis_name: 'X', 'Y', or 'Z'
         :type axis_name: str
-        :return: max potential
-        :rtype: 
+        :return: maximum potential
+        :rtype: np.ndarray
         '''
         axis_name = axis_name.capitalize()
         if pottype == 'former':
@@ -226,13 +249,13 @@ LOCPOT format is essentially same as CHGCAR but simpler.
             if axis_name == 'Z':
                 pot = np.max(np.max(self.potarray, axis=2), axis=1)
         elif pottype == 'latter':
-            if axis_name == 'X':
+            if axis_name == 'X':  # <= Fixme!!!
                 pot = np.max(np.max(
                     np.transpose(self.potarray2, (2, 0, 1)), axis=2), axis=1)
-            if axis_name == 'Y':
+            if axis_name == 'Y':  # <= Fixme!!!
                 pot = np.max(np.max(
                     np.transpose(self.potarray2, (1, 0, 2)), axis=2), axis=1)
-            if axis_name == 'Z':
+            if axis_name == 'Z':  # <= Fixme!!!
                 pot = np.max(np.max(self.potarray2, axis=2), axis=1)
         else:
             raise RuntimeError("invalid pottype option")
@@ -244,7 +267,7 @@ LOCPOT format is essentially same as CHGCAR but simpler.
         :param axis_name: 'X', 'Y', or 'Z'
         :type axis_name: str
         :return: median potential
-        :rtype: 
+        :rtype: np.ndarray
         '''
         axis_name = axis_name.capitalize()
         if pottype == 'former':
@@ -257,13 +280,13 @@ LOCPOT format is essentially same as CHGCAR but simpler.
             if axis_name == 'Z':
                 pot = np.median(np.median(self.potarray, axis=2), axis=1)
         elif pottype == 'latter':
-            if axis_name == 'X':
+            if axis_name == 'X':  # <= Fixme!!!
                 pot = np.median(np.median(
                     np.transpose(self.potarray2, (2, 0, 1)), axis=2), axis=1)
-            if axis_name == 'Y':
+            if axis_name == 'Y':  # <= Fixme!!!
                 pot = np.median(np.median(
                     np.transpose(self.potarray2, (1, 0, 2)), axis=2), axis=1)
-            if axis_name == 'Z':
+            if axis_name == 'Z':  # <= Fixme!!!
                 pot = np.median(np.median(self.potarray2, axis=2), axis=1)
         else:
             raise RuntimeError("invalid pottype option")
