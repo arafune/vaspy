@@ -405,6 +405,10 @@ structure drowing'''
                 self.__energies = np.array(self.__energies)
                 
     def fermi_correction(self, fermi):
+        '''Correct the Fermi level
+        :param fermi: value of the Fermi level (from OUTCAR or vasprun.xml).
+        :type fermi: float
+        '''
         self.__energies -= fermi
                         
     def compose_sites(self, arg):
