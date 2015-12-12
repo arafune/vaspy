@@ -68,7 +68,8 @@ procar = procar.PROCAR(args.procar)
 band = procar.band()
 del procar  # for memory saving
 if fermi != 0.0:
-    band.energies -= fermi
+        band.fermi_correction(fermi)
+
 for sites in siteindex:
     band.compose_sites(sites)
 band.compose_orbital(flat_orbitals)
