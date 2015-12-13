@@ -42,7 +42,7 @@ class CHGCAR(poscar.POSCAR):
              ....
 
     :attribute: chgArray, meshX, meshY, meshZ, spininfo
-    :version: 1.0.0
+    :version: 2.0.0
 
     .. note:: the current verstion ignores
               "augmentation occupacies".
