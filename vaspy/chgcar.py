@@ -14,14 +14,14 @@ import sys
 try:
     from vaspy import poscar, tools
 except ImportError:
-    mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
-    sys.path.append(os.path.dirname(os.path.abspath(mypath)))
+    MYPATH = os.readlink(__file__) if os.path.islink(__file__) else __file__
+    sys.path.append(os.path.dirname(os.path.abspath(MYPATH)))
     import poscar
     import tools
 
 
-_re_blank = re.compile(r'^[\s]*$')
-_re_aug_occ = re.compile(r'\baugmentation occupancies')
+_RE_BLANK = re.compile(r'^[\s]*$')
+_RE_AUG_OCC = re.compile(r'\baugmentation occupancies')
 
 
 class CHGCAR(poscar.POSCAR):
@@ -41,21 +41,21 @@ class CHGCAR(poscar.POSCAR):
              0.047680  0.261795  0.361962          #9th line   poscar.POSCAR[8]
              ....
 
-    :attribute: chgArray, meshX, meshY, meshZ, spininfo
+    :attribute: chg_array, mesh_x, mesh_y, mesh_z, spininfo
     :version: 1.0.0
 
     .. note:: the current verstion ignores
               "augmentation occupacies".
 '''
-    # accessor: chgArray, meshX-Y-Z
+    # accessor: chg_array, mesh_x-y-z
 
     def __init__(self, chgcar_file=None):
         super(CHGCAR, self).__init__(None)
-        self.__meshX = 0
-        self.__meshY = 0
-        self.__meshZ = 0
+        self.__mesh_x = 0
+        self.__mesh_y = 0
+        self.__mesh_z = 0
         self.__spininfo = 0
-        self.__chgArray = []
+        self.__chg_array = []
         if chgcar_file:
             self.load_from_file(chgcar_file)
 
@@ -72,15 +72,15 @@ class CHGCAR(poscar.POSCAR):
             for line in thefile:
                 line = line.rstrip('\n')
                 if section == 'poscar':
-                    if re.search(_re_blank, line):
+                    if re.search(_RE_BLANK, line):
                         self.load_from_array(tmp)
                         section = 'define_separator'
                     else:
                         tmp.append(line)
                 elif section == 'define_separator':
                     separator = line if separator is None else separator
-                    if self.meshX == self.meshY == self.meshZ == 0:
-                        self.__meshX, self.__meshY, self.__meshZ = [
+                    if self.mesh_x == self.mesh_y == self.mesh_z == 0:
+                        self.__mesh_x, self.__mesh_y, self.__mesh_z = [
                             int(str) for str in line.split()]
                     section = 'grid'
                 elif section == 'aug':
@@ -96,16 +96,16 @@ class CHGCAR(poscar.POSCAR):
                     elif separator in line:
                         pass
                     else:
-                        self.__chgArray.extend(map(float, line.split()))
-        if len(self.chgArray) % (self.meshX * self.meshY * self.meshZ) != 0:
-            print(len(self.chgArray), ": Should be ",
-                  self.meshX * self.meshY * self.meshZ, "x 1, 2, 4")
-            print(len(self.chgArray) % (self.meshX * self.meshY * self.meshZ),
+                        self.__chg_array.extend(map(float, line.split()))
+        if len(self.chg_array) % (self.mesh_x * self.mesh_y * self.mesh_z) != 0:
+            print(len(self.chg_array), ": Should be ",
+                  self.mesh_x * self.mesh_y * self.mesh_z, "x 1, 2, 4")
+            print(len(self.chg_array) % (self.mesh_x * self.mesh_y * self.mesh_z),
                   ": Should be zero")
             raise RuntimeError('Failed: Construction')
-        self.__spininfo = len(self.chgArray) // (self.meshX *
-                                                 self.meshY *
-                                                 self.meshZ)
+        self.__spininfo = len(self.chg_array) // (self.mesh_x *
+                                                  self.mesh_y *
+                                                  self.mesh_z)
         if self.spininfo == 1:
             self.__spininfo = [""]
         elif self.spininfo == 2:
@@ -116,19 +116,19 @@ class CHGCAR(poscar.POSCAR):
             raise RuntimeError("CHGCAR is correct?")
 
     @property
-    def meshX(self):
+    def mesh_x(self):
         '''Number of mesh along the first axis of the cell'''
-        return self.__meshX
+        return self.__mesh_x
 
     @property
-    def meshY(self):
+    def mesh_y(self):
         '''Number of mesh along the second axis of the cell'''
-        return self.__meshY
+        return self.__mesh_y
 
     @property
-    def meshZ(self):
+    def mesh_z(self):
         '''Number of mesh along the third axis of the cell'''
-        return self.__meshZ
+        return self.__mesh_z
 
     @property
     def spininfo(self):
@@ -146,9 +146,9 @@ class CHGCAR(poscar.POSCAR):
         return self.__spininfo
 
     @property
-    def chgArray(self):
+    def chg_array(self):
         '''charge data'''
-        return self.__chgArray
+        return self.__chg_array
 
     def magnetization(self, direction=None):
         '''
@@ -177,27 +177,27 @@ class CHGCAR(poscar.POSCAR):
             raise RuntimeError("This CHGCAR is not spinresolved version")
         dest_chgcar = copy.deepcopy(self)
         if len(self.spininfo) == 2:
-            total, sd1 = tools.each_slice(self.chgArray,
-                                          self.meshX *
-                                          self.meshY *
-                                          self.meshZ)
-            dest_chgcar.__chgArray = list(sd1)
+            total, sd1 = tools.each_slice(self.chg_array,
+                                          self.mesh_x *
+                                          self.mesh_y *
+                                          self.mesh_z)
+            dest_chgcar.__chg_array = list(sd1)
             dest_chgcar.__spininfo = ["up-down"]
         elif len(self.spininfo) == 4:
-            total, sd1, sd2, sd3 = tools.each_slice(self.chgArray,
-                                                    self.meshX *
-                                                    self.meshY *
-                                                    self.meshZ)
+            total, sd1, sd2, sd3 = tools.each_slice(self.chg_array,
+                                                    self.mesh_x *
+                                                    self.mesh_y *
+                                                    self.mesh_z)
             if direction is None:
                 direction = 'x'
             if direction == 'x':
-                dest_chgcar.__chgArray = list(sd1)
+                dest_chgcar.__chg_array = list(sd1)
                 dest_chgcar.__spininfo = ["mX"]
             elif direction == 'y':
-                dest_chgcar.__chgArray = list(sd2)
+                dest_chgcar.__chg_array = list(sd2)
                 dest_chgcar.__spininfo = ["mY"]
             elif direction == 'z':
-                dest_chgcar.__chgArray = list(sd3)
+                dest_chgcar.__chg_array = list(sd3)
                 dest_chgcar.__spininfo = ["mZ"]
         return dest_chgcar
 
@@ -214,11 +214,11 @@ class CHGCAR(poscar.POSCAR):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         dest_chgcar = copy.deepcopy(self)
-        total, magnetization = tools.each_slice(self.chgArray,
-                                                self.meshX *
-                                                self.meshY *
-                                                self.meshZ)
-        dest_chgcar.__chgArray = [
+        total, magnetization = tools.each_slice(self.chg_array,
+                                                self.mesh_x *
+                                                self.mesh_y *
+                                                self.mesh_z)
+        dest_chgcar.__chg_array = [
             (up + down) / 2 for up, down in zip(total, magnetization)]
         dest_chgcar.__spininfo = ["up"]
         return dest_chgcar
@@ -236,11 +236,11 @@ class CHGCAR(poscar.POSCAR):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         dest_chgcar = copy.deepcopy(self)
-        total, magnetization = tools.each_slice(self.chgArray,
-                                                self.meshX *
-                                                self.meshY *
-                                                self.meshZ)
-        dest_chgcar.__chgArray = [
+        total, magnetization = tools.each_slice(self.chg_array,
+                                                self.mesh_x *
+                                                self.mesh_y *
+                                                self.mesh_z)
+        dest_chgcar.__chg_array = [
             (up - down) / 2 for up, down in zip(total, magnetization)]
         dest_chgcar.__spininfo = ["down"]
         return dest_chgcar
@@ -261,14 +261,14 @@ class CHGCAR(poscar.POSCAR):
         if not isinstance(other, CHGCAR):
             return NotImplemented
         add_chgcar = super(CHGCAR, self).__add__(other)
-        if any([self.meshX != other.meshX,
-                self.meshY != other.meshY,
-                self.meshZ != other.meshZ]):
+        if any([self.mesh_x != other.mesh_x,
+                self.mesh_y != other.mesh_y,
+                self.mesh_z != other.mesh_z]):
             raise RuntimeError('Mesh sizes are inconsistent')
-        augend = self.chgArray
-        addend = other.chgArray
+        augend = self.chg_array
+        addend = other.chg_array
         if len(augend) == len(addend):
-            add_chgcar.__chgArray = [x + y for x, y in zip(augend, addend)]
+            add_chgcar.__chg_array = [x + y for x, y in zip(augend, addend)]
         else:
             raise RuntimeError('the mesh sies are different.')
         return add_chgcar
@@ -290,15 +290,15 @@ class CHGCAR(poscar.POSCAR):
         if not isinstance(other, CHGCAR):
             return NotImplemented
         diff_chgcar = copy.deepcopy(self)
-        if any([self.meshX != other.meshX,
-                self.meshY != other.meshY,
-                self.meshZ != other.meshZ]):
+        if any([self.mesh_x != other.mesh_x,
+                self.mesh_y != other.mesh_y,
+                self.mesh_z != other.mesh_z]):
             raise RuntimeError('Mesh sizes are incinsistent')
-        minuend = self.chgArray
-        subtrahend = other.chgArray
+        minuend = self.chg_array
+        subtrahend = other.chg_array
         if len(minuend) == len(subtrahend):
-            diff_chgcar.__chgArray = [x - y for x, y in
-                                      zip(minuend, subtrahend)]
+            diff_chgcar.__chg_array = [x - y for x, y in
+                                       zip(minuend, subtrahend)]
         else:
             raise RuntimeError('the mesh sizes are different.')
         return diff_chgcar
@@ -310,13 +310,13 @@ class CHGCAR(poscar.POSCAR):
         :rtype: str
 '''
         outputstring = ''
-        tmp = self.chgArray
-        for tmp in tools.each_slice(self.chgArray,
-                                    self.meshX * self.meshY * self.meshZ):
+        tmp = self.chg_array
+        for tmp in tools.each_slice(self.chg_array,
+                                    self.mesh_x * self.mesh_y * self.mesh_z):
             output = []
-            outputstring += '\n  {0}  {1}  {2}\n'.format(self.meshX,
-                                                         self.meshY,
-                                                         self.meshZ)
+            outputstring += '\n  {0}  {1}  {2}\n'.format(self.mesh_x,
+                                                         self.mesh_y,
+                                                         self.mesh_z)
             for array in tools.each_slice(tmp, 5):
                 output.append(''.join('  {0:18.11E}'.format(i)
                                       for i in array if i is not None))
