@@ -96,7 +96,11 @@ class CHGCAR(poscar.POSCAR):
                     elif separator in line:
                         pass
                     else:
-                        self.__chg_array.extend(map(float, line.split()))
+#                        self.__chg_array.extend(map(float, line.split()))
+                        ## same as above?
+                        self.__chg_array.extend([float(item)
+                                                 for item
+                                                 in line.split()])
         if len(self.chg_array) % (self.mesh_x * self.mesh_y * self.mesh_z) != 0:
             print(len(self.chg_array), ": Should be ",
                   self.mesh_x * self.mesh_y * self.mesh_z, "x 1, 2, 4")

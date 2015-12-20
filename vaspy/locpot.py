@@ -61,7 +61,8 @@ class LOCPOT(poscar.POSCAR):
                     separator = line if separator is None else separator
                     if self.mesh_x == self.mesh_y == self.mesh_z == 0:
                         self.__mesh_x, self.__mesh_y, self.__mesh_z = \
-                            list(map(int, line.split()))
+                                [int(i) for i in line.split()]
+#                            list(map(int, line.split()))
                         section = 'grid'
                 elif section == 'grid':
                     line = line.rstrip('\n')
