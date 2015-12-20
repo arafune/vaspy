@@ -112,10 +112,10 @@ class OUTCAR(object):  # Version safety
     def select_posforce_header(self, posforce_flag, *sites):
         if sites == () or sites[0] == []:
             sites = range(1, self.nions + 1)
-        # if type(sites[0])==list or type(sites[0])==tuple:
         if isinstance(sites[0], (list, tuple)):
             sites = [n for n in sites[0]]
-        return [posforce for (index, site) in enumerate(self.posforce_title)
+        return [posforce for (index, site)
+                in enumerate(self.posforce_title)
                 for (posforce, boolian) in zip(site, posforce_flag)
                 if boolian and (index + 1 in sites)]
 # return [posforce for (posforce, boolian) in zip(ithAtom, poforce_flag)
@@ -131,7 +131,7 @@ class OUTCAR(object):  # Version safety
 
         if sites == () or sites[0] == []:
             sites = range(1, self.nions + 1)
-        if isinstance(sites[0], list) or isinstance(sites[0], tuple):
+        if isinstance(sites[0], (list, tuple)):
             sites = [n for n in sites[0]]
         return [[posforce for (index, site) in enumerate(one_cycle)
                  for (posforce, boolian) in zip(site, posforce_flag)
