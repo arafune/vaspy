@@ -595,7 +595,7 @@ class POSCAR(object):
         if self.is_selective:
             tmp.append('Selective Dynamics')
         tmp.append(self.coordinate_type)
-        for pos, t_or_f, atom in tools.ziplong(self.position,  # Version safety
+        for pos, t_or_f, atom in tools.ZIPLONG(self.position,  # Version safety
                                                self.coordinate_changeflags,
                                                self.atom_identifer, fillvalue=''):
             tmp.append(' '.join('  {0:20.17f}'.format(i) for i in pos) +
