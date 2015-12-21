@@ -66,7 +66,9 @@ class LOCPOT(poscar.POSCAR):
                         section = 'grid'
                 elif section == 'grid':
                     line = line.rstrip('\n')
-                    self.__potlist.extend(map(np.float64, line.split()))
+                    self.__potlist.extend([np.float64(i) for i in
+                                           line.split()])
+#                        map(np.float64, line.split()))
             if len(self.__potlist) == self.mesh_x * self.mesh_y * self.mesh_z:
                 self.__potarray = np.array(self.__potlist).reshape(
                     self.mesh_z, self.mesh_y, self.mesh_x)
@@ -298,13 +300,13 @@ class LOCPOT(poscar.POSCAR):
         :return: cell axis length of x, y, and z
         :rtype: tuple
         '''
-        x = self.lattice_vec1 * self.scaling_factor
-        y = self.lattice_vec2 * self.scaling_factor
-        z = self.lattice_vec3 * self.scaling_factor
-        x = np.linalg.norm(x)
-        y = np.linalg.norm(y)
-        z = np.linalg.norm(z)
-        return (x, y, z)
+#        x = self.lattice_vec1 * self.scaling_factor
+#        y = self.lattice_vec2 * self.scaling_factor
+#        z = self.lattice_vec3 * self.scaling_factor
+        cell_x = np.linalg.norm(self.lattice_vec1 * self.scaling_factor)
+        cell_y = np.linalg.norm(self.lattice_vec2 * self.scaling_factor)
+        cell_z = np.linalg.norm(self.lattice_vec3 * self.scaling_factor)
+        return (cell_x, cell_y, cell_z)
 
     def plot_potential_along_axis(self, axis_name, pottype='former'):
         '''Plot potential curve along the axis
@@ -315,25 +317,25 @@ class LOCPOT(poscar.POSCAR):
         axis_name = axis_name.capitalize()
         axes_length = self.get_axes_lengthes()
         if axis_name == 'X':
-            X = np.linspace(0, axes_length[0], self.mesh_x)
+            horizontal_axis = np.linspace(0, axes_length[0], self.mesh_x)
             plt.clf()
             plt.xlim(xmax=axes_length[0])
         if axis_name == 'Y':
-            X = np.linspace(0, axes_length[1], self.mesh_y)
+            horizontal_axis = np.linspace(0, axes_length[1], self.mesh_y)
             plt.clf()
             plt.xlim(xmax=axes_length[1])
         if axis_name == 'Z':
-            X = np.linspace(0, axes_length[2], self.mesh_z)
+            horizontal_axis = np.linspace(0, axes_length[2], self.mesh_z)
             plt.clf()
             plt.xlim(xmax=axes_length[2])
-        Y1 = self.average_along_axis(axis_name, pottype)
-        Y2 = self.max_along_axis(axis_name, pottype)
-        Y3 = self.min_along_axis(axis_name, pottype)
-        Y4 = self.median_along_axis(axis_name, pottype)
-        plt.plot(X, Y1, label='average')
-        plt.plot(X, Y2, label='max')
-        plt.plot(X, Y3, label='min')
-        plt.plot(X, Y4, label='median')
+        y_average = self.average_along_axis(axis_name, pottype)
+        y_max = self.max_along_axis(axis_name, pottype)
+        y_min = self.min_along_axis(axis_name, pottype)
+        y_median = self.median_along_axis(axis_name, pottype)
+        plt.plot(horizontal_axis, y_average, label='average')
+        plt.plot(horizontal_axis, y_max, label='max')
+        plt.plot(horizontal_axis, y_min, label='min')
+        plt.plot(horizontal_axis, y_median, label='median')
         xlabel = "Position along " + axis_name + "-axis (A)"
         title = "Local potential (" + axis_name + ")"
         plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
