@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # translate from procar.rb of scRipt4VASP 2014/2/26 master branch
+"""
+PROCAR and BandStructure class
+"""
 
 from __future__ import print_function  # Version safety
 from __future__ import division        # Version safety
@@ -18,8 +21,8 @@ import numpy as np
 try:
     from vaspy import tools
 except ImportError:
-    mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
-    sys.path.append(os.path.dirname(os.path.abspath(mypath)))
+    MYPATH = os.readlink(__file__) if os.path.islink(__file__) else __file__
+    sys.path.append(os.path.dirname(os.path.abspath(MYPATH)))
     import tools
 
 
@@ -79,10 +82,16 @@ class PROCAR(object):  # Version safety
 
     @property
     def orbital(self):
+        '''setter for orbital property'''
         return self.__orbital
 
     @property
     def phase(self):
+        '''setter for phase property.
+
+        'Phase' characteristics is not clear for my yet.
+        So this program does not treat the value.
+        '''
         return self.__phase
 
     @property
@@ -172,12 +181,12 @@ class PROCAR(object):  # Version safety
                            (self.numk * self.n_bands * self.n_atoms))
         if len(self.orbital) % (self.numk * self.n_bands * self.n_atoms) != 0:
             raise RuntimeError("PROCAR file may be broken")
-        if self.spininfo == 1:
-            self.__spininfo = ('',)    # standard
-        elif self.spininfo == 2:
-            self.__spininfo = ('_up', '_down')   # collinear
-        elif self.spininfo == 4:
-            self.__spininfo = ('_mT', '_mX', '_mY', '_mZ')  # non-collinear
+        if self.spininfo == 1: # standard
+            self.__spininfo = ('',)
+        elif self.spininfo == 2:   # collinear
+            self.__spininfo = ('_up', '_down')
+        elif self.spininfo == 4:  # non-collinear
+            self.__spininfo = ('_mT', '_mX', '_mY', '_mZ')
 
     def __str__(self):
         '''x.__str__() <=> str(x)
@@ -361,6 +370,7 @@ class BandStructure(object):
 
     @property
     def kvectors(self):
+        '''setter for kvector'''
         return self.__kvectors
 
     @kvectors.setter
@@ -582,7 +592,8 @@ structure drowing'''
         return orb_indexes
 
     def compose_orbital(self, arg):
-        '''Add composed orbital contribution in each 'sites' stored in BandStructure.sitecomposed.
+        '''Add composed orbital contribution in
+        each 'sites' stored in BandStructure.sitecomposed.
 
         :param arg: orbital names
         :type arg: str, list, tuple
