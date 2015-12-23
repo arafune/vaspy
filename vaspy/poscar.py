@@ -130,8 +130,8 @@ class POSCAR(object):
             self.ionnums = [int(x) for x in next(poscar).split()]
         self.__atom_identifer = []
         atomnames = []
-        for elm, n in zip(self.iontype, self.ionnums):
-            for j in range(1, n + 1):
+        for elm, ionnums in zip(self.iontype, self.ionnums):
+            for j in range(1, ionnums + 1):
                 tmp = elm + str(j)
                 if tmp not in atomnames:
                     atomnames.append(tmp)
