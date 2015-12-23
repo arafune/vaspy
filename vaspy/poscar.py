@@ -50,6 +50,7 @@ except ImportError:
     import tools
 import numpy as np
 
+
 class POSCAR(object):
 
     '''
@@ -260,7 +261,7 @@ class POSCAR(object):
                 raise ValueError
             if i[0] <= 0 or i[1] <= 0:
                 raise ValueError
-            dest = self.position[i[0] - 1: i[1]] # <<fix-ME!
+            dest = self.position[i[0] - 1: i[1]]  # <<fix-ME!
         return dest
 
     def pos_replace(self, i, vector):
@@ -468,17 +469,26 @@ class POSCAR(object):
             self.to_direct()
         axis_name = axis_name.capitalize()
         if axis_name == 'X':
-            self.__lattice_vec1 = np.dot(self.rotate_x(theta), self.lattice_vec1)
-            self.__lattice_vec2 = np.dot(self.rotate_x(theta), self.lattice_vec2)
-            self.__lattice_vec3 = np.dot(self.rotate_x(theta), self.lattice_vec3)
+            self.__lattice_vec1 = np.dot(self.rotate_x(theta),
+                                         self.lattice_vec1)
+            self.__lattice_vec2 = np.dot(self.rotate_x(theta),
+                                         self.lattice_vec2)
+            self.__lattice_vec3 = np.dot(self.rotate_x(theta),
+                                         self.lattice_vec3)
         elif axis_name == 'Y':
-            self.__lattice_vec1 = np.dot(self.rotate_y(theta), self.lattice_vec1)
-            self.__lattice_vec2 = np.dot(self.rotate_y(theta), self.lattice_vec2)
-            self.__lattice_vec3 = np.dot(self.rotate_y(theta), self.lattice_vec3)
+            self.__lattice_vec1 = np.dot(self.rotate_y(theta),
+                                         self.lattice_vec1)
+            self.__lattice_vec2 = np.dot(self.rotate_y(theta),
+                                         self.lattice_vec2)
+            self.__lattice_vec3 = np.dot(self.rotate_y(theta),
+                                         self.lattice_vec3)
         elif axis_name == 'Z':
-            self.__lattice_vec1 = np.dot(self.rotate_z(theta), self.lattice_vec1)
-            self.__lattice_vec2 = np.dot(self.rotate_z(theta), self.lattice_vec2)
-            self.__lattice_vec3 = np.dot(self.rotate_z(theta), self.lattice_vec3)
+            self.__lattice_vec1 = np.dot(self.rotate_z(theta),
+                                         self.lattice_vec1)
+            self.__lattice_vec2 = np.dot(self.rotate_z(theta),
+                                         self.lattice_vec2)
+            self.__lattice_vec3 = np.dot(self.rotate_z(theta),
+                                         self.lattice_vec3)
         if original_is_cartesian:
             self.to_cartesian()
 
@@ -592,9 +602,12 @@ class POSCAR(object):
         tmp = []
         tmp.append(self.system_name)
         tmp.append(str(self.scaling_factor))
-        tmp.append(''.join('   {0:20.17f}'.format(i) for i in self.lattice_vec1))
-        tmp.append(''.join('   {0:20.17f}'.format(i) for i in self.lattice_vec2))
-        tmp.append(''.join('   {0:20.17f}'.format(i) for i in self.lattice_vec3))
+        tmp.append(''.join('   {0:20.17f}'.format(i) for i in
+                           self.lattice_vec1))
+        tmp.append(''.join('   {0:20.17f}'.format(i) for i in
+                           self.lattice_vec2))
+        tmp.append(''.join('   {0:20.17f}'.format(i) for i in
+                           self.lattice_vec3))
         if not self.iontype[0].isdigit():
             tmp.append(' ' + ' '.join(self.iontype))
         tmp.append(' ' + ' '.join(str(i) for i in self.ionnums))
@@ -603,7 +616,8 @@ class POSCAR(object):
         tmp.append(self.coordinate_type)
         for pos, t_or_f, atom in tools.ZIPLONG(self.position,  # Version safety
                                                self.coordinate_changeflags,
-                                               self.atom_identifer, fillvalue=''):
+                                               self.atom_identifer,
+                                               fillvalue=''):
             tmp.append(' '.join('  {0:20.17f}'.format(i) for i in pos) +
                        ' ' + t_or_f +
                        ' ' + atom)
