@@ -534,7 +534,6 @@ class POSCAR(object):
         dest_poscar.ionnums.extend(other.ionnums)
         dest_poscar.position.extend(other.position)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
-
         dest_poscar.atom_identifer
 
         return dest_poscar
