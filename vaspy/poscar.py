@@ -4,6 +4,8 @@
 
 translate from poscar.rb of 2014/2/26, master branch
 
+The below is an example of POSCAR file::
+
  fcc (111) surface
    3.52000000000000
      0.7071067800000000    0.0000000000000000    0.0000000000000000
@@ -11,8 +13,8 @@ translate from poscar.rb of 2014/2/26, master branch
      0.0000000000000000    0.0000000000000000   11.5470000000000006
    Cu
      9
-Selective dynamics
-Direct
+ Selective dynamics
+ Direct
   0.0000000000000000  0.0000000000000000  0.0000000000000000   F   F   F
   0.3333333300000021  0.6666666699999979  0.0499999999999972   F   F   F
   0.6666666699999979  0.3333333300000021  0.1000000000000014   F   F   F
@@ -35,9 +37,10 @@ Direct
 '''
 
 from __future__ import division, print_function  # Version safety
+import numpy as np
 import itertools as it
-import re
 import copy
+import re
 import os
 import sys
 try:
@@ -46,8 +49,6 @@ except ImportError:
     MYPATH = os.readlink(__file__) if os.path.islink(__file__) else __file__
     sys.path.append(os.path.dirname(os.path.abspath(MYPATH)))
     import tools
-import numpy as np
-
 
 
 class POSCAR(object):
@@ -245,14 +246,18 @@ class POSCAR(object):
                      position[19:25], not position[19:24])
 
         '''
-        if type(i[0]) == int:
+        if isinstance(i[0], int):
+            if i[0] <= 0:
+                raise ValueError
             dest = []
             for ii in i:
                 dest.append(self.position[ii - 1])
             if len(dest) == 1:
                 dest = dest[0]
-        elif type(i[0]) == tuple:
+        elif isinstance(i[0], tuple):
             if i[0] > i[1]:
+                raise ValueError
+            if i[0] <= 0 or i[1] <= 0:
                 raise ValueError
             dest = self.positions[i[0] - 1: i[1]]
         return dest
