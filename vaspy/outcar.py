@@ -32,8 +32,8 @@ class OUTCAR(object):  # Version safety
         """ build atom_names (the list of atomname_with_index)
         """
         self.atom_names = []
-        for elm, n in zip(self.iontype, self.ionnums):
-            for j in range(1, n + 1):
+        for elm, ion_n in zip(self.iontype, self.ionnums):
+            for j in range(1, ion_n + 1):
                 tmp = elm + str(j)
                 if tmp not in self.atom_names:
                     self.atom_names.append(tmp)
@@ -91,7 +91,6 @@ class OUTCAR(object):  # Version safety
                     self.fermi = float(line.split()[2])
                 else:
                     pass
-
         self.atom_identifer = [name + ":#" + str(index + 1)
                                for (index, name)
                                in enumerate(
@@ -131,7 +130,7 @@ class OUTCAR(object):  # Version safety
 
         if sites == () or sites[0] == []:
             sites = range(1, self.nions + 1)
-        if type(sites[0]) == list or type(sites[0]) == tuple:
+        if isinstance(sites[0], (list, tuple)):
             sites = [n for n in sites[0]]
         return [[posforce for (index, site) in enumerate(one_cycle)
                  for (posforce, boolian) in zip(site, posforce_flag)
