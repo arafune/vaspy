@@ -171,8 +171,8 @@ class POSCAR(object):
         # return self.__atom_identifer
         self.__atom_identifer = []
         atomnames = []
-        for elm, n in zip(self.iontype, self.ionnums):
-            for j in range(1, n + 1):
+        for elm, ionnums in zip(self.iontype, self.ionnums):
+            for j in range(1, ionnums + 1):
                 tmp = elm + str(j)
                 if tmp not in atomnames:
                     atomnames.append(tmp)
@@ -251,8 +251,8 @@ class POSCAR(object):
             if i[0] <= 0:
                 raise ValueError
             dest = []
-            for ii in i:
-                dest.append(self.position[ii - 1])
+            for site_index in i:
+                dest.append(self.position[site_index - 1])
             if len(dest) == 1:
                 dest = dest[0]
         elif isinstance(i[0], tuple):
