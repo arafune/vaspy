@@ -260,7 +260,7 @@ class POSCAR(object):
                 raise ValueError
             if i[0] <= 0 or i[1] <= 0:
                 raise ValueError
-            dest = self.positions[i[0] - 1: i[1]]
+            dest = self.position[i[0] - 1: i[1]] # <<fix-ME!
         return dest
 
     def pos_replace(self, i, vector):
