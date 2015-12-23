@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # translate from procar.rb of scRipt4VASP 2014/2/26 master branch
+"""
+PROCAR and BandStructure class
+"""
 
 from __future__ import print_function  # Version safety
 from __future__ import division        # Version safety
@@ -18,8 +21,8 @@ import numpy as np
 try:
     from vaspy import tools
 except ImportError:
-    mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
-    sys.path.append(os.path.dirname(os.path.abspath(mypath)))
+    MYPATH = os.readlink(__file__) if os.path.islink(__file__) else __file__
+    sys.path.append(os.path.dirname(os.path.abspath(MYPATH)))
     import tools
 
 
@@ -67,8 +70,8 @@ class PROCAR(object):  # Version safety
         self.__phase = list()
         self.__spininfo = 0   # nospin: 1, spinresolved: 2, soi: 4
         self.__numk = 0
-        self.__nBands = 0
-        self.__nAtoms = 0
+        self.__n_bands = 0
+        self.__n_atoms = 0
         self.__kvectors = list()
         self.__energies = list()
 
@@ -79,10 +82,16 @@ class PROCAR(object):  # Version safety
 
     @property
     def orbital(self):
+        '''setter for orbital property'''
         return self.__orbital
 
     @property
     def phase(self):
+        '''setter for phase property.
+
+        'Phase' characteristics is not clear for my yet.
+        So this program does not treat the value.
+        '''
         return self.__phase
 
     @property
@@ -96,14 +105,14 @@ class PROCAR(object):  # Version safety
         return self.__numk
 
     @property
-    def nBands(self):
+    def n_bands(self):
         '''Number of Bands'''
-        return self.__nBands
+        return self.__n_bands
 
     @property
-    def nAtoms(self):
+    def n_atoms(self):
         '''Number of atoms'''
-        return self.__nAtoms
+        return self.__n_atoms
 
     @property
     def kvectors(self):
@@ -128,20 +137,21 @@ class PROCAR(object):  # Version safety
         :param str file: filename of *PROCAR* file
         :param Boolian phase_read: Switch for loading phase characters
         '''
-        f = open(file)
-        first_line = f.readline()
+        procar_file = open(file)
+        first_line = procar_file.readline()
         if 'PROCAR lm decomposed + phase' not in first_line:
-            close(f)
+            procar_file.close()
             raise RuntimeError("This PROCAR is not a proper format\n \
                                 See INCAR in the calculation.\n")
         section = list()
-        with f:
-            for line in f:
+        with procar_file:
+            for line in procar_file:
                 if line.isspace():
                     continue
                 elif "k-points: " in line:
-                    self.__numk, self.__nBands, self.__nAtoms = [
-                        int(i) for i in re.split('\s|:',line) if i.isdigit()]
+                    self.__numk, self.__n_bands, self.__n_atoms = [
+                        int(i) for i in re.split('\s|:', line)
+                        if i.isdigit()]
                 elif "k-point " in line:
                     self.__kvectors.append(np.array(
                         [float(i) for i in line.split()[3:6]]))
@@ -168,15 +178,15 @@ class PROCAR(object):  # Version safety
                         self.__phase.append(tmp)
 
         self.__spininfo = (len(self.orbital) //
-                           (self.numk * self.nBands * self.nAtoms))
-        if len(self.orbital) % (self.numk * self.nBands * self.nAtoms) != 0:
+                           (self.numk * self.n_bands * self.n_atoms))
+        if len(self.orbital) % (self.numk * self.n_bands * self.n_atoms) != 0:
             raise RuntimeError("PROCAR file may be broken")
-        if self.spininfo == 1:
-            self.__spininfo = ('',)    # standard
-        elif self.spininfo == 2:
-            self.__spininfo = ('_up', '_down')   # collinear
-        elif self.spininfo == 4:
-            self.__spininfo = ('_mT', '_mX', '_mY', '_mZ')  # non-collinear
+        if self.spininfo == 1: # standard
+            self.__spininfo = ('',)
+        elif self.spininfo == 2:   # collinear
+            self.__spininfo = ('_up', '_down')
+        elif self.spininfo == 4:  # non-collinear
+            self.__spininfo = ('_mT', '_mX', '_mY', '_mZ')
 
     def __str__(self):
         '''x.__str__() <=> str(x)
@@ -185,14 +195,14 @@ class PROCAR(object):  # Version safety
         '''
         template = '''The properties of this procar:
   # of k-points: {0.numk}
-  # of bands: {0.nBands}
-  # of ions: {0.nAtoms}
+  # of bands: {0.n_bands}
+  # of ions: {0.n_atoms}
   # of kvectors: {1}
   # of energies: {2}
-    ((# of k-points) * (# of bands) = {0.numk}*{0.nBands}={3})
+    ((# of k-points) * (# of bands) = {0.numk}*{0.n_bands}={3})
   # of orbital component: {4}
     ((# of k-points) * (# of bands) * (# of ions) =
-        {0.numk}*{0.nBands}*{0.nAtoms}={5})
+        {0.numk}*{0.n_bands}*{0.n_atoms}={5})
   # of phase component: {6}
   Orbitals are: {0.orb_names}
   spininfo: {0.spininfo}
@@ -200,9 +210,9 @@ class PROCAR(object):  # Version safety
         return template.format(self,
                                len(self.kvectors),
                                len(self.energies),
-                               self.numk * self.nBands,
+                               self.numk * self.n_bands,
                                len(self.orbital),
-                               self.numk * self.nBands * self.nAtoms,
+                               self.numk * self.n_bands * self.n_atoms,
                                len(self.phase))
 
     def __iter__(self):
@@ -215,8 +225,8 @@ class PROCAR(object):  # Version safety
         '''
         band = BandStructure()
         band.kvectors = self.kvectors[0:self.numk]
-        band.nBands = self.nBands
-        band.nAtoms = self.nAtoms
+        band.n_bands = self.n_bands
+        band.n_atoms = self.n_atoms
         band.spininfo = self.spininfo
         band.orb_names = list(self.orb_names)
         # BandStructure.isready() must be True
@@ -238,7 +248,7 @@ class BandStructure(object):
     '''
 
     def __init__(self, arg=None):
-        self.__nBands = 0
+        self.__n_bands = 0
         self.__kvectors = list()
         self.__kdistance = list()
         self.__sitecomposed = []
@@ -250,7 +260,7 @@ class BandStructure(object):
                           'tot']
 
     def isready(self):
-        '''Return True if numk, nBands, nAtoms, spininfo, and
+        '''Return True if numk, n_bands, n_atoms, spininfo, and
         orb_names are set, otherwise raise ValueError.
 
         This method is used for check before when orbitals, phases, energies
@@ -259,13 +269,13 @@ class BandStructure(object):
             raise ValueError("numk is not defined")
         if self.numk == 0:
             raise ValueError("numk is not defined")
-        if self.nBands == 0:
-            raise ValueError("nBands is not correctly set")
-        if not hasattr(self, "nAtoms"):
-            raise ValueError("nAtoms is not defined")
+        if self.n_bands == 0:
+            raise ValueError("n_bands is not correctly set")
+        if not hasattr(self, "n_atoms"):
+            raise ValueError("n_atoms is not defined")
         if not hasattr(self, "spininfo"):
             raise ValueError("spininfo is not defined")
-        elif not type(self.spininfo) == tuple:
+        elif not isinstance(self.spininfo, tuple):
             raise TypeError("spininfo type should be tuple")
         if not hasattr(self, "orb_names"):
             raise ValueError("orb_names is not defined")
@@ -274,14 +284,14 @@ class BandStructure(object):
         return True
 
     @property
-    def nBands(self):
+    def n_bands(self):
         '''Number of bands'''
-        return self.__nBands
+        return self.__n_bands
 
-    @nBands.setter
-    def nBands(self, arg):
-        self.__nBands = arg
-        self.available_band = list(range(self.nBands))
+    @n_bands.setter
+    def n_bands(self, arg):
+        self.__n_bands = arg
+        self.available_band = list(range(self.n_bands))
 
     @property
     def orbitals(self):
@@ -300,20 +310,20 @@ class BandStructure(object):
         (But this option is not so entirely tested.
         Do not use for real analysis)
         '''
-        if type(arg) == np.ndarray and arg.ndim == 4:
+        if isinstance(arg, np.ndarray) and arg.ndim == 4:
             self.__orbitals = arg
         elif self.isready():
             if len(self.spininfo) == 1 or len(self.spininfo) == 4:
                 self.__orbitals = \
                     np.array(arg).reshape(self.numk,
-                                          self.nBands,
-                                          self.nAtoms * len(self.spininfo),
+                                          self.n_bands,
+                                          self.n_atoms * len(self.spininfo),
                                           len(self.orb_names))
             elif len(self.spininfo) == 2:
                 self.__orbitals = \
                     np.array(arg).reshape(2, self.numk,
-                                          self.nBands,
-                                          self.nAtoms,
+                                          self.n_bands,
+                                          self.n_atoms,
                                           len(self.orb_names))
                 self.__orbitals = [self.__orbitals[0], self.__orbitals[1]]
 
@@ -349,17 +359,18 @@ class BandStructure(object):
             phases = phase_re + phase_im * (0.0 + 1.0J)
         if self.isready():
             if len(self.spininfo) == 1 or len(self.spininfo) == 4:
-                self.__phases = phases.reshape(self.numk, self.nBands,
-                                               self.nAtoms,
+                self.__phases = phases.reshape(self.numk, self.n_bands,
+                                               self.n_atoms,
                                                len(self.orb_names) - 1)
             elif len(self.spininfo) == 2:
-                self.__phases = phases.reshape(2, self.numk, self.nBands,
-                                               self.nAtoms,
+                self.__phases = phases.reshape(2, self.numk, self.n_bands,
+                                               self.n_atoms,
                                                len(self.orb_names) - 1)
                 self.__phases = (self.__phases[0], self.__phases[1])
 
     @property
     def kvectors(self):
+        '''setter for kvector'''
         return self.__kvectors
 
     @kvectors.setter
@@ -393,24 +404,26 @@ structure drowing'''
     def energies(self, arg):
         if self.isready():
             if len(self.spininfo) == 1 or len(self.spininfo) == 4:
-                self.__energies = np.array(arg).reshape(self.numk, self.nBands)
+                self.__energies = np.array(arg).reshape(self.numk, self.n_bands)
             elif len(self.spininfo) == 2:
                 self.__energies = (
                     np.array(
-                        arg[:self.numk * len(self.available_band)]).reshape(
-                            self.numk, self.nBands),
+                        arg[:self.numk *
+                            len(self.available_band)]).reshape(
+                                self.numk, self.n_bands),
                     np.array(
-                        arg[self.numk * len(self.available_band):]).reshape(
-                            self.numk, self.nBands))
+                        arg[self.numk *
+                            len(self.available_band):]).reshape(
+                                self.numk, self.n_bands))
                 self.__energies = np.array(self.__energies)
-                
+
     def fermi_correction(self, fermi):
         '''Correct the Fermi level
         :param fermi: value of the Fermi level (from OUTCAR or vasprun.xml).
         :type fermi: float
         '''
         self.__energies -= fermi
-                        
+
     def compose_sites(self, arg):
         '''Make sitecomposed ndarray
 
@@ -426,9 +439,8 @@ structure drowing'''
             cmporbs = np.array([[[np.sum(
                 [y for x, y in enumerate(self.orbitals[i, j])
                  if x in site_numbers],
-                axis=0)]
-                for j in range(len(self.available_band))]
-                for i in range(self.numk)])
+                axis=0)] for j in range(len(self.available_band))]
+                                for i in range(self.numk)])
             if self.__sitecomposed:
                 self.__sitecomposed[0] = np.concatenate(
                     (self.__sitecomposed[0], cmporbs),
@@ -441,15 +453,13 @@ structure drowing'''
             cmporbsUp = np.array([[[np.sum(
                 [y for x, y in enumerate(upspin_orbitals[i, j])
                  if x in site_numbers],
-                axis=0)]
-                for j in range(len(self.available_band))]
-                for i in range(self.numk)])
+                axis=0)] for j in range(len(self.available_band))]
+                                  for i in range(self.numk)])
             cmporbsDown = np.array([[[np.sum(
                 [y for x, y in enumerate(downspin_orbitals[i, j])
                  if x in site_numbers],
-                axis=0)]
-                for j in range(len(self.available_band))]
-                for i in range(self.numk)])
+                axis=0)] for j in range(len(self.available_band))]
+                                    for i in range(self.numk)])
             self.__orbitals[0] = np.concatenate((self.__orbitals[0],
                                                  cmporbsUp),
                                                 axis=2)
@@ -466,35 +476,31 @@ structure drowing'''
             else:
                 self.__sitecomposed = [cmporbsUp, cmporbsDown]
         if len(self.spininfo) == 4:
-            site_numbers_mT = tuple(x + self.nAtoms * 0 for x in site_numbers)
-            site_numbers_mX = tuple(x + self.nAtoms * 1 for x in site_numbers)
-            site_numbers_mY = tuple(x + self.nAtoms * 2 for x in site_numbers)
-            site_numbers_mZ = tuple(x + self.nAtoms * 3 for x in site_numbers)
+            site_numbers_mT = tuple(x + self.n_atoms * 0 for x in site_numbers)
+            site_numbers_mX = tuple(x + self.n_atoms * 1 for x in site_numbers)
+            site_numbers_mY = tuple(x + self.n_atoms * 2 for x in site_numbers)
+            site_numbers_mZ = tuple(x + self.n_atoms * 3 for x in site_numbers)
             #
             cmporbs_mT = np.array([[[np.sum(
                 [y for x, y in enumerate(self.orbitals[i, j])
                  if x in site_numbers_mT],
-                axis=0)]
-                for j in range(len(self.available_band))]
-                for i in range(self.numk)])
+                axis=0)] for j in range(len(self.available_band))]
+                                   for i in range(self.numk)])
             cmporbs_mX = np.array([[[np.sum(
                 [y for x, y in enumerate(self.orbitals[i, j])
                  if x in site_numbers_mX],
-                axis=0)]
-                for j in range(len(self.available_band))]
-                for i in range(self.numk)])
+                axis=0)] for j in range(len(self.available_band))]
+                                   for i in range(self.numk)])
             cmporbs_mY = np.array([[[np.sum(
                 [y for x, y in enumerate(self.orbitals[i, j])
                  if x in site_numbers_mY],
-                axis=0)]
-                for j in range(len(self.available_band))]
-                for i in range(self.numk)])
+                axis=0)] for j in range(len(self.available_band))]
+                                   for i in range(self.numk)])
             cmporbs_mZ = np.array([[[np.sum(
                 [y for x, y in enumerate(self.orbitals[i, j])
                  if x in site_numbers_mZ],
-                axis=0)]
-                for j in range(len(self.available_band))]
-                for i in range(self.numk)])
+                axis=0)] for j in range(len(self.available_band))]
+                                   for i in range(self.numk)])
             if self.__sitecomposed:
                 self.__sitecomposed[0] = np.concatenate(
                     (self.__sitecomposed[0], cmporbs_mT),
@@ -586,7 +592,8 @@ structure drowing'''
         return orb_indexes
 
     def compose_orbital(self, arg):
-        '''Add composed orbital contribution in each 'sites' stored in BandStructure.sitecomposed.
+        '''Add composed orbital contribution in
+        each 'sites' stored in BandStructure.sitecomposed.
 
         :param arg: orbital names
         :type arg: str, list, tuple
@@ -611,10 +618,9 @@ structure drowing'''
                     numk, numband, numsite, norbs = self.sitecomposed[l].shape
                     orbitalcomposed = np.array([[[[np.sum(
                         [y for x, y in enumerate(self.sitecomposed[l][i, j, k])
-                         if x in orbindex])]
-                        for k in range(numsite)]
-                        for j in range(numband)]
-                        for i in range(numk)])
+                         if x in orbindex])] for k in range(numsite)]
+                                                 for j in range(numband)]
+                                                for i in range(numk)])
                     self.sitecomposed[l] = np.concatenate(
                         (self.sitecomposed[l], orbitalcomposed),
                         axis=3)
@@ -697,22 +703,26 @@ structure drowing'''
                     table.append(sitelist)
                 table.append([])
         elif len(self.spininfo) == 2:
-            for b in range(numband):
-                for k in range(numk):
+            for bandindex in range(numband):
+                for kindex in range(numk):
                     sitelist = list()
-                    sitelist.append(self.kdistance[k])
-                    sitelist.append(self.energies[0][k, b])
+                    sitelist.append(self.kdistance[kindex])
+                    sitelist.append(self.energies[0][kindex, bandindex])
                     for site, norbs in zip(list(range(numsite)),
                                            orbnums):
-                        for o in norbs:
+                        for orb in norbs:
                             sitelist.append(
-                                self.sitecomposed[0][k, b, site, o])
-                    sitelist.append(self.energies[1][k, b])
+                                self.sitecomposed[0][kindex,
+                                                     bandindex,
+                                                     site, orb])
+                    sitelist.append(self.energies[1][kindex, bandindex])
                     for site, norbs in zip(list(range(numsite)),
                                            orbnums):
-                        for o in norbs:
+                        for orb in norbs:
                             sitelist.append(
-                                self.sitecomposed[1][k, b, site, o])
+                                self.sitecomposed[1][kindex,
+                                                     bandindex,
+                                                     site, orb])
                     table.append(sitelist)
                 table.append([])
         else:

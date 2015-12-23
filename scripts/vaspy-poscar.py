@@ -73,7 +73,7 @@ if (args.rotateX, args.rotateY, args.rotateZ).count(None) < 2:
 ############
 
 # print(args.poscar) #DEBUG
-args.poscar.to_Cartesian()
+args.poscar.to_cartesian()
 # print(args.poscar) #DEBUG
 
 #

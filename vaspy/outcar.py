@@ -32,8 +32,8 @@ class OUTCAR(object):  # Version safety
         """ build atom_names (the list of atomname_with_index)
         """
         self.atom_names = []
-        for elm, ion_n in zip(self.iontype, self.ionnums):
-            for j in range(1, ion_n + 1):
+        for elm, ionnum in zip(self.iontype, self.ionnums):
+            for j in range(1, ionnum + 1):
                 tmp = elm + str(j)
                 if tmp not in self.atom_names:
                     self.atom_names.append(tmp)
@@ -111,10 +111,10 @@ class OUTCAR(object):  # Version safety
     def select_posforce_header(self, posforce_flag, *sites):
         if sites == () or sites[0] == []:
             sites = range(1, self.nions + 1)
-        # if type(sites[0])==list or type(sites[0])==tuple:
         if isinstance(sites[0], (list, tuple)):
             sites = [n for n in sites[0]]
-        return [posforce for (index, site) in enumerate(self.posforce_title)
+        return [posforce for (index, site)
+                in enumerate(self.posforce_title)
                 for (posforce, boolian) in zip(site, posforce_flag)
                 if boolian and (index + 1 in sites)]
 # return [posforce for (posforce, boolian) in zip(ithAtom, poforce_flag)

@@ -76,8 +76,8 @@ class TestPROCAR(unittest.TestCase):
 
     def test_BScreation_from_procar_std(self):
         testBand = self.procar_std.band()
-        self.assertEqual(3, testBand.nAtoms)
-        self.assertEqual(2, testBand.nBands)
+        self.assertEqual(3, testBand.n_atoms)
+        self.assertEqual(2, testBand.n_bands)
         self.assertEqual(("",), testBand.spininfo)
         np.testing.assert_array_equal([np.array([0.0, 0.0, 0.0]),
                                        np.array([0.25, 0.25, 0.]),
@@ -92,8 +92,8 @@ class TestPROCAR(unittest.TestCase):
 
     def test_BScreation_from_procar_single(self):
         testBand = self.procar_single.band()
-        self.assertEqual(3, testBand.nAtoms)
-        self.assertEqual(1, testBand.nBands)
+        self.assertEqual(3, testBand.n_atoms)
+        self.assertEqual(1, testBand.n_bands)
         np.testing.assert_array_equal([np.array([0.0, 0.0, 0.0])],
                                       testBand.kvectors)
         np.testing.assert_array_equal(
@@ -124,8 +124,8 @@ class TestPROCAR(unittest.TestCase):
 
     def test_BScreation_from_procar_spin(self):
         testBand = self.procar_spin.band()
-        self.assertEqual(3, testBand.nAtoms)
-        self.assertEqual(2, testBand.nBands)
+        self.assertEqual(3, testBand.n_atoms)
+        self.assertEqual(2, testBand.n_bands)
         self.assertEqual(("_up", "_down"), testBand.spininfo)
         np.testing.assert_array_equal([np.array([0.0, 0.0, 0.0]),
                                        np.array([0.25, 0.25, 0.]),
@@ -138,8 +138,8 @@ class TestPROCAR(unittest.TestCase):
 
     def test_BScreation_from_procar_soi(self):
         testBand = self.procar_soi.band()
-        self.assertEqual(3, testBand.nAtoms)
-        self.assertEqual(2, testBand.nBands)
+        self.assertEqual(3, testBand.n_atoms)
+        self.assertEqual(2, testBand.n_bands)
         self.assertEqual(("_mT", "_mX", "_mY", "_mZ"), testBand.spininfo)
         np.testing.assert_array_equal([np.array([0.0, 0.0, 0.0]),
                                        np.array([0.25, 0.25, 0.]),
