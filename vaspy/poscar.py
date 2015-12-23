@@ -37,7 +37,6 @@ The below is an example of POSCAR file::
 '''
 
 from __future__ import division, print_function  # Version safety
-import numpy as np
 import itertools as it
 import copy
 import re
@@ -49,7 +48,7 @@ except ImportError:
     MYPATH = os.readlink(__file__) if os.path.islink(__file__) else __file__
     sys.path.append(os.path.dirname(os.path.abspath(MYPATH)))
     import tools
-
+import numpy as np
 
 class POSCAR(object):
 
@@ -112,21 +111,23 @@ class POSCAR(object):
         self.system_name = next(poscar)
         self.scaling_factor = float(next(poscar))
         self.__lattice_vec1 = np.array(
-            list(map(float, next(poscar).split())))  # Version safety
+            [float(x) for x in next(poscar).split()])
+#            list(map(float, next(poscar).split())))  # Version safety
         self.__lattice_vec2 = np.array(
-            list(map(float, next(poscar).split())))  # Version safety
+            [float(x) for x in next(poscar).split()])
+#            list(map(float, next(poscar).split())))  # Version safety
         self.__lattice_vec3 = np.array(
-            list(map(float, next(poscar).split())))  # Version safety
+            [float(x) for x in next(poscar).split()])
+#            list(map(float, next(poscar).split())))  # Version safety
         self.iontype = next(poscar).split()
         # parse POSCAR evenif the element names are not set.
         # At present, the String representation number
         #   are used for the  dummy name.
         if self.iontype[0].isdigit():
-            self.ionnums = list(map(int, self.iontype))
-            #                      [int(i) for i in self.iontype]
+            self.ionnums = [int(i) for i in self.iontype]
+            #
         else:
-            self.ionnums = list(
-                map(int, next(poscar).split()))  # Version safety
+            self.ionnums = [int(x) for x in next(poscar).split()]
         self.__atom_identifer = []
         atomnames = []
         for elm, n in zip(self.iontype, self.ionnums):
