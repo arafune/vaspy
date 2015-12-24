@@ -267,7 +267,7 @@ class POSCAR(object):
 
         :rtype: np.array
 '''
-        sitelist=[]
+        sitelist = []
         for thearg in i:
             if isinstance(thearg, int):
                 sitelist.append(thearg)
@@ -278,7 +278,7 @@ class POSCAR(object):
         if isinstance(pos, np.ndarray):
             return pos
         elif isinstance(pos, list):
-            return sum(pos)/len(pos)            
+            return sum(pos)/len(pos)
 
     def pos_replace(self, i, vector):
         '''
@@ -805,6 +805,7 @@ class POSCAR(object):
         mat = np.array([line1, line2, line3])
         result = np.dot(np.linalg.inv(mat.T), point)
         return all((0 <= float(q) <= 1) for q in result)
+
 
 def _vectorize(vector):
     if not isinstance(vector, _VECTOR_ACCEPTABLES):

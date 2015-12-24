@@ -181,7 +181,7 @@ class PROCAR(object):  # Version safety
                            (self.numk * self.n_bands * self.n_atoms))
         if len(self.orbital) % (self.numk * self.n_bands * self.n_atoms) != 0:
             raise RuntimeError("PROCAR file may be broken")
-        if self.spininfo == 1: # standard
+        if self.spininfo == 1:  # standard
             self.__spininfo = ('',)
         elif self.spininfo == 2:   # collinear
             self.__spininfo = ('_up', '_down')
@@ -335,7 +335,8 @@ class BandStructure(object):
     def phases(self):
         '''phase data
 
-        .. note:: At present I have no idea about this parameter.  How to use it?'''
+        .. note:: At present I have no idea about this parameter.
+How to use it?'''
         return self.__phases
 
     @phases.setter
@@ -404,7 +405,8 @@ structure drowing'''
     def energies(self, arg):
         if self.isready():
             if len(self.spininfo) == 1 or len(self.spininfo) == 4:
-                self.__energies = np.array(arg).reshape(self.numk, self.n_bands)
+                self.__energies = np.array(arg).reshape(
+                    self.numk, self.n_bands)
             elif len(self.spininfo) == 2:
                 self.__energies = (
                     np.array(
