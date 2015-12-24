@@ -779,24 +779,13 @@ class POSCAR(object):
         :type line3: numpy.ndarray, numpy.matrix, list, tuple
         :rtype: Boolean
         '''
-        x0, y0, z0 = _vectorize(point).flatten()
-        x1, y1, z1 = _vectorize(line1).flatten()
-        x2, y2, z2 = _vectorize(line2).flatten()
-        x3, y3, z3 = _vectorize(line3).flatten()
-        l = -(-x3 * y2 * z0 + x2 * y3 * z0 + x3 * y0 * z2 - x0 * y3 * z2 -
-              x2 * y0 * z3 + x0 * y2 * z3) / (x3 * y2 * z1 - x2 * y3 * z1 -
-                                              x3 * y1 * z2 + x1 * y3 * z2 +
-                                              x2 * y1 * z3 - x1 * y2 * z3)
-        m = -(x3 * y1 * z0 - x1 * y3 * z0 - x3 * y0 * z1 + x0 * y3 * z1 +
-              x1 * y0 * z3 - x0 * y1 * z3) / (x3 * y2 * z1 - x2 * y3 * z1 -
-                                              x3 * y1 * z2 + x1 * y3 * z2 +
-                                              x2 * y1 * z3 - x1 * y2 * z3)
-        n = -(x2 * y1 * z0 - x1 * y2 * z0 - x2 * y0 * z1 + x0 * y2 * z1 +
-              x1 * y0 * z2 - x0 * y1 * z2) / (-x3 * y2 * z1 + x2 * y3 * z1 +
-                                              x3 * y1 * z2 - x1 * y3 * z2 -
-                                              x2 * y1 * z3 + x1 * y2 * z3)
-        return all((0 <= q <= 1) for q in (l, m, n))
-
+        point = np.array(point).flatten()
+        line1 = np.array(line1).flatten()
+        line2 = np.array(line2).flatten()
+        line3 = np.array(line3).flatten()
+        mat = np.array([line1, line2, line3])
+        result = np.dot(np.linalg.inv(mat.T), point)
+        return all((0 <= float(q) <= 1) for q in result)
 
 def _vectorize(vector):
     if not isinstance(vector, _VECTOR_ACCEPTABLES):

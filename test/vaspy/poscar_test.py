@@ -36,6 +36,23 @@ class TestPOSCAR(unittest.TestCase):
         np.testing.assert_allclose(np.array([0.0, 0.0, 1.02529049]),
                                       self.testposcar.lattice_vec3)
 
+    def test_point_in_box(self):
+        self.assertFalse(self.testposcar.point_in_box(
+            (0.5, 0.5, 0.2),
+            self.testposcar.lattice_vec1,
+            self.testposcar.lattice_vec2,
+            self.testposcar.lattice_vec3))
+        self.assertTrue(self.testposcar.point_in_box(
+            (0.5, 0.1, 0.2),
+            self.testposcar.lattice_vec1,
+            self.testposcar.lattice_vec2,
+            self.testposcar.lattice_vec3))
+        self.assertTrue(self.testposcar.point_in_box(
+            (0.5, 0.5, 0.2),
+            (1,0,0),
+            (0,1,0),
+            (0,0,1)))
+        
     def test_poscar_pos_1(self):
         pos=self.testposcar.pos(4)
         np.testing.assert_allclose(np.array([0.237639553, 0.429027113, 0.5]), pos)
