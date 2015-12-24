@@ -32,9 +32,25 @@ class TestPOSCAR(unittest.TestCase):
         np.testing.assert_array_equal(np.array([0.866025404, 0.5, 0.]),
                                       self.testposcar.latticeV2)
 
-    def test_latticeV3(self):
-        np.testing.assert_array_equal(np.array([0.0, 0.0, 1.025290499]),
-                                      self.testposcar.latticeV3)
+    def test_lattice_vec3(self):
+        np.testing.assert_allclose(np.array([0.0, 0.0, 1.02529049]),
+                                      self.testposcar.lattice_vec3)
+
+    def test_poscar_pos_1(self):
+        pos=self.testposcar.pos(4)
+        np.testing.assert_allclose(np.array([0.237639553, 0.429027113, 0.5]), pos)
+
+    def test_poscar_pos_2(self):
+        pos=self.testposcar.pos(4,5,6)
+        np.testing.assert_allclose([np.array([0.237639553, 0.429027113, 0.5]), np.array([0.237639553, 0.333333333, 0.5]), np.array([0.333333333, 0.237639553, 0.5])], pos)
+
+    def test_poscar_pos_3(self):
+        pos=self.testposcar.pos(5,4,6)
+        np.testing.assert_allclose([ np.array([0.237639553, 0.333333333, 0.5]), np.array([0.237639553, 0.429027113, 0.5]), np.array([0.333333333, 0.237639553, 0.5])], pos)
+
+    def test_poscar_pos_4(self):
+        pos=self.testposcar.pos((4,6))
+        np.testing.assert_allclose([np.array([0.237639553, 0.429027113, 0.5]), np.array([0.237639553, 0.333333333, 0.5]), np.array([0.333333333, 0.237639553, 0.5])], pos)
 
     def test_atom_identifer(self):
         self.assertEqual(['#1:Ni1', '#2:Ni2', '#3:Ni3',
