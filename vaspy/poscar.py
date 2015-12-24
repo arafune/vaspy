@@ -257,6 +257,29 @@ class POSCAR(object):
             dest = dest[0]
         return dest
 
+    def average_position(self, *i):
+        '''Return the average position of the sites
+
+        :param i: site indexes
+        :type i: int, tuple, list, range
+
+        :return: atom's position
+
+        :rtype: np.array
+'''
+        sitelist=[]
+        for thearg in i:
+            if isinstance(thearg, int):
+                sitelist.append(thearg)
+            elif isinstance(thearg, (tuple, list, range)):
+                for site_index in thearg:
+                    sitelist.append(site_index)
+        pos = self.pos(sitelist)
+        if isinstance(pos, np.ndarray):
+            return pos
+        elif isinstance(pos, list):
+            return sum(pos)/len(pos)            
+
     def pos_replace(self, i, vector):
         '''
         :param i: site #

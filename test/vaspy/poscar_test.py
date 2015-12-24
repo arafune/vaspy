@@ -99,6 +99,24 @@ class TestPOSCAR(unittest.TestCase):
              np.array([0.429027113, 0.237639553, 0.5])],             
             pos)
 
+    def test_poscar_average_position(self):
+        pos=self.testposcar.average_position(1, range(4,8))
+        np.testing.assert_allclose(
+            np.array([0.3475279104, 0.3475279104, 0.5]),
+            pos)
+
+    def test_poscar_average_position2(self):
+        pos=self.testposcar.average_position(1, 4, 5, 6, 7)
+        np.testing.assert_allclose(
+            np.array([0.3475279104, 0.3475279104, 0.5]),
+            pos)
+
+    def test_poscar_average_position3(self):
+        pos=self.testposcar.average_position(1)
+        np.testing.assert_allclose(
+            np.array([0.5, 0.5, 0.5]),
+            pos)
+
     def test_atom_identifer(self):
         self.assertEqual(['#1:Ni1', '#2:Ni2', '#3:Ni3',
                           '#4:C1', '#5:C2', '#6:C3', '#7:C4',
