@@ -126,7 +126,6 @@ class POSCAR(object):
         #   are used for the  dummy name.
         if self.iontype[0].isdigit():
             self.ionnums = [int(i) for i in self.iontype]
-            #
         else:
             self.ionnums = [int(x) for x in next(poscar).split()]
         self.__atom_identifer = []
@@ -534,7 +533,7 @@ class POSCAR(object):
         dest_poscar.ionnums.extend(other.ionnums)
         dest_poscar.position.extend(other.position)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
-        dest_poscar.atom_identifer
+#        dest_poscar.atom_identifer
 
         return dest_poscar
 
@@ -565,7 +564,7 @@ class POSCAR(object):
         dest_poscar.ionnums.extend(other.ionnums)
         dest_poscar.position.extend(other.position)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
-        dest_poscar.atom_identifer
+#        dest_poscar.atom_identifer
         if original_is_direct:
             dest_poscar.to_direct()
         return dest_poscar
@@ -657,10 +656,12 @@ class POSCAR(object):
         '''
         if self.is_cartesian:
             self.coordinate_type = "Direct"
-            m = np.linalg.inv(np.transpose(np.array([self.lattice_vec1,
-                                                     self.lattice_vec2,
-                                                     self.lattice_vec3])))
-            self.position = [m.dot(v) for v in self.position]
+            mat = np.linalg.inv(
+                np.transpose(
+                    np.array([self.lattice_vec1,
+                              self.lattice_vec2,
+                              self.lattice_vec3])))
+            self.position = [mat.dot(v) for v in self.position]
 
     def guess_molecule(self, site_list, center=None):
         '''Arrange atom position to form a molecule.
