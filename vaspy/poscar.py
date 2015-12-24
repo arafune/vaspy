@@ -751,6 +751,8 @@ class POSCAR(object):
         self.translate(vector, atomrange)
 
     def save(self, filename):
+        '''Save POSCAR contents to the file named "filename"
+'''
         try:  # Version safety
             file = open(filename, mode='w', newline='\n')
         except TypeError:
