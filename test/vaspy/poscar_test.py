@@ -74,12 +74,29 @@ class TestPOSCAR(unittest.TestCase):
              np.array([0.333333333, 0.237639553, 0.5])],
             pos)
 
-    def test_poscar_pos_4(self):
+    def test_poscar_pos_4(self):  # Ver. 2 fails
         pos=self.testposcar.pos((4,6))
         np.testing.assert_allclose(
             [np.array([0.237639553, 0.429027113, 0.5]),
-             np.array([0.237639553, 0.333333333, 0.5]),
              np.array([0.333333333, 0.237639553, 0.5])],
+            pos)
+
+    def test_poscar_pos_5(self):  # Ver. 2 fails
+        pos=self.testposcar.pos(1, (4,6))
+        np.testing.assert_allclose(
+            [np.array([0.5, 0.5, 0.5]),
+             np.array([0.237639553, 0.429027113, 0.5]),
+             np.array([0.333333333, 0.237639553, 0.5])],
+            pos)
+
+    def test_poscar_pos_6(self):  # Ver. 2 fails
+        pos=self.testposcar.pos(1, range(4,8))  # 1, 4, 5, 6, 7
+        np.testing.assert_allclose(
+            [np.array([0.5, 0.5, 0.5]),
+             np.array([0.237639553, 0.429027113, 0.5]),
+             np.array([0.237639553, 0.333333333, 0.5]),
+             np.array([0.333333333, 0.237639553, 0.5]),
+             np.array([0.429027113, 0.237639553, 0.5])],             
             pos)
 
     def test_atom_identifer(self):

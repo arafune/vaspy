@@ -227,38 +227,32 @@ class POSCAR(object):
 
         As in VASP, the atom index starts with "1", not "0".
 
-        :param i: site index (index range can be set by tuple (from, to))
-        :type i: int, or tuple of two int
+        :param i: site indexes
+        :type i: int, tuple, list, range
 
         :return: atom's position (When single value is set as i,
                  return just an atom position)
 
         :rtype: np.array or list of np.array
 
-        .. note:: You can set the index range by using tuple.
-
-        :Example: (20, 25) means the index from site# 20 to site# 25.
-
         .. warning:: the first site # is "1", not "0". (Follow VESTA's way.)
 
-        .. warning:: (to user who knows Python's style of list slice)
-                     When set the site index range by tuple, the
-                     latter index is included.  (pos(20, 25) returns
-                     position[19:25], not position[19:24])
-
+        .. warning:: Now, you **cannot** set the index range by using tuple.
+ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         '''
-        if isinstance(i[0], int):
-            dest = []
-            for site_index in i:
-                if site_index <= 0:
+        dest = []
+        for thearg in i:
+            if isinstance(thearg, int):
+                if thearg <= 0:
                     raise ValueError
-                dest.append(self.position[site_index - 1])
-        elif isinstance(i[0], tuple):
-            if i[0][0] > i[0][1]:
-                raise ValueError
-            if i[0][0] <= 0 or i[0][1] <= 0:
-                raise ValueError
-            dest = self.position[i[0][0] - 1: i[0][1]]  # <<fix-ME!
+                else:
+                    dest.append(self.position[thearg - 1])
+            elif isinstance(thearg, (tuple, list, range)):
+                for site_index in thearg:
+                    if site_index <= 0:
+                        raise ValueError
+                    else:
+                        dest.append(self.position[site_index - 1])
         if len(dest) == 1:
             dest = dest[0]
         return dest
@@ -295,7 +289,7 @@ class POSCAR(object):
             original_is_cartesian = True
             self.to_direct()
         self.repack_in_cell()
-        poslists = self.pos((from_index, to_index))  #<<<< FIXME!!!
+        poslists = self.pos(range(from_index, to_index+1))
         poslists.sort(keys=lambda x: (x[0], x[1], x[2]))
         for i in range(from_index, to_index + 1):
             self.pos_replace(i, poslists.pop(0))
@@ -534,7 +528,6 @@ class POSCAR(object):
         dest_poscar.position.extend(other.position)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
 #        dest_poscar.atom_identifer
-
         return dest_poscar
 
     def merge(self, other):
@@ -758,6 +751,8 @@ class POSCAR(object):
         self.translate(vector, atomrange)
 
     def save(self, filename):
+        '''Save POSCAR contents to the file named "filename"
+'''
         try:  # Version safety
             file = open(filename, mode='w', newline='\n')
         except TypeError:
