@@ -249,19 +249,19 @@ class POSCAR(object):
 
         '''
         if isinstance(i[0], int):
-            if i[0] <= 0:
-                raise ValueError
             dest = []
             for site_index in i:
+                if site_index <= 0:
+                    raise ValueError
                 dest.append(self.position[site_index - 1])
-            if len(dest) == 1:
-                dest = dest[0]
         elif isinstance(i[0], tuple):
-            if i[0] > i[1]:
+            if i[0][0] > i[0][1]:
                 raise ValueError
-            if i[0] <= 0 or i[1] <= 0:
+            if i[0][0] <= 0 or i[0][1] <= 0:
                 raise ValueError
-            dest = self.position[i[0] - 1: i[1]]  # <<fix-ME!
+            dest = self.position[i[0][0] - 1: i[0][1]]  # <<fix-ME!
+        if len(dest) == 1:
+            dest = dest[0]
         return dest
 
     def pos_replace(self, i, vector):
@@ -296,7 +296,7 @@ class POSCAR(object):
             original_is_cartesian = True
             self.to_direct()
         self.repack_in_cell()
-        poslists = self.pos((from_index, to_index))
+        poslists = self.pos((from_index, to_index))  #<<<< FIXME!!!
         poslists.sort(keys=lambda x: (x[0], x[1], x[2]))
         for i in range(from_index, to_index + 1):
             self.pos_replace(i, poslists.pop(0))
