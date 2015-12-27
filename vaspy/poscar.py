@@ -64,8 +64,8 @@ class POSCAR(object):
     It provides a way to slightly modify POSCAR or
     CONTCAR, which has already works well.
 
-    :attribute: lattice_vec1, lattice_vec1, lattice_vec3
-    :version: 2.0
+    :attribute: system_name, scaling_factor, cell_vecs
+    :version: 3.0
     '''
 
     def __init__(self, arg=None):
@@ -75,9 +75,9 @@ class POSCAR(object):
         '''
         self.system_name = ""
         self.scaling_factor = 0.
-        self.__lattice_vec1 = np.array([0., 0., 0.])
-        self.__lattice_vec2 = np.array([0., 0., 0.])
-        self.__lattice_vec3 = np.array([0., 0., 0.])
+        self.__cell_vecs = np.array([[0., 0., 0.],
+                                     [0., 0., 0.],
+                                     [0., 0., 0.]])
         self.iontype = []
         self.ionnums = []
         self.coordinate_type = ""
@@ -92,47 +92,15 @@ class POSCAR(object):
             self.load_from_array(arg)
 
     @property
-    def lattice_vec1(self):
-        '''The vector of the first axis of the unit cell'''
-        return self.__lattice_vec1
+    def cell_vecs(self):
+        '''Return the matrix of the unit cell'''
+        return self.__cell_vecs
 
-    @lattice_vec1.setter
-    def lattice_vec1(self, vec):
-        if isinstance(vec, (np.ndarray, np.matrix, list, tuple)):
-            if len(vec) == 3:
-                self.__lattice_vec1 = np.array(vec).flatten()
-            else:
-                raise TypeError
-        else:
-            raise TypeError
-
-    @property
-    def lattice_vec2(self):
-        '''The vector of the second axis of the unit cell'''
-        return self.__lattice_vec2
-
-    @lattice_vec2.setter
-    def lattice_vec2(self, vec):
-        if isinstance(vec, (np.ndarray, np.matrix, list, tuple)):
-            if len(vec) == 3:
-                self.__lattice_vec2 = np.array(vec).flatten()
-            else:
-                raise TypeError
-        else:
-            raise TypeError
-
-    @property
-    def lattice_vec3(self):
-        '''The vector of the third axis of the unit cell'''
-        return self.__lattice_vec3
-
-    @lattice_vec3.setter
-    def lattice_vec3(self, vec):
-        if isinstance(vec, (np.ndarray, np.matrix, list, tuple)):
-            if len(vec) == 3:
-                self.__lattice_vec3 = np.array(vec).flatten()
-            else:
-                raise TypeError
+    @cell_vecs.setter
+    def cell_vecs(self, vec):
+        '''Setter of cell matrix'''
+        if three_by_three(vec):
+            self.__cell_vecs = np.array(vec)
         else:
             raise TypeError
 
@@ -141,12 +109,9 @@ class POSCAR(object):
         poscar = iter(map(str.rstrip, poscar))  # Version safety
         self.system_name = next(poscar)
         self.scaling_factor = float(next(poscar))
-        self.__lattice_vec1 = np.array(
-            [float(x) for x in next(poscar).split()])
-        self.__lattice_vec2 = np.array(
-            [float(x) for x in next(poscar).split()])
-        self.__lattice_vec3 = np.array(
-            [float(x) for x in next(poscar).split()])
+        self.cell_vecs[0] = [float(x) for x in next(poscar).split()]
+        self.cell_vecs[1] = [float(x) for x in next(poscar).split()]
+        self.cell_vecs[2] = [float(x) for x in next(poscar).split()]
         self.iontype = next(poscar).split()
         # parse POSCAR evenif the element names are not set.
         # At present, the String representation number
@@ -419,8 +384,7 @@ class POSCAR(object):
         '''Return 27 vector sets correspond the neiboring
 
         :param position: atom position defined in the coordinated by
-                         lattice_vec1, lattice_vec2, lattice_vec3 ( scaling
-                         facter is not accounted).
+                         cell_vecs ( scaling facter is not accounted).
 
         :param type: np.array, list
         :return: list of np.array
@@ -431,9 +395,9 @@ class POSCAR(object):
         candidates27 = []
         if self.is_cartesian:
             for l, m, n in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
-                candidates27.append(l * self.lattice_vec1 +
-                                    m * self.lattice_vec2 +
-                                    n * self.lattice_vec3 +
+                candidates27.append(l * self.cell_vecs[0] +
+                                    m * self.cell_vecs[1] +
+                                    n * self.cell_vecs[2] +
                                     position)
         else:
             for l, m, n in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
@@ -460,10 +424,7 @@ class POSCAR(object):
         center = _vectorize(center)
         if len(center) != 3:
             raise ValueError
-        if not self.point_in_box(center / self.scaling_factor,
-                                 self.lattice_vec1,
-                                 self.lattice_vec2,
-                                 self.lattice_vec3):
+        if not self.point_in_box(center / self.scaling_factor, self.cell_vecs):
             raise ValueError('the center must be in the Braves lattice')
         if not isinstance(site, int):
             raise ValueError('argument error in atom_rotate method')
@@ -810,29 +771,32 @@ class POSCAR(object):
         with file:
             file.write(str(self))
 
-    def point_in_box(self, point, line1, line2, line3):
+    def point_in_box(self, point, cell_vecs):
         '''Return True if point is located in the box
-
-        .. note:: The box is defined by three vectors (line1, line2, and line3)
 
         :param point: vector representing the "point"
         :type point: numpy.ndarray, numpy.matrix, list, tuple
-        :param line1: vector representing the "box"
-        :param line2: vector representing the "box"
-        :param line3: vector representing the "box"
-        :type line1: numpy.ndarray, numpy.matrix, list, tuple
-        :type line2: numpy.ndarray, numpy.matrix, list, tuple
-        :type line3: numpy.ndarray, numpy.matrix, list, tuple
+        :param cell_vecs: vectors defining the "box"
+        :type cell_vecs: numpy.ndarray, numpy.matrix, list, tuple
         :rtype: Boolean
         '''
-        point = np.array(point).flatten()
-        line1 = np.array(line1).flatten()
-        line2 = np.array(line2).flatten()
-        line3 = np.array(line3).flatten()
-        mat = np.array([line1, line2, line3])
-        result = np.dot(np.linalg.inv(mat.T), point)
-        return all((0 <= float(q) <= 1) for q in result)
+        if three_by_three(cell_vecs):
+            point = np.array(point).flatten()            
+            result = np.dot(np.linalg.inv(cell_vecs.T), point)
+            return all((0 <= float(q) <= 1) for q in result)
+        else:
+            raise TypeError
 
+def three_by_three(vec):
+    '''Return True if vec can be converted into the 3x3 matrix'''
+    if not isinstance(vec, (np.ndarray, np.matrix, list, tuple)):
+        return False
+    if len(vec) != 3:
+        return False
+    if [3, 3, 3] == [len(i) for i in vec]:
+        return True
+    else:
+        return False
 
 def _vectorize(vector):
     if not isinstance(vector, (np.ndarray, np.matrix, list, tuple)):

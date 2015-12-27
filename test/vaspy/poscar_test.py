@@ -24,40 +24,31 @@ class TestPOSCAR(unittest.TestCase):
         # a=os.getcwd()  # return the directory where nose execute.
         self.assertEqual('NiC4S4', self.testposcar.system_name)
 
-    def test_lattice_vec1(self):
-        np.testing.assert_array_equal(np.array([0.866025404, -0.5, 0.]),
-                                      self.testposcar.lattice_vec1)
+    def test_cell_vec1(self):
+        np.testing.assert_allclose(np.array([0.866025404, -0.5, 0.]),
+                                      self.testposcar.cell_vecs[0])
 
-    def test_lattice_vec2(self):
-        np.testing.assert_array_equal(np.array([0.866025404, 0.5, 0.]),
-                                      self.testposcar.lattice_vec2)
+    def test_cell_vec2(self):
+        np.testing.assert_allclose(np.array([0.866025404, 0.5, 0.]),
+                                      self.testposcar.cell_vecs[1])
 
-    def test_lattice_vec3_setter(self):
-        self.testposcar.lattice_vec3 = (1,0,0)
+    def test_cell_vec3_setter(self):
+        self.testposcar.cell_vecs[2] = (1,0,0)
         np.testing.assert_allclose(np.array([1, 0, 0]),
-                                   self.testposcar.lattice_vec3)
+                                   self.testposcar.cell_vecs[2])
   
-    def test_lattice_vec3(self):
+    def test_cell_vec3(self):
         np.testing.assert_allclose(np.array([0.0, 0.0, 1.02529049]),
-                                      self.testposcar.lattice_vec3)
+                                      self.testposcar.cell_vec[2])
 
         
     def test_point_in_box(self):
         self.assertFalse(self.testposcar.point_in_box(
-            (0.5, 0.5, 0.2),
-            self.testposcar.lattice_vec1,
-            self.testposcar.lattice_vec2,
-            self.testposcar.lattice_vec3))
+            (0.5, 0.5, 0.2), self.testposcar.cell_vecs))
         self.assertTrue(self.testposcar.point_in_box(
-            (0.5, 0.1, 0.2),
-            self.testposcar.lattice_vec1,
-            self.testposcar.lattice_vec2,
-            self.testposcar.lattice_vec3))
+            (0.5, 0.1, 0.2), self.testposcar.cell_vecs))
         self.assertTrue(self.testposcar.point_in_box(
-            (0.5, 0.5, 0.2),
-            (1,0,0),
-            (0,1,0),
-            (0,0,1)))
+            (0.5, 0.5, 0.2), ((1, 0, 0), (0, 1, 0),(0, 0, 1))))
         
     def test_poscar_pos_1(self):
         pos=self.testposcar.pos(4)
@@ -177,7 +168,7 @@ class TestPOSCAR(unittest.TestCase):
         self.testposcar.tune_scaling_factor(1.0)
         np.testing.assert_allclose(
             np.array([12.66995166052, -7.315, 0.0]),
-            self.testposcar.lattice_vec1,
+            self.testposcar.cell_vecs[0], 
             rtol=1e-07)
 
     def test_tune_scaling_factor_withCartesian(self):
@@ -185,7 +176,7 @@ class TestPOSCAR(unittest.TestCase):
         self.testposcar.tune_scaling_factor(1.0)
         np.testing.assert_allclose(
             np.array([12.66995166052, -7.315, 0.0]),
-            self.testposcar.lattice_vec1,
+            self.testposcar.cell_vecs[0], 
             rtol=1e-07)
         np.testing.assert_allclose(
             np.array([12.66995166052, 0.0, 7.5000000001850005]),
