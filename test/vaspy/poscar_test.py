@@ -39,7 +39,7 @@ class TestPOSCAR(unittest.TestCase):
   
     def test_cell_vec3(self):
         np.testing.assert_allclose(np.array([0.0, 0.0, 1.02529049]),
-                                      self.testposcar.cell_vec[2])
+                                      self.testposcar.cell_vecs[2])
 
         
     def test_point_in_box(self):
