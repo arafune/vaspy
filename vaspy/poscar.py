@@ -105,6 +105,7 @@ class POSCAR(object):
                 raise TypeError
         else:
             raise TypeError
+
     @property
     def lattice_vec2(self):
         '''The vector of the second axis of the unit cell'''
@@ -142,13 +143,10 @@ class POSCAR(object):
         self.scaling_factor = float(next(poscar))
         self.__lattice_vec1 = np.array(
             [float(x) for x in next(poscar).split()])
-#            list(map(float, next(poscar).split())))  # Version safety
         self.__lattice_vec2 = np.array(
             [float(x) for x in next(poscar).split()])
-#            list(map(float, next(poscar).split())))  # Version safety
         self.__lattice_vec3 = np.array(
             [float(x) for x in next(poscar).split()])
-#            list(map(float, next(poscar).split())))  # Version safety
         self.iontype = next(poscar).split()
         # parse POSCAR evenif the element names are not set.
         # At present, the String representation number
