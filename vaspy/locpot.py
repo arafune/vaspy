@@ -300,12 +300,9 @@ class LOCPOT(poscar.POSCAR):
         :return: cell axis length of x, y, and z
         :rtype: tuple
         '''
-#        x = self.lattice_vec1 * self.scaling_factor
-#        y = self.lattice_vec2 * self.scaling_factor
-#        z = self.lattice_vec3 * self.scaling_factor
-        cell_x = np.linalg.norm(self.lattice_vec1 * self.scaling_factor)
-        cell_y = np.linalg.norm(self.lattice_vec2 * self.scaling_factor)
-        cell_z = np.linalg.norm(self.lattice_vec3 * self.scaling_factor)
+        cell_x = np.linalg.norm(self.cell_vecs[0] * self.scaling_factor)
+        cell_y = np.linalg.norm(self.cell_vecs[1] * self.scaling_factor)
+        cell_z = np.linalg.norm(self.cell_vecs[2] * self.scaling_factor)
         return (cell_x, cell_y, cell_z)
 
     def plot_potential_along_axis(self, axis_name, pottype='former'):
