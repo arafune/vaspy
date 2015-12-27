@@ -472,27 +472,13 @@ class POSCAR(object):
             original_is_cartesian = True
             self.to_direct()
         axis_name = axis_name.capitalize()
+
         if axis_name == 'X':
-            self.__lattice_vec1 = np.dot(self.rotate_x(theta),
-                                         self.lattice_vec1)
-            self.__lattice_vec2 = np.dot(self.rotate_x(theta),
-                                         self.lattice_vec2)
-            self.__lattice_vec3 = np.dot(self.rotate_x(theta),
-                                         self.lattice_vec3)
+            self.cell_vecs = np.dot(self.rotat_x(theta), self.cell_vecs.T).T
         elif axis_name == 'Y':
-            self.__lattice_vec1 = np.dot(self.rotate_y(theta),
-                                         self.lattice_vec1)
-            self.__lattice_vec2 = np.dot(self.rotate_y(theta),
-                                         self.lattice_vec2)
-            self.__lattice_vec3 = np.dot(self.rotate_y(theta),
-                                         self.lattice_vec3)
+            self.cell_vecs = np.dot(self.rotat_y(theta), self.cell_vecs.T).T
         elif axis_name == 'Z':
-            self.__lattice_vec1 = np.dot(self.rotate_z(theta),
-                                         self.lattice_vec1)
-            self.__lattice_vec2 = np.dot(self.rotate_z(theta),
-                                         self.lattice_vec2)
-            self.__lattice_vec3 = np.dot(self.rotate_z(theta),
-                                         self.lattice_vec3)
+            self.cell_vecs = np.dot(self.rotat_z(theta), self.cell_vecs.T).T
         if original_is_cartesian:
             self.to_cartesian()
 
@@ -527,13 +513,8 @@ class POSCAR(object):
         dest_poscar = copy.deepcopy(self)
         if dest_poscar.scaling_factor != other.scaling_factor:
             raise ValueError('scaling factor is different.')
-        if np.linalg.norm(dest_poscar.lattice_vec1 +
-                          dest_poscar.lattice_vec2 +
-                          dest_poscar.lattice_vec3 -
-                          (other.lattice_vec1 +
-                           other.lattice_vec2 +
-                           other.lattice_vec3)) != 0:
-            raise ValueError('lattice vectors are different.')
+        if np.linalg.norm(dest_poscar.cell_vecs - other.cell_vecs) != 0:
+            raise ValueError('lattice vectors (cell matrix) are different.')
         dest_poscar.iontype.extend(other.iontype)
         dest_poscar.ionnums.extend(other.ionnums)
         dest_poscar.position.extend(other.position)
@@ -582,9 +563,9 @@ class POSCAR(object):
         out_list = []
         out_list.append(self.system_name)
         out_list.append(self.scaling_factor)
-        out_list.append(self.lattice_vec1)
-        out_list.append(self.lattice_vec2)
-        out_list.append(self.lattice_vec3)
+        out_list.append(self.cell_vecs[0])
+        out_list.append(self.cell_vecs[1])
+        out_list.append(self.cell_vecs[2])
         if not self.iontype[0].isdigit():
             out_list.append(self.iontype)
         out_list.append(self.ionnums)
@@ -637,9 +618,7 @@ class POSCAR(object):
                      scaling_factor attribute directly
 '''
         old = self.scaling_factor
-        self.__lattice_vec1 *= (old / new_scaling_factor)
-        self.__lattice_vec2 *= (old / new_scaling_factor)
-        self.__lattice_vec3 *= (old / new_scaling_factor)
+        self.cell_vecs *= (old / new_scaling_factor)
         self.scaling_factor = new_scaling_factor
         if self.is_cartesian:
             self.position = [i * old / new_scaling_factor
@@ -650,9 +629,7 @@ class POSCAR(object):
 '''
         if self.is_direct:
             self.coordinate_type = "Cartesian"
-            mat = np.array([self.lattice_vec1,
-                            self.lattice_vec2,
-                            self.lattice_vec3]).transpose()
+            mat = self.cell_vecs.transpose()
             self.position = [mat.dot(v) for v in self.position]
 
     def to_direct(self):
@@ -660,11 +637,7 @@ class POSCAR(object):
         '''
         if self.is_cartesian:
             self.coordinate_type = "Direct"
-            mat = np.linalg.inv(
-                np.transpose(
-                    np.array([self.lattice_vec1,
-                              self.lattice_vec2,
-                              self.lattice_vec3])))
+            mat = np.linalg.inv(np.transpose(self.cell_vecs))
             self.position = [mat.dot(v) for v in self.position]
 
     def guess_molecule(self, site_list, center=None):
