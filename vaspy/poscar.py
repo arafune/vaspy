@@ -605,11 +605,11 @@ class POSCAR(object):
         tmp.append(self.system_name)
         tmp.append(str(self.scaling_factor))
         tmp.append(''.join('   {0:20.17f}'.format(i) for i in
-                           self.lattice_vec1))
+                           self.cell_vecs[0]))
         tmp.append(''.join('   {0:20.17f}'.format(i) for i in
-                           self.lattice_vec2))
+                           self.cell_vecs[1]))
         tmp.append(''.join('   {0:20.17f}'.format(i) for i in
-                           self.lattice_vec3))
+                           self.cell_vecs[2]))
         if not self.iontype[0].isdigit():
             tmp.append(' ' + ' '.join(self.iontype))
         tmp.append(' ' + ' '.join(str(i) for i in self.ionnums))
