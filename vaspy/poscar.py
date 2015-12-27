@@ -781,7 +781,8 @@ class POSCAR(object):
         :rtype: Boolean
         '''
         if three_by_three(cell_vecs):
-            point = np.array(point).flatten()            
+            point = np.array(point).flatten()
+            cell_vecs = np.array(cell_vecs)
             result = np.dot(np.linalg.inv(cell_vecs.T), point)
             return all((0 <= float(q) <= 1) for q in result)
         else:
