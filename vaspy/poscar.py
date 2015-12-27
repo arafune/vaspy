@@ -7,23 +7,23 @@ translate from poscar.rb of 2014/2/26, master branch
 The below is an example of POSCAR file::
 
  fcc (111) surface
-   3.52000000000000
-     0.7071067800000000    0.0000000000000000    0.0000000000000000
-    -0.3535533900000000    0.6123724000000000    0.0000000000000000
-     0.0000000000000000    0.0000000000000000   11.5470000000000006
+   3.5200000
+     0.707106780  0.000000000   0.000000000
+    -0.353553390  0.612372400   0.000000000
+     0.000000000  0.000000000  11.547000006
    Cu
      9
  Selective dynamics
  Direct
-  0.0000000000000000  0.0000000000000000  0.0000000000000000   F   F   F
-  0.3333333300000021  0.6666666699999979  0.0499999999999972   F   F   F
-  0.6666666699999979  0.3333333300000021  0.1000000000000014   F   F   F
-  0.0000000000000000  0.0000000000000000  0.1499999999999986   T   T   T
-  0.3333333300000021  0.6666666699999979  0.2000000000000028   T   T   T
-  0.0000000000000000  0.0000000000000000  0.2500000000000000   T   T   T
-  0.3333333300000021  0.6666666699999979  0.2999999999999972   T   T   T
-  0.6666666699999979  0.3333333300000021  0.3500000000000014   T   T   T
-  0.0000000000000000  0.0000000000000000  0.3999999999999986   T   T   T
+  0.000000000  0.000000000  0.000000000   F   F   F
+  0.333333333  0.666666666  0.050000000   F   F   F
+  0.666666666  0.333333333  0.100000000   F   F   F
+  0.000000000  0.000000000  0.150000000   T   T   T
+  0.333333333  0.666666666  0.200000000   T   T   T
+  0.000000000  0.000000000  0.250000000   T   T   T
+  0.333333333  0.666666666  0.300000000   T   T   T
+  0.666666666  0.333333333  0.350000000   T   T   T
+  0.000000000  0.000000000  0.400000000   T   T   T
 
   0.00000000E+00  0.00000000E+00  0.00000000E+00
   0.00000000E+00  0.00000000E+00  0.00000000E+00
@@ -45,8 +45,8 @@ import sys
 try:
     from vaspy import tools
 except ImportError:
-    MYPATH = os.readlink(__file__) if os.path.islink(__file__) else __file__
-    sys.path.append(os.path.dirname(os.path.abspath(MYPATH)))
+    mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
+    sys.path.append(os.path.dirname(os.path.abspath(mypath)))
     import tools
 import numpy as np
 
@@ -835,11 +835,10 @@ class POSCAR(object):
 
 
 def _vectorize(vector):
-    if not isinstance(vector, _VECTOR_ACCEPTABLES):
+    if not isinstance(vector, (np.ndarray, np.matrix, list, tuple)):
         raise TypeError('Cannot convert into vector.')
     return np.array(vector).flatten()
 
-_VECTOR_ACCEPTABLES = (np.ndarray, np.matrix, list, tuple)
 # --------------------------
 
 if __name__ == "__main__":
