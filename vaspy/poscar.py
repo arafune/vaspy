@@ -96,15 +96,44 @@ class POSCAR(object):
         '''The vector of the first axis of the unit cell'''
         return self.__lattice_vec1
 
+    @lattice_vec1.setter
+    def lattice_vec1(self, vec):
+        if isinstance(vec, (np.ndarray, np.matrix, list, tuple)):
+            if len(vec) == 3:
+                self.__lattice_vec1 = np.array(vec).flatten()
+            else:
+                raise TypeError
+        else:
+            raise TypeError
     @property
     def lattice_vec2(self):
         '''The vector of the second axis of the unit cell'''
         return self.__lattice_vec2
 
+    @lattice_vec2.setter
+    def lattice_vec2(self, vec):
+        if isinstance(vec, (np.ndarray, np.matrix, list, tuple)):
+            if len(vec) == 3:
+                self.__lattice_vec2 = np.array(vec).flatten()
+            else:
+                raise TypeError
+        else:
+            raise TypeError
+
     @property
     def lattice_vec3(self):
         '''The vector of the third axis of the unit cell'''
         return self.__lattice_vec3
+
+    @lattice_vec3.setter
+    def lattice_vec3(self, vec):
+        if isinstance(vec, (np.ndarray, np.matrix, list, tuple)):
+            if len(vec) == 3:
+                self.__lattice_vec3 = np.array(vec).flatten()
+            else:
+                raise TypeError
+        else:
+            raise TypeError
 
     def load_from_array(self, poscar):
         '''POSCAR parser'''
