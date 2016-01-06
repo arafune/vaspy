@@ -474,11 +474,11 @@ class POSCAR(object):
         axis_name = axis_name.capitalize()
 
         if axis_name == 'X':
-            self.cell_vecs = np.dot(self.rotat_x(theta), self.cell_vecs.T).T
+            self.cell_vecs = np.dot(self.rotate_x(theta), self.cell_vecs.T).T
         elif axis_name == 'Y':
-            self.cell_vecs = np.dot(self.rotat_y(theta), self.cell_vecs.T).T
+            self.cell_vecs = np.dot(self.rotate_y(theta), self.cell_vecs.T).T
         elif axis_name == 'Z':
-            self.cell_vecs = np.dot(self.rotat_z(theta), self.cell_vecs.T).T
+            self.cell_vecs = np.dot(self.rotate_z(theta), self.cell_vecs.T).T
         if original_is_cartesian:
             self.to_cartesian()
 
