@@ -98,11 +98,6 @@ class OUTCAR(object):  # Version safety
                                     for (elm, n) in zip(self.iontype,
                                                         self.ionnums)
                                     for j in range(1, int(n) + 1)])]
-        #            i=1
-        #            for elm, n in zip(self.iontype, self.ionnums):
-        #                for j in range(1, int(n)+1):
-        #                    self.atom_identifer.append(elem+str(j)+":#"+str(i))
-        #                    i = i+1
         self.posforce = [posforce[i:i + self.nions]
                          for i in range(0, len(posforce), self.nions)]
         self.set_atom_names()
