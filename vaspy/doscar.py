@@ -48,8 +48,11 @@ class DOSCAR(object):  # Version safety
                 elif 2 <= idx <= 5:
                     continue
                 elif idx == 6:
-                    separate_text = line.rstrip('\n')
-                    self.__nEnergypoints = int(separate_text.split()[2])
+                    try:
+                        separate_text = line.rstrip('\n')
+                        self.__nEnergypoints = int(separate_text.split()[2])
+                    except ValueError:
+                        self.__nEnergypoints = int(line[32:37])
                     continue
                 else:  # idx >= 7
                     if separate_text in line:
