@@ -153,9 +153,16 @@ class PROCAR(object):  # Version safety
                         int(i) for i in re.split('\s|:', line)
                         if i.isdigit()]
                 elif "k-point " in line:
-                    self.__kvectors.append(np.array(
-                        [float(i) for i in line.split()[3:6]]))
-                    section = []
+                    try:
+                        self.__kvectors.append(np.array(
+                            [float(i) for i in line.split()[3:6]]))
+                        section = []
+                    except ValueError:
+                        self.__kvectors.append(np.array(
+                            [np.float(line[18:29]),
+                             np.float(line[29:40]),
+                             np.float(line[40:41])]))
+                        section = []
                 elif "band " in line:
                     self.__energies.append(float(line.split()[4]))
                     section = []
