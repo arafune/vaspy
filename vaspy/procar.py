@@ -159,9 +159,9 @@ class PROCAR(object):  # Version safety
                         section = []
                     except ValueError:
                         self.__kvectors.append(np.array(
-                            [np.float(line[18:29]),
-                             np.float(line[29:40]),
-                             np.float(line[40:41])]))
+                            [np.float_(line[18:29]),
+                             np.float_(line[29:40]),
+                             np.float_(line[40:51])]))
                         section = []
                 elif "band " in line:
                     self.__energies.append(float(line.split()[4]))
