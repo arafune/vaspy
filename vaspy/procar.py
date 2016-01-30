@@ -251,7 +251,7 @@ class EnergyBand(object):
 Simple band structure object for analyzing by using ipython'''
     def __init__(self, kvectors, energies):
         self.kvectors = np.array(kvectors)
-        self.kdistance = np.cumsum(
+        self.kdistances = np.cumsum(
             np.linalg.norm(
                 np.concatenate(
                     (np.array([[0, 0, 0]]),
@@ -297,50 +297,82 @@ class Projection(object):
 Orbital projection object for analyzing by using python
 '''
     def __init__(self, orbitals, natom=0, numk=0, nbands=0, soi=False):
-        self.orbitals = np.array(orbitals)
+        self.proj = np.array(orbitals)
         self.natom = natom
         self.numk = numk
         self.nbands = nbands
         self.soi = soi
+        self.output_states = 0
+        self.output_headers = []
         if soi:
             if 4 * natom * numk * nbands == len(orbitals):
-                self.orbitals.reshape(numk, nbands, natom, 10)
+                self.proj = self.proj.reshape(numk,
+                                              nbands,
+                                              natom,
+                                              40).transpose()
             else:
                 raise ValueError("Argments are mismatched.")
         else:
             if natom * numk * nbands == len(orbitals):
-                self.orbitals.reshape(numk, nbands, natom, 40)
+                self.proj = self.proj.reshape(numk,
+                                              nbands,
+                                              natom,
+                                              10).transpose()
+                # orbitals[orbindex][siteindex-1][bandindex][kindex]
             else:
                 raise ValueError("Argments are mismatched.")
 
 
-    def projsum(self, states, axis=None):
+    def sum_states(self, states, axis=None):
         '''Return summantion of states
 
         :param states: tuple of tuple of site index and orbital name
         :type state: tuple
         :note: site index starts '1' not 0.
+        :param axis: quantization axis for SOI calculation ('x', 'y' or 'z')
+        :type axis: str
 
         :Example: ((1, px), (1, py))
         to produce pxpy
-        
-        :Example: ((1, pz), (43, pz)) 
-
+        :Example: ((1, pz), (43, pz))
         to produce pz orbital of
         'surface' (Here, the 43 atoms is included in the unit cell and
         1st and 43the atoms are assumed to be identical.)
-
         '''
-        pass
+        result = 0
+        orb_names = ['s', 'py', 'pz', 'px',
+                     'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot']
+        for aState in states:
+            if isinstance(aState[1], int) and 0<=aState[1]<=9:
+                orbindex = aState[1]
+            elif aState[1] in orb_names:
+                orbindex = orb_names.index[aState[1]]
+            else:
+                raise ValueError("Check your input for orbital name")
+            if self.soi and (axis == 'x' or axis =='Y' or axis == 0):
+                orbindex += 10
+            elif self.soi and (axis == 'y' or axis=='Y' or axis == 1):
+                orbindex += 20
+            elif self.soi and (axis == 'z' or axis=='Z' or axis == 2):
+                orbindex += 30
+            result += self.proj[orbindex][aState[0]-1]
+        return np.array([result])
 
     def add_output_states(self, name, state):
         '''
-        Construct states for output
+        Construct states for output (self.output_states)
         '''
-        pass
+        if name in self.output_headerlist:
+            raise ValueError("Unique state nume is required")
+        self.output_headers.append(name)
+        try:
+            self.output_states = np.concatenate((self.output_states, state))
+        except (TypeError, ValueError):
+            self.output_states = state
+            self.output_headers=[name]
+
 
 class Band_with_projection(object):
-
     ''' .. py:class:: BandStructure class
 
     The "Band structure" object deduced from PROCAR file.
