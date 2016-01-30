@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 script to use (demonstrate) vaspy.procar (Ver.3) module.
@@ -45,7 +45,7 @@ parser.add_argument('procar', metavar='PROCAR_file',
 args = parser.parse_args()
 
 # ---
-if not (len(args.atomindex) == len(args.orbital) == len(args.atomsetname)):
+if not len(args.atomindex) == len(args.orbital) == len(args.atomsetname):
     raise parser.error("--atom, --as and --orbital are mismatched.")
 # ---
 
@@ -57,20 +57,20 @@ elif args.fermi is not None:
 else:
     fermi = 0.0
 
-sitenames = tuple(set([ e for inner in args.atomsetname for e in inner]))
-flat_orbitals = tuple(set([ e for inner in args.orbital for e in inner]))
+sitenames = tuple(set([e for inner in args.atomsetname for e in inner]))
+flat_orbitals = tuple(set([e for inner in args.orbital for e in inner]))
 
 # As atomindex used here begins with "1", but siteindex used in procar.py
 # internaly begins with "0".  (This is because VASP is fortran program !)
-siteindex = [[ i-1 for i in internal] for internal in args.atomindex]
+siteindex = [[i-1 for i in internal] for internal in args.atomindex]
 
 procar = procar.PROCAR(args.procar)
 band = procar.band()
 del procar  # for memory saving
 if fermi != 0.0:
-        band.fermi_correction(fermi)
+    band.fermi_correction(fermi)
 
 for sites in siteindex:
     band.compose_sites(sites)
 band.compose_orbital(flat_orbitals)
-print (band.get_sitecomposed_data(sitenames, args.orbital))
+print(band.get_sitecomposed_data(sitenames, args.orbital))

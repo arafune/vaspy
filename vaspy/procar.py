@@ -13,11 +13,13 @@ import os
 import sys
 import csv
 import functools as ft
+import numpy as np
+import matplotlib.pyplot as plt
 if sys.version_info[0] >= 3:     # Version safety
     from io import StringIO
 else:
     from cStringIO import StringIO
-import numpy as np
+
 try:
     from vaspy import tools
 except ImportError:
@@ -230,7 +232,7 @@ class PROCAR(object):  # Version safety
 
         :rtype: BandStructure
         '''
-        band = BandStructure()
+        band = Band_with_projection()
         band.kvectors = self.kvectors[0:self.numk]
         band.n_bands = self.n_bands
         band.n_atoms = self.n_atoms
@@ -243,7 +245,101 @@ class PROCAR(object):  # Version safety
         return band
 
 
-class BandStructure(object):
+class EnergyBand(object):
+    ''' ..py:class:: EnergyBand class
+
+Simple band structure object for analyzing by using ipython'''
+    def __init__(self, kvectors, energies):
+        self.kvectors = np.array(kvectors)
+        self.kdistance = np.cumsum(
+            np.linalg.norm(
+                np.concatenate(
+                    (np.array([[0, 0, 0]]),
+                     np.diff(kvectors, axis=0))), axis=1))
+        self.numk = len(self.kvectors)
+        self.nbands = len(energies)//len(kvectors)
+        self.energies = np.array(energies).reshape(self.numk, self.nbands)
+
+    def fermi_correction(self, fermi):
+        '''.. py:method:: fermi_correction(fermi)
+
+        Correct the Fermi level
+
+        :param fermi: value of the Fermi level
+        :type fermi: float
+'''
+        self.energies -= fermi
+
+    def showband(self, yrange=None):  # How to set default value?
+        '''Draw band structure by using maptlotlib
+
+        For 'just seeing' use.
+
+        :param yrange: minimum and maxmum value of energy axis
+        :type yrange: tupple
+'''
+        energies = np.swapaxes(self.energies, 1, 0)
+        for i in range(0, energies.shape[0]):
+            plt.plot(self.kdistances,
+                     energies[i],
+                     color='blue')
+        if yrange is not None:
+            plt.ylim([yrange[0], yrange[1]])
+        plt.xlim([self.kdistances[0],
+                  self.kdistances[-1]])
+        plt.ylabel("Energy (eV)")
+        plt.show()
+
+
+class Projection(object):
+    ''' ..py:class:: Orbital Projection class
+
+Orbital projection object for analyzing by using python
+'''
+    def __init__(self, orbitals, natom=0, numk=0, nbands=0, soi=False):
+        self.orbitals = np.array(orbitals)
+        self.natom = natom
+        self.numk = numk
+        self.nbands = nbands
+        self.soi = soi
+        if soi:
+            if 4 * natom * numk * nbands == len(orbitals):
+                self.orbitals.reshape(numk, nbands, natom, 10)
+            else:
+                raise ValueError("Argments are mismatched.")
+        else:
+            if natom * numk * nbands == len(orbitals):
+                self.orbitals.reshape(numk, nbands, natom, 40)
+            else:
+                raise ValueError("Argments are mismatched.")
+
+
+    def projsum(self, states, axis=None):
+        '''Return summantion of states
+
+        :param states: tuple of tuple of site index and orbital name
+        :type state: tuple
+        :note: site index starts '1' not 0.
+
+        :Example: ((1, px), (1, py))
+        to produce pxpy
+        
+        :Example: ((1, pz), (43, pz)) 
+
+        to produce pz orbital of
+        'surface' (Here, the 43 atoms is included in the unit cell and
+        1st and 43the atoms are assumed to be identical.)
+
+        '''
+        pass
+
+    def add_output_states(self, name, state):
+        '''
+        Construct states for output
+        '''
+        pass
+
+class Band_with_projection(object):
 
     ''' .. py:class:: BandStructure class
 
@@ -410,6 +506,8 @@ structure drowing'''
 
     @energies.setter
     def energies(self, arg):
+        '''Setter for energies property.
+'''
         if self.isready():
             if len(self.spininfo) == 1 or len(self.spininfo) == 4:
                 self.__energies = np.array(arg).reshape(
@@ -690,7 +788,7 @@ structure drowing'''
     def list_sitecomposed_data(self, orbnames):
         '''Return list of sitecomposed attribute to 2D-list
 
-        :param orbnames: orbital names  e.g., (('s','pxpy','p'),('s','pxpy','p'))
+        :param orbnames: orbital names  e.g., (('s','pxpy','p'),('s','pz','p'))
         :type orbnames: list, tuple
         '''
         orbnums = self.get_orbnums(orbnames)
@@ -739,6 +837,8 @@ structure drowing'''
         return table
 
     def get_sitecomposed_data(self, sitenames, orbnames):
+        '''Return band structure with (gathered) orbital
+contributions as string'''
         header = map(str, self.set_header(sitenames, orbnames))
         output = "\t".join(header) + "\n"
         lists = self.list_sitecomposed_data(orbnames)
