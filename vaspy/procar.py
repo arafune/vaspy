@@ -1,8 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # translate from procar.rb of scRipt4VASP 2014/2/26 master branch
-"""
-PROCAR and BandStructure class
+""".. py:module:: procar.py
+
+This module provides PROCAR, Band_with_Projection, EnergyBand,
+Projection classes.
+
+* PROCAR class is used to stored the PROCAR information in the memory.
+* Band_with_Projection class is used in vaspy-procar.py script.
+    *  This class is essentially used on ipython, but not so easy for use.
+* EnergyBand class is used for drawing the energy band.
+* Projection class is used for storing the orbital projection data
 """
 
 from __future__ import print_function  # Version safety
@@ -30,9 +38,14 @@ except ImportError:
 
 class PROCAR(object):  # Version safety
 
-    '''Class for PROCAR
+    '''.. py:class:: PROCAR(PROCAR_file[, phase_read])
 
-    .. py:class:: PROCAR(object)
+    Class for storing the data saved in PROCAR file.
+
+    :param PROCAR_FILE: File name of "PROCAR".
+    :type PROCAR_FILE: str
+    :param phase_read: Set True is you read phase data.
+    :type phase_read: boolean
 
     PROCAR consists of these lines.  Appear once per file.
 
@@ -61,75 +74,25 @@ class PROCAR(object):  # Version safety
 
     5. orbital contribution.
 
-      :Example:
-    1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
+:Example:    1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
 
     :author: Ryuichi Arafune
     '''
 
     def __init__(self, arg=None, phase_read=False):
-        self.__orbital = list()
-        self.__phase = list()
-        self.__spininfo = 0   # nospin: 1, spinresolved: 2, soi: 4
-        self.__numk = 0
-        self.__n_bands = 0
-        self.__n_atoms = 0
-        self.__kvectors = list()
-        self.__energies = list()
+        self.orbital = list()
+        self.phase = list()
+        self.spininfo = 0   # nospin: 1, spinresolved: 2, soi: 4
+        self.numk = 0
+        self.n_bands = 0
+        self.n_atoms = 0
+        self.kvectors = list()
+        self.energies = list()
 
         if isinstance(arg, str):
             self.load_from_file(arg, phase_read)
         else:
             raise RuntimeError("the arg of PROCAR() should be the filename")
-
-    @property
-    def orbital(self):
-        '''setter for orbital property'''
-        return self.__orbital
-
-    @property
-    def phase(self):
-        '''setter for phase property.
-
-        'Phase' characteristics is not clear for my yet.
-        So this program does not treat the value.
-        '''
-        return self.__phase
-
-    @property
-    def spininfo(self):
-        '''spin-related information'''
-        return self.__spininfo
-
-    @property
-    def numk(self):
-        '''Number of k-points'''
-        return self.__numk
-
-    @property
-    def n_bands(self):
-        '''Number of Bands'''
-        return self.__n_bands
-
-    @property
-    def n_atoms(self):
-        '''Number of atoms'''
-        return self.__n_atoms
-
-    @property
-    def kvectors(self):
-        '''k-vectors'''
-        return self.__kvectors
-
-    @property
-    def energies(self):
-        '''Energies'''
-        return self.__energies
-
-    @property
-    def orb_names(self):
-        '''Name of orbitals'''
-        return self.__orb_names
 
     def load_from_file(self, file, phase_read=False):
         '''.. py:method::  load_fromfile(file, [phase_read=False])
@@ -137,41 +100,41 @@ class PROCAR(object):  # Version safety
         A virtual parser of PROCAR
 
         :param str file: filename of *PROCAR* file
-        :param Boolian phase_read: Switch for loading phase characters
+        :param Boolean phase_read: Switch for loading phase characters
         '''
         procar_file = open(file)
         first_line = procar_file.readline()
         if 'PROCAR lm decomposed + phase' not in first_line:
             procar_file.close()
             raise RuntimeError("This PROCAR is not a proper format\n \
-                                See INCAR in the calculation.\n")
+                                Check your INCAR the calculations.\n")
         section = list()
         with procar_file:
             for line in procar_file:
                 if line.isspace():
                     continue
                 elif "k-points: " in line:
-                    self.__numk, self.__n_bands, self.__n_atoms = [
+                    self.numk, self.n_bands, self.n_atoms = [
                         int(i) for i in re.split('\s|:', line)
                         if i.isdigit()]
                 elif "k-point " in line:
                     try:
-                        self.__kvectors.append(np.array(
+                        self.kvectors.append(np.array(
                             [float(i) for i in line.split()[3:6]]))
                         section = []
                     except ValueError:
-                        self.__kvectors.append(np.array(
+                        self.kvectors.append(np.array(
                             [np.float_(line[18:29]),
                              np.float_(line[29:40]),
                              np.float_(line[40:51])]))
                         section = []
                 elif "band " in line:
-                    self.__energies.append(float(line.split()[4]))
+                    self.energies.append(float(line.split()[4]))
                     section = []
                 elif "ion" in line:
                     if "tot" in line:
                         section = ['orbital']
-                        self.__orb_names = tuple(line.split()[1:])
+                        self.orb_names = tuple(line.split()[1:])
                     else:
                         section = ['phase']
                 else:
@@ -179,23 +142,23 @@ class PROCAR(object):  # Version safety
                         if "tot " in line[0:4]:
                             continue
                         tmp = [float(i) for i in line.split()[1:]]
-                        self.__orbital.append(tmp)
+                        self.orbital.append(tmp)
                     elif section == ['phase']:
                         if not phase_read:
                             continue
                         tmp = [float(i) for i in line.split()[1:]]
-                        self.__phase.append(tmp)
+                        self.phase.append(tmp)
 
-        self.__spininfo = (len(self.orbital) //
-                           (self.numk * self.n_bands * self.n_atoms))
+        self.spininfo = (len(self.orbital) //
+                         (self.numk * self.n_bands * self.n_atoms))
         if len(self.orbital) % (self.numk * self.n_bands * self.n_atoms) != 0:
             raise RuntimeError("PROCAR file may be broken")
         if self.spininfo == 1:  # standard
-            self.__spininfo = ('',)
+            self.spininfo = ('',)
         elif self.spininfo == 2:   # collinear
-            self.__spininfo = ('_up', '_down')
+            self.spininfo = ('_up', '_down')
         elif self.spininfo == 4:  # non-collinear
-            self.__spininfo = ('_mT', '_mX', '_mY', '_mZ')
+            self.spininfo = ('_mT', '_mX', '_mY', '_mZ')
 
     def __str__(self):
         '''x.__str__() <=> str(x)
@@ -225,12 +188,14 @@ class PROCAR(object):  # Version safety
                                len(self.phase))
 
     def __iter__(self):
-        return iter(self.__orbital)
+        return iter(self.orbital)
 
     def band(self):
-        '''Return BandStructure object
+        '''.. py:method:: band()
 
-        :rtype: BandStructure
+        Return Band_with_projection object
+
+        :rtype: Band_with_projection
         '''
         band = Band_with_projection()
         band.kvectors = self.kvectors[0:self.numk]
@@ -246,9 +211,16 @@ class PROCAR(object):  # Version safety
 
 
 class EnergyBand(object):
-    ''' ..py:class:: EnergyBand class
+    '''.. py:class:: EnergyBand(kvectors, energies)
 
-Simple band structure object for analyzing by using ipython'''
+    Simple band structure object for analyzing by using ipython.
+
+    :param kvectors: 1D array data of k-vectors.
+    :type kvectors: np.array
+    :param energies: 1D array data of energies
+    :type energies: np.array
+'''
+
     def __init__(self, kvectors, energies):
         self.kvectors = np.array(kvectors)
         self.kdistances = np.cumsum(
@@ -265,18 +237,20 @@ Simple band structure object for analyzing by using ipython'''
 
         Correct the Fermi level
 
-        :param fermi: value of the Fermi level
+        :param fermi: value of the Fermi level.
         :type fermi: float
 '''
         self.energies -= fermi
 
     def showband(self, yrange=None):  # How to set default value?
-        '''Draw band structure by using maptlotlib
+        '''.. py:method:: showband(yrange)
 
+        Draw band structure by using maptlotlib
         For 'just seeing' use.
 
-        :param yrange: minimum and maxmum value of energy axis
-        :type yrange: tupple
+        :param yrange: Minimum and maximum value of the y-axis. \
+If not specified, use the matplotlib default value.
+        :type yrange: tuple
 '''
         energies = np.swapaxes(self.energies, 1, 0)
         for i in range(0, energies.shape[0]):
@@ -292,12 +266,12 @@ Simple band structure object for analyzing by using ipython'''
 
 
 class Projection(object):
-    ''' ..py:class:: Orbital Projection class
+    '''.. py:class:: Projection(projections, natom, numk, nbands[, soi])
 
-Orbital projection object for analyzing by using python
+Orbital projection object for analyzing by using python.
 '''
-    def __init__(self, orbitals, natom=0, numk=0, nbands=0, soi=False):
-        self.proj = np.array(orbitals)
+    def __init__(self, projection, natom=0, numk=0, nbands=0, soi=False):
+        self.proj = np.array(projection)
         self.natom = natom
         self.numk = numk
         self.nbands = nbands
@@ -305,7 +279,7 @@ Orbital projection object for analyzing by using python
         self.output_states = 0
         self.output_headers = []
         if soi:
-            if 4 * natom * numk * nbands == len(orbitals):
+            if 4 * natom * numk * nbands == len(projection):
                 self.proj = self.proj.reshape(numk,
                                               nbands,
                                               natom,
@@ -313,7 +287,7 @@ Orbital projection object for analyzing by using python
             else:
                 raise ValueError("Argments are mismatched.")
         else:
-            if natom * numk * nbands == len(orbitals):
+            if natom * numk * nbands == len(projection):
                 self.proj = self.proj.reshape(numk,
                                               nbands,
                                               natom,
@@ -322,45 +296,49 @@ Orbital projection object for analyzing by using python
             else:
                 raise ValueError("Argments are mismatched.")
 
-
     def sum_states(self, states, axis=None):
-        '''Return summantion of states
+        '''.. py:method:: sum_states(states[, axis=axis])
+
+        Return summantion of states
 
         :param states: tuple of tuple of site index and orbital name
         :type state: tuple
         :note: site index starts '1' not 0.
-        :param axis: quantization axis for SOI calculation ('x', 'y' or 'z')
+        :param axis: quantization axis for SOI calculation. 'x', 'y' or 'z'.
         :type axis: str
-
-        :Example: ((1, px), (1, py))
-        to produce pxpy
-        :Example: ((1, pz), (43, pz))
-        to produce pz orbital of
-        'surface' (Here, the 43 atoms is included in the unit cell and
-        1st and 43the atoms are assumed to be identical.)
+        :Example: ((1, "px"), (1, "py")) # to produce pxpy projection
+        :Example: ((1, "pz"), (43, "pz")) # to produce pz orbital projection \
+        for 'surface' atom (Here, the 43 atoms is included in the unit cell \
+        and 1st and 43the atoms are assumed to be identical.)
         '''
         result = 0
         orb_names = ['s', 'py', 'pz', 'px',
                      'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot']
         for aState in states:
-            if isinstance(aState[1], int) and 0<=aState[1]<=9:
+            if isinstance(aState[1], int) and 0 <= aState[1] <= 9:
                 orbindex = aState[1]
             elif aState[1] in orb_names:
                 orbindex = orb_names.index[aState[1]]
             else:
                 raise ValueError("Check your input for orbital name")
-            if self.soi and (axis == 'x' or axis =='Y' or axis == 0):
+            if self.soi and (axis == 'x' or axis == 'Y' or axis == 0):
                 orbindex += 10
-            elif self.soi and (axis == 'y' or axis=='Y' or axis == 1):
+            elif self.soi and (axis == 'y' or axis == 'Y' or axis == 1):
                 orbindex += 20
-            elif self.soi and (axis == 'z' or axis=='Z' or axis == 2):
+            elif self.soi and (axis == 'z' or axis == 'Z' or axis == 2):
                 orbindex += 30
             result += self.proj[orbindex][aState[0]-1]
         return np.array([result])
 
     def add_output_states(self, name, state):
-        '''
-        Construct states for output (self.output_states)
+        '''.. py: method:: add_output_states(name, state)
+
+        Construct states for output.
+
+        :param name: name of the (summed) state.  Used for the header.
+        :param state: orbital projection data.  From sum_states method.
+        :type name: str
+        :type state: np.array
         '''
         if name in self.output_headerlist:
             raise ValueError("Unique state nume is required")
@@ -369,23 +347,31 @@ Orbital projection object for analyzing by using python
             self.output_states = np.concatenate((self.output_states, state))
         except (TypeError, ValueError):
             self.output_states = state
-            self.output_headers=[name]
+            self.output_headers = [name]
 
 
 class Band_with_projection(object):
-    ''' .. py:class:: BandStructure class
+    '''.. py:class:: Band_with_projection()
 
     The "Band structure" object deduced from PROCAR file.
+
+    This class provides the way Band data with orbital projection. And
+    most of the functions are used in vaspy-procar.py script.  As this
+    class is not so well sophisticated, the use is not easy.  Anyway,
+    it works, however.
+
+
 
     :class variables: kvectors, energies, states, spin, orb_names
 
     .. note:: Finally, Band, Orbital, State classes can be removed ?
+
     '''
 
     def __init__(self, arg=None):
         self.__n_bands = 0
         self.__kvectors = list()
-        self.__kdistance = list()
+        self.kdistance = list()
         self.__sitecomposed = []
         self.__orbitals = 0
         self.__phases = 0
@@ -395,7 +381,9 @@ class Band_with_projection(object):
                           'tot']
 
     def isready(self):
-        '''Return True if numk, n_bands, n_atoms, spininfo, and
+        '''.. py:method:: isready()
+
+        Return True if numk, n_bands, n_atoms, spininfo, and
         orb_names are set, otherwise raise ValueError.
 
         This method is used for check before when orbitals, phases, energies
@@ -468,15 +456,15 @@ class Band_with_projection(object):
 
     @property
     def phases(self):
-        '''phase data
+        '''Phase data
 
-        .. note:: At present I have no idea about this parameter.
-How to use it?'''
+.. note:: At present I have no idea about this parameter. How to use it?
+'''
         return self.__phases
 
     @phases.setter
     def phases(self, arg):
-        '''phases
+        '''Phases
 
         Return is 4-rank tensor for the standard (i.e. ISPIN = 0) or SOI
         calculations.
@@ -516,20 +504,14 @@ How to use it?'''
             raise TypeError(errmsg)
         self.__kvectors = kvectors
         self.numk = len(self.kvectors)
-        self.__kdistance = list()
+        self.kdistance = list()
         for i, k in enumerate(self.kvectors):
             if i == 0:
-                self.__kdistance.append(0.0)
+                self.kdistance.append(0.0)
             else:
-                self.__kdistance.append(
+                self.kdistance.append(
                     self.kdistance[i - 1] +
                     np.linalg.norm(self.kvectors[i - 1] - k))
-
-    @property
-    def kdistance(self):
-        '''Distance of k.  This is used for the horizontal axis in the band
-structure drowing'''
-        return self.__kdistance
 
     @property
     def energies(self):
@@ -558,6 +540,9 @@ structure drowing'''
 
     def fermi_correction(self, fermi):
         '''Correct the Fermi level
+
+        .. py:method:: fermi_correction(fermi)
+
         :param fermi: value of the Fermi level (from OUTCAR or vasprun.xml).
         :type fermi: float
         '''
@@ -654,8 +639,8 @@ structure drowing'''
                     (self.__sitecomposed[3], cmporbs_mZ),
                     axis=2)
             else:
-                self.__sitecomposed = [cmporbs_mT, cmporbs_mX, cmporbs_mY,
-                                       cmporbs_mZ]
+                self.__sitecomposed = [cmporbs_mT,
+                                       cmporbs_mX, cmporbs_mY, cmporbs_mZ]
 
     def check_orb_name(self, arg):
         '''Return arg without change if arg is a member of the 'orbital name'.
