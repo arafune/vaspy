@@ -381,7 +381,7 @@ class POSCAR(object):
 
     # class method? or independent function?
     def make27candidate(self, position):
-        '''Return 27 vector sets correspond the neiboring
+        '''Return 27 vectors set correspond the neiboring
 
         :param position: atom position defined in the coordinated by
                          cell_vecs ( scaling facter is not accounted).
