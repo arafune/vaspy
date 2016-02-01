@@ -3,7 +3,7 @@
 # translate from procar.rb of scRipt4VASP 2014/2/26 master branch
 """.. py:module:: procar.py
 
-This module provides PROCAR, Band_with_Projection, EnergyBand,
+This module provides PROCAR, BandWithProjection, EnergyBand,
 Projection classes.
 
 * PROCAR class is used to stored the PROCAR information in the memory.
@@ -195,9 +195,9 @@ class PROCAR(object):  # Version safety
 
         Return Band_with_projection object
 
-        :rtype: Band_with_projection
+        :rtype: BandWithProjection
         '''
-        band = Band_with_projection()
+        band = BandWithProjection()
         band.kvectors = self.kvectors[0:self.numk]
         band.n_bands = self.n_bands
         band.n_atoms = self.n_atoms
@@ -350,8 +350,8 @@ Orbital projection object for analyzing by using python.
             self.output_headers = [name]
 
 
-class Band_with_projection(object):
-    '''.. py:class:: Band_with_projection()
+class BandWithProjection(object):
+    '''.. py:class:: BandWithProjection()
 
     The "Band structure" object deduced from PROCAR file.
 
