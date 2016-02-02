@@ -113,16 +113,13 @@ class DOS(object):  # Version safety
     The first element is the the energy.
     The latter element is list for the density.
 
-    :author: Ryuichi Arafune
     :attribute: dos
     '''
 
     def __init__(self, array=None):
-        self.dos = list()
+        self.dos = 0
         if array is not None:
-            for arr in array:
-                a_float = [float(i) for i in arr]
-                self.dos.append([a_float[0], a_float[1:]])
+            self.dos = array
 
     def __deepcopy__(self, memo):
         "x.__deepcopy__() <-> copy.deepcopy(x)"
