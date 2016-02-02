@@ -166,47 +166,44 @@ class TDOS(DOS):
 
 
 class PDOS(DOS):
-
     '''
     Class for partial DOS
 
     :author: Ryuichi Arafune
     '''
-
     def __init__(self, array=None, site=None):
         super(PDOS, self).__init__(array)
         self.site = "" if site is None else site
         self.orbital_spin = list()
         orbitalname = ["s", "py", "pz", "px", "dxy", "dyz", "dz2",
                        "dxz", "dx2"]
-        # this order above is refered from sphpro.F of vasp source
+        # the above order is refered from sphpro.F of vasp source
         soi = ("mT", "mX", "mY", "mZ")
         spin = ("up", "down")
         spininfo = []
         if array is not None:
             flag = len(self.dos[0][1])
-            if flag == 9:
+            if flag == 10:
                 self.orbital_spin = orbitalname
-            elif flag == 18:  # Spin resolved
+            elif flag == 19:  # Spin resolved
                 spininfo = ['up', 'down']
                 self.orbital_spin = [
                     orb + "_" + spn for orb in orbitalname
                     for spn in spin]
-            elif flag == 36:  # SOI
+            elif flag == 37:  # SOI
                 spininfo = ['mT', 'mX', 'mY', 'mZ']
                 self.orbital_spin = [
                     orb + "_" + spn for orb in orbitalname
                     for spn in soi]
             else:
                 self.orbital_spin = []
-
         if len(spininfo) == 2:  # In collinear spin calculation.
-                                    # DOS of down-spin is set by
-                                    # negative value.
-            for line in self.dos:
-                for index, density in enumerate(line[1]):
-                    if index % 2 != 0:
-                        line[1][index] = -density
+                                # DOS of down-spin is set by
+                                # negative value.
+            tmp = self.dos.transpose()
+            for i in range(2,19,2):
+                tmp[i] *= -1
+            self.dos = tmp.transpose()
 
     def plot_dos(self, orbitals, fermi=0.0):
         """plot DOS spectra with matplotlib.pyplot
