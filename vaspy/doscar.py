@@ -13,7 +13,6 @@ else:
 
 
 class DOSCAR(object):  # Version safety
-
     '''Class for DOSCAR file
 
     A container of DOS object
@@ -118,7 +117,7 @@ class DOS(object):  # Version safety
         else:
             return self.dos[i][0]
 
-    def export_csv_core(self, file, **kwargs):
+    def export_csv(self, filename, **kwargs):
         '''..py:method:: export_csv(file, **kwargs)
 
         Export data to file object (or file-like object) as csv format.
@@ -126,7 +125,7 @@ class DOS(object):  # Version safety
 
         See help(csv.writer) for detail.
         '''
-        with open(file, mode='wb') as fhandle:
+        with open(filename, mode='wb') as fhandle:
             np.savetxt(fhandle,
                        self.dos, kwargs,
                        delimiter='\t', newline='\n')
@@ -155,14 +154,14 @@ class TDOS(DOS):
         else:
             self.header = "#Energy\tTDOS_up\tTDOS_down"
 
-    def export_csv(self, file):
+    def export_csv(self, filename):
         '''..py:export_csv:: export_csv(file, kwargs)
 
         Export data to file object (or file-like object) as csv format.
         kwargs are keyword options of csv.writer().
         '''
         header = self.header.encode('utf-8')
-        self.export_csv_core(file, header=header)
+        super(TDOS, self).export_csv(filename, header=header)
 
 
 class PDOS(DOS):
@@ -201,19 +200,38 @@ class PDOS(DOS):
                                 # DOS of down-spin is set by
                                 # negative value.
             tmp = self.dos.transpose()
-            for i in range(2,19,2):
+            for i in range(2, 19, 2):
                 tmp[i] *= -1
             self.dos = tmp.transpose()
 
-    def plot_dos(self, orbitals, fermi=0.0):
-        """plot DOS spectra with matplotlib.pyplot
+    def export_csv(self, file, site=None):  # Not implemented yet
+        """Export data to file object (or file-like object) as csv format.
+        kwargs are keyword options of csv.writer().
+        see help(csv.writer) for detail.
+        """
+#        csvwriter = _csv.writer(file, **kwargs)
+        tmp = ["#energy"]
+        for i in self.orbital_spin:
+            if site is not None:
+                tmp.append(site + "_" + i)
+            elif self.site == "":
+                tmp.append(i)
+            else:
+                tmp.append(self.site + "_" + i)
+        header = "\t".join(tmp)
+        super(PDOS, self).export_csv(file, header=header)
+
+    def plot_dos(self, orbitals, fermi=0.0):  # Not implemented yet
+        '''..py:plot_dos(orbitals[, fermi=0.0])
+
+        plot DOS spectra with matplotlib.pyplot
 
         :param orbitals: orbital name
         :type orbitals: str
 
         .. warning:: not implemented yet!!
 
-        """
+        '''
         pass
 
     def __add__(self, other):   # Not implemented yet
@@ -238,24 +256,6 @@ class PDOS(DOS):
             sumPDOS.site = self.site + other.site
             sumPDOS.orbital_spin = self.orbital_spin
             return sumPDOS
-
-    def export_csv(self, file, site=None, **kwargs):  # Not implemented yet
-        """Export data to file object (or file-like object) as csv format.
-        kwargs are keyword options of csv.writer().
-        see help(csv.writer) for detail.
-        """
-        csvwriter = _csv.writer(file, **kwargs)
-        tmp = ["#energy"]
-        for i in self.orbital_spin:
-            if site is not None:
-                tmp.append(site + "_" + i)
-            elif self.site == "":
-                tmp.append(i)
-            else:
-                tmp.append(self.site + "_" + i)
-        csvwriter.writerow(tmp)
-
-        super(PDOS, self).export_csv(file, **kwargs)
 
     def __str__(self, site=None):  # Not implemented yet
         """x.__str__() <-> str(x)
