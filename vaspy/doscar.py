@@ -121,9 +121,7 @@ class DOS(object):  # Version safety
         '''..py:method:: export_csv(file, **kwargs)
 
         Export data to file object (or file-like object) as csv format.
-        kwargs are keyword options of csv.writer().
-
-        See help(csv.writer) for detail.
+        kwargs are keyword options of numpy.savetxt().
         '''
         with open(filename, mode='wb') as fhandle:
             np.savetxt(fhandle,
@@ -131,11 +129,11 @@ class DOS(object):  # Version safety
                        delimiter='\t', newline='\n')
 
     def __str__(self):
-        """x.__str__() <=> str(x)
+        '''x.__str__() <=> str(x)
 
         :return: string representation of DOS object (tab deliminated).
         :rtype: str
-        """
+        '''
         with _StringIO() as stream:
             self.export_csv(stream, delimiter='\t', lineterminator='\n')
             return stream.getvalue()
@@ -146,7 +144,6 @@ class TDOS(DOS):
 
     :author: Ryuichi Arafune
     '''
-
     def __init__(self, array):
         super(TDOS, self).__init__(array)
         if len(self.dos[0][1]) == 2:
@@ -155,10 +152,9 @@ class TDOS(DOS):
             self.header = "#Energy\tTDOS_up\tTDOS_down"
 
     def export_csv(self, filename):
-        '''..py:export_csv:: export_csv(file, kwargs)
+        '''..py:export_csv:: export_csv(filename, kwargs)
 
         Export data to file object (or file-like object) as csv format.
-        kwargs are keyword options of csv.writer().
         '''
         header = self.header.encode('utf-8')
         super(TDOS, self).export_csv(filename, header=header)
@@ -205,11 +201,10 @@ class PDOS(DOS):
             self.dos = tmp.transpose()
 
     def export_csv(self, file, site=None):  # Not implemented yet
-        """Export data to file object (or file-like object) as csv format.
-        kwargs are keyword options of csv.writer().
-        see help(csv.writer) for detail.
-        """
-#        csvwriter = _csv.writer(file, **kwargs)
+        '''.. py:method:: export_csv(file[, site=site])
+
+        Export data to file object (or file-like object) as csv format.
+        '''
         tmp = ["#energy"]
         for i in self.orbital_spin:
             if site is not None:
