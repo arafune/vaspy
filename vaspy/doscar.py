@@ -121,37 +121,37 @@ class DOS(object):  # Version safety
         if array is not None:
             self.dos = array
 
-    def __deepcopy__(self, memo):
-        "x.__deepcopy__() <-> copy.deepcopy(x)"
-        dest = DOS()
-        dest.dos = _copy.deepcopy(self.dos, memo)
-        return dest
+    # def __deepcopy__(self, memo):
+    #     "x.__deepcopy__() <-> copy.deepcopy(x)"
+    #     dest = DOS()
+    #     dest.dos = _copy.deepcopy(self.dos, memo)
+    #     return dest
 
-    def deepcopy(self):
-        '''call copy.deepcopy'''
-        return _copy.deepcopy(self)
+    # def deepcopy(self):
+    #     '''call copy.deepcopy'''
+    #     return _copy.deepcopy(self)
 
-    def __iter__(self):
-        for ith_point in self.dos:
-            yield ith_point
+    # def __iter__(self):
+    #     for ith_point in self.dos:
+    #         yield ith_point
 
-    def append(self, dos_data):
-        '''wrapper of list.append()
+    # def append(self, dos_data):
+    #     '''wrapper of list.append()
 
-        :param dos_data: dos_data
-        :type dos_data: np.array
-        '''
-        self.dos.append(_filter_dos_data(dos_data))
+    #     :param dos_data: dos_data
+    #     :type dos_data: np.array
+    #     '''
+    #     self.dos.append(_filter_dos_data(dos_data))
 
-    def pop(self, i=-1):
-        '''Wrapper of list.pop()
+    # def pop(self, i=-1):
+    #     '''Wrapper of list.pop()
 
-        :return: return and remove the last element
-        :rtype: np.array
+    #     :return: return and remove the last element
+    #     :rtype: np.array
 
-        (the highest energy data) of the DOS object.
-        '''
-        return self.dos.pop(i)
+    #     (the highest energy data) of the DOS object.
+    #     '''
+    #     return self.dos.pop(i)
 
     # self.unshift(X) => self.[0:0] = X
     # self.shift => self.pop(0)
@@ -160,17 +160,17 @@ class DOS(object):  # Version safety
         """x.__len__() <=> len(x)"""
         return len(self.dos)
 
-    def __setitem__(self, idx, value):
-        """x.__setitem__(i, y) <=> x[i]=y"""
-        if isinstance(idx, int):
-            value = _filter_dos_data(value)
-        if isinstance(idx, slice):
-            value = [_filter_dos_data(each) for each in value]
-        self.dos.__setitem__(idx, value)
+    # def __setitem__(self, idx, value):
+    #     """x.__setitem__(i, y) <=> x[i]=y"""
+    #     if isinstance(idx, int):
+    #         value = _filter_dos_data(value)
+    #     if isinstance(idx, slice):
+    #         value = [_filter_dos_data(each) for each in value]
+    #     self.dos.__setitem__(idx, value)
 
-    def __getitem__(self, idx):
-        """x.__getitem__(i) <=> x[i]"""
-        self.dos.__getitem__(idx)
+    # def __getitem__(self, idx):
+    #     """x.__getitem__(i) <=> x[i]"""
+    #     self.dos.__getitem__(idx)
 
     def fermilevel_correction(self, fermi):
         '''Fermi level Correction
