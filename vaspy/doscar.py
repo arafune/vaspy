@@ -69,39 +69,6 @@ class DOSCAR(object):  # Version safety
         thefile.close()
 
 
-    def load_from_file(self, doscar_file):
-        """Parse DOSCAR file to create dos_container
-
-        :param doscar_file: file name of "DOSCAR"
-        :type doscar_file: str
-        :rtype: DOSCAR
-        """
-        with open(doscar_file) as the_doscar:
-            separate_text = ""
-            aDOS = list()
-            for idx, line in enumerate(the_doscar, 1):
-                if idx == 1:
-                    self.nAtom = int(line.split()[0])
-                elif 2 <= idx <= 5:
-                    continue
-                elif idx == 6:
-                    try:
-                        separate_text = line.rstrip('\n')
-                        self.nenergypnts = int(separate_text.split()[2])
-                    except ValueError:
-                        self.nenergypnts = int(line[32:37])
-                    continue
-                else:  # idx >= 7
-                    if separate_text in line:
-                        self.dos_container.append(aDOS)
-                        aDOS = list()
-                    else:
-                        aDOS.append([float(i) for i in line.split()])
-            else:
-                self.dos_container.append(aDOS)
-                return self.dos_container.append(aDOS)
-
-
 class DOS(object):  # Version safety
 
     '''Class for DOS
