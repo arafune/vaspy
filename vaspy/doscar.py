@@ -228,8 +228,8 @@ class TDOS(DOS):
 
 
 class PDOS(DOS):
+    '''.. py:class:: PDOS(array[, site])
 
-    '''
     Class for partial DOS
 
     :author: Ryuichi Arafune
