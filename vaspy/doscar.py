@@ -191,8 +191,9 @@ class DOS(object):  # Version safety
                  If arg is null, return the all energies in DOS object.
         :rtype: np.ndarray
         '''
+        tmp = self.dos.transpose()
         if i is None:
-            return [each[0] for each in self.dos]
+            return tmp[0]
         else:
             return self.dos[i][0]
 
