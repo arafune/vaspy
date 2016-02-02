@@ -31,8 +31,8 @@ else:
 try:
     from vaspy import tools
 except ImportError:
-    MYPATH = os.readlink(__file__) if os.path.islink(__file__) else __file__
-    sys.path.append(os.path.dirname(os.path.abspath(MYPATH)))
+    mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
+    sys.path.append(os.path.dirname(os.path.abspath(mypath)))
     import tools
 
 
@@ -368,7 +368,7 @@ class BandWithProjection(object):
 
     '''
 
-    def __init__(self, arg=None):
+    def __init__(self):
         self.__n_bands = 0
         self.__kvectors = list()
         self.kdistance = list()
