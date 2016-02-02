@@ -30,7 +30,6 @@ class DOSCAR(object):  # Version safety
         self.dos_container = list()
 
         if arg is not None:
-#            self.load_from_file(arg)
             self.load_doscar_file(arg)
 
     def load_doscar_file(self, doscarfile):
@@ -40,15 +39,15 @@ class DOSCAR(object):  # Version safety
 
         :param doscar_file: file name of "DOSCAR"
         :type doscar_file: str
-        :rtype: DOSCAR
 '''
         aDOS = list()
         thefile = open(doscarfile)
         line = thefile.readline()
         self.nAtom = int(line.split()[0])  # 1st line
         for i in range(4):
-            thefile.readline()             # 2-5 lines
-        try:                               # 6 line
+            line = thefile.readline()      # 2-5 lines
+        line = thefile.readline()          # 6 line
+        try:                               
             self.nenergypnts = int(line.split()[2])
         except ValueError:
             self.nenergypnts = int(line[32:37])
@@ -182,7 +181,9 @@ class DOS(object):  # Version safety
         :param fermi: fermi level
         :type fermi: float
         '''
-        self.dos = [(each[0] - fermi, each[1]) for each in self.dos]
+        tmp = self.dos.transpose()
+        tmp[0] -= fermi
+        self.dos = tmp.transpose()
 
     def energies(self, i=None):
         '''Return the *i*-th energy of the object
