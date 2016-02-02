@@ -216,7 +216,7 @@ class PDOS(DOS):
         """
         pass
 
-    def __add__(self, other):
+    def __add__(self, other):   # Not implemented yet
         """x.__add__(y) <-> x+y
 
         :param addend: addend.energies.length must be equal to
@@ -239,7 +239,7 @@ class PDOS(DOS):
             sumPDOS.orbital_spin = self.orbital_spin
             return sumPDOS
 
-    def export_csv(self, file, site=None, **kwargs):
+    def export_csv(self, file, site=None, **kwargs):  # Not implemented yet
         """Export data to file object (or file-like object) as csv format.
         kwargs are keyword options of csv.writer().
         see help(csv.writer) for detail.
@@ -257,7 +257,7 @@ class PDOS(DOS):
 
         super(PDOS, self).export_csv(file, **kwargs)
 
-    def __str__(self, site=None):
+    def __str__(self, site=None):  # Not implemented yet
         """x.__str__() <-> str(x)
 
         Returns String representation of PDOS object.
