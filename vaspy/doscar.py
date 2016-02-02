@@ -6,7 +6,7 @@ from __future__ import division  # Version safety
 import copy as _copy
 import csv as _csv
 import sys as _sys
-# import numpy as np
+import numpy as np
 # import matplotlib.pyplot as plt
 from numbers import Number as _Number
 if _sys.version_info[0] >= 3:  # Version safety
@@ -26,11 +26,52 @@ class DOSCAR(object):  # Version safety
 
     def __init__(self, arg=None):
         self.nAtom = 0
-        self.__nEnergypoints = 0
+        self.nenergypnts = 0
         self.dos_container = list()
 
         if arg is not None:
-            self.load_from_file(arg)
+#            self.load_from_file(arg)
+            self.load_doscar_file(arg)
+
+    def load_doscar_file(self, doscarfile):
+        '''.. py:method load_doscar_file(doscarfile)
+
+        Parse DOSCAR file and store it in memory
+
+        :param doscar_file: file name of "DOSCAR"
+        :type doscar_file: str
+        :rtype: DOSCAR
+'''
+        aDOS = list()
+        thefile = open(doscarfile)
+        line = thefile.readline()
+        self.nAtom = int(line.split()[0])  # 1st line
+        for i in range(4):
+            thefile.readline()             # 2-5 lines
+        try:                               # 6 line
+            self.nenergypnts = int(line.split()[2])
+        except ValueError:
+            self.nenergypnts = int(line[32:37])
+        for energypnts in range(self.nenergypnts):  # TDOS
+            line = thefile.readline()
+            data = line.split()
+            if len(data) == 3:
+                data = data[0:2]
+            elif len(data) == 5:
+                data = data[0:3]
+            aDOS.append([np.float_(i) for i in data])
+        self.dos_container.append(np.array(aDOS))
+        #
+        for iatom in range(self.nAtom):  # PDOS
+            thefile.readline()
+            aDOS = list()
+            for energypts in range(self.nenergypnts):
+                line = thefile.readline()
+                data = line.split()
+                aDOS.append([np.float_(i) for i in data])
+            self.dos_container.append(np.array(aDOS))
+        thefile.close()
+
 
     def load_from_file(self, doscar_file):
         """Parse DOSCAR file to create dos_container
@@ -50,9 +91,9 @@ class DOSCAR(object):  # Version safety
                 elif idx == 6:
                     try:
                         separate_text = line.rstrip('\n')
-                        self.__nEnergypoints = int(separate_text.split()[2])
+                        self.nenergypnts = int(separate_text.split()[2])
                     except ValueError:
-                        self.__nEnergypoints = int(line[32:37])
+                        self.nenergypnts = int(line[32:37])
                     continue
                 else:  # idx >= 7
                     if separate_text in line:
