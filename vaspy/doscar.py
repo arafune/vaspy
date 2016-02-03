@@ -4,6 +4,7 @@
 from __future__ import print_function  # Version safety
 from __future__ import division  # Version safety
 import sys as _sys
+import copy
 import numpy as np
 # import matplotlib.pyplot as plt
 if _sys.version_info[0] >= 3:  # Version safety
@@ -229,15 +230,27 @@ class PDOS(DOS):
         '''
         pass
 
+    def __deepcopy__(self, memo):
+        '''pdos.__deepcopy__() <-> copy.deepcopy(x)'''
+        dest = PDOS()
+        dest.dos = copy.deepcopy(self.dos, memo)
+        dest.site = copy.deepcopy(self.site, memo)
+        dest.orbital_spin = copy.deepcopy(self.orbital_spin, memo)
+        return dest
+
+    def deepcopy(self):
+        '''Use __deepcopy__ as method'''
+        return copy.deepcopy(self)
+    
     def __add__(self, other):   # Not implemented yet
-        """x.__add__(y) <-> x+y
+        '''x.__add__(y) <-> x+y
 
         :param addend: addend.energies.length must be equal to
         self.energies.length.
         :type addend: PDOS
         :return: PDOS
         :rtype: PDOS
-        """
+        '''
         if not isinstance(other, PDOS):
             return NotImplemented
         if self.dos == [] and self.site == "":
