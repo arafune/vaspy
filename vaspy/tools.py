@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+'''.. py:module:: tools
+
 Module for tools used in vaspy
 '''
 
@@ -9,12 +10,12 @@ import re
 import itertools as it
 from collections import Iterable
 # Version safety
-ziplong = it.izip_longest if hasattr(it, 'izip_longest') else it.zip_longest
+ZIPLONG = it.izip_longest if hasattr(it, 'izip_longest') else it.zip_longest
 
 if not hasattr(__builtins__, 'basestring'):  # Version safety
-    flatten_ignore = (dict, str, bytes, bytearray)
+    FLATTEN_IGNORE = (dict, str, bytes, bytearray)
 else:
-    flatten_ignore = (dict, basestring)
+    FLATTEN_IGNORE = (dict, basestring)
 
 
 def each_slice(iterable, n, fillvalue=None):
@@ -23,7 +24,7 @@ def each_slice(iterable, n, fillvalue=None):
 make new iterator object which get n item from [iterable] at once.
 '''
     args = [iter(iterable)] * n
-    return ziplong(*args, fillvalue=fillvalue)  # Version safety
+    return ZIPLONG(*args, fillvalue=fillvalue)  # Version safety
 
 
 def removeall(L, value):
@@ -36,7 +37,7 @@ def removeall(L, value):
     return L
 
 
-def flatten(nested, target=Iterable, ignore=flatten_ignore):
+def flatten(nested, target=Iterable, ignore=FLATTEN_IGNORE):
     '''flatten(iterable) => list
 
     flatten nested iterable.
@@ -65,8 +66,8 @@ def flatten(nested, target=Iterable, ignore=flatten_ignore):
         i += 1
     return nested
 
-_rerange = re.compile(r'(\d+)-(\d+)')
-_resingle = re.compile(r'\d+')
+_RERANGE = re.compile(r'(\d+)-(\d+)')
+_RESINGLE = re.compile(r'\d+')
 
 
 def parse_Atomselection(L):
@@ -85,11 +86,11 @@ def parse_Atomselection(L):
     array = L.split(',')
     output = set()
     for each in array:
-        if re.search(_rerange, each):
-            start, stop = re.findall(_rerange, each)[0]
+        if re.search(_RERANGE, each):
+            start, stop = re.findall(_RERANGE, each)[0]
             # Version safety
             output |= set(str(i) for i in range(int(start), int(stop) + 1))
-        elif re.search(_resingle, each):
+        elif re.search(_RESINGLE, each):
             output.add(each)
     return sorted(output)
 
@@ -113,13 +114,13 @@ def parse_AtomselectionNum(L):
 
 if __name__ == '__main__':
     import argparse
-    each_slice_demo = lambda L, n: list(each_slice(L, n))
-    demo = {'each_slice_demo': (range(10), 3),
+    EACH_SLICE_DEMO = lambda L, n: list(each_slice(L, n))
+    demo = {'EACH_SLICE_DEMO': (range(10), 3),
             'removeall': ([1, 0, 0, 1, 0, 1, 0, 0], 0),
             'flatten': ((1, [range(2), 3, set([4, 5]), [6]],  # Version safety
                          frozenset([7, 8])),),
             'parse_Atomselection': ('1-5,8,9,11-15',), }
-    argcounts = {'each_slice_demo': 2,
+    argcounts = {'EACH_SLICE_DEMO': 2,
                  'removeall': 2,
                  'flatten': 1,
                  'parse_Atomselection': 1}

@@ -1,11 +1,44 @@
 #! /usr/bin/env python
 # -*- conding: utf-8 -*-
-'''This mudule provides POSCAR class
+'''.. py:module:: poscar
+
+This mudule provides POSCAR class
 
 translate from poscar.rb of 2014/2/26, master branch
+
+The below is an example of POSCAR file::
+
+ fcc (111) surface
+   3.5200000
+     0.707106780  0.000000000   0.000000000
+    -0.353553390  0.612372400   0.000000000
+     0.000000000  0.000000000  11.547000006
+   Cu
+     9
+ Selective dynamics
+ Direct
+  0.000000000  0.000000000  0.000000000   F   F   F
+  0.333333333  0.666666666  0.050000000   F   F   F
+  0.666666666  0.333333333  0.100000000   F   F   F
+  0.000000000  0.000000000  0.150000000   T   T   T
+  0.333333333  0.666666666  0.200000000   T   T   T
+  0.000000000  0.000000000  0.250000000   T   T   T
+  0.333333333  0.666666666  0.300000000   T   T   T
+  0.666666666  0.333333333  0.350000000   T   T   T
+  0.000000000  0.000000000  0.400000000   T   T   T
+
+  0.00000000E+00  0.00000000E+00  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00
+  0.00000000E+00  0.00000000E+00  0.00000000E+00
 '''
+
 from __future__ import division, print_function  # Version safety
-import numpy as np
 import itertools as it
 import copy
 import re
@@ -17,43 +50,11 @@ except ImportError:
     mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
     sys.path.append(os.path.dirname(os.path.abspath(mypath)))
     import tools
-
-'''
- fcc (111) surface
-   3.52000000000000
-     0.7071067800000000    0.0000000000000000    0.0000000000000000
-    -0.3535533900000000    0.6123724000000000    0.0000000000000000
-     0.0000000000000000    0.0000000000000000   11.5470000000000006
-   Cu
-     9
-Selective dynamics
-Direct
-  0.0000000000000000  0.0000000000000000  0.0000000000000000   F   F   F
-  0.3333333300000021  0.6666666699999979  0.0499999999999972   F   F   F
-  0.6666666699999979  0.3333333300000021  0.1000000000000014   F   F   F
-  0.0000000000000000  0.0000000000000000  0.1499999999999986   T   T   T
-  0.3333333300000021  0.6666666699999979  0.2000000000000028   T   T   T
-  0.0000000000000000  0.0000000000000000  0.2500000000000000   T   T   T
-  0.3333333300000021  0.6666666699999979  0.2999999999999972   T   T   T
-  0.6666666699999979  0.3333333300000021  0.3500000000000014   T   T   T
-  0.0000000000000000  0.0000000000000000  0.3999999999999986   T   T   T
-
-  0.00000000E+00  0.00000000E+00  0.00000000E+00
-  0.00000000E+00  0.00000000E+00  0.00000000E+00
-  0.00000000E+00  0.00000000E+00  0.00000000E+00
-  0.00000000E+00  0.00000000E+00  0.00000000E+00
-  0.00000000E+00  0.00000000E+00  0.00000000E+00
-  0.00000000E+00  0.00000000E+00  0.00000000E+00
-  0.00000000E+00  0.00000000E+00  0.00000000E+00
-  0.00000000E+00  0.00000000E+00  0.00000000E+00
-  0.00000000E+00  0.00000000E+00  0.00000000E+00
-'''
+import numpy as np
 
 
 class POSCAR(object):
-
-    '''
-    .. py:class:: POSCAR(object)
+    '''.. py:class:: POSCAR(file or array)
 
     Class for POSCAR (CONTCAR) format
 
@@ -63,8 +64,8 @@ class POSCAR(object):
     It provides a way to slightly modify POSCAR or
     CONTCAR, which has already works well.
 
-    :attribute: latticeV1, latticeV1, latticeV3
-    :version: 2.0
+    :attribute: system_name, scaling_factor, cell_vecs
+    :version: 2.1
     '''
 
     def __init__(self, arg=None):
@@ -74,9 +75,9 @@ class POSCAR(object):
         '''
         self.system_name = ""
         self.scaling_factor = 0.
-        self.__latticeV1 = np.array([0., 0., 0.])
-        self.__latticeV2 = np.array([0., 0., 0.])
-        self.__latticeV3 = np.array([0., 0., 0.])
+        self.__cell_vecs = np.array([[0., 0., 0.],
+                                     [0., 0., 0.],
+                                     [0., 0., 0.]])
         self.iontype = []
         self.ionnums = []
         self.coordinate_type = ""
@@ -91,45 +92,38 @@ class POSCAR(object):
             self.load_from_array(arg)
 
     @property
-    def latticeV1(self):
-        '''The vector of the first axis of the unit cell'''
-        return self.__latticeV1
+    def cell_vecs(self):
+        '''Return the matrix of the unit cell'''
+        return self.__cell_vecs
 
-    @property
-    def latticeV2(self):
-        '''The vector of the second axis of the unit cell'''
-        return self.__latticeV2
-
-    @property
-    def latticeV3(self):
-        '''The vector of the third axis of the unit cell'''
-        return self.__latticeV3
+    @cell_vecs.setter
+    def cell_vecs(self, vec):
+        '''Setter of cell matrix'''
+        if three_by_three(vec):
+            self.__cell_vecs = np.array(vec)
+        else:
+            raise TypeError
 
     def load_from_array(self, poscar):
         '''POSCAR parser'''
         poscar = iter(map(str.rstrip, poscar))  # Version safety
         self.system_name = next(poscar)
         self.scaling_factor = float(next(poscar))
-        self.__latticeV1 = np.array(
-            list(map(float, next(poscar).split())))  # Version safety
-        self.__latticeV2 = np.array(
-            list(map(float, next(poscar).split())))  # Version safety
-        self.__latticeV3 = np.array(
-            list(map(float, next(poscar).split())))  # Version safety
+        self.cell_vecs[0] = [float(x) for x in next(poscar).split()]
+        self.cell_vecs[1] = [float(x) for x in next(poscar).split()]
+        self.cell_vecs[2] = [float(x) for x in next(poscar).split()]
         self.iontype = next(poscar).split()
         # parse POSCAR evenif the element names are not set.
         # At present, the String representation number
         #   are used for the  dummy name.
         if self.iontype[0].isdigit():
-            self.ionnums = list(map(int, self.iontype))
-            #                      [int(i) for i in self.iontype]
+            self.ionnums = [int(i) for i in self.iontype]
         else:
-            self.ionnums = list(
-                map(int, next(poscar).split()))  # Version safety
+            self.ionnums = [int(x) for x in next(poscar).split()]
         self.__atom_identifer = []
         atomnames = []
-        for elm, n in zip(self.iontype, self.ionnums):
-            for j in range(1, n + 1):
+        for elm, ionnums in zip(self.iontype, self.ionnums):
+            for j in range(1, ionnums + 1):
                 tmp = elm + str(j)
                 if tmp not in atomnames:
                     atomnames.append(tmp)
@@ -169,8 +163,8 @@ class POSCAR(object):
         # return self.__atom_identifer
         self.__atom_identifer = []
         atomnames = []
-        for elm, n in zip(self.iontype, self.ionnums):
-            for j in range(1, n + 1):
+        for elm, ionnums in zip(self.iontype, self.ionnums):
+            for j in range(1, ionnums + 1):
                 tmp = elm + str(j)
                 if tmp not in atomnames:
                     atomnames.append(tmp)
@@ -225,40 +219,64 @@ class POSCAR(object):
 
         As in VASP, the atom index starts with "1", not "0".
 
-        :param i: site index (index range can be set by tuple (from, to))
-        :type i: int, or tuple of two int
+        :param i: site indexes
+        :type i: int, tuple, list, range
 
         :return: atom's position (When single value is set as i,
                  return just an atom position)
 
         :rtype: np.array or list of np.array
 
-        .. note:: You can set the index range by using tuple.
-
-        :Example: (20, 25) means the index from site# 20 to site# 25.
-
         .. warning:: the first site # is "1", not "0". (Follow VESTA's way.)
 
-        .. warning:: (to user who knows Python's style of list slice)
-                     When set the site index range by tuple, the
-                     latter index is included.  (pos(20, 25) returns
-                     position[19:25], not position[19:24])
-
+        .. warning:: Now, you **cannot** set the index range by using tuple.\
+Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         '''
-        if type(i[0]) == int:
-            dest = []
-            for ii in i:
-                dest.append(self.position[ii - 1])
-            if len(dest) == 1:
-                dest = dest[0]
-        elif type(i[0]) == tuple:
-            if i[0] > i[1]:
-                raise ValueError
-            dest = self.positions[i[0] - 1: i[1]]
+        dest = []
+        for thearg in i:
+            if isinstance(thearg, int):
+                if thearg <= 0:
+                    raise ValueError
+                else:
+                    dest.append(self.position[thearg - 1])
+            elif isinstance(thearg, (tuple, list, range)):
+                for site_index in thearg:
+                    if site_index <= 0:
+                        raise ValueError
+                    else:
+                        dest.append(self.position[site_index - 1])
+        if len(dest) == 1:
+            dest = dest[0]
         return dest
 
+    def average_position(self, *i):
+        '''.. py:method:: average_position(*i)
+
+        Return the average position of the sites
+
+        :param i: site indexes
+        :type i: int, tuple, list, range
+
+        :return: atom's position
+
+        :rtype: np.array
+'''
+        sitelist = []
+        for thearg in i:
+            if isinstance(thearg, int):
+                sitelist.append(thearg)
+            elif isinstance(thearg, (tuple, list, range)):
+                for site_index in thearg:
+                    sitelist.append(site_index)
+        pos = self.pos(sitelist)
+        if isinstance(pos, np.ndarray):
+            return pos
+        elif isinstance(pos, list):
+            return sum(pos)/len(pos)
+
     def pos_replace(self, i, vector):
-        '''
+        '''.. py:method:: pos_replace(i, vector)
+
         :param i: site #
         :param vector: list of the i-th atom position.
         :type i: int
@@ -287,16 +305,16 @@ class POSCAR(object):
         original_is_cartesian = False
         if self.is_cartesian:
             original_is_cartesian = True
-            self.to_Direct()
+            self.to_direct()
         self.repack_in_cell()
-        poslists = self.pos((from_index, to_index))
+        poslists = self.pos(range(from_index, to_index+1))
         poslists.sort(keys=lambda x: (x[0], x[1], x[2]))
         for i in range(from_index, to_index + 1):
             self.pos_replace(i, poslists.pop(0))
         if original_is_cartesian:
-            self.to_Cartesian()
+            self.to_cartesian()
 
-    def rotateX(self, theta):
+    def rotate_x(self, theta):
         '''Rotation matrix around X-axis
 
         :param theta: angle of rotation (Degrees)
@@ -307,7 +325,7 @@ class POSCAR(object):
         :Example:
 
         >>> t = POSCAR()
-        >>> t.rotateX(60)
+        >>> t.rotate_x(60)
         array([[ 1.       ,  0.       ,  0.       ],
                [ 0.       ,  0.5      , -0.8660254],
                [ 0.       ,  0.8660254,  0.5      ]])
@@ -318,13 +336,13 @@ class POSCAR(object):
              [0.0, np.cos(theta * degree), -np.sin(theta * degree)],
              [0.0, np.sin(theta * degree), np.cos(theta * degree)]])
 
-    def rotateY(self, theta):
+    def rotate_y(self, theta):
         '''Rotation matrix around Y-axis
 
         :Example:
 
         >>> t = POSCAR()
-        >>> t.rotateY(60)
+        >>> t.rotate_y(60)
         array([[ 0.5      ,  0.       ,  0.8660254],
                [ 0.       ,  1.       ,  0.       ],
                [-0.8660254,  0.       ,  0.5      ]])
@@ -335,13 +353,13 @@ class POSCAR(object):
              [0.0, 1.0, 0.0],
              [-np.sin(theta * degree), 0.0, np.cos(theta * degree)]])
 
-    def rotateZ(self, theta):
+    def rotate_z(self, theta):
         '''Rotation matrix around Z-axis
 
         :Example:
 
         >>> t = POSCAR()
-        >>> t.rotateZ(60)
+        >>> t.rotate_z(60)
         array([[ 0.5      , -0.8660254,  0.       ],
                [ 0.8660254,  0.5      ,  0.       ],
                [ 0.       ,  0.       ,  1.       ]])
@@ -366,11 +384,10 @@ class POSCAR(object):
 
     # class method? or independent function?
     def make27candidate(self, position):
-        '''Return 27 vector sets correspond the neiboring
+        '''Return 27 vectors set correspond the neiboring
 
         :param position: atom position defined in the coordinated by
-                         latticeV1, latticeV2, latticeV3 ( scaling
-                         facter is not accounted).
+                         cell_vecs ( scaling facter is not accounted).
 
         :param type: np.array, list
         :return: list of np.array
@@ -381,9 +398,9 @@ class POSCAR(object):
         candidates27 = []
         if self.is_cartesian:
             for l, m, n in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
-                candidates27.append(l * self.latticeV1 +
-                                    m * self.latticeV2 +
-                                    n * self.latticeV3 +
+                candidates27.append(l * self.cell_vecs[0] +
+                                    m * self.cell_vecs[1] +
+                                    n * self.cell_vecs[2] +
                                     position)
         else:
             for l, m, n in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
@@ -410,19 +427,16 @@ class POSCAR(object):
         center = _vectorize(center)
         if len(center) != 3:
             raise ValueError
-        if not self.point_in_box(center / self.scaling_factor,
-                                 self.latticeV1,
-                                 self.latticeV2,
-                                 self.latticeV3):
+        if not self.point_in_box(center / self.scaling_factor, self.cell_vecs):
             raise ValueError('the center must be in the Braves lattice')
         if not isinstance(site, int):
             raise ValueError('argument error in atom_rotate method')
         if not self.is_cartesian:
-            self.to_Cartesian()
+            self.to_cartesian()
         position = self.pos(site)
         position -= center / self.scaling_factor
-        position = getattr(self, 'rotate' +
-                           axis_name.capitalize())(theta).dot(position)
+        position = getattr(self, 'rotate_' +
+                           axis_name.lower())(theta).dot(position)
         position += center / self.scaling_factor
         self.pos_replace(site, position)
 
@@ -459,22 +473,17 @@ class POSCAR(object):
         original_is_cartesian = False
         if self.is_cartesian:
             original_is_cartesian = True
-            self.to_Direct()
+            self.to_direct()
         axis_name = axis_name.capitalize()
+
         if axis_name == 'X':
-            self.__latticeV1 = np.dot(self.rotateX(theta), self.latticeV1)
-            self.__latticeV2 = np.dot(self.rotateX(theta), self.latticeV2)
-            self.__latticeV3 = np.dot(self.rotateX(theta), self.latticeV3)
+            self.cell_vecs = np.dot(self.rotate_x(theta), self.cell_vecs.T).T
         elif axis_name == 'Y':
-            self.__latticeV1 = np.dot(self.rotateY(theta), self.latticeV1)
-            self.__latticeV2 = np.dot(self.rotateY(theta), self.latticeV2)
-            self.__latticeV3 = np.dot(self.rotateY(theta), self.latticeV3)
+            self.cell_vecs = np.dot(self.rotate_y(theta), self.cell_vecs.T).T
         elif axis_name == 'Z':
-            self.__latticeV1 = np.dot(self.rotateZ(theta), self.latticeV1)
-            self.__latticeV2 = np.dot(self.rotateZ(theta), self.latticeV2)
-            self.__latticeV3 = np.dot(self.rotateZ(theta), self.latticeV3)
+            self.cell_vecs = np.dot(self.rotate_z(theta), self.cell_vecs.T).T
         if original_is_cartesian:
-            self.to_Cartesian()
+            self.to_cartesian()
 
     def repack_in_cell(self):
         '''Repack all atoms in the unit cell
@@ -484,7 +493,7 @@ class POSCAR(object):
         original_is_cartesian = False
         if self.is_cartesian:
             original_is_cartesian = True
-            self.to_Direct()
+            self.to_direct()
         for pos in self.position:
             for i in (0, 1, 2):
                 while pos[i] < 0.0 or pos[i] > 1.0:
@@ -493,7 +502,7 @@ class POSCAR(object):
                     elif pos[i] > 1.0:
                         pos[i] -= 1.0
         if original_is_cartesian:
-            self.to_Cartesian()
+            self.to_cartesian()
 
     def __add__(self, other):
         '''
@@ -504,24 +513,17 @@ class POSCAR(object):
         '''
         if not isinstance(other, POSCAR):
             return NotImplemented
-        destPOSCAR = copy.deepcopy(self)
-        if destPOSCAR.scaling_factor != other.scaling_factor:
+        dest_poscar = copy.deepcopy(self)
+        if dest_poscar.scaling_factor != other.scaling_factor:
             raise ValueError('scaling factor is different.')
-        if np.linalg.norm(destPOSCAR.latticeV1 +
-                          destPOSCAR.latticeV2 +
-                          destPOSCAR.latticeV3 -
-                          (other.latticeV1 +
-                           other.latticeV2 +
-                           other.latticeV3)) != 0:
-            raise ValueError('lattice vectors are different.')
-        destPOSCAR.iontype.extend(other.iontype)
-        destPOSCAR.ionnums.extend(other.ionnums)
-        destPOSCAR.position.extend(other.position)
-        destPOSCAR.coordinate_changeflags.extend(other.coordinate_changeflags)
-
-        destPOSCAR.atom_identifer
-
-        return destPOSCAR
+        if np.linalg.norm(dest_poscar.cell_vecs - other.cell_vecs) != 0:
+            raise ValueError('lattice vectors (cell matrix) are different.')
+        dest_poscar.iontype.extend(other.iontype)
+        dest_poscar.ionnums.extend(other.ionnums)
+        dest_poscar.position.extend(other.position)
+        dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
+#        dest_poscar.atom_identifer
+        return dest_poscar
 
     def merge(self, other):
         '''lazy __add__: Return POSCAR generated from two POSCARs
@@ -537,23 +539,23 @@ class POSCAR(object):
         '''
         if not isinstance(other, POSCAR):
             return NotImplemented
-        destPOSCAR = copy.deepcopy(self)
+        dest_poscar = copy.deepcopy(self)
         original_is_direct = False
-        if destPOSCAR.is_direct:
+        if dest_poscar.is_direct:
             original_is_direct = True
-            destPOSCAR.to_Cartesian()
-        otherPOSCAR = copy.deepcopy(other)
-        original_scaling_factor = destPOSCAR.scaling_factor
-        otherPOSCAR.tune_scaling_factor(original_scaling_factor)
-        otherPOSCAR.to_Cartesian()
-        destPOSCAR.iontype.extend(other.iontype)
-        destPOSCAR.ionnums.extend(other.ionnums)
-        destPOSCAR.position.extend(other.position)
-        destPOSCAR.coordinate_changeflags.extend(other.coordinate_changeflags)
-        destPOSCAR.atom_identifer
+            dest_poscar.to_cartesian()
+        other_poscar = copy.deepcopy(other)
+        original_scaling_factor = dest_poscar.scaling_factor
+        other_poscar.tune_scaling_factor(original_scaling_factor)
+        other_poscar.to_cartesian()
+        dest_poscar.iontype.extend(other.iontype)
+        dest_poscar.ionnums.extend(other.ionnums)
+        dest_poscar.position.extend(other.position)
+        dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
+#        dest_poscar.atom_identifer
         if original_is_direct:
-            destPOSCAR.to_Direct()
-        return destPOSCAR
+            dest_poscar.to_direct()
+        return dest_poscar
 
     def to_list(self):
         '''Return POSCAR object by list-style
@@ -564,9 +566,9 @@ class POSCAR(object):
         out_list = []
         out_list.append(self.system_name)
         out_list.append(self.scaling_factor)
-        out_list.append(self.latticeV1)
-        out_list.append(self.latticeV2)
-        out_list.append(self.latticeV3)
+        out_list.append(self.cell_vecs[0])
+        out_list.append(self.cell_vecs[1])
+        out_list.append(self.cell_vecs[2])
         if not self.iontype[0].isdigit():
             out_list.append(self.iontype)
         out_list.append(self.ionnums)
@@ -586,20 +588,24 @@ class POSCAR(object):
         tmp = []
         tmp.append(self.system_name)
         tmp.append(str(self.scaling_factor))
-        tmp.append(''.join('   {0:20.17f}'.format(i) for i in self.latticeV1))
-        tmp.append(''.join('   {0:20.17f}'.format(i) for i in self.latticeV2))
-        tmp.append(''.join('   {0:20.17f}'.format(i) for i in self.latticeV3))
+        tmp.append(''.join('   {0:20.17f}'.format(i) for i in
+                           self.cell_vecs[0]))
+        tmp.append(''.join('   {0:20.17f}'.format(i) for i in
+                           self.cell_vecs[1]))
+        tmp.append(''.join('   {0:20.17f}'.format(i) for i in
+                           self.cell_vecs[2]))
         if not self.iontype[0].isdigit():
             tmp.append(' ' + ' '.join(self.iontype))
         tmp.append(' ' + ' '.join(str(i) for i in self.ionnums))
         if self.is_selective:
             tmp.append('Selective Dynamics')
         tmp.append(self.coordinate_type)
-        for pos, tf, atom in tools.ziplong(self.position,  # Version safety
-                                           self.coordinate_changeflags,
-                                           self.atom_identifer, fillvalue=''):
+        for pos, t_or_f, atom in tools.ZIPLONG(self.position,  # Version safety
+                                               self.coordinate_changeflags,
+                                               self.atom_identifer,
+                                               fillvalue=''):
             tmp.append(' '.join('  {0:20.17f}'.format(i) for i in pos) +
-                       ' ' + tf +
+                       ' ' + t_or_f +
                        ' ' + atom)
         return '\n'.join(tmp) + '\n'
 
@@ -615,33 +621,27 @@ class POSCAR(object):
                      scaling_factor attribute directly
 '''
         old = self.scaling_factor
-        self.__latticeV1 *= (old / new_scaling_factor)
-        self.__latticeV2 *= (old / new_scaling_factor)
-        self.__latticeV3 *= (old / new_scaling_factor)
+        self.cell_vecs *= (old / new_scaling_factor)
         self.scaling_factor = new_scaling_factor
         if self.is_cartesian:
             self.position = [i * old / new_scaling_factor
                              for i in self.position]
 
-    def to_Cartesian(self):
+    def to_cartesian(self):
         '''Change the coordinate to cartesian from direct
 '''
         if self.is_direct:
             self.coordinate_type = "Cartesian"
-            mat = np.array([self.latticeV1,
-                            self.latticeV2,
-                            self.latticeV3]).transpose()
+            mat = self.cell_vecs.transpose()
             self.position = [mat.dot(v) for v in self.position]
 
-    def to_Direct(self):
+    def to_direct(self):
         '''Change the coordinate to direct from cartesian.
         '''
         if self.is_cartesian:
             self.coordinate_type = "Direct"
-            m = np.linalg.inv(np.transpose(np.array([self.latticeV1,
-                                                     self.latticeV2,
-                                                     self.latticeV3])))
-            self.position = [m.dot(v) for v in self.position]
+            mat = np.linalg.inv(np.transpose(self.cell_vecs))
+            self.position = [mat.dot(v) for v in self.position]
 
     def guess_molecule(self, site_list, center=None):
         '''Arrange atom position to form a molecule.
@@ -700,8 +700,8 @@ class POSCAR(object):
         :type site_list: list
 '''
         molecule = self.guess_molecule(site_list)
-        for site, posVector in zip(site_list, molecule):
-            self.pos_replace(site, posVector)
+        for site, pos_vector in zip(site_list, molecule):
+            self.pos_replace(site, pos_vector)
 
     def translate(self, vector, atomlist):
         '''Translate the selected atom(s) by vector
@@ -721,11 +721,11 @@ class POSCAR(object):
                                         vector / self.scaling_factor)
         else:
             vector = _vectorize(vector)
-            self.to_Cartesian()
+            self.to_cartesian()
             for i in atomlist:
                 self.position[i - 1] = (self.position[i - 1] +
                                         vector / self.scaling_factor)
-            self.to_Direct()
+            self.to_direct()
         return self.position
 
     def translate_all(self, vector):
@@ -738,6 +738,8 @@ class POSCAR(object):
         self.translate(vector, atomrange)
 
     def save(self, filename):
+        '''Save POSCAR contents to the file named "filename"
+'''
         try:  # Version safety
             file = open(filename, mode='w', newline='\n')
         except TypeError:
@@ -745,46 +747,39 @@ class POSCAR(object):
         with file:
             file.write(str(self))
 
-    def point_in_box(self, point, l1, l2, l3):
+    def point_in_box(self, point, cell_vecs):
         '''Return True if point is located in the box
-
-        .. note:: The box is defined by three vectors (l1, l2, and l3)
 
         :param point: vector representing the "point"
         :type point: numpy.ndarray, numpy.matrix, list, tuple
-        :param l1: vector representing the "box"
-        :param l2: vector representing the "box"
-        :param l3: vector representing the "box"
-        :type l1: numpy.ndarray, numpy.matrix, list, tuple
-        :type l2: numpy.ndarray, numpy.matrix, list, tuple
-        :type l3: numpy.ndarray, numpy.matrix, list, tuple
+        :param cell_vecs: vectors defining the "box"
+        :type cell_vecs: numpy.ndarray, numpy.matrix, list, tuple
         :rtype: Boolean
         '''
-        x0, y0, z0 = _vectorize(point).flatten()
-        x1, y1, z1 = _vectorize(l1).flatten()
-        x2, y2, z2 = _vectorize(l2).flatten()
-        x3, y3, z3 = _vectorize(l3).flatten()
-        l = -(-x3 * y2 * z0 + x2 * y3 * z0 + x3 * y0 * z2 - x0 * y3 * z2 -
-              x2 * y0 * z3 + x0 * y2 * z3) / (x3 * y2 * z1 - x2 * y3 * z1 -
-                                              x3 * y1 * z2 + x1 * y3 * z2 +
-                                              x2 * y1 * z3 - x1 * y2 * z3)
-        m = -(x3 * y1 * z0 - x1 * y3 * z0 - x3 * y0 * z1 + x0 * y3 * z1 +
-              x1 * y0 * z3 - x0 * y1 * z3) / (x3 * y2 * z1 - x2 * y3 * z1 -
-                                              x3 * y1 * z2 + x1 * y3 * z2 +
-                                              x2 * y1 * z3 - x1 * y2 * z3)
-        n = -(x2 * y1 * z0 - x1 * y2 * z0 - x2 * y0 * z1 + x0 * y2 * z1 +
-              x1 * y0 * z2 - x0 * y1 * z2) / (-x3 * y2 * z1 + x2 * y3 * z1 +
-                                              x3 * y1 * z2 - x1 * y3 * z2 -
-                                              x2 * y1 * z3 + x1 * y2 * z3)
-        return all((0 <= q <= 1) for q in (l, m, n))
+        if three_by_three(cell_vecs):
+            point = np.array(point).flatten()
+            cell_vecs = np.array(cell_vecs)
+            result = np.dot(np.linalg.inv(cell_vecs.T), point)
+            return all((0 <= float(q) <= 1) for q in result)
+        else:
+            raise TypeError
 
+def three_by_three(vec):
+    '''Return True if vec can be converted into the 3x3 matrix'''
+    if not isinstance(vec, (np.ndarray, np.matrix, list, tuple)):
+        return False
+    if len(vec) != 3:
+        return False
+    if [3, 3, 3] == [len(i) for i in vec]:
+        return True
+    else:
+        return False
 
 def _vectorize(vector):
-    if not isinstance(vector, _vector_acceptables):
+    if not isinstance(vector, (np.ndarray, np.matrix, list, tuple)):
         raise TypeError('Cannot convert into vector.')
     return np.array(vector).flatten()
 
-_vector_acceptables = (np.ndarray, np.matrix, list, tuple)
 # --------------------------
 
 if __name__ == "__main__":

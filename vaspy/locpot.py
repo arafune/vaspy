@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+'''.. py:module:: locpot
+
 This module provides LOCPOT class
 '''
 #
@@ -21,25 +22,29 @@ except ImportError:
 
 
 class LOCPOT(poscar.POSCAR):
+    '''.. py:class:: LOCPOT(LOCPOT_file)
 
-    '''Class for LOCPOT
+    Class for LOCPOT
 
     LOCPOT format is essentially same as that of CHGCAR
 
-    :attribute: meshX, meshY, meshZ, potlist
+    :attribute: mesh_x, mesh_y, mesh_z, potlist
+    :version: 2.1
 '''
 
     def __init__(self, arg=None):
         super(LOCPOT, self).__init__(None)
-        self.__meshX = 0
-        self.__meshY = 0
-        self.__meshZ = 0
+        self.__mesh_x = 0
+        self.__mesh_y = 0
+        self.__mesh_z = 0
         self.__potlist = []
         if arg:
             self.load_from_file(arg)
 
     def load_from_file(self, locpotfile):
-        '''Parse LOCPOT file to construct LOCPOT object
+        '''.. py:method:: load_from_file(locpotfile)
+
+        Parse LOCPOT file to construct LOCPOT object
 
         :param locpotfile: file name of 'LOCPOT'
         :type locpotfile: str
@@ -48,8 +53,8 @@ class LOCPOT(poscar.POSCAR):
         section = 'poscar'
         separator = None
         tmp = []
-        with open(locpotfile) as f:
-            for line in f:
+        with open(locpotfile) as locpot_file:
+            for line in locpot_file:
                 if section == 'poscar':
                     if line.isspace():
                         self.load_from_array(tmp)
@@ -59,55 +64,58 @@ class LOCPOT(poscar.POSCAR):
                         tmp.append(line)
                 elif section == 'define_separator':
                     separator = line if separator is None else separator
-                    if self.meshX == self.meshY == self.meshZ == 0:
-                        self.__meshX, self.__meshY, self.__meshZ = \
-                            list(map(int, line.split()))
+                    if self.mesh_x == self.mesh_y == self.mesh_z == 0:
+                        self.__mesh_x, self.__mesh_y, self.__mesh_z = \
+                                [int(i) for i in line.split()]
+#                            list(map(int, line.split()))
                         section = 'grid'
                 elif section == 'grid':
                     line = line.rstrip('\n')
-                    self.__potlist.extend(map(np.float64, line.split()))
-            if len(self.__potlist) == self.meshX * self.meshY * self.meshZ:
+                    self.__potlist.extend([np.float64(i) for i in
+                                           line.split()])
+#                        map(np.float64, line.split()))
+            if len(self.__potlist) == self.mesh_x * self.mesh_y * self.mesh_z:
                 self.__potarray = np.array(self.__potlist).reshape(
-                    self.meshZ, self.meshY, self.meshX)
-            elif len(self.__potlist) == 2 * (self.meshX *
-                                             self.meshY *
-                                             self.meshZ) + 3 + sum(
-                    self.ionnums):
+                    self.mesh_z, self.mesh_y, self.mesh_x)
+            elif len(self.__potlist) == (2 * (self.mesh_x *
+                                              self.mesh_y *
+                                              self.mesh_z) +
+                                         3 + sum(self.ionnums)):
                 self.__potarray = np.array(
                     self.__potlist[:
-                                   self.meshX *
-                                   self.meshY *
-                                   self.meshZ]).reshape(self.meshZ,
-                                                        self.meshY,
-                                                        self.meshX)
+                                   self.mesh_x *
+                                   self.mesh_y *
+                                   self.mesh_z]).reshape(self.mesh_z,
+                                                         self.mesh_y,
+                                                         self.mesh_x)
                 self.__potarray2 = np.array(
-                    self.__potlist[self.meshX *
-                                   self.meshY *
-                                   self.meshZ:
-                                   self.meshX *
-                                   self.meshY *
-                                   self.meshZ + sum(self.ionnums)])
+                    self.__potlist[self.mesh_x *
+                                   self.mesh_y *
+                                   self.mesh_z:
+                                   self.mesh_x *
+                                   self.mesh_y *
+                                   self.mesh_z + sum(self.ionnums)])
                 self.__potarray3 = np.array(
-                    self.__potlist[- self.meshX *
-                                   self.meshY *
-                                   self.meshZ:]).reshape(self.meshZ,
-                                                         self.meshY,
-                                                         self.meshX)
+                    self.__potlist[- self.mesh_x *
+                                   self.mesh_y *
+                                   self.mesh_z:]).reshape(self.mesh_z,
+                                                          self.mesh_y,
+                                                          self.mesh_x)
 
     @property
-    def meshX(self):
+    def mesh_x(self):
         '''Number of mesh along the first axis of the cell'''
-        return self.__meshX
+        return self.__mesh_x
 
     @property
-    def meshY(self):
+    def mesh_y(self):
         '''Number of mesh along the second axis of the cell'''
-        return self.__meshY
+        return self.__mesh_y
 
     @property
-    def meshZ(self):
+    def mesh_z(self):
         '''Number of mesh along the second axis of the cell'''
-        return self.__meshZ
+        return self.__mesh_z
 
     @property
     def potlist(self):
@@ -163,10 +171,10 @@ class LOCPOT(poscar.POSCAR):
     def get_mesh(self):
         '''Return mesh size
 
-        :return: (meshX, meshY, meshZ)
+        :return: (mesh_x, mesh_y, mesh_z)
         :rtype: tuple
         '''
-        return self.__meshX, self.__meshY, self.__meshZ
+        return self.__mesh_x, self.__mesh_y, self.__mesh_z
 
     def average_along_axis(self, axis_name, pottype='former'):
         '''Calculate average value of potential along 'axis'
@@ -298,13 +306,10 @@ class LOCPOT(poscar.POSCAR):
         :return: cell axis length of x, y, and z
         :rtype: tuple
         '''
-        x = self.latticeV1 * self.scaling_factor
-        y = self.latticeV2 * self.scaling_factor
-        z = self.latticeV3 * self.scaling_factor
-        x = np.linalg.norm(x)
-        y = np.linalg.norm(y)
-        z = np.linalg.norm(z)
-        return (x, y, z)
+        cell_x = np.linalg.norm(self.cell_vecs[0] * self.scaling_factor)
+        cell_y = np.linalg.norm(self.cell_vecs[1] * self.scaling_factor)
+        cell_z = np.linalg.norm(self.cell_vecs[2] * self.scaling_factor)
+        return (cell_x, cell_y, cell_z)
 
     def plot_potential_along_axis(self, axis_name, pottype='former'):
         '''Plot potential curve along the axis
@@ -313,27 +318,27 @@ class LOCPOT(poscar.POSCAR):
         :type axis_name: str
         '''
         axis_name = axis_name.capitalize()
-        axesLength = self.get_axes_lengthes()
+        axes_length = self.get_axes_lengthes()
         if axis_name == 'X':
-            X = np.linspace(0, axesLength[0], self.meshX)
+            horizontal_axis = np.linspace(0, axes_length[0], self.mesh_x)
             plt.clf()
-            plt.xlim(xmax=axesLength[0])
+            plt.xlim(xmax=axes_length[0])
         if axis_name == 'Y':
-            X = np.linspace(0, axesLength[1], self.meshY)
+            horizontal_axis = np.linspace(0, axes_length[1], self.mesh_y)
             plt.clf()
-            plt.xlim(xmax=axesLength[1])
+            plt.xlim(xmax=axes_length[1])
         if axis_name == 'Z':
-            X = np.linspace(0, axesLength[2], self.meshZ)
+            horizontal_axis = np.linspace(0, axes_length[2], self.mesh_z)
             plt.clf()
-            plt.xlim(xmax=axesLength[2])
-        Y1 = self.average_along_axis(axis_name, pottype)
-        Y2 = self.max_along_axis(axis_name, pottype)
-        Y3 = self.min_along_axis(axis_name, pottype)
-        Y4 = self.median_along_axis(axis_name, pottype)
-        plt.plot(X, Y1, label='average')
-        plt.plot(X, Y2, label='max')
-        plt.plot(X, Y3, label='min')
-        plt.plot(X, Y4, label='median')
+            plt.xlim(xmax=axes_length[2])
+        y_average = self.average_along_axis(axis_name, pottype)
+        y_max = self.max_along_axis(axis_name, pottype)
+        y_min = self.min_along_axis(axis_name, pottype)
+        y_median = self.median_along_axis(axis_name, pottype)
+        plt.plot(horizontal_axis, y_average, label='average')
+        plt.plot(horizontal_axis, y_max, label='max')
+        plt.plot(horizontal_axis, y_min, label='min')
+        plt.plot(horizontal_axis, y_median, label='median')
         xlabel = "Position along " + axis_name + "-axis (A)"
         title = "Local potential (" + axis_name + ")"
         plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)

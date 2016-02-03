@@ -24,17 +24,95 @@ class TestPOSCAR(unittest.TestCase):
         # a=os.getcwd()  # return the directory where nose execute.
         self.assertEqual('NiC4S4', self.testposcar.system_name)
 
-    def test_latticeV1(self):
-        np.testing.assert_array_equal(np.array([0.866025404, -0.5, 0.]),
-                                      self.testposcar.latticeV1)
+    def test_cell_vec1(self):
+        np.testing.assert_allclose(np.array([0.866025404, -0.5, 0.]),
+                                      self.testposcar.cell_vecs[0])
 
-    def test_latticeV2(self):
-        np.testing.assert_array_equal(np.array([0.866025404, 0.5, 0.]),
-                                      self.testposcar.latticeV2)
+    def test_cell_vec2(self):
+        np.testing.assert_allclose(np.array([0.866025404, 0.5, 0.]),
+                                      self.testposcar.cell_vecs[1])
 
-    def test_latticeV3(self):
-        np.testing.assert_array_equal(np.array([0.0, 0.0, 1.025290499]),
-                                      self.testposcar.latticeV3)
+    def test_cell_vec3_setter(self):
+        self.testposcar.cell_vecs[2] = (1,0,0)
+        np.testing.assert_allclose(np.array([1, 0, 0]),
+                                   self.testposcar.cell_vecs[2])
+  
+    def test_cell_vec3(self):
+        np.testing.assert_allclose(np.array([0.0, 0.0, 1.02529049]),
+                                      self.testposcar.cell_vecs[2])
+
+        
+    def test_point_in_box(self):
+        self.assertFalse(self.testposcar.point_in_box(
+            (0.5, 0.5, 0.2), self.testposcar.cell_vecs))
+        self.assertTrue(self.testposcar.point_in_box(
+            (0.5, 0.1, 0.2), self.testposcar.cell_vecs))
+        self.assertTrue(self.testposcar.point_in_box(
+            (0.5, 0.5, 0.2), ((1, 0, 0), (0, 1, 0),(0, 0, 1))))
+        
+    def test_poscar_pos_1(self):
+        pos=self.testposcar.pos(4)
+        np.testing.assert_allclose(
+            np.array([0.237639553, 0.429027113, 0.5]), pos)
+
+    def test_poscar_pos_2(self):
+        pos=self.testposcar.pos(4,5,6)
+        np.testing.assert_allclose(
+            [np.array([0.237639553, 0.429027113, 0.5]),
+             np.array([0.237639553, 0.333333333, 0.5]),
+             np.array([0.333333333, 0.237639553, 0.5])],
+            pos)
+
+    def test_poscar_pos_3(self):
+        pos=self.testposcar.pos(5,4,6)
+        np.testing.assert_allclose(
+            [np.array([0.237639553, 0.333333333, 0.5]),
+             np.array([0.237639553, 0.429027113, 0.5]),
+             np.array([0.333333333, 0.237639553, 0.5])],
+            pos)
+
+    def test_poscar_pos_4(self):  # Ver. 2 fails
+        pos=self.testposcar.pos((4,6))
+        np.testing.assert_allclose(
+            [np.array([0.237639553, 0.429027113, 0.5]),
+             np.array([0.333333333, 0.237639553, 0.5])],
+            pos)
+
+    def test_poscar_pos_5(self):  # Ver. 2 fails
+        pos=self.testposcar.pos(1, (4,6))
+        np.testing.assert_allclose(
+            [np.array([0.5, 0.5, 0.5]),
+             np.array([0.237639553, 0.429027113, 0.5]),
+             np.array([0.333333333, 0.237639553, 0.5])],
+            pos)
+
+    def test_poscar_pos_6(self):  # Ver. 2 fails
+        pos=self.testposcar.pos(1, range(4,8))  # 1, 4, 5, 6, 7
+        np.testing.assert_allclose(
+            [np.array([0.5, 0.5, 0.5]),
+             np.array([0.237639553, 0.429027113, 0.5]),
+             np.array([0.237639553, 0.333333333, 0.5]),
+             np.array([0.333333333, 0.237639553, 0.5]),
+             np.array([0.429027113, 0.237639553, 0.5])],             
+            pos)
+
+    def test_poscar_average_position(self):
+        pos=self.testposcar.average_position(1, range(4,8))
+        np.testing.assert_allclose(
+            np.array([0.3475279104, 0.3475279104, 0.5]),
+            pos)
+
+    def test_poscar_average_position2(self):
+        pos=self.testposcar.average_position(1, 4, 5, 6, 7)
+        np.testing.assert_allclose(
+            np.array([0.3475279104, 0.3475279104, 0.5]),
+            pos)
+
+    def test_poscar_average_position3(self):
+        pos=self.testposcar.average_position(1)
+        np.testing.assert_allclose(
+            np.array([0.5, 0.5, 0.5]),
+            pos)
 
     def test_atom_identifer(self):
         self.assertEqual(['#1:Ni1', '#2:Ni2', '#3:Ni3',
@@ -48,7 +126,7 @@ class TestPOSCAR(unittest.TestCase):
 
     def test_is_cartesian(self):
         self.assertFalse(self.testposcar.is_cartesian)
-        self.testposcar.to_Cartesian()
+        self.testposcar.to_cartesian()
         self.assertTrue(self.testposcar.is_cartesian)
 
     def test_is_direct(self):
@@ -74,7 +152,7 @@ class TestPOSCAR(unittest.TestCase):
                           self.testposcar.pos_replace,
                           6,
                           [0, 0, 0])
-        self.testposcar.to_Cartesian()
+        self.testposcar.to_cartesian()
         self.testposcar.pos_replace(6, [0, 0, 0])
         np.testing.assert_array_equal(np.array([0, 0, 0]),
                                       self.testposcar.pos(6))
@@ -82,19 +160,23 @@ class TestPOSCAR(unittest.TestCase):
         np.testing.assert_array_equal(np.array([1, 3, 4]),
                                       self.testposcar.pos(7))
 
+    def test_pos_raise_value_error(self):
+        self.assertRaises(ValueError, self.testposcar.pos,-1)
+        self.assertRaises(ValueError, self.testposcar.pos,0)
+        
     def test_tune_scaling_factor(self):
         self.testposcar.tune_scaling_factor(1.0)
         np.testing.assert_allclose(
             np.array([12.66995166052, -7.315, 0.0]),
-            self.testposcar.latticeV1,
+            self.testposcar.cell_vecs[0], 
             rtol=1e-07)
 
     def test_tune_scaling_factor_withCartesian(self):
-        self.testposcar.to_Cartesian()
+        self.testposcar.to_cartesian()
         self.testposcar.tune_scaling_factor(1.0)
         np.testing.assert_allclose(
             np.array([12.66995166052, -7.315, 0.0]),
-            self.testposcar.latticeV1,
+            self.testposcar.cell_vecs[0], 
             rtol=1e-07)
         np.testing.assert_allclose(
             np.array([12.66995166052, 0.0, 7.5000000001850005]),
@@ -105,22 +187,22 @@ class TestPOSCAR(unittest.TestCase):
             self.testposcar.pos(7),
             rtol=1e-06)
 
-    def test_to_Cartesian(self):
+    def test_to_cartesian(self):
         tmp = self.testposcar.pos(6)
-        self.testposcar.to_Cartesian()
+        self.testposcar.to_cartesian()
         np.testing.assert_allclose(
             np.array([0.494477, -0.047847, 0.512645]),
             self.testposcar.pos(6),
             rtol=1e-05)
-        self.testposcar.to_Direct()
+        self.testposcar.to_direct()
         np.testing.assert_allclose(
             tmp,
             self.testposcar.pos(6),
             rtol=1e-05)
 
-    def test_to_Direct(self):
+    def test_to_direct(self):
         tmp = self.testposcar.pos(6)
-        self.testposcar.to_Direct()
+        self.testposcar.to_direct()
         np.testing.assert_array_equal(tmp, self.testposcar.pos(6))
 
     def test_to_list(self):
@@ -154,9 +236,10 @@ class TestPOSCAR(unittest.TestCase):
         global tmpstr_after_rotate
         self.assertEqual(tmpstr_original, self.testposcar.__str__())
         self.testposcar.atom_rotate(1, "z", 90, (0, 0, 0))
-        self.testposcar.to_Direct()
+        self.testposcar.to_direct()
         self.assertEqual(tmpstr_after_rotate,
                          self.testposcar.__str__())
+
 
     def test_nearest(self):
         pass
@@ -265,22 +348,22 @@ Direct
    0.23763955299999995    0.42902711299999996    0.50000000000000000 T T T #4:C1
    0.23763955299999998    0.33333333300000001    0.50000000000000000 T T T #5:C2
    0.33333333300000001    0.23763955299999998    0.50000000000000000 T T T #6:C3
-   0.42902711299999996    0.23763955299999995    0.50000000000000000 T T T #7:C4
-   0.42902711300000007    0.33333333300000001    0.50000000000000000 T T T #8:C5
-   0.33333333300000001    0.42902711300000007    0.50000000000000000 T T T #9:C6
+   0.42902711300000002    0.23763955300000000    0.50000000000000000 T T T #7:C4
+   0.42902711299999996    0.33333333300000001    0.50000000000000000 T T T #8:C5
+   0.33333333300000001    0.42902711299999996    0.50000000000000000 T T T #9:C6
   -0.23763955299999995   -0.42902711299999996    0.50000000000000000 T T T #10:C7
   -0.23763955299999998   -0.33333333300000001    0.50000000000000000 T T T #11:C8
   -0.33333333300000001   -0.23763955299999998    0.50000000000000000 T T T #12:C9
-  -0.42902711299999996   -0.23763955299999995    0.50000000000000000 T T T #13:C10
-  -0.42902711300000007   -0.33333333300000001    0.50000000000000000 T T T #14:C11
-  -0.33333333300000001   -0.42902711300000007    0.50000000000000000 T T T #15:C12
-   0.11323764000000003    0.55342902699999996    0.50000000000000000 T T T #16:S1
+  -0.42902711300000002   -0.23763955300000000    0.50000000000000000 T T T #13:C10
+  -0.42902711299999996   -0.33333333300000001    0.50000000000000000 T T T #14:C11
+  -0.33333333300000001   -0.42902711299999996    0.50000000000000000 T T T #15:C12
+   0.11323763999999997    0.55342902699999996    0.50000000000000000 T T T #16:S1
    0.11323763999999999    0.33333333300000001    0.50000000000000000 T T T #17:S2
    0.33333333300000001    0.11323763999999999    0.50000000000000000 T T T #18:S3
    0.55342902699999996    0.11323764000000003    0.50000000000000000 T T T #19:S4
    0.55342902699999996    0.33333333299999995    0.50000000000000000 T T T #20:S5
    0.33333333299999995    0.55342902699999996    0.50000000000000000 T T T #21:S6
-  -0.11323764000000003   -0.55342902699999996    0.50000000000000000 T T T #22:S7
+  -0.11323763999999997   -0.55342902699999996    0.50000000000000000 T T T #22:S7
   -0.11323763999999999   -0.33333333300000001    0.50000000000000000 T T T #23:S8
   -0.33333333300000001   -0.11323763999999999    0.50000000000000000 T T T #24:S9
   -0.55342902699999996   -0.11323764000000003    0.50000000000000000 T T T #25:S10

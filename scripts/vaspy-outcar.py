@@ -54,7 +54,8 @@ if args.plot:
     import matplotlib.pyplot as plt
     for name, data in zip(headers, zip(*posforce)):
         plt.plot(data, label=name)
-    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+    plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left',
+               ncol=len(headers)//10+1)
     plt.show()
 else:
     print("\t".join(headers))
