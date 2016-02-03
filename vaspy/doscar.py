@@ -147,9 +147,9 @@ class TDOS(DOS):
     def __init__(self, array):
         super(TDOS, self).__init__(array)
         if len(self.dos[0][1]) == 2:
-            self.header = "#Energy\tTDOS"
+            self.header = "Energy\tTDOS"
         else:
-            self.header = "#Energy\tTDOS_up\tTDOS_down"
+            self.header = "Energy\tTDOS_up\tTDOS_down"
 
     def export_csv(self, filename):
         '''..py:export_csv:: export_csv(filename, kwargs)
