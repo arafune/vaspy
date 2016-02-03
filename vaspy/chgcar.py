@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+'''.. py:module:: chgcar
+
 Module for CHGCAR class
 
 translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
