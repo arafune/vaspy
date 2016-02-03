@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
+""".. py:module:: outcar
+
 This module provides OUTCAR class
 """
 
@@ -9,12 +10,14 @@ from __future__ import print_function  # Version safety
 
 
 class OUTCAR(object):  # Version safety
+    '''.. py:class:: OUTCAR(outcar_file)
 
-    """Class for OUTCAR file that stores calculation details
+    Class for OUTCAR file that stores calculation details
     and/or calculation progress
 
     :Author: Ryuichi Arafune
-    """
+    :version: 2.1
+    '''
 
     def __init__(self, arg=None):
         self.nions = 0
@@ -29,8 +32,10 @@ class OUTCAR(object):  # Version safety
             self.load_from_file(arg)
 
     def set_atom_names(self):
-        """ build atom_names (the list of atomname_with_index)
-        """
+        '''.. py:set_atom_names()
+
+        build atom_names (the list of atomname_with_index)
+        '''
         self.atom_names = []
         for elm, ionnum in zip(self.iontype, self.ionnums):
             for j in range(1, ionnum + 1):
@@ -47,7 +52,9 @@ class OUTCAR(object):  # Version safety
         return self.atom_names
 
     def set_posforce_title(self):
-        """build posforce_title
+        """..py:set_posforce_title()
+
+        build posforce_title
         """
         self.set_atom_names()
         self.posforce_title = [[i + "_x",
@@ -59,10 +66,12 @@ class OUTCAR(object):  # Version safety
                                for i in self.atom_names]
 
     def load_from_file(self, arg):
-        """Effectively, this is a constructor of OUTCAR object.
+        ''' .. py:load_from_file(outcar_filename)
+
+        Effectively, this is a constructor of OUTCAR object.
 
         :param arg: File name of "OUTCAR"
-        """
+        '''
         # local variables
         section = []
         posforce = []
@@ -104,6 +113,8 @@ class OUTCAR(object):  # Version safety
         self.set_posforce_title()
 
     def select_posforce_header(self, posforce_flag, *sites):
+        '''.. py:method:: select_posforce_header(posforce_flag, *sites)
+'''
         if sites == () or sites[0] == []:
             sites = range(1, self.nions + 1)
         if isinstance(sites[0], (list, tuple)):
@@ -117,12 +128,13 @@ class OUTCAR(object):  # Version safety
 # correct?
 
     def select_posforce(self, posforce_flag, *sites):
-        """Return the posforce corresponding the posforce_flag
+        '''.. py:select_posforce(posforce_flag, *sites)
+
+        Return the posforce corresponding the posforce_flag
 
         .. note:: posforce_flag: An 6-element True/False list that indicates
                   the output (ex.) [True, True, False, True, True, False]
-        """
-
+        '''
         if sites == () or sites[0] == []:
             sites = range(1, self.nions + 1)
         if isinstance(sites[0], (list, tuple)):

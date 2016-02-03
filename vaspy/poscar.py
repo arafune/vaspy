@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 # -*- conding: utf-8 -*-
-'''This mudule provides POSCAR class
+'''.. py:module:: poscar
+
+This mudule provides POSCAR class
 
 translate from poscar.rb of 2014/2/26, master branch
 
@@ -52,9 +54,7 @@ import numpy as np
 
 
 class POSCAR(object):
-
-    '''
-    .. py:class:: POSCAR(object)
+    '''.. py:class:: POSCAR(file or array)
 
     Class for POSCAR (CONTCAR) format
 
@@ -65,7 +65,7 @@ class POSCAR(object):
     CONTCAR, which has already works well.
 
     :attribute: system_name, scaling_factor, cell_vecs
-    :version: 3.0
+    :version: 2.1
     '''
 
     def __init__(self, arg=None):
@@ -229,8 +229,8 @@ class POSCAR(object):
 
         .. warning:: the first site # is "1", not "0". (Follow VESTA's way.)
 
-        .. warning:: Now, you **cannot** set the index range by using tuple.
- Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
+        .. warning:: Now, you **cannot** set the index range by using tuple.\
+Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         '''
         dest = []
         for thearg in i:
@@ -250,7 +250,9 @@ class POSCAR(object):
         return dest
 
     def average_position(self, *i):
-        '''Return the average position of the sites
+        '''.. py:method:: average_position(*i)
+
+        Return the average position of the sites
 
         :param i: site indexes
         :type i: int, tuple, list, range
@@ -273,7 +275,8 @@ class POSCAR(object):
             return sum(pos)/len(pos)
 
     def pos_replace(self, i, vector):
-        '''
+        '''.. py:method:: pos_replace(i, vector)
+
         :param i: site #
         :param vector: list of the i-th atom position.
         :type i: int

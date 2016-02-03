@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+'''.. py:module:: tools
+
 Module for tools used in vaspy
 '''
 

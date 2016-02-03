@@ -37,7 +37,6 @@ except ImportError:
 
 
 class PROCAR(object):  # Version safety
-
     '''.. py:class:: PROCAR(PROCAR_file[, phase_read])
 
     Class for storing the data saved in PROCAR file.
@@ -77,6 +76,7 @@ class PROCAR(object):  # Version safety
 :Example:    1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
 
     :author: Ryuichi Arafune
+    :version: 2.1
     '''
 
     def __init__(self, arg=None, phase_read=False):

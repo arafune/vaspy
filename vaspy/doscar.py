@@ -56,6 +56,7 @@ class DOSCAR(object):  # Version safety
     A container of DOS object
 
     :author: Ryuichi Arafune
+    :version: 2.1
     '''
 
     def __init__(self, arg=None):
