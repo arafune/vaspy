@@ -32,7 +32,7 @@ class OUTCAR(object):  # Version safety
             self.load_from_file(arg)
 
     def set_atom_names(self):
-        '''.. py:set_atom_names()
+        '''.. py:method:: set_atom_names()
 
         build atom_names (the list of atomname_with_index)
         '''
@@ -52,7 +52,7 @@ class OUTCAR(object):  # Version safety
         return self.atom_names
 
     def set_posforce_title(self):
-        """..py:set_posforce_title()
+        """.. py:method:: set_posforce_title()
 
         build posforce_title
         """
@@ -66,7 +66,7 @@ class OUTCAR(object):  # Version safety
                                for i in self.atom_names]
 
     def load_from_file(self, arg):
-        ''' .. py:load_from_file(outcar_filename)
+        ''' .. py:method:: load_from_file(outcar_filename)
 
         Effectively, this is a constructor of OUTCAR object.
 
@@ -128,7 +128,7 @@ class OUTCAR(object):  # Version safety
 # correct?
 
     def select_posforce(self, posforce_flag, *sites):
-        '''.. py:select_posforce(posforce_flag, *sites)
+        '''.. py:method:: select_posforce(posforce_flag, *sites)
 
         Return the posforce corresponding the posforce_flag
 
