@@ -4,14 +4,15 @@
 script to use(demonstrate) vaspy.doscar
 """
 
-import argparse
 import os
 import sys
-mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
-sys.path.append(os.path.dirname(os.path.abspath(mypath)))
+import argparse
 from vaspy.outcar import OUTCAR
 from vaspy.doscar import DOSCAR, TDOS, PDOS
 from vaspy import tools
+
+mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
+sys.path.append(os.path.dirname(os.path.abspath(mypath)))
 
 parser = argparse.ArgumentParser(
     formatter_class=argparse.RawTextHelpFormatter)
@@ -54,51 +55,38 @@ if args.outcar is not NotImplemented:
     args.fermi = outcar.fermi
 #
 if atomlist == []:
-    atomlist.extend("atom" + str(i) for i in range(1, doscar.nAtom + 1))
+    atomlist.extend("atom" + str(i) for i in range(1, doscar.natom + 1))
 #
 # construct TDOS & PDOS objects
 #
 doses = [TDOS(doscar.dos_container.pop(0))]
 #
 doses.extend(PDOS(*each) for each in zip(doscar.dos_container,
-                                        atomlist))  # tmp[1:] ?
+                                         atomlist))  # tmp[1:] ?
+#
+# Fermi level correction
+#
+[thedos.fermilevel_correction(args.fermi) for thedos in doses]
 #
 if args.atomset is not None:  # atomset and atomsetname are given by
                               # the command line argument.
     if len(args.atomset) == len(args.atomsetname):
-        sumPDOSs = list()
+        pdoses = list()
         for site, name in zip(args.atomset, args.atomsetname):
             each = PDOS()
             for atomNo in site:
                 each += doses[atomNo]
             each.site = name
-            sumPDOSs.append(each)
-        for summedPDOS in sumPDOSs:
-            filename = summedPDOS.site + ".dat"
-            try:  # Version safety
-                file = open(filename, mode='w', newline='')
-            except TypeError:
-                file = open(filename, mode='wb')
-            with file:
-                summedPDOS.export_csv(file, delimiter='\t')
+            pdoses.append(each)
+        for a_pdos in pdoses:
+            filename = a_pdos.site + ".dat"
+            a_pdos.export_csv(filename)
     else:
         raise ValueError("Checke your command.")
 #
-try:  # Version safety
-    file = open("total.dat", mode='w', newline='')
-except TypeError:
-    file = open("total.dat", mode='wb')
-with file:
-    doses[0].fermilevel_correction(args.fermi)
-    doses[0].export_csv(file, delimiter='\t')
-for i, n in zip(doses[1:], atomlist):
-    i.fermilevel_correction(args.fermi)
-    if isinstance(i, PDOS) and i.site == "":
-        i.site = n
-    filename = n + "_dos.dat"
-    try:  # Version safety
-        file = open(filename, mode='w', newline='')
-    except TypeError:
-        file = open(filename, mode='wb')
-    with file:
-        i.export_csv(file, delimiter='\t')
+doses[0].export_csv("total.dat")
+for thedos, atom_index in zip(doses[1:], atomlist):
+    if isinstance(thedos, PDOS) and thedos.site == "":
+        thedos.site = atom_index
+    filename = atom_index + "_dos.dat"
+    thedos.export_csv(filename)
