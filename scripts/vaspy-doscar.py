@@ -58,18 +58,19 @@ if atomlist == []:
 #
 # construct TDOS & PDOS objects
 #
-tmp = doscar.dos_container
-d = [TDOS(tmp.pop(0))]
+doses = [TDOS(doscar.dos_container.pop(0))]
 #
-d.extend(PDOS(*each) for each in zip(tmp, atomlist))  # tmp[1:] ?
+doses.extend(PDOS(*each) for each in zip(doscar.dos_container,
+                                        atomlist))  # tmp[1:] ?
 #
-if args.atomset is not None:
+if args.atomset is not None:  # atomset and atomsetname are given by
+                              # the command line argument.
     if len(args.atomset) == len(args.atomsetname):
         sumPDOSs = list()
         for site, name in zip(args.atomset, args.atomsetname):
             each = PDOS()
             for atomNo in site:
-                each += d[atomNo]
+                each += doses[atomNo]
             each.site = name
             sumPDOSs.append(each)
         for summedPDOS in sumPDOSs:
@@ -80,15 +81,17 @@ if args.atomset is not None:
                 file = open(filename, mode='wb')
             with file:
                 summedPDOS.export_csv(file, delimiter='\t')
+    else:
+        raise ValueError("Checke your command.")
 #
 try:  # Version safety
     file = open("total.dat", mode='w', newline='')
 except TypeError:
     file = open("total.dat", mode='wb')
 with file:
-    d[0].fermilevel_correction(args.fermi)
-    d[0].export_csv(file, delimiter='\t')
-for i, n in zip(d[1:], atomlist):
+    doses[0].fermilevel_correction(args.fermi)
+    doses[0].export_csv(file, delimiter='\t')
+for i, n in zip(doses[1:], atomlist):
     i.fermilevel_correction(args.fermi)
     if isinstance(i, PDOS) and i.site == "":
         i.site = n

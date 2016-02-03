@@ -203,11 +203,15 @@ def _filter_dos_data(data):
 
 
 class TDOS(DOS):
+    '''.. py:class:: TODS(array)
 
-    """Class for total DOS
+    Class for total DOS
 
-    :author: Ryuichi Arafune
-    """
+    :param array: DOS data
+    :type array: np.array
+    
+    .. py:attribute:: header
+    '''
 
     def __init__(self, array):
         super(TDOS, self).__init__(array)
@@ -232,7 +236,10 @@ class PDOS(DOS):
 
     Class for partial DOS
 
-    :author: Ryuichi Arafune
+    :param array: DOS data
+    :type array: numpy.array
+    :param site: site name
+    :type site: str
     '''
 
     def __init__(self, array=None, site=None):
