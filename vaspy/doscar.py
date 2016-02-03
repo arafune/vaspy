@@ -93,7 +93,7 @@ class DOSCAR(object):  # Version safety
                 data = data[0:2]
             elif len(data) == 5:
                 data = data[0:3]
-            a_dos.append([np.float_(i) for i in data])
+            a_dos.append([float(i) for i in data])
         self.dos_container.append(np.array(a_dos))
         #
         for dummy in range(self.natom):  # PDOS
@@ -102,7 +102,7 @@ class DOSCAR(object):  # Version safety
             for dummy2 in range(self.nenergypnts):
                 line = thefile.readline()
                 data = line.split()
-                a_dos.append([np.float_(i) for i in data])
+                a_dos.append([float(i) for i in data])
             self.dos_container.append(np.array(a_dos))
         thefile.close()
 
@@ -121,7 +121,7 @@ class DOS(object):  # Version safety
     def __init__(self, array=None):
         self.dos = np.array([])
         if array is not None:
-            self.dos = array
+            self.dos = array.transpose()
 
     def __len__(self):
         """x.__len__() <=> len(x)"""
@@ -135,9 +135,7 @@ class DOS(object):  # Version safety
         :param fermi: fermi level
         :type fermi: float
         '''
-        tmp = self.dos.transpose()
-        tmp[0] -= fermi
-        self.dos = tmp.transpose()
+        self.dos[0] -= fermi
 
     def energies(self, i=None):
         '''..py:method:: energies(i)
@@ -150,9 +148,8 @@ class DOS(object):  # Version safety
                  If arg is null, return the all energies in DOS object.
         :rtype: np.ndarray
         '''
-        tmp = self.dos.transpose()
         if i is None:
-            return tmp[0]
+            return self.dos[0]
         else:
             return self.dos[0][i]
 
@@ -161,15 +158,16 @@ class DOS(object):  # Version safety
 
         Export data to file object (or file-like object) as csv format.
         '''
+        transposed_dos = self.dos.transpose()
         if header is None:
             with open(filename, mode='wb') as fhandle:
                 np.savetxt(fhandle,
-                           self.dos,
+                           transposed_dos,
                            delimiter='\t', newline='\n')
         else:
             with open(filename, mode='wb') as fhandle:
                 np.savetxt(fhandle,
-                           self.dos, header=header,
+                           transposed_dos, header=header,
                            delimiter='\t', newline='\n')
 
 class TDOS(DOS):
@@ -183,10 +181,9 @@ class TDOS(DOS):
     .. py:attribute:: header
     '''
 
-
     def __init__(self, array):
         super(TDOS, self).__init__(array)
-        if len(self.dos[0]) == 2:
+        if len(self.dos) == 2:
             self.header = "Energy\tTDOS"
         else:
             self.header = "Energy\tTDOS_up\tTDOS_down"
@@ -203,9 +200,8 @@ class TDOS(DOS):
         ''' .. py:method:: graphview()
 
         Show graphview by using matplotlib'''
-        data = self.dos.transpose()
-        for density in data[1:]:
-            plt.plot(data[0], density)
+        for density in self.dos[1:]:
+            plt.plot(self.dos[0], density)
         plt.show()
 
 class PDOS(DOS):
@@ -228,18 +224,17 @@ class PDOS(DOS):
         spins_soi = ("mT", "mX", "mY", "mZ")
         spins = ("up", "down")
         if array is not None:
-            flag = len(self.dos[0])
+            flag = len(self.dos)
             if flag == 10:
                 self.orbital_spin = orbitalnames
             elif flag == 19:  # Spin resolved
                 self.orbital_spin = [
                     orb + "_" + spin for orb in orbitalnames
                     for spin in spins]
-                # In collinear spin calculation, DOS of down-spin is set by negative value.
-                tmp = self.dos.transpose()
+                # In collinear spin calculation, DOS of down-spin is
+                # set by negative value.
                 for i in range(2, 19, 2):
-                    tmp[i] *= -1
-                self.dos = tmp.transpose()
+                    self.dos[i] *= -1
             elif flag == 37:  # SOI
                 self.orbital_spin = [
                     orb + "_" + spin for orb in orbitalnames
@@ -252,18 +247,18 @@ class PDOS(DOS):
 
         Show DOS graph by using matplotlib.  For 'just seeing' use. '''
         try:
-            alist = [self.orbital_spin.index(orbname) for orbname in orbitalnames]
+            alist = [self.orbital_spin.index(orbname)
+                     for orbname in orbitalnames]
         except ValueError:
             err = "Check argment of this function\n"
             err += "The following name(s) are accpted:\n"
             err += ", ".join(self.orbital_spin)
             raise ValueError(err)
-        data = self.dos.transpose()
         for orbital in alist:
-            plt.plot(data[0], data[orbital+1])
+            plt.plot(self.dos[0], self.dos[orbital+1])
         plt.show()
 
-    def export_csv(self, file, site=None):
+    def export_csv(self, filename, site=None):
         '''.. py:method:: export_csv(file[, site=site])
 
         Export data to file object (or file-like object) as csv format.
@@ -277,7 +272,7 @@ class PDOS(DOS):
             else:
                 tmp.append(self.site + "_" + i)
         header = "\t".join(tmp)
-        super(PDOS, self).export_csv(file, header=header)
+        super(PDOS, self).export_csv(filename, header=header)
 
     def plot_dos(self, orbitals, fermi=0.0):  # Not implemented yet
         '''..py:plot_dos(orbitals[, fermi=0.0])
@@ -307,12 +302,9 @@ class PDOS(DOS):
             return copy.deepcopy(other)
         else:
             sum_pdos = PDOS()
-            dos = self.dos.transpose()
-            otherdos = other.dos.transpose()
-            energies = copy.deepcopy(dos[0])
-            sum_pdos.dos = dos + otherdos
+            energies = copy.deepcopy(self.dos[0])
+            sum_pdos.dos = self.dos + other.dos
             sum_pdos.dos[0] = energies
-            sum_pdos.dos = sum_pdos.dos.transpose()
             sum_pdos.site = self.site + other.site
             sum_pdos.orbital_spin = self.orbital_spin
             return sum_pdos
