@@ -1,42 +1,44 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-''' ..py:module doscar
+'''.. py:module doscar
 
-From VASP webpage:
+This module provides DOSCAR and related classes.
 
-The file DOSCAR contains the DOS and integrated DOS The units are
-"number of states/unit cell". For dynamic simulations and relaxations,
-an averaged DOS and an averaged integrated DOS is written to the file.
-For a description of how the averaging is done see 7.18, 7.32).
-The first few lines of the DOSCAR file are made up by a header,
-which is followed by NDOS lines holding three data
+From VASP webpage::
 
- energy     dos     integrated_dos
+  The file DOSCAR contains the DOS and integrated DOS The units are
+  "number of states/unit cell". For dynamic simulations and relaxations,
+  an averaged DOS and an averaged integrated DOS is written to the file.
+  For a description of how the averaging is done see 7.18, 7.32).
+  The first few lines of the DOSCAR file are made up by a header,
+  which is followed by NDOS lines holding three data
 
-For spin-polarized calculations each line holds five data
+   energy     dos     integrated_dos
 
- energy     dos(up) dos(dwn)  integrated_dos(up) integrated_dos(dwn)
+  For spin-polarized calculations each line holds five data
 
-If RWIGS (Wigner Seitz radii, see section 7.29) is set in the INCAR file,
-a l- and site-projected DOS is calculated and also written to the file
-DOSCAR. One set of data is written for each ion,
-each set of data holds NDOS lines with the following data
+   energy     dos(up) dos(dwn)  integrated_dos(up) integrated_dos(dwn)
 
- energy s-dos p-dos d-dos
+  If RWIGS (Wigner Seitz radii, see section 7.29) is set in the INCAR file,
+  a l- and site-projected DOS is calculated and also written to the file
+  DOSCAR. One set of data is written for each ion,
+  each set of data holds NDOS lines with the following data
 
-and
+   energy s-dos p-dos d-dos
 
- energy s-dos(up) p-dos(up) d-dos(up) s-dos(dwn) p-dos(dwn) d-dos(dwn)
+  and
 
-for the non spin-polarized and spin polarized case respectively.
-The units of the l- and site projected DOS are states/atom.
-Please mind, that the site projected DOS is not evaluated
-in the parallel version if NPAR tex2html_wrap_inline5201 1.
+   energy s-dos(up) p-dos(up) d-dos(up) s-dos(dwn) p-dos(dwn) d-dos(dwn)
 
-Mind: For relaxations the DOSCAR is usually useless.
-If you want to get an accurate DOS for the final configuration
-copy CONTCAR to POSCAR and make another static (ISTART=1; NSW=0)
-calculation.
+  for the non spin-polarized and spin polarized case respectively.
+  The units of the l- and site projected DOS are states/atom.
+  Please mind, that the site projected DOS is not evaluated
+  in the parallel version if NPAR tex2html_wrap_inline5201 1.
+
+  Mind: For relaxations the DOSCAR is usually useless.
+  If you want to get an accurate DOS for the final configuration
+  copy CONTCAR to POSCAR and make another static (ISTART=1; NSW=0)
+  calculation.
 '''
 
 from __future__ import print_function  # Version safety
@@ -129,7 +131,7 @@ class DOS(object):  # Version safety
         return len(self.dos)
 
     def fermilevel_correction(self, fermi):
-        '''..py:method:: fermilevel_correction(fermi)
+        '''.. py:method:: fermilevel_correction(fermi)
 
         Fermi level Correction
 
@@ -139,7 +141,7 @@ class DOS(object):  # Version safety
         self.dos[0] -= fermi
 
     def energies(self, i=None):
-        '''..py:method:: energies(i)
+        '''.. py:method:: energies(i)
 
         Return the *i*-th energy of the object
 
@@ -155,7 +157,7 @@ class DOS(object):  # Version safety
             return self.dos[0][i]
 
     def export_csv(self, filename, header=None):
-        '''..py:method:: export_csv(file[, header=header string])
+        '''.. py:method:: export_csv(file[, header=header string])
 
         Export data to file object (or file-like object) as csv format.
         '''
@@ -190,7 +192,7 @@ class TDOS(DOS):
             self.header = "Energy\tTDOS_up\tTDOS_down"
 
     def export_csv(self, filename):
-        '''..py:export_csv:: export_csv(filename)
+        '''.. py:method:: export_csv(filename)
 
         Export data to file object (or file-like object) as csv format.
         '''
@@ -276,7 +278,7 @@ class PDOS(DOS):
         super(PDOS, self).export_csv(filename, header=header)
 
     def plot_dos(self, orbitals, fermi=0.0):  # Not implemented yet
-        '''..py:plot_dos(orbitals[, fermi=0.0])
+        '''.. py:method:: plot_dos(orbitals[, fermi=0.0])
 
         plot DOS spectra with matplotlib.pyplot
 
