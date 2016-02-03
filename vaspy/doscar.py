@@ -268,17 +268,17 @@ class PDOS(DOS):
         '''
         pass
 
-    def __deepcopy__(self, memo):
-        '''pdos.__deepcopy__() <-> copy.deepcopy(x)'''
-        dest = PDOS()
-        dest.dos = copy.deepcopy(self.dos, memo)
-        dest.site = copy.deepcopy(self.site, memo)
-        dest.orbital_spin = copy.deepcopy(self.orbital_spin, memo)
-        return dest
+    # def __deepcopy__(self, memo):
+    #     '''pdos.__deepcopy__() <-> copy.deepcopy(x)'''
+    #     dest = PDOS()
+    #     dest.dos = copy.deepcopy(self.dos, memo)
+    #     dest.site = copy.deepcopy(self.site, memo)
+    #     dest.orbital_spin = copy.deepcopy(self.orbital_spin, memo)
+    #     return dest
 
-    def deepcopy(self):
-        '''Use __deepcopy__ as method'''
-        return copy.deepcopy(self)
+    # def deepcopy(self):
+    #     '''Use __deepcopy__ as method'''
+    #     return copy.deepcopy(self)
     
     def __add__(self, other):   # Not implemented yet
         '''x.__add__(y) <-> x+y
@@ -292,13 +292,16 @@ class PDOS(DOS):
         if not isinstance(other, PDOS):
             return NotImplemented
         if self.dos == [] and self.site == "":
-            return other.deepcopy()
+#            return other.deepcopy()
+            return copy.deepcopy(other)
         else:
             sumPDOS = PDOS()
-            for s, a in zip(self, other):
-                # sumPDOS.push( [s[0], s[1].zip(a[1]).map{|i| i[0]+i[1]}])
-                sumPDOS.append([s[0],
-                                [sum(each) for each in zip(s[1], a[1])]])
+            dos = self.dos.transpose()
+            otherdos = other.dos.transpose()
+            energies = copy.deepcopy(dos[0])
+            sumPDOS.dos = dos + otherdos
+            sumPDOS.dos[0] = energies
+            sumPDOS.dos = sumPDOS.dos.transpose()
             sumPDOS.site = self.site + other.site
             sumPDOS.orbital_spin = self.orbital_spin
             return sumPDOS
