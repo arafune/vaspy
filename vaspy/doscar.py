@@ -301,7 +301,7 @@ class PDOS(DOS):
         '''
         if not isinstance(other, PDOS):
             return NotImplemented
-        if self.dos == [] and self.site == "":
+        if len(self.dos) == 0 and self.site == "":
             return copy.deepcopy(other)
         else:
             sum_pdos = PDOS()
