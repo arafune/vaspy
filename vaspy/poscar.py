@@ -764,6 +764,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         else:
             raise TypeError
 
+
 def three_by_three(vec):
     '''Return True if vec can be converted into the 3x3 matrix'''
     if not isinstance(vec, (np.ndarray, np.matrix, list, tuple)):
@@ -774,6 +775,7 @@ def three_by_three(vec):
         return True
     else:
         return False
+
 
 def _vectorize(vector):
     if not isinstance(vector, (np.ndarray, np.matrix, list, tuple)):

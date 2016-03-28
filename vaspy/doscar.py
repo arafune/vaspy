@@ -57,7 +57,7 @@ class DOSCAR(object):  # Version safety
 
     A container of DOS object
 
-    .. py:attribute: natom 
+    .. py:attribute: natom
 
     :py:attr:`natom` is number of atoms.
 
@@ -67,8 +67,9 @@ class DOSCAR(object):  # Version safety
 
     .. py:attribute:dos_container
 
-    :py:attr:`dos_container` is a python list object that stores the DOS object.  
-    By default, the first item is the TDOS, and the latter items are PDOS.
+    :py:attr:`dos_container` is a python list object that
+    stores the DOS object. By default, the first item is the TDOS, and the
+    latter items are PDOS.
 
 
     :author: Ryuichi Arafune
@@ -96,7 +97,7 @@ class DOSCAR(object):  # Version safety
         line = thefile.readline()
         self.natom = int(line.split()[0])  # 1st line
         line = [thefile.readline() for i in range(4)]
-        #for i in range(4):
+        # for i in range(4):
         #    line = thefile.readline()      # 2-5 lines
         line = thefile.readline()          # 6 line
         try:
@@ -134,7 +135,7 @@ class DOS(object):  # Version safety
 
     .. py:attribute: dos
 
-    :py:attribute:`dos` is the python linst object that stores dos data. 
+    :py:attribute:`dos` is the python linst object that stores dos data.
     By default, the first column is the energy, the latter is the density.
     '''
 
@@ -190,6 +191,7 @@ class DOS(object):  # Version safety
                            transposed_dos, header=header,
                            delimiter='\t', newline='\n')
 
+
 class TDOS(DOS):
     '''.. py:class:: TODS(array)
 
@@ -224,6 +226,7 @@ class TDOS(DOS):
             plt.plot(self.dos[0], density)
         plt.show()
 
+
 class PDOS(DOS):
     '''.. py:class:: PDOS(array[, site])
 
@@ -235,8 +238,9 @@ class PDOS(DOS):
 
     .. py:attribute: orbital_spin
 
-    :py:attr:`orbital_spin` is the name of the orbital with spin character.  (If non-spin calculated results, 
-    :py:attr:`orbital_spin` is just orbital name)
+    :py:attr:`orbital_spin` is the name of the orbital with spin character.
+    (If non-spin calculated results, :py:attr:`orbital_spin` is
+    just orbital name)
 
     :param array: DOS data
     :type array: numpy.array
