@@ -440,11 +440,10 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         position += center / self.scaling_factor
         self.pos_replace(site, position)
 
-    def atoms_rotate(self, site_list_pack, axis_name, theta, center):
+    def atoms_rotate(self, site_list, axis_name, theta, center):
         '''Rotate atoms
 
-        :param site_list_pack: list array of the list array (not
-                               typo!) of site for rotation (The first
+        :param site_list:  list array of site for rotation (The first
                                atom is "1".).
 
         :param axis_name: "X", "x", "Y", "y", "Z",or "z".
@@ -452,15 +451,14 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
         :param theta: Rotation angle (Degrees).
         :param center: center position for rotation.
-        :type site_list_pack: list, tuple
+        :type site_list: list, tuple
         :type theta: float
         :type axis_name: str
         :type center: np.array, list, tuple
 
         '''
-        for site_list in site_list_pack:
-            for site in site_list:
-                self.atom_rotate(site, axis_name, theta, center)
+        for site in site_list:
+            self.atom_rotate(site, axis_name, theta, center)
 
     def cell_rotate(self, theta, axis_name='Z'):
         '''Rotate unit-cell (rotation angle is set by degree.)
