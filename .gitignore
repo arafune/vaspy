@@ -4,3 +4,5 @@ build
 install-vaspy.txt
 testPOSCAR
 *.ipynb
+dist
+MANIFEST
