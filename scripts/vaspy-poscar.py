@@ -57,9 +57,10 @@ parser.add_argument('--output', metavar='file_name',
 if not specified, use standard output''')
 parser.add_argument('poscar', metavar='POSCAR_file (or CONTCAR_file)',
                     type=POSCAR)
+parser.add_argument('--to_direct', action="store_true",
+                    help='''Change direct coordinates''')
 
 args = parser.parse_args()
-
 # translate option and rotate option are not set simulaneously.
 if args.translate and any([args.rotateX,
                            args.rotateY,
@@ -109,7 +110,8 @@ if any([args.rotateX, args.rotateY, args.rotateZ]):
         theta = args.rotateZ[0]
         center = args.rotateZ[1:]
     args.poscar.atoms_rotate(args.site, axis_name, theta, center)
-
+if args.to_direct:
+    args.poscar.to_direct()
 #
 #  Output result
 #
