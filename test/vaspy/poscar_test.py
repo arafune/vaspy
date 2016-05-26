@@ -240,7 +240,48 @@ class TestPOSCAR(unittest.TestCase):
         self.assertEqual(tmpstr_after_rotate,
                          self.testposcar.__str__())
 
+    def test_poscar_supercell1(self):
+        supercell = self.testposcar.supercell(3, 2, 1)
+        np.testing.assert_allclose(
+            np.array([2.59807621, -1.5, 0.]),
+            supercell.cell_vecs[0])
+        np.testing.assert_allclose(
+            np.array([1.73205081, 1., 0.]),
+            supercell.cell_vecs[1])
+        np.testing.assert_allclose(
+            np.array([0.0, 0.0, 1.02529049]),
+            supercell.cell_vecs[2])
 
+    def test_poscar_supercell2(self):
+        supercell = self.testposcar.supercell(3, 2, 1)
+        self.assertEqual('NiC4S4', supercell.system_name)
+        self.assertEqual(['Ni', 'C', 'S'], supercell.iontype)
+        self.assertEqual([18, 72, 72], supercell.ionnums)
+
+    def test_poscar_supercell3(self):
+        supercell = self.testposcar.supercell(1, 1, 1)
+        np.testing.assert_allclose(
+            self.testposcar.position[0],
+            supercell.position[0])
+
+    def test_poscar_supercell4(self):
+        supercell = self.testposcar.supercell(3, 2, 1)
+        np.testing.assert_allclose(
+            supercell.position[0],
+            np.array([self.testposcar.position[0][0]/3,
+                      self.testposcar.position[0][1]/2,
+                      self.testposcar.position[0][2]/1]))
+        np.testing.assert_allclose(
+            supercell.position[1],
+            np.array([self.testposcar.position[0][0]/3 * 2 ,
+                      self.testposcar.position[0][1]/2,
+                      self.testposcar.position[0][2]/1]))
+
+    def test_poscar_supercell5(self):
+        supercell = self.testposcar.supercell(3, 2, 1)
+        self.assertEqual(6*len(self.testposcar.position),
+                         len(supercell.position))
+        
     def test_nearest(self):
         pass
 

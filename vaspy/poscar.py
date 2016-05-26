@@ -300,6 +300,46 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             raise RuntimeError(message)
         self.position[i - 1] = vector
 
+    def supercell(self, nx, ny, nz):
+        '''.. py:metho:: supercell(nx, ny, nz)
+
+        Make supercell
+
+        :param int nz, ny, nz: repeat number along x, y, and axis
+        :return: sposcar
+        :rtype: POSCAR
+        '''
+        if not isinstance(nx, int) \
+           or not isinstance(ny, int) \
+           or not isinstance(nz, int):
+            raise ValueError("arguments must be positive integer")
+        if nx <= 0 or ny <= 0 or nz <= 0:
+            raise ValueError("arguments must be positive integer")
+        #
+        sposcar = copy.deepcopy(self)
+        sposcar.to_direct()
+        sposcar.repack_in_cell()
+        sposcar.cell_vecs[0] = sposcar.cell_vecs[0] * nx
+        sposcar.cell_vecs[1] = sposcar.cell_vecs[1] * ny
+        sposcar.cell_vecs[2] = sposcar.cell_vecs[2] * nz
+        sposcar.ionnums = [i * nx * ny * nz for i in sposcar.ionnums]
+        sposition = sposcar.position
+        sposcar.position = []
+        sposition = [np.array([x[0] / nx, x[1] / ny, x[2] / nz])
+                     for x in sposition]
+        for spos in sposition:
+            for iz in range(1, nz+1):
+                for iy in range(1, ny+1):
+                    for ix in range(1, nx+1):
+                        sposcar.position.append(np.array(
+                            [spos[0]*ix, spos[1]*iy, spos[2]*iz]))
+        sposcar.coordinate_changeflags = []
+        for flags in self.coordinate_changeflags:
+            for i in range(nx * ny * nz):
+                sposcar.coordinate_changeflags.append(flags)
+        sposcar.__atom_identifer = []
+        return sposcar
+
     def sort(self, from_index, to_index):
         '''Sort positions attribute by coordinate
 
@@ -428,7 +468,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
     def atom_rotate(self, site, axis_name, theta, center):
         '''.. py:atom_rotate(site, axis_name, theta, center)
 
-        Rotate the atom 
+        Rotate the atom
 
         :param site: site # for rotation (The first atom is "1".).
         :param axis_name: "X", "x", "Y", "y", "Z", or "z". Rotation axis.
