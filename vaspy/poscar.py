@@ -105,7 +105,12 @@ class POSCAR(object):
             raise TypeError
 
     def load_from_array(self, poscar):
-        '''POSCAR parser'''
+        '''.. :py:method:: load_from_array(poscar)
+
+        POSCAR parser
+        :param poscar: POSCAR data
+        :type poscar: str, list, tuple
+        '''
         poscar = iter(map(str.rstrip, poscar))  # Version safety
         self.system_name = next(poscar)
         self.scaling_factor = float(next(poscar))
@@ -518,7 +523,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             self.atom_rotate(site, axis_name, theta, center)
 
     def cell_rotate(self, theta, axis_name='Z'):
-        '''Rotate unit-cell (rotation angle is set by degree.)
+        '''.. py:method:: cell_rotate(theta, axis_name)
+
+        Rotate unit-cell (rotation angle is set by degree.)
 
         :param theta: rotation angle
         :type theta: float
@@ -541,7 +548,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             self.to_cartesian()
 
     def repack_in_cell(self):
-        '''Repack all atoms in the unit cell
+        '''.. py:method:repack_in_cell()
+
+        Repack all atoms in the unit cell
 
         No negative values in DIRECT coordinate.
         '''
@@ -560,7 +569,8 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             self.to_cartesian()
 
     def __add__(self, other):
-        '''
+        '''.. py:method:: __add__(other)
+
         :param other:
         :type other:  POSCAR
         :return: POSCAR
@@ -581,7 +591,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return dest_poscar
 
     def merge(self, other):
-        '''lazy __add__: Return POSCAR generated from two POSCARs
+        '''.. py:method:: merge(other)
+
+        lazy __add__: Return POSCAR generated from two POSCARs
 
         Even if the cell vectors and scaling factors are different,
         the 'merged' POSCAR is created.
@@ -613,7 +625,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return dest_poscar
 
     def to_list(self):
-        '''Return POSCAR object by list-style
+        '''.. py:method:: to_list()
+
+        Return POSCAR object by list-style
 
         :return: a list representation of POSCAR.
         :rtype: list
@@ -636,7 +650,8 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return out_list
 
     def __str__(self):
-        '''
+        '''.. py:method::__str__()
+
         :return: a string representation of POSCAR
         :rtype: string
         '''
@@ -755,7 +770,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return molecule
 
     def guess_molecule2(self, site_list):
-        '''Arranges atom positions to form a molecule.
+        '''.. py:method::guess_molecule2(site_lsit)
+
+        Arranges atom positions to form a molecule.
 
         poscar updates
 
@@ -767,7 +784,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             self.pos_replace(site, pos_vector)
 
     def translate(self, vector, atomlist):
-        '''Translate the selected atom(s) by vector
+        '''..py:method::translate(vector, atomlist)
+
+        Translate the selected atom(s) by vector
 
         :param vector: translational vector (in Cartesian frame)
         :param atomlist: list of the atom to be moved
@@ -792,7 +811,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return self.position
 
     def translate_all(self, vector):
-        '''Translate **all** atoms by vector
+        '''.. py:method::translate_all(vector)
+
+        Translate **all** atoms by vector
 
         :param vector: translational vector
         :type vector: list, numpy.array
@@ -801,7 +822,10 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         self.translate(vector, atomrange)
 
     def save(self, filename):
-        '''Save POSCAR contents to the file named "filename"
+        '''.. py:method::samve(filename)
+
+        Save POSCAR contents to the file named "filename"
+        :param str filename: File name for save
 '''
         try:  # Version safety
             file = open(filename, mode='w', newline='\n')
@@ -811,7 +835,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             file.write(str(self))
 
     def point_in_box(self, point, cell_vecs):
-        '''Return True if point is located in the box
+        '''.. py:method::point_in_box(point, cell_vecs)
+
+        Return True if point is located in the box
 
         :param point: vector representing the "point"
         :type point: numpy.ndarray, numpy.matrix, list, tuple
