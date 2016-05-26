@@ -70,7 +70,7 @@ class POSCAR(object):
 
     def __init__(self, arg=None):
         '''
-        :param arg: POSCAR file name, or list of POSCAR text.
+        :param str arg: POSCAR file name, or list of POSCAR text.
         :type arg: str
         '''
         self.system_name = ""
@@ -189,7 +189,9 @@ class POSCAR(object):
 
     @property
     def is_cartesian(self):
-        '''Return True if Cartesian coordinate is set
+        '''.. py:method:: is_cartesian()
+
+        Return True if Cartesian coordinate is set
 
         :return: True if coordinate is cartesian
         :rtype: Boolean
@@ -198,7 +200,9 @@ class POSCAR(object):
 
     @property
     def is_direct(self):
-        '''Return True if DIRECT coordinate is set
+        '''.. py:method:: is_direct()
+
+        Return True if DIRECT coordinate is set
 
         :return: True if coordinate is direct (not cartesian)
         :rtype: Boolean
@@ -207,7 +211,9 @@ class POSCAR(object):
 
     @property
     def is_selective(self):
-        '''Return True if "Selective Dynamcis" is set
+        '''.. py:method:: is_selective()
+
+        Return True if "Selective Dynamcis" is set
 
         :return: True if "Selective Dynamics" switch on.
         :rtype: Boolean
@@ -215,7 +221,9 @@ class POSCAR(object):
         return self.__selective
 
     def pos(self, *i):
-        '''Accessor of POSCAR.position.
+        '''.. py::method:: pos(i)
+
+        Accessor of POSCAR.position.
 
         As in VASP, the atom index starts with "1", not "0".
 
@@ -315,10 +323,11 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             self.to_cartesian()
 
     def rotate_x(self, theta):
-        '''Rotation matrix around X-axis
+        ''' .. py:method:: rotate_x(theta)
 
-        :param theta: angle of rotation (Degrees)
-        :type theta: float
+        Rotation matrix around X-axis
+
+        :param float theta: angle of rotation (Degrees)
         :return: rotation matrix
         :rtype: np.array
 
@@ -337,7 +346,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
              [0.0, np.sin(theta * degree), np.cos(theta * degree)]])
 
     def rotate_y(self, theta):
-        '''Rotation matrix around Y-axis
+        '''.. py:method:: rotate_y(theta)
+
+        Rotation matrix around Y-axis
 
         :Example:
 
@@ -354,7 +365,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
              [-np.sin(theta * degree), 0.0, np.cos(theta * degree)]])
 
     def rotate_z(self, theta):
-        '''Rotation matrix around Z-axis
+        '''.. py:method:: rotate_y(theta)
+
+        Rotation matrix around Z-axis
 
         :Example:
 
@@ -372,7 +385,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
     # class method? or independent function?
     def nearest(self, array, point):
-        '''
+        '''.. py:nearest::(array, point)
 
         :param array:
         :param point:
@@ -384,7 +397,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
     # class method? or independent function?
     def make27candidate(self, position):
-        '''Return 27 vectors set correspond the neiboring
+        '''.. py:make27candidate(position)
+
+        Return 27 vectors set correspond the neiboring
 
         :param position: atom position defined in the coordinated by
                          cell_vecs ( scaling facter is not accounted).
@@ -411,7 +426,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return candidates27
 
     def atom_rotate(self, site, axis_name, theta, center):
-        '''Rotate atom (single atom!)
+        '''.. py:atom_rotate(site, axis_name, theta, center)
+
+        Rotate the atom 
 
         :param site: site # for rotation (The first atom is "1".).
         :param axis_name: "X", "x", "Y", "y", "Z", or "z". Rotation axis.
@@ -608,7 +625,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return '\n'.join(tmp) + '\n'
 
     def tune_scaling_factor(self, new_scaling_factor=1.0):
-        '''Change scaling factor to new value
+        '''.. py:method:: tune_scaling_factor(new_scaling_factor=1.0)
+
+        Change scaling factor to new value
 
         :param new_scaling_factor:
         :type new_scaling_factor: float
@@ -626,7 +645,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
                              for i in self.position]
 
     def to_cartesian(self):
-        '''Change the coordinate to cartesian from direct
+        '''.. py:method:: to_cartesian()
+
+        Change the coordinate to cartesian from direct
 '''
         if self.is_direct:
             self.coordinate_type = "Cartesian"
@@ -634,7 +655,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             self.position = [mat.dot(v) for v in self.position]
 
     def to_direct(self):
-        '''Change the coordinate to direct from cartesian.
+        '''.. py:method:: to_direct()
+
+        Change the coordinate to direct from cartesian.
         '''
         if self.is_cartesian:
             self.coordinate_type = "Direct"
@@ -642,7 +665,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             self.position = [mat.dot(v) for v in self.position]
 
     def guess_molecule(self, site_list, center=None):
-        '''Arrange atom position to form a molecule.
+        '''.. py:method::guess_molecule(site_list, center)
+
+        Arrange atom position to form a molecule.
 
         This method is effective to rotate a molecule.
 
@@ -752,7 +777,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         :type point: numpy.ndarray, numpy.matrix, list, tuple
         :param cell_vecs: vectors defining the "box"
         :type cell_vecs: numpy.ndarray, numpy.matrix, list, tuple
-        :rtype: Boolean
+        :rtype: boolean
         '''
         if three_by_three(cell_vecs):
             point = np.array(point).flatten()
@@ -764,7 +789,13 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
 
 def three_by_three(vec):
-    '''Return True if vec can be converted into the 3x3 matrix'''
+    '''.. py:function:three_by_three(vec)
+
+    Return True if vec can be converted into the 3x3 matrix
+    :param vec: list like object
+    :type vec: numpy.ndarray, numpy.matrix, list, tuple
+    :rtype: boolean
+    '''
     if not isinstance(vec, (np.ndarray, np.matrix, list, tuple)):
         return False
     if len(vec) != 3:
