@@ -226,7 +226,7 @@ class POSCAR(object):
         return self.__selective
 
     def pos(self, *i):
-        '''.. py::method:: pos(i)
+        '''.. py:method:: pos(i)
 
         Accessor of POSCAR.position.
 
@@ -430,7 +430,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
     # class method? or independent function?
     def nearest(self, array, point):
-        '''.. py:nearest::(array, point)
+        '''.. py:method:: nearest(array, point)
 
         :param array:
         :param point:
@@ -650,7 +650,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return out_list
 
     def __str__(self):
-        '''.. py:method::__str__()
+        '''.. py:method:: __str__()
 
         :return: a string representation of POSCAR
         :rtype: string
@@ -720,7 +720,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             self.position = [mat.dot(v) for v in self.position]
 
     def guess_molecule(self, site_list, center=None):
-        '''.. py:method::guess_molecule(site_list, center)
+        '''.. py:method:: guess_molecule(site_list, center)
 
         Arrange atom position to form a molecule.
 

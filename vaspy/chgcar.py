@@ -26,8 +26,9 @@ _RE_AUG_OCC = re.compile(r'\baugmentation occupancies')
 
 
 class CHGCAR(poscar.POSCAR):
+    '''.. py:class:: CHGCAR
 
-    '''Class for CHGCAR
+    Class for CHGCAR
 
      An example of the first few lines of CHGCAR. ::
 
@@ -61,7 +62,9 @@ class CHGCAR(poscar.POSCAR):
             self.load_from_file(chgcar_file)
 
     def load_from_file(self, chgcarfile):
-        '''Parse CHGCAR file to construct CHGCAR object
+        '''.. py:method:: load_from_file(chgcarfile)
+
+        Parse CHGCAR file to construct CHGCAR object
 
         :param chgcarfile: CHGCAR file name
         :type chgcarfile: str
@@ -141,7 +144,9 @@ class CHGCAR(poscar.POSCAR):
 
     @property
     def spininfo(self):
-        '''Spin property of CHGCAR
+        '''.. py:method:: spininfo()
+
+        Spin property of CHGCAR
 
         *  for ``ISPIN = 1``, [""]
 
@@ -160,7 +165,8 @@ class CHGCAR(poscar.POSCAR):
         return self.__chg_array
 
     def magnetization(self, direction=None):
-        '''
+        '''.. py:method:: magnetization(direction)
+
         Return CHGCAR for magnetization
 
         For collinear spin-polarized calculations
@@ -211,7 +217,9 @@ class CHGCAR(poscar.POSCAR):
         return dest_chgcar
 
     def majorityspin(self):
-        '''Return CHGCAR for majority spin
+        '''.. py:method:: majorityspin()
+
+        Return CHGCAR for majority spin
 
         This method is for CHGCAR given by ``ISPIN=2`` but not-SOI
         calculations.
@@ -233,7 +241,9 @@ class CHGCAR(poscar.POSCAR):
         return dest_chgcar
 
     def minorityspin(self):
-        '''Return CHGCAR for minority spin
+        '''.. py:method:: majorityspin()
+
+        Return CHGCAR for minority spin
 
         This method is for CHGCAR given by ``ISPIN=2`` but not-SOI
         calculations.
@@ -255,7 +265,8 @@ class CHGCAR(poscar.POSCAR):
         return dest_chgcar
 
     def __add__(self, other):
-        '''
+        '''.. py:method:: __add__(other)
+
         x.__add__(y) <=> x + y
 
         :param CHGCAR: other addition CHGCAR object
@@ -283,7 +294,9 @@ class CHGCAR(poscar.POSCAR):
         return add_chgcar
 
     def __sub__(self, other):
-        '''x.__sub__y <=> x - y
+        '''.. py:method:: __sub__(other)
+
+        x.__sub__y <=> x - y
 
         :param other: difference CHGCAR object
         :type other: CHGCAR
@@ -313,7 +326,9 @@ class CHGCAR(poscar.POSCAR):
         return diff_chgcar
 
     def __str__(self):
-        '''x.__str__() <=> str(x)
+        '''.. py:method:: __str__()
+
+        x.__str__() <=> str(x)
 
         :return: a string representation of CHGCAR.
         :rtype: str
@@ -333,7 +348,9 @@ class CHGCAR(poscar.POSCAR):
         return super(CHGCAR, self).__str__() + outputstring + '\n'
 
     def save(self, filename):
-        '''Save CHGCAR object as CHGCAR file style
+        '''.. py:method:: save(filename)
+
+        Save CHGCAR object as CHGCAR file style
 
         :param filename: file name
         :type filename: str
