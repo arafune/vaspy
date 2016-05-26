@@ -57,9 +57,12 @@ parser.add_argument('--output', metavar='file_name',
 if not specified, use standard output''')
 parser.add_argument('poscar', metavar='POSCAR_file (or CONTCAR_file)',
                     type=POSCAR)
-
+parser.add_argument('--to_direct', action="store_true",
+                    help='''Change direct coordinates''')
+parser.add_argument('--to_cartesian', action="store_true",
+                    help='''Change cartesian coordinates''')
+#
 args = parser.parse_args()
-
 # translate option and rotate option are not set simulaneously.
 if args.translate and any([args.rotateX,
                            args.rotateY,
@@ -110,6 +113,14 @@ if any([args.rotateX, args.rotateY, args.rotateZ]):
         center = args.rotateZ[1:]
     args.poscar.atoms_rotate(args.site, axis_name, theta, center)
 
+if args.to_direct and args.to_cartesian:
+    raise ValueError("Error!!  Set either of --to_direct or --to_cartesian")
+
+if args.to_direct:
+    args.poscar.to_direct()
+
+if args.to_cartesian:
+    args.poscar.to_cartesian()
 #
 #  Output result
 #
