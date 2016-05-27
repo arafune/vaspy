@@ -73,10 +73,23 @@ class PROCAR(object):  # Version safety
 
     5. orbital contribution.
 
-:Example:    1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
+      :Example:    1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
 
-    :author: Ryuichi Arafune
-    :version: 2.1
+    .. py:attribute:: orbital
+
+      list object. Store orbital character
+
+    .. py:attribute:: phase
+
+      list (Not used at present)
+
+    .. py:attribute:: spininfo
+
+      tuple
+
+        * nospin: ('',)
+        * spinresolved: ('_up', '_down')
+        * soi: ('_mT', '_mX', '_mY', '_mZ')
     '''
 
     def __init__(self, arg=None, phase_read=False):

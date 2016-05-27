@@ -72,10 +72,6 @@ class DOSCAR(object):  # Version safety
     :py:attr:`dos_container` is a python list object that
     stores the DOS object. By default, the first item is the TDOS, and the
     latter items are PDOS.
-
-
-    :author: Ryuichi Arafune
-    :version: 2.1
     '''
 
     def __init__(self, arg=None):
