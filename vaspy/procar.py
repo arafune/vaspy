@@ -161,7 +161,9 @@ class PROCAR(object):  # Version safety
             self.spininfo = ('_mT', '_mX', '_mY', '_mZ')
 
     def __str__(self):
-        '''x.__str__() <=> str(x)
+        '''.. py:method:: __str__()
+
+        __str__() <=> str(x)
 
         show the PROCAR character, not contents.
         '''
