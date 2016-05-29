@@ -70,34 +70,34 @@ class LOCPOT(poscar.POSCAR):
                 elif section == 'grid':
                     line = line.rstrip('\n')
                     self.potlist.extend([np.float64(i) for i in
-                                           line.split()])
+                                         line.split()])
 #                        map(np.float64, line.split()))
             if len(self.potlist) == self.mesh_x * self.mesh_y * self.mesh_z:
                 self.potarray = np.array(self.potlist).reshape(
                     self.mesh_z, self.mesh_y, self.mesh_x)
             elif len(self.potlist) == 2 * (self.mesh_x *
-                                             self.mesh_y *
-                                             self.mesh_z) + 3 + sum(self.ionnums):
+                                           self.mesh_y *
+                                           self.mesh_z) + 3 + sum(self.ionnums):
                 self.potarray = np.array(
                     self.potlist[:
-                                   self.mesh_x *
-                                   self.mesh_y *
-                                   self.mesh_z]).reshape(self.mesh_z,
-                                                         self.mesh_y,
-                                                         self.mesh_x)
+                                 self.mesh_x *
+                                 self.mesh_y *
+                                 self.mesh_z]).reshape(self.mesh_z,
+                                                       self.mesh_y,
+                                                       self.mesh_x)
                 self.potarray2 = np.array(
                     self.potlist[self.mesh_x *
-                                   self.mesh_y *
-                                   self.mesh_z:
-                                   self.mesh_x *
-                                   self.mesh_y *
-                                   self.mesh_z + sum(self.ionnums)])
+                                 self.mesh_y *
+                                 self.mesh_z:
+                                 self.mesh_x *
+                                 self.mesh_y *
+                                 self.mesh_z + sum(self.ionnums)])
                 self.potarray3 = np.array(
                     self.potlist[- self.mesh_x *
-                                   self.mesh_y *
-                                   self.mesh_z:]).reshape(self.mesh_z,
-                                                          self.mesh_y,
-                                                          self.mesh_x)
+                                 self.mesh_y *
+                                 self.mesh_z:]).reshape(self.mesh_z,
+                                                        self.mesh_y,
+                                                        self.mesh_x)
 
     def get_mesh(self):
         '''.. py:method:: get_mesh()

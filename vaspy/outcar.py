@@ -110,8 +110,8 @@ class OUTCAR(object):  # Version safety
         self.set_posforce_title()
 
     def select_posforce_header(self, posforce_flag, *sites):
-        '''.. py:method:: select_posforce_header(posforce_flag, *sites)        
-'''
+        '''.. py:method:: select_posforce_header(posforce_flag, *sites)
+        '''
         if sites == () or sites[0] == []:
             sites = range(1, self.nions + 1)
         if isinstance(sites[0], (list, tuple)):
