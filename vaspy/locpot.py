@@ -32,10 +32,10 @@ class LOCPOT(poscar.POSCAR):
 
     def __init__(self, arg=None):
         super(LOCPOT, self).__init__(None)
-        self.__mesh_x = 0
-        self.__mesh_y = 0
-        self.__mesh_z = 0
-        self.__potlist = []
+        self.mesh_x = 0
+        self.mesh_y = 0
+        self.mesh_z = 0
+        self.potlist = []
         if arg:
             self.load_from_file(arg)
 
@@ -63,107 +63,41 @@ class LOCPOT(poscar.POSCAR):
                 elif section == 'define_separator':
                     separator = line if separator is None else separator
                     if self.mesh_x == self.mesh_y == self.mesh_z == 0:
-                        self.__mesh_x, self.__mesh_y, self.__mesh_z = \
+                        self.mesh_x, self.mesh_y, self.mesh_z = \
                                 [int(i) for i in line.split()]
 #                            list(map(int, line.split()))
                         section = 'grid'
                 elif section == 'grid':
                     line = line.rstrip('\n')
-                    self.__potlist.extend([np.float64(i) for i in
+                    self.potlist.extend([np.float64(i) for i in
                                            line.split()])
 #                        map(np.float64, line.split()))
-            if len(self.__potlist) == self.mesh_x * self.mesh_y * self.mesh_z:
-                self.__potarray = np.array(self.__potlist).reshape(
+            if len(self.potlist) == self.mesh_x * self.mesh_y * self.mesh_z:
+                self.potarray = np.array(self.potlist).reshape(
                     self.mesh_z, self.mesh_y, self.mesh_x)
-            elif len(self.__potlist) == 2 * (self.mesh_x *
+            elif len(self.potlist) == 2 * (self.mesh_x *
                                              self.mesh_y *
                                              self.mesh_z) + 3 + sum(self.ionnums):
-                self.__potarray = np.array(
-                    self.__potlist[:
+                self.potarray = np.array(
+                    self.potlist[:
                                    self.mesh_x *
                                    self.mesh_y *
                                    self.mesh_z]).reshape(self.mesh_z,
                                                          self.mesh_y,
                                                          self.mesh_x)
-                self.__potarray2 = np.array(
-                    self.__potlist[self.mesh_x *
+                self.potarray2 = np.array(
+                    self.potlist[self.mesh_x *
                                    self.mesh_y *
                                    self.mesh_z:
                                    self.mesh_x *
                                    self.mesh_y *
                                    self.mesh_z + sum(self.ionnums)])
-                self.__potarray3 = np.array(
-                    self.__potlist[- self.mesh_x *
+                self.potarray3 = np.array(
+                    self.potlist[- self.mesh_x *
                                    self.mesh_y *
                                    self.mesh_z:]).reshape(self.mesh_z,
                                                           self.mesh_y,
                                                           self.mesh_x)
-
-    @property
-    def mesh_x(self):
-        '''Number of mesh along the first axis of the cell'''
-        return self.__mesh_x
-
-    @property
-    def mesh_y(self):
-        '''Number of mesh along the second axis of the cell'''
-        return self.__mesh_y
-
-    @property
-    def mesh_z(self):
-        '''Number of mesh along the second axis of the cell'''
-        return self.__mesh_z
-
-    @property
-    def potlist(self):
-        '''Potential data (Array style)
-
-        From Vasp Manual, the potential is written using the following
-        commands in Fortran (as same as for charge density in CHGCAR)
-
-        .. code-block :: fortran
-
-           WRITE(IU, FORM) (((C(NX, NY, NZ), NX=1, NGXC), NY=1, NGYZ), NZ=1, NGZC)
-
-        '''
-        return self.__potlist
-
-    @property
-    def potarray(self):
-        '''Potential data (Array style)
-
-        This data should be used until its meaning is clear.  I (RA)
-        have not understand the meaning of the potarray 2 and 3...
-
-        '''
-        return self.__potarray
-
-    @property  # <= Fixme!!!
-    def potarray3(self):
-        '''(maybe) Potential data (Array style)
-
-        This data should NOT be used until its meaning is clear.  I
-        (RA) have not understand the meaning of the potarray 2 and
-        3...
-
-        .. warning:: Do not use this attribute if you do not know
-                     what you treated
-
-        '''
-        return self.__potarray2
-
-    @property  # <= Fixme!!!
-    def potarray2(self):
-        '''(maybe) Potential data (Array style)
-
-        Usually this data should NOT be used.  I (RA) have not
-        understand the meaning of the potarray 2 and 3...
-
-        .. warning:: Do not use this attribute if you do not know
-                     what you treated
-
-        '''
-        return self.__potarray3
 
     def get_mesh(self):
         '''.. py:method:: get_mesh()
@@ -173,7 +107,7 @@ class LOCPOT(poscar.POSCAR):
         :return: (mesh_x, mesh_y, mesh_z)
         :rtype: tuple
         '''
-        return self.__mesh_x, self.__mesh_y, self.__mesh_z
+        return self.mesh_x, self.mesh_y, self.mesh_z
 
     def average_along_axis(self, axis_name, pottype='former'):
         '''.. py:method:: average_along_axis(axis_name, pottype)
