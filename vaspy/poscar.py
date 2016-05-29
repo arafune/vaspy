@@ -65,7 +65,6 @@ class POSCAR(object):
     CONTCAR, which has already works well.
 
     :attribute: system_name, scaling_factor, cell_vecs
-    :version: 2.1
     '''
 
     def __init__(self, arg=None):
@@ -269,11 +268,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
         :param i: site indexes
         :type i: int, tuple, list, range
-
         :return: atom's position
-
         :rtype: np.array
-'''
+        '''
         sitelist = []
         for thearg in i:
             if isinstance(thearg, int):
@@ -295,7 +292,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         :type i: int
         :type vector: list, tuple, np.array
         :note: the first site # is "1", not "0" to follow VESTA's way.
-'''
+        '''
         vector = _vectorize(vector)
         if not isinstance(i, int):
             raise ValueError
@@ -346,7 +343,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return sposcar
 
     def sort(self, from_index, to_index):
-        '''Sort positions attribute by coordinate
+        '''.. py:method:: sort(from_index, to_index)
+
+        Sort positions attribute by coordinate
 
         :param from_index: first index # for sort
         :param to_index: last index # for sort
@@ -485,7 +484,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         :type center: np.array, list, tuple
         :todo:  check the center in the Braves lattice.
         :todo:  take into account the periodic boundary.
-'''
+        '''
         center = _vectorize(center)
         if len(center) != 3:
             raise ValueError
@@ -631,7 +630,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
         :return: a list representation of POSCAR.
         :rtype: list
-'''
+        '''
         out_list = []
         out_list.append(self.system_name)
         out_list.append(self.scaling_factor)
@@ -691,7 +690,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
         .. warning:: If you change the cell size, change
                      scaling_factor attribute directly
-'''
+        '''
         old = self.scaling_factor
         self.cell_vecs *= (old / new_scaling_factor)
         self.scaling_factor = new_scaling_factor
@@ -703,7 +702,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         '''.. py:method:: to_cartesian()
 
         Change the coordinate to cartesian from direct
-'''
+        '''
         if self.is_direct:
             self.coordinate_type = "Cartesian"
             mat = self.cell_vecs.transpose()
@@ -778,7 +777,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
         :param site_list: list of site number
         :type site_list: list
-'''
+        '''
         molecule = self.guess_molecule(site_list)
         for site, pos_vector in zip(site_list, molecule):
             self.pos_replace(site, pos_vector)
@@ -795,7 +794,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         :note: the first atom is "1", not "0".
         :return: position
         :rtype: numpy.array
-'''
+        '''
         if self.is_cartesian:
             vector = _vectorize(vector)
             for i in atomlist:
@@ -817,7 +816,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
         :param vector: translational vector
         :type vector: list, numpy.array
-'''
+        '''
         atomrange = list(range(1, sum(self.ionnums) + 1))
         self.translate(vector, atomrange)
 
@@ -826,7 +825,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
         Save POSCAR contents to the file named "filename"
         :param str filename: File name for save
-'''
+        '''
         try:  # Version safety
             file = open(filename, mode='w', newline='\n')
         except TypeError:
