@@ -89,9 +89,6 @@ class PROCAR(object):  # Version safety
         * nospin: ('',)
         * spinresolved: ('_up', '_down')
         * soi: ('_mT', '_mX', '_mY', '_mZ')
-
-    :author: Ryuichi Arafune
-    :version: 2.1
     '''
 
     def __init__(self, arg=None, phase_read=False):
@@ -177,7 +174,9 @@ class PROCAR(object):  # Version safety
             self.spininfo = ('_mT', '_mX', '_mY', '_mZ')
 
     def __str__(self):
-        '''x.__str__() <=> str(x)
+        '''.. py:method:: __str__()
+
+        __str__() <=> str(x)
 
         show the PROCAR character, not contents.
         '''

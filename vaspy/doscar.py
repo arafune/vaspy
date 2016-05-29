@@ -33,7 +33,7 @@ From VASP webpage::
   for the non spin-polarized and spin polarized case respectively.
   The units of the l- and site projected DOS are states/atom.
   Please mind, that the site projected DOS is not evaluated
-  in the parallel version if NPAR tex2html_wrap_inline5201 1.
+  in the parallel version if NPAR is not equal to 1.
 
   Mind: For relaxations the DOSCAR is usually useless.
   If you want to get an accurate DOS for the final configuration
@@ -53,12 +53,25 @@ import matplotlib.pyplot as plt
 
 
 class DOSCAR(object):  # Version safety
-    '''Class for DOSCAR file
+    '''.. py:class:: DOSCAR(doscarfile)
+
+    Class for DOSCAR file
 
     A container of DOS object
 
-    :author: Ryuichi Arafune
-    :version: 2.1
+    .. py:attribute: natom
+
+    :py:attr:`natom` is number of atoms.
+
+    .. py:attribute: nenergypnts
+
+    :py:attr:`nenergypnts` is number of energy points.  (VASP defaults is 301.)
+
+    .. py:attribute:dos_container
+
+    :py:attr:`dos_container` is a python list object that
+    stores the DOS object. By default, the first item is the TDOS, and the
+    latter items are PDOS.
     '''
 
     def __init__(self, arg=None):
@@ -82,7 +95,7 @@ class DOSCAR(object):  # Version safety
         line = thefile.readline()
         self.natom = int(line.split()[0])  # 1st line
         line = [thefile.readline() for i in range(4)]
-        #for i in range(4):
+        # for i in range(4):
         #    line = thefile.readline()      # 2-5 lines
         line = thefile.readline()          # 6 line
         try:
@@ -92,9 +105,9 @@ class DOSCAR(object):  # Version safety
         for dummy in range(self.nenergypnts):  # TDOS
             line = thefile.readline()
             data = line.split()
-            if len(data) == 3:
+            if len(data) == 3:    # SOI or non-spin
                 data = data[0:2]
-            elif len(data) == 5:
+            elif len(data) == 5:  # spin-collinear
                 data = data[0:3]
             a_dos.append([float(i) for i in data])
         self.dos_container.append(np.array(a_dos))
@@ -111,14 +124,18 @@ class DOSCAR(object):  # Version safety
 
 
 class DOS(object):  # Version safety
+    '''.. py:class:: DOS
 
-    '''Class for DOS
+    Class for DOS
 
     List object consisting two elements.
     The first element is the the energy.
     The latter element is list for the density.
 
-    :attribute: dos
+    .. py:attribute: dos
+
+    :py:attribute:`dos` is the python linst object that stores dos data.
+    By default, the first column is the energy, the latter is the density.
     '''
 
     def __init__(self, array=None):
@@ -173,6 +190,7 @@ class DOS(object):  # Version safety
                            transposed_dos, header=header,
                            delimiter='\t', newline='\n')
 
+
 class TDOS(DOS):
     '''.. py:class:: TODS(array)
 
@@ -207,10 +225,21 @@ class TDOS(DOS):
             plt.plot(self.dos[0], density)
         plt.show()
 
+
 class PDOS(DOS):
     '''.. py:class:: PDOS(array[, site])
 
     Class for partial DOS
+
+    .. py:attribute: site
+
+    :py:attr:`site` is the name of the site.
+
+    .. py:attribute: orbital_spin
+
+    :py:attr:`orbital_spin` is the name of the orbital with spin character.
+    (If non-spin calculated results, :py:attr:`orbital_spin` is
+    just orbital name)
 
     :param array: DOS data
     :type array: numpy.array
@@ -291,17 +320,18 @@ class PDOS(DOS):
         pass
 
     def __add__(self, other):
-        '''x.__add__(y) <-> x+y
+        '''.. py:method:: __add__(other)
 
-        :param addend: addend.energies.length must be equal to \
-        self.energies.length.
-        :type addend: PDOS
+        x.__add__(y) <-> x+y
+
+        :param other: len(other.energies) must be equal to  len(self.energies).
+        :type other: PDOS
         :return: PDOS
         :rtype: PDOS
         '''
         if not isinstance(other, PDOS):
             return NotImplemented
-        if self.dos == [] and self.site == "":
+        if len(self.dos) == 0 and self.site == "":
             return copy.deepcopy(other)
         else:
             sum_pdos = PDOS()

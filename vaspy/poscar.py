@@ -65,12 +65,11 @@ class POSCAR(object):
     CONTCAR, which has already works well.
 
     :attribute: system_name, scaling_factor, cell_vecs
-    :version: 2.1
     '''
 
     def __init__(self, arg=None):
         '''
-        :param arg: POSCAR file name, or list of POSCAR text.
+        :param str arg: POSCAR file name, or list of POSCAR text.
         :type arg: str
         '''
         self.system_name = ""
@@ -105,7 +104,12 @@ class POSCAR(object):
             raise TypeError
 
     def load_from_array(self, poscar):
-        '''POSCAR parser'''
+        '''.. :py:method:: load_from_array(poscar)
+
+        POSCAR parser
+        :param poscar: POSCAR data
+        :type poscar: str, list, tuple
+        '''
         poscar = iter(map(str.rstrip, poscar))  # Version safety
         self.system_name = next(poscar)
         self.scaling_factor = float(next(poscar))
@@ -189,7 +193,9 @@ class POSCAR(object):
 
     @property
     def is_cartesian(self):
-        '''Return True if Cartesian coordinate is set
+        '''.. py:method:: is_cartesian()
+
+        Return True if Cartesian coordinate is set
 
         :return: True if coordinate is cartesian
         :rtype: Boolean
@@ -198,7 +204,9 @@ class POSCAR(object):
 
     @property
     def is_direct(self):
-        '''Return True if DIRECT coordinate is set
+        '''.. py:method:: is_direct()
+
+        Return True if DIRECT coordinate is set
 
         :return: True if coordinate is direct (not cartesian)
         :rtype: Boolean
@@ -207,7 +215,9 @@ class POSCAR(object):
 
     @property
     def is_selective(self):
-        '''Return True if "Selective Dynamcis" is set
+        '''.. py:method:: is_selective()
+
+        Return True if "Selective Dynamcis" is set
 
         :return: True if "Selective Dynamics" switch on.
         :rtype: Boolean
@@ -215,7 +225,9 @@ class POSCAR(object):
         return self.__selective
 
     def pos(self, *i):
-        '''Accessor of POSCAR.position.
+        '''.. py:method:: pos(i)
+
+        Accessor of POSCAR.position.
 
         As in VASP, the atom index starts with "1", not "0".
 
@@ -256,11 +268,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
         :param i: site indexes
         :type i: int, tuple, list, range
-
         :return: atom's position
-
         :rtype: np.array
-'''
+        '''
         sitelist = []
         for thearg in i:
             if isinstance(thearg, int):
@@ -282,7 +292,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         :type i: int
         :type vector: list, tuple, np.array
         :note: the first site # is "1", not "0" to follow VESTA's way.
-'''
+        '''
         vector = _vectorize(vector)
         if not isinstance(i, int):
             raise ValueError
@@ -292,8 +302,50 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             raise RuntimeError(message)
         self.position[i - 1] = vector
 
+    def supercell(self, nx, ny, nz):
+        '''.. py:metho:: supercell(nx, ny, nz)
+
+        Make supercell
+
+        :param int nz, ny, nz: repeat number along x, y, and axis
+        :return: sposcar
+        :rtype: POSCAR
+        '''
+        if not isinstance(nx, int) \
+           or not isinstance(ny, int) \
+           or not isinstance(nz, int):
+            raise ValueError("arguments must be positive integer")
+        if nx <= 0 or ny <= 0 or nz <= 0:
+            raise ValueError("arguments must be positive integer")
+        #
+        sposcar = copy.deepcopy(self)
+        sposcar.to_direct()
+        sposcar.repack_in_cell()
+        sposcar.cell_vecs[0] = sposcar.cell_vecs[0] * nx
+        sposcar.cell_vecs[1] = sposcar.cell_vecs[1] * ny
+        sposcar.cell_vecs[2] = sposcar.cell_vecs[2] * nz
+        sposcar.ionnums = [i * nx * ny * nz for i in sposcar.ionnums]
+        sposition = sposcar.position
+        sposcar.position = []
+        sposition = [np.array([x[0] / nx, x[1] / ny, x[2] / nz])
+                     for x in sposition]
+        for spos in sposition:
+            for iz in range(1, nz+1):
+                for iy in range(1, ny+1):
+                    for ix in range(1, nx+1):
+                        sposcar.position.append(np.array(
+                            [spos[0]*ix, spos[1]*iy, spos[2]*iz]))
+        sposcar.coordinate_changeflags = []
+        for flags in self.coordinate_changeflags:
+            for i in range(nx * ny * nz):
+                sposcar.coordinate_changeflags.append(flags)
+        sposcar.__atom_identifer = []
+        return sposcar
+
     def sort(self, from_index, to_index):
-        '''Sort positions attribute by coordinate
+        '''.. py:method:: sort(from_index, to_index)
+
+        Sort positions attribute by coordinate
 
         :param from_index: first index # for sort
         :param to_index: last index # for sort
@@ -315,10 +367,11 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             self.to_cartesian()
 
     def rotate_x(self, theta):
-        '''Rotation matrix around X-axis
+        ''' .. py:method:: rotate_x(theta)
 
-        :param theta: angle of rotation (Degrees)
-        :type theta: float
+        Rotation matrix around X-axis
+
+        :param float theta: angle of rotation (Degrees)
         :return: rotation matrix
         :rtype: np.array
 
@@ -337,7 +390,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
              [0.0, np.sin(theta * degree), np.cos(theta * degree)]])
 
     def rotate_y(self, theta):
-        '''Rotation matrix around Y-axis
+        '''.. py:method:: rotate_y(theta)
+
+        Rotation matrix around Y-axis
 
         :Example:
 
@@ -354,7 +409,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
              [-np.sin(theta * degree), 0.0, np.cos(theta * degree)]])
 
     def rotate_z(self, theta):
-        '''Rotation matrix around Z-axis
+        '''.. py:method:: rotate_y(theta)
+
+        Rotation matrix around Z-axis
 
         :Example:
 
@@ -372,7 +429,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
     # class method? or independent function?
     def nearest(self, array, point):
-        '''
+        '''.. py:method:: nearest(array, point)
 
         :param array:
         :param point:
@@ -384,7 +441,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
     # class method? or independent function?
     def make27candidate(self, position):
-        '''Return 27 vectors set correspond the neiboring
+        '''.. py:make27candidate(position)
+
+        Return 27 vectors set correspond the neiboring
 
         :param position: atom position defined in the coordinated by
                          cell_vecs ( scaling facter is not accounted).
@@ -411,7 +470,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return candidates27
 
     def atom_rotate(self, site, axis_name, theta, center):
-        '''Rotate atom (single atom!)
+        '''.. py:atom_rotate(site, axis_name, theta, center)
+
+        Rotate the atom
 
         :param site: site # for rotation (The first atom is "1".).
         :param axis_name: "X", "x", "Y", "y", "Z", or "z". Rotation axis.
@@ -423,7 +484,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         :type center: np.array, list, tuple
         :todo:  check the center in the Braves lattice.
         :todo:  take into account the periodic boundary.
-'''
+        '''
         center = _vectorize(center)
         if len(center) != 3:
             raise ValueError
@@ -440,11 +501,10 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         position += center / self.scaling_factor
         self.pos_replace(site, position)
 
-    def atoms_rotate(self, site_list_pack, axis_name, theta, center):
+    def atoms_rotate(self, site_list, axis_name, theta, center):
         '''Rotate atoms
 
-        :param site_list_pack: list array of the list array (not
-                               typo!) of site for rotation (The first
+        :param site_list:  list array of site for rotation (The first
                                atom is "1".).
 
         :param axis_name: "X", "x", "Y", "y", "Z",or "z".
@@ -452,18 +512,19 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
         :param theta: Rotation angle (Degrees).
         :param center: center position for rotation.
-        :type site_list_pack: list, tuple
+        :type site_list: list, tuple
         :type theta: float
         :type axis_name: str
         :type center: np.array, list, tuple
 
         '''
-        for site_list in site_list_pack:
-            for site in site_list:
-                self.atom_rotate(site, axis_name, theta, center)
+        for site in site_list:
+            self.atom_rotate(site, axis_name, theta, center)
 
     def cell_rotate(self, theta, axis_name='Z'):
-        '''Rotate unit-cell (rotation angle is set by degree.)
+        '''.. py:method:: cell_rotate(theta, axis_name)
+
+        Rotate unit-cell (rotation angle is set by degree.)
 
         :param theta: rotation angle
         :type theta: float
@@ -486,7 +547,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             self.to_cartesian()
 
     def repack_in_cell(self):
-        '''Repack all atoms in the unit cell
+        '''.. py:method:repack_in_cell()
+
+        Repack all atoms in the unit cell
 
         No negative values in DIRECT coordinate.
         '''
@@ -505,7 +568,8 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             self.to_cartesian()
 
     def __add__(self, other):
-        '''
+        '''.. py:method:: __add__(other)
+
         :param other:
         :type other:  POSCAR
         :return: POSCAR
@@ -526,7 +590,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return dest_poscar
 
     def merge(self, other):
-        '''lazy __add__: Return POSCAR generated from two POSCARs
+        '''.. py:method:: merge(other)
+
+        lazy __add__: Return POSCAR generated from two POSCARs
 
         Even if the cell vectors and scaling factors are different,
         the 'merged' POSCAR is created.
@@ -558,11 +624,13 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return dest_poscar
 
     def to_list(self):
-        '''Return POSCAR object by list-style
+        '''.. py:method:: to_list()
+
+        Return POSCAR object by list-style
 
         :return: a list representation of POSCAR.
         :rtype: list
-'''
+        '''
         out_list = []
         out_list.append(self.system_name)
         out_list.append(self.scaling_factor)
@@ -581,7 +649,8 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return out_list
 
     def __str__(self):
-        '''
+        '''.. py:method:: __str__()
+
         :return: a string representation of POSCAR
         :rtype: string
         '''
@@ -610,7 +679,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return '\n'.join(tmp) + '\n'
 
     def tune_scaling_factor(self, new_scaling_factor=1.0):
-        '''Change scaling factor to new value
+        '''.. py:method:: tune_scaling_factor(new_scaling_factor=1.0)
+
+        Change scaling factor to new value
 
         :param new_scaling_factor:
         :type new_scaling_factor: float
@@ -619,7 +690,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
 
         .. warning:: If you change the cell size, change
                      scaling_factor attribute directly
-'''
+        '''
         old = self.scaling_factor
         self.cell_vecs *= (old / new_scaling_factor)
         self.scaling_factor = new_scaling_factor
@@ -628,15 +699,19 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
                              for i in self.position]
 
     def to_cartesian(self):
-        '''Change the coordinate to cartesian from direct
-'''
+        '''.. py:method:: to_cartesian()
+
+        Change the coordinate to cartesian from direct
+        '''
         if self.is_direct:
             self.coordinate_type = "Cartesian"
             mat = self.cell_vecs.transpose()
             self.position = [mat.dot(v) for v in self.position]
 
     def to_direct(self):
-        '''Change the coordinate to direct from cartesian.
+        '''.. py:method:: to_direct()
+
+        Change the coordinate to direct from cartesian.
         '''
         if self.is_cartesian:
             self.coordinate_type = "Direct"
@@ -644,7 +719,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             self.position = [mat.dot(v) for v in self.position]
 
     def guess_molecule(self, site_list, center=None):
-        '''Arrange atom position to form a molecule.
+        '''.. py:method:: guess_molecule(site_list, center)
+
+        Arrange atom position to form a molecule.
 
         This method is effective to rotate a molecule.
 
@@ -692,19 +769,23 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return molecule
 
     def guess_molecule2(self, site_list):
-        '''Arranges atom positions to form a molecule.
+        '''.. py:method::guess_molecule2(site_lsit)
+
+        Arranges atom positions to form a molecule.
 
         poscar updates
 
         :param site_list: list of site number
         :type site_list: list
-'''
+        '''
         molecule = self.guess_molecule(site_list)
         for site, pos_vector in zip(site_list, molecule):
             self.pos_replace(site, pos_vector)
 
     def translate(self, vector, atomlist):
-        '''Translate the selected atom(s) by vector
+        '''..py:method::translate(vector, atomlist)
+
+        Translate the selected atom(s) by vector
 
         :param vector: translational vector (in Cartesian frame)
         :param atomlist: list of the atom to be moved
@@ -713,7 +794,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         :note: the first atom is "1", not "0".
         :return: position
         :rtype: numpy.array
-'''
+        '''
         if self.is_cartesian:
             vector = _vectorize(vector)
             for i in atomlist:
@@ -729,17 +810,22 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         return self.position
 
     def translate_all(self, vector):
-        '''Translate **all** atoms by vector
+        '''.. py:method::translate_all(vector)
+
+        Translate **all** atoms by vector
 
         :param vector: translational vector
         :type vector: list, numpy.array
-'''
+        '''
         atomrange = list(range(1, sum(self.ionnums) + 1))
         self.translate(vector, atomrange)
 
     def save(self, filename):
-        '''Save POSCAR contents to the file named "filename"
-'''
+        '''.. py:method::samve(filename)
+
+        Save POSCAR contents to the file named "filename"
+        :param str filename: File name for save
+        '''
         try:  # Version safety
             file = open(filename, mode='w', newline='\n')
         except TypeError:
@@ -748,13 +834,15 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             file.write(str(self))
 
     def point_in_box(self, point, cell_vecs):
-        '''Return True if point is located in the box
+        '''.. py:method::point_in_box(point, cell_vecs)
+
+        Return True if point is located in the box
 
         :param point: vector representing the "point"
         :type point: numpy.ndarray, numpy.matrix, list, tuple
         :param cell_vecs: vectors defining the "box"
         :type cell_vecs: numpy.ndarray, numpy.matrix, list, tuple
-        :rtype: Boolean
+        :rtype: boolean
         '''
         if three_by_three(cell_vecs):
             point = np.array(point).flatten()
@@ -764,8 +852,15 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         else:
             raise TypeError
 
+
 def three_by_three(vec):
-    '''Return True if vec can be converted into the 3x3 matrix'''
+    '''.. py:function:three_by_three(vec)
+
+    Return True if vec can be converted into the 3x3 matrix
+    :param vec: list like object
+    :type vec: numpy.ndarray, numpy.matrix, list, tuple
+    :rtype: boolean
+    '''
     if not isinstance(vec, (np.ndarray, np.matrix, list, tuple)):
         return False
     if len(vec) != 3:
@@ -774,6 +869,7 @@ def three_by_three(vec):
         return True
     else:
         return False
+
 
 def _vectorize(vector):
     if not isinstance(vector, (np.ndarray, np.matrix, list, tuple)):
