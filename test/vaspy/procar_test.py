@@ -5,7 +5,7 @@
 import os
 # import tempfile
 from nose.tools import eq_, ok_
-from nose.tools import with_setup, assert_equal
+from nose.tools import with_setup, assert_equal, raises
 import numpy as np
 import vaspy.procar as procar
 
@@ -53,7 +53,7 @@ class TestSinglePROCAR(object):
         eq_(self.singleband.n_bands, self.singleprocar.n_bands)
         eq_(self.singleband.kvectors, self.singleprocar.kvectors)
         eq_(self.singleband.spininfo, self.singleprocar.spininfo)
-        eq_(self.singleband.isready())
+        ok_(self.singleband.isready())
         np.testing.assert_array_equal(self.singleband.kdistance,
                                       [0.])
 
@@ -75,6 +75,52 @@ class TestSinglePROCAR(object):
         '''test for Band_with_projection.orbitals setter'''
         np.testing.assert_array_equal(self.singleband.orbitals[0][0],
                                       self.singleprocar.orbital)
+
+    @with_setup(setup=setup)
+    def test_singleprocar_band_compose_sites(self):
+        '''test for Band_with_projection.compose_sites'''
+        self.singleband.compose_sites((0, 2))
+        np.testing.assert_array_almost_equal(self.singleband.sitecomposed,
+                                             [[[[[0.0020, 0.0022, 0.0024,
+                                                  0.0026, 0.0028, 0.0030,
+                                                  0.0032, 0.0034, 0.0036,
+                                                  0.0252]]]]])
+
+        np.testing.assert_allclose(self.singleband.sitecomposed,
+                                   [[[[[0.0020, 0.0022, 0.0024,
+                                        0.0026, 0.0028, 0.0030,
+                                        0.0032, 0.0034, 0.0036,
+                                        0.0252]]]]])
+
+    @raises(RuntimeError)
+    @with_setup(setup=setup)
+    def test_singleprocar_band_compose_orbital0(self):
+        '''test for Band_with_projection.compose_orbital (0)
+
+        raise RuntimeError when no item in sitecomposed
+        '''
+        self.singleband.compose_orbital(('p', 'pxpy', 'd'))
+
+    @with_setup(setup=setup)
+    def test_singleprocar_band_compose_orbital1(self):
+        '''test for Band_with_projection.compose_orbital ()
+
+        raise RuntimeError when no item in sitecomposed
+        '''
+        self.singleband.compose_sites((0, 2))
+        self.singleband.compose_orbital(('p', 'pxpy', 'd'))
+        np.testing.assert_allclose(self.singleband.sitecomposed,
+                                   [[[[[0.0020, 0.0022, 0.0024,
+                                        0.0026, 0.0028, 0.0030,
+                                        0.0032, 0.0034, 0.0036,
+                                        0.0252,
+                                        0.0072, 0.0048, 0.0160]]]]])
+        eq_(self.singleband.orb_names,
+            ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2',
+             'dxz', 'dx2', 'tot', 'p', 'pxpy', 'd'])
+
+
+# ------------------------------
 
 
 class TestSpinPolarizedPROCAR(object):
@@ -167,6 +213,31 @@ class TestSpinPolarizedPROCAR(object):
              0.0084, 0.0085, 0.0086, 0.0087,
              0.0088, 0.0756])
 
+    @with_setup(setup=setup)
+    def test_spinprocar_band_compose_orbital1(self):
+        '''test for Band_with_projection.compose_orbital (SOI)
+
+        raise RuntimeError when no item in sitecomposed
+        '''
+        self.spinband.compose_sites((0, 2))
+        self.spinband.compose_orbital(('p', 'pxpy', 'd'))
+        np.testing.assert_allclose(self.spinband.sitecomposed[0][0][0][0],
+                                   [0.0020, 0.0022, 0.0024,
+                                    0.0026, 0.0028, 0.0030,
+                                    0.0032, 0.0034, 0.0036, 0.0252,
+                                    0.0072, 0.0048, 0.0160])
+        np.testing.assert_allclose(self.spinband.sitecomposed[1][0][0][0],
+                                   [2.0020, 2.0022, 2.0024,
+                                    2.0026, 2.0028, 2.0030,
+                                    2.0032, 2.0034, 2.0036, 18.0252,
+                                    6.0072, 4.0048, 10.0160])
+        eq_(self.spinband.orb_names,
+            ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2',
+             'dxz', 'dx2', 'tot', 'p', 'pxpy', 'd'])
+
+
+# -------------------------
+
 
 class TestSOIPROCAR(object):
     '''Class for Test of PROCAR module
@@ -227,14 +298,13 @@ class TestSOIPROCAR(object):
         np.testing.assert_array_equal(self.soiband.energies,
                                       [[-10, -5], [-7, -4], [-6, -1]])
 
-    def test_singleprocar_fermi_correction(self):
+    def test_soiprocar_fermi_correction(self):
         '''test for Band_with_projection.fermi_correction
         '''
         self.soiband.fermi_correction(1.0)
         np.testing.assert_array_equal(self.soiband.energies,
-                                [[-11, -6], [-8, -5], [-7, -2]])
+                                      [[-11, -6], [-8, -5], [-7, -2]])
 
-    
     @with_setup(setup=setup)
     def test_soiprocar_band_orbitalread(self):
         '''test for Band_with_projection.orbitals setter (SOI)'''
@@ -259,49 +329,46 @@ class TestSOIPROCAR(object):
              3.0074, 3.0075, 3.0076, 3.0077,
              3.0078, 3.0666])
 
+    @with_setup(setup=setup)
+    def test_soiprocar_band_compose_sites(self):
+        '''test for Band_with_projection.compose_sites (SOI)'''
+        self.soiband.compose_sites((0, 2))
+        np.testing.assert_allclose(self.soiband.sitecomposed[0][0][0][0],
+                                   [0.0020, 0.0022, 0.0024,
+                                    0.0026, 0.0028, 0.0030,
+                                    0.0032, 0.0034, 0.0036, 0.0252])
+
+    @raises(RuntimeError)
+    @with_setup(setup=setup)
+    def test_soiprocar_band_compose_orbital0(self):
+        '''test for Band_with_projection.compose_orbital (0) (SOI)
+
+        raise RuntimeError when no item in sitecomposed
+        '''
+        self.soiband.compose_orbital(('p', 'pxpy', 'd'))
+
+    @with_setup(setup=setup)
+    def test_soiprocar_band_compose_orbital1(self):
+        '''test for Band_with_projection.compose_orbital (SOI)
+
+        raise RuntimeError when no item in sitecomposed
+        '''
+        self.soiband.compose_sites((0, 2))
+        self.soiband.compose_orbital(('p', 'pxpy', 'd'))
+        np.testing.assert_allclose(self.soiband.sitecomposed[0][0][0][0],  # mT
+                                   [0.0020, 0.0022, 0.0024,
+                                    0.0026, 0.0028, 0.0030,
+                                    0.0032, 0.0034, 0.0036, 0.0252,
+                                    0.0072, 0.0048, 0.0160])
+        np.testing.assert_allclose(self.soiband.sitecomposed[2][0][0][0],  # mY
+                                   [4.002, 4.0022, 4.0024, 4.0026, 4.0028,
+                                    4.0030, 4.0032, 4.0034, 4.0036, 4.0252,
+                                    12.0072, 8.0048, 20.016])
+        eq_(self.soiband.orb_names,
+            ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2',
+             'dxz', 'dx2', 'tot', 'p', 'pxpy', 'd'])
+
 '''
-class TestPROCAR(unittest.TestCase):
-
-    def setUp(self):
-        # single state
-        global procar_single
-        filePROCAR = tempfile.mkstemp()
-        f = open(filePROCAR[1], 'w')
-        f.write(procar_single)
-        f.close()
-        self.procar_single = procar.PROCAR(filePROCAR[1], phase_read=True)
-        os.remove(filePROCAR[1])
-        # without Spi/Spin
-        global procar_woSpi
-        filePROCAR = tempfile.mkstemp()
-        f = open(filePROCAR[1], 'w')
-        f.write(procar_woSpi)
-        f.close()
-        self.procar_std = procar.PROCAR(filePROCAR[1], phase_read=True)
-        os.remove(filePROCAR[1])
-        # with Spin
-        global procar_Spin
-        filePROCAR = tempfile.mkstemp()
-        f = open(filePROCAR[1], 'w')
-        f.write(procar_Spin)
-        f.close()
-        self.procar_spin = procar.PROCAR(filePROCAR[1], phase_read=True)
-        os.remove(filePROCAR[1])
-        # with SOI (noncollinear)
-        global procar_SOI
-        filePROCAR = tempfile.mkstemp()
-        f = open(filePROCAR[1], 'w')
-        f.write(procar_SOI)
-        f.close()
-        self.procar_soi = procar.PROCAR(filePROCAR[1], phase_read=True)
-        os.remove(filePROCAR[1])
-        #
-        # Band object
-        #
-        self.nullband = procar.BandStructure()
-
-    def test_procar_load(self):
-        pass
 
     def test_procar_std_print(self):
         self.assertEqual(output_print_procar_std, self.procar_std.__str__())
