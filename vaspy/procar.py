@@ -329,11 +329,11 @@ class Projection(object):
         result = 0
         orb_names = ['s', 'py', 'pz', 'px',
                      'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot']
-        for aState in states:
-            if isinstance(aState[1], int) and 0 <= aState[1] <= 9:
-                orbindex = aState[1]
-            elif aState[1] in orb_names:
-                orbindex = orb_names.index[aState[1]]
+        for a_state in states:
+            if isinstance(a_state[1], int) and 0 <= a_state[1] <= 9:
+                orbindex = a_state[1]
+            elif a_state[1] in orb_names:
+                orbindex = orb_names.index[a_state[1]]
             else:
                 raise ValueError("Check your input for orbital name")
             if self.soi and (axis == 'x' or axis == 'X' or axis == 0):
@@ -342,7 +342,7 @@ class Projection(object):
                 orbindex += 20
             elif self.soi and (axis == 'z' or axis == 'Z' or axis == 2):
                 orbindex += 30
-            result += self.proj[orbindex][aState[0]-1]
+            result += self.proj[orbindex][a_state[0]-1]
         return np.array([result])
 
     def add_output_states(self, name, state):
@@ -394,7 +394,7 @@ class BandWithProjection(object):
                           'dxy', 'dyz', 'dz2', 'dxz', 'dx2',
                           'tot']
 
-    def isready(self):
+    def isready(self):  #checked
         '''.. py:method:: isready()
 
         Return True if numk, n_bands, n_atoms, spininfo, and
@@ -420,7 +420,7 @@ class BandWithProjection(object):
             raise ValueError("orb_names is not correctly set")
         return True
 
-    @property
+    @property  # checked
     def n_bands(self):
         '''Number of bands'''
         return self.__n_bands
@@ -430,7 +430,7 @@ class BandWithProjection(object):
         self.__n_bands = arg
         self.available_band = list(range(self.n_bands))
 
-    @property
+    @property    # checked
     def orbitals(self):
         '''Number of bands'''
         return self.__orbitals
@@ -465,15 +465,11 @@ class BandWithProjection(object):
                 self.__orbitals = [self.__orbitals[0], self.__orbitals[1]]
 
     @property
-    def sitecomposed(self):
-        return self.__sitecomposed
-
-    @property
     def phases(self):
         '''Phase data
 
-.. note:: At present I have no idea about this parameter. How to use it?
-'''
+        .. note:: At present I have no idea about this parameter. How to use it?
+        '''
         return self.__phases
 
     @phases.setter
@@ -506,7 +502,7 @@ class BandWithProjection(object):
                                                len(self.orb_names) - 1)
                 self.__phases = (self.__phases[0], self.__phases[1])
 
-    @property
+    @property    # checked
     def kvectors(self):
         '''setter for kvector'''
         return self.__kvectors
@@ -527,7 +523,7 @@ class BandWithProjection(object):
                     self.kdistance[i - 1] +
                     np.linalg.norm(self.kvectors[i - 1] - k))
 
-    @property
+    @property    # checked
     def energies(self):
         '''Energies'''
         return self.__energies
@@ -535,7 +531,7 @@ class BandWithProjection(object):
     @energies.setter
     def energies(self, arg):
         '''Setter for energies property.
-'''
+        '''
         if self.isready():
             if len(self.spininfo) == 1 or len(self.spininfo) == 4:
                 self.__energies = np.array(arg).reshape(
@@ -552,7 +548,7 @@ class BandWithProjection(object):
                                 self.numk, self.n_bands))
                 self.__energies = np.array(self.__energies)
 
-    def fermi_correction(self, fermi):
+    def fermi_correction(self, fermi):  # checked
         '''Correct the Fermi level
 
         .. py:method:: fermi_correction(fermi)
@@ -561,6 +557,11 @@ class BandWithProjection(object):
         :type fermi: float
         '''
         self.__energies -= fermi
+
+
+    @property
+    def sitecomposed(self):
+        return self.__sitecomposed
 
     def compose_sites(self, arg):
         '''Make sitecomposed ndarray
@@ -887,7 +888,7 @@ class BandWithProjection(object):
         header = map(str, self.set_header(sitenames, orbnames))
         output = "\t".join(header) + "\n"
         lists = self.list_sitecomposed_data(orbnames)
-        for l in lists:
-            l = map(str, l)
-            output += "\t".join(l) + "\n"
+        for line in lists:
+            line = map(str, line)
+            output += "\t".join(line) + "\n"
         return output

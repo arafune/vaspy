@@ -53,6 +53,7 @@ class TestSinglePROCAR(object):
         eq_(self.singleband.n_bands, self.singleprocar.n_bands)
         eq_(self.singleband.kvectors, self.singleprocar.kvectors)
         eq_(self.singleband.spininfo, self.singleprocar.spininfo)
+        eq_(self.singleband.isready())
         np.testing.assert_array_equal(self.singleband.kdistance,
                                       [0.])
 
@@ -61,6 +62,13 @@ class TestSinglePROCAR(object):
         '''test for Band_with_projection.energies setter'''
         np.testing.assert_array_equal(self.singleband.energies,
                                       [[-15.0]])
+
+    def test_singleprocar_fermi_correction(self):
+        '''test for Band_with_projection.fermi_correction
+        '''
+        self.singleband.fermi_correction(1.0)
+        np.testing.assert_array_equal(self.singleband.energies,
+                                      [[-16.0]])
 
     @with_setup(setup=setup)
     def test_singleprocar_band_orbitalread(self):
@@ -119,6 +127,7 @@ class TestSpinPolarizedPROCAR(object):
         eq_(self.spinband.n_bands, self.spinprocar.n_bands)
         eq_(self.spinband.kvectors, self.spinprocar.kvectors[0:3])
         eq_(self.spinband.spininfo, self.spinprocar.spininfo)
+        ok_(self.spinband.isready())
         np.testing.assert_array_almost_equal(self.spinband.kdistance,
                                              [0., 0.353553, 0.707107])
 
@@ -132,6 +141,16 @@ class TestSpinPolarizedPROCAR(object):
                                        [[-10.5, -5.5],
                                         [-7.5, -4.5],
                                         [-6.5, -1.5]]])
+
+    def test_spinprocar_fermi_correction(self):
+        '''test for Band_with_projection.fermi_correction (SPIN)
+        '''
+        self.spinband.fermi_correction(1.0)
+        np.testing.assert_array_equal(self.spinband.energies,
+                                      [[[-11, -6], [-8, -5], [-7, -2]],
+                                       [[-11.5, -6.5],
+                                        [-8.5, -5.5],
+                                        [-7.5, -2.5]]])
 
     @with_setup(setup=setup)
     def test_spinprocar_band_orbitalread(self):
@@ -196,6 +215,7 @@ class TestSOIPROCAR(object):
         eq_(self.soiband.n_bands, self.soiprocar.n_bands)
         eq_(self.soiband.kvectors, self.soiprocar.kvectors[0:3])
         eq_(self.soiband.spininfo, self.soiprocar.spininfo)
+        ok_(self.soiband.isready())
         np.testing.assert_array_almost_equal(self.soiband.kdistance,
                                              [0., 0.353553, 0.707107])
 
@@ -207,6 +227,14 @@ class TestSOIPROCAR(object):
         np.testing.assert_array_equal(self.soiband.energies,
                                       [[-10, -5], [-7, -4], [-6, -1]])
 
+    def test_singleprocar_fermi_correction(self):
+        '''test for Band_with_projection.fermi_correction
+        '''
+        self.soiband.fermi_correction(1.0)
+        np.testing.assert_array_equal(self.soiband.energies,
+                                [[-11, -6], [-8, -5], [-7, -2]])
+
+    
     @with_setup(setup=setup)
     def test_soiprocar_band_orbitalread(self):
         '''test for Band_with_projection.orbitals setter (SOI)'''
