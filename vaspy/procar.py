@@ -89,9 +89,6 @@ class PROCAR(object):  # Version safety
         * nospin: ('',)
         * spinresolved: ('_up', '_down')
         * soi: ('_mT', '_mX', '_mY', '_mZ')
-
-    :author: Ryuichi Arafune
-    :version: 2.1
     '''
 
     def __init__(self, arg=None, phase_read=False):
@@ -177,7 +174,9 @@ class PROCAR(object):  # Version safety
             self.spininfo = ('_mT', '_mX', '_mY', '_mZ')
 
     def __str__(self):
-        '''x.__str__() <=> str(x)
+        '''.. py:method:: __str__()
+
+        __str__() <=> str(x)
 
         show the PROCAR character, not contents.
         '''
@@ -337,7 +336,7 @@ class Projection(object):
                 orbindex = orb_names.index[aState[1]]
             else:
                 raise ValueError("Check your input for orbital name")
-            if self.soi and (axis == 'x' or axis == 'Y' or axis == 0):
+            if self.soi and (axis == 'x' or axis == 'X' or axis == 0):
                 orbindex += 10
             elif self.soi and (axis == 'y' or axis == 'Y' or axis == 1):
                 orbindex += 20
