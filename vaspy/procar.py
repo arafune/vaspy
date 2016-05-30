@@ -336,7 +336,7 @@ class Projection(object):
                 orbindex = orb_names.index[aState[1]]
             else:
                 raise ValueError("Check your input for orbital name")
-            if self.soi and (axis == 'x' or axis == 'Y' or axis == 0):
+            if self.soi and (axis == 'x' or axis == 'X' or axis == 0):
                 orbindex += 10
             elif self.soi and (axis == 'y' or axis == 'Y' or axis == 1):
                 orbindex += 20
