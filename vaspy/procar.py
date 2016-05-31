@@ -27,7 +27,6 @@ if sys.version_info[0] >= 3:     # Version safety
     from io import StringIO
 else:
     from cStringIO import StringIO
-
 try:
     from vaspy import tools
 except ImportError:
@@ -329,11 +328,11 @@ class Projection(object):
         result = 0
         orb_names = ['s', 'py', 'pz', 'px',
                      'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot']
-        for aState in states:
-            if isinstance(aState[1], int) and 0 <= aState[1] <= 9:
-                orbindex = aState[1]
-            elif aState[1] in orb_names:
-                orbindex = orb_names.index[aState[1]]
+        for a_state in states:
+            if isinstance(a_state[1], int) and 0 <= a_state[1] <= 9:
+                orbindex = a_state[1]
+            elif a_state[1] in orb_names:
+                orbindex = orb_names.index[a_state[1]]
             else:
                 raise ValueError("Check your input for orbital name")
             if self.soi and (axis == 'x' or axis == 'X' or axis == 0):
@@ -342,7 +341,7 @@ class Projection(object):
                 orbindex += 20
             elif self.soi and (axis == 'z' or axis == 'Z' or axis == 2):
                 orbindex += 30
-            result += self.proj[orbindex][aState[0]-1]
+            result += self.proj[orbindex][a_state[0]-1]
         return np.array([result])
 
     def add_output_states(self, name, state):
@@ -385,10 +384,12 @@ class BandWithProjection(object):
         self.__n_bands = 0
         self.__kvectors = list()
         self.kdistance = list()
-        self.__sitecomposed = []
+        self.sitecomposed = []
         self.__orbitals = 0
         self.__phases = 0
         self.__energies = 0
+        self.numk = 0
+        self.n_atoms = 0
         self.spininfo = tuple()
         self.orb_names = ['s', 'py', 'pz', 'px',
                           'dxy', 'dyz', 'dz2', 'dxz', 'dx2',
@@ -465,19 +466,15 @@ class BandWithProjection(object):
                 self.__orbitals = [self.__orbitals[0], self.__orbitals[1]]
 
     @property
-    def sitecomposed(self):
-        return self.__sitecomposed
-
-    @property
     def phases(self):
         '''Phase data
 
-.. note:: At present I have no idea about this parameter. How to use it?
-'''
+        .. note:: At present I have no idea about this parameter. How to use it?
+        '''
         return self.__phases
 
     @phases.setter
-    def phases(self, arg):
+    def phases(self, arg):  # not checked
         '''Phases
 
         Return is 4-rank tensor for the standard (i.e. ISPIN = 0) or SOI
@@ -513,7 +510,7 @@ class BandWithProjection(object):
 
     @kvectors.setter
     def kvectors(self, kvectors):
-        if type(kvectors) != list:
+        if not isinstance(kvectors, list):
             errmsg = 'kvectors must be an array of ndarray\n'
             raise TypeError(errmsg)
         self.__kvectors = kvectors
@@ -527,7 +524,7 @@ class BandWithProjection(object):
                     self.kdistance[i - 1] +
                     np.linalg.norm(self.kvectors[i - 1] - k))
 
-    @property
+    @property    # checked
     def energies(self):
         '''Energies'''
         return self.__energies
@@ -535,7 +532,7 @@ class BandWithProjection(object):
     @energies.setter
     def energies(self, arg):
         '''Setter for energies property.
-'''
+        '''
         if self.isready():
             if len(self.spininfo) == 1 or len(self.spininfo) == 4:
                 self.__energies = np.array(arg).reshape(
@@ -579,12 +576,12 @@ class BandWithProjection(object):
                  if x in site_numbers],
                 axis=0)] for j in range(len(self.available_band))]
                                 for i in range(self.numk)])
-            if self.__sitecomposed:
-                self.__sitecomposed[0] = np.concatenate(
-                    (self.__sitecomposed[0], cmporbs),
+            if self.sitecomposed:
+                self.sitecomposed[0] = np.concatenate(
+                    (self.sitecomposed[0], cmporbs),
                     axis=2)
             else:
-                self.__sitecomposed = [cmporbs]
+                self.sitecomposed = [cmporbs]
         if len(self.spininfo) == 2:
             upspin_orbitals = self.orbitals[0]
             downspin_orbitals = self.orbitals[1]
@@ -604,15 +601,15 @@ class BandWithProjection(object):
             self.__orbitals[1] = np.concatenate((self.__orbitals[1],
                                                  cmporbsDown),
                                                 axis=2)
-            if self.__sitecomposed:
-                self.__sitecomposed[0] = np.concatenate(
-                    (self.__sitecomposed[0], cmporbsUp),
+            if self.sitecomposed:
+                self.sitecomposed[0] = np.concatenate(
+                    (self.sitecomposed[0], cmporbsUp),
                     axis=2)
-                self.__sitecomposed[1] = np.concatenate(
-                    (self.__sitecomposed[1], cmporbsDown),
+                self.sitecomposed[1] = np.concatenate(
+                    (self.sitecomposed[1], cmporbsDown),
                     axis=2)
             else:
-                self.__sitecomposed = [cmporbsUp, cmporbsDown]
+                self.sitecomposed = [cmporbsUp, cmporbsDown]
         if len(self.spininfo) == 4:
             site_numbers_mT = tuple(x + self.n_atoms *
                                     0 for x in site_numbers)
@@ -643,49 +640,22 @@ class BandWithProjection(object):
                  if x in site_numbers_mZ],
                 axis=0)] for j in range(len(self.available_band))]
                                    for i in range(self.numk)])
-            if self.__sitecomposed:
-                self.__sitecomposed[0] = np.concatenate(
-                    (self.__sitecomposed[0], cmporbs_mT),
+            if self.sitecomposed:
+                self.sitecomposed[0] = np.concatenate(
+                    (self.sitecomposed[0], cmporbs_mT),
                     axis=2)
-                self.__sitecomposed[1] = np.concatenate(
-                    (self.__sitecomposed[1], cmporbs_mX),
+                self.sitecomposed[1] = np.concatenate(
+                    (self.sitecomposed[1], cmporbs_mX),
                     axis=2)
-                self.__sitecomposed[2] = np.concatenate(
-                    (self.__sitecomposed[2], cmporbs_mY),
+                self.sitecomposed[2] = np.concatenate(
+                    (self.sitecomposed[2], cmporbs_mY),
                     axis=2)
-                self.__sitecomposed[3] = np.concatenate(
-                    (self.__sitecomposed[3], cmporbs_mZ),
+                self.sitecomposed[3] = np.concatenate(
+                    (self.sitecomposed[3], cmporbs_mZ),
                     axis=2)
             else:
-                self.__sitecomposed = [cmporbs_mT,
-                                       cmporbs_mX, cmporbs_mY, cmporbs_mZ]
-
-    def check_orb_name(self, arg):
-        '''.. py:method::check_orb_name(arg)
-
-        Return arg without change if arg is a member of the 'orbital name'.
-        i.e., if arg is an alias of the (more appropriate) orbital
-        name, return it as is.  If arg is neither the appropriate
-        orbital name nor the alias, raise ValueError.
-
-        :param arg: the string to be checked as the orbital name
-        :type arg: str
-        :rtype: str
-
-        '''
-        translate_dict = {'pypx': 'pxpy', 'pzpx': 'pxpz', 'pzpy': 'pypz',
-                          'pxpypz': 'p', 'pxpzpy': 'p', 'pypxpz': 'p',
-                          'pypzpx': 'p', 'pzpxpy': 'p', 'pzpypx': 'p',
-                          'spd': 'tot'}
-        proper_orb_name_list = self.orb_names + [
-            'sp', 'p', 'pxpy', 'pxpz', 'pypz', 'spd', 'd']
-        if arg in translate_dict.keys():
-            arg = translate_dict[arg]
-        if arg in proper_orb_name_list:
-            return arg
-        else:
-            errmsg = arg + ": (composed) orbital name was not defined."
-            raise ValueError(errmsg)
+                self.sitecomposed = [cmporbs_mT,
+                                     cmporbs_mX, cmporbs_mY, cmporbs_mZ]
 
     def get_orb_index(self, arg):
         '''.. py:method::get_orb_index(arg)
@@ -704,7 +674,7 @@ class BandWithProjection(object):
         :return: number corresponding to (composed) orbital name.
         :rtype: tuple
         '''
-        orbname = self.check_orb_name(arg)
+        orbname = check_orb_name(arg)
         if (orbname in self.orb_names and
                 self.orb_names.index(orbname) <= self.orb_names.index('tot')):
             orb_indexes = (self.orb_names.index(orbname),)
@@ -750,13 +720,13 @@ class BandWithProjection(object):
             err = "This method operates with on sitecomposed attribute,"
             err += " but it's null"
             raise RuntimeError(err)
-        if type(arg) == str:
+        if isinstance(arg, str):
             if ':' in arg:
                 arg = arg.split(':')
             else:
                 arg = [arg]
         for orb in arg:
-            orb = self.check_orb_name(orb)
+            orb = check_orb_name(orb)
             if orb in self.orb_names:
                 continue
             else:
@@ -774,7 +744,7 @@ class BandWithProjection(object):
                         axis=3)
                 self.orb_names.append(orb)
 
-    def del_band(self, band_indexes):
+    def del_band(self, band_indexes):  # not checked
         '''not yet impremented'''
         if not self.sitecomposed:
             err = "This method operates with on sitecomposed attribute,"
@@ -788,6 +758,8 @@ class BandWithProjection(object):
         :type sitenames: tuple, list
         :param orbnames: orbital names e.g., (('s', 'pxpy',), ('pxpy', 'p'))
         :type orbnames: tuple, list
+        :return: header
+        :rtype: list
         '''
         if len(sitenames) != len(orbnames):
             raise ValueError("Length of sitenames and orbnames is not same.")
@@ -828,7 +800,7 @@ class BandWithProjection(object):
         return tuple(tuple(self.orb_names.index(orb) for orb in orbs)
                      for orbs in orbnames)
 
-    def list_sitecomposed_data(self, orbnames):
+    def list_sitecomposed_data(self, orbnames):  # not checked
         '''.. py:method::list_sitecomposed_data(orbnames)
 
         Return list of sitecomposed attribute to 2D-list
@@ -881,13 +853,42 @@ class BandWithProjection(object):
             raise RuntimeError("spininfo is incorrect")
         return table
 
-    def get_sitecomposed_data(self, sitenames, orbnames):
+    def get_sitecomposed_data(self, sitenames, orbnames):  # not checked
         '''Return band structure with (gathered) orbital
         contributions as string'''
         header = map(str, self.set_header(sitenames, orbnames))
         output = "\t".join(header) + "\n"
         lists = self.list_sitecomposed_data(orbnames)
-        for l in lists:
-            l = map(str, l)
-            output += "\t".join(l) + "\n"
+        for line in lists:
+            line = map(str, line)
+            output += "\t".join(line) + "\n"
         return output
+
+
+def check_orb_name(arg):
+    '''.. py:function::check_orb_name(arg)
+
+    Return arg without change if arg is a member of the 'orbital name'.
+    i.e., if arg is an alias of the (more appropriate) orbital
+    name, return it as is.  If arg is neither the appropriate
+    orbital name nor the alias, raise ValueError.
+
+    :param arg: the string to be checked as the orbital name
+    :type arg: str
+    :rtype: str
+    '''
+    translate_dict = {'pypx': 'pxpy', 'pzpx': 'pxpz', 'pzpy': 'pypz',
+                      'pxpypz': 'p', 'pxpzpy': 'p', 'pypxpz': 'p',
+                      'pypzpx': 'p', 'pzpxpy': 'p', 'pzpypx': 'p',
+                      'spd': 'tot'}
+    proper_orb_name_list = ['s', 'py', 'pz', 'px',
+                            'dxy', 'dyz', 'dz2', 'dxz', 'dx2',
+                            'tot'] + ['sp', 'p',
+                                      'pxpy', 'pxpz', 'pypz', 'spd', 'd']
+    if arg in translate_dict.keys():
+        arg = translate_dict[arg]
+    if arg in proper_orb_name_list:
+        return arg
+    else:
+        errmsg = arg + ": (composed) orbital name was not defined."
+        raise ValueError(errmsg)
