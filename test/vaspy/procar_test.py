@@ -150,12 +150,12 @@ class TestSinglePROCAR(object):
         '''test for Band_with_projection.check_orb_name
         '''
         self.singleband.compose_sites((0, 2))
-        eq_(self.singleband.check_orb_name('p'), 'p')
-        self.singleband.check_orb_name('k')
+        eq_(procar.check_orb_name('p'), 'p')
+        procar.check_orb_name('k')
 
     @with_setup(setup=setup)
     def test_singleprocar_setheader(self):
-        '''test for Band_with_projection.check_orb_name
+        '''test for Band_with_projection.set_header
         '''
         self.singleband.compose_sites((0, 2))
         self.singleband.compose_orbital(('p', 'pxpy', 'd'))

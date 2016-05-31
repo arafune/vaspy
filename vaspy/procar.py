@@ -21,12 +21,12 @@ import os
 import sys
 # import csv
 # import functools as ft
+import numpy as np
+import matplotlib.pyplot as plt
 if sys.version_info[0] >= 3:     # Version safety
     from io import StringIO
 else:
     from cStringIO import StringIO
-import numpy as np
-import matplotlib.pyplot as plt
 try:
     from vaspy import tools
 except ImportError:
@@ -510,7 +510,7 @@ class BandWithProjection(object):
 
     @kvectors.setter
     def kvectors(self, kvectors):
-        if type(kvectors) != list:
+        if not isinstance(kvectors, list):
             errmsg = 'kvectors must be an array of ndarray\n'
             raise TypeError(errmsg)
         self.__kvectors = kvectors
@@ -655,36 +655,7 @@ class BandWithProjection(object):
                     axis=2)
             else:
                 self.sitecomposed = [cmporbs_mT,
-                                       cmporbs_mX, cmporbs_mY, cmporbs_mZ]
-
-    def check_orb_name(self, arg):
-        '''.. py:method::check_orb_name(arg)
-
-        Return arg without change if arg is a member of the 'orbital name'.
-        i.e., if arg is an alias of the (more appropriate) orbital
-        name, return it as is.  If arg is neither the appropriate
-        orbital name nor the alias, raise ValueError.
-
-        :param arg: the string to be checked as the orbital name
-        :type arg: str
-        :rtype: str
-
-        '''
-        translate_dict = {'pypx': 'pxpy', 'pzpx': 'pxpz', 'pzpy': 'pypz',
-                          'pxpypz': 'p', 'pxpzpy': 'p', 'pypxpz': 'p',
-                          'pypzpx': 'p', 'pzpxpy': 'p', 'pzpypx': 'p',
-                          'spd': 'tot'}
-        proper_orb_name_list = ['s', 'py', 'pz', 'px',
-                                'dxy', 'dyz', 'dz2', 'dxz', 'dx2',
-                                'tot'] + ['sp', 'p',
-                                          'pxpy', 'pxpz', 'pypz', 'spd', 'd']
-        if arg in translate_dict.keys():
-            arg = translate_dict[arg]
-        if arg in proper_orb_name_list:
-            return arg
-        else:
-            errmsg = arg + ": (composed) orbital name was not defined."
-            raise ValueError(errmsg)
+                                     cmporbs_mX, cmporbs_mY, cmporbs_mZ]
 
     def get_orb_index(self, arg):
         '''.. py:method::get_orb_index(arg)
@@ -703,7 +674,7 @@ class BandWithProjection(object):
         :return: number corresponding to (composed) orbital name.
         :rtype: tuple
         '''
-        orbname = self.check_orb_name(arg)
+        orbname = check_orb_name(arg)
         if (orbname in self.orb_names and
                 self.orb_names.index(orbname) <= self.orb_names.index('tot')):
             orb_indexes = (self.orb_names.index(orbname),)
@@ -755,7 +726,7 @@ class BandWithProjection(object):
             else:
                 arg = [arg]
         for orb in arg:
-            orb = self.check_orb_name(orb)
+            orb = check_orb_name(orb)
             if orb in self.orb_names:
                 continue
             else:
@@ -892,3 +863,32 @@ class BandWithProjection(object):
             line = map(str, line)
             output += "\t".join(line) + "\n"
         return output
+
+
+def check_orb_name(arg):
+    '''.. py:function::check_orb_name(arg)
+
+    Return arg without change if arg is a member of the 'orbital name'.
+    i.e., if arg is an alias of the (more appropriate) orbital
+    name, return it as is.  If arg is neither the appropriate
+    orbital name nor the alias, raise ValueError.
+
+    :param arg: the string to be checked as the orbital name
+    :type arg: str
+    :rtype: str
+    '''
+    translate_dict = {'pypx': 'pxpy', 'pzpx': 'pxpz', 'pzpy': 'pypz',
+                      'pxpypz': 'p', 'pxpzpy': 'p', 'pypxpz': 'p',
+                      'pypzpx': 'p', 'pzpxpy': 'p', 'pzpypx': 'p',
+                      'spd': 'tot'}
+    proper_orb_name_list = ['s', 'py', 'pz', 'px',
+                            'dxy', 'dyz', 'dz2', 'dxz', 'dx2',
+                            'tot'] + ['sp', 'p',
+                                      'pxpy', 'pxpz', 'pypz', 'spd', 'd']
+    if arg in translate_dict.keys():
+        arg = translate_dict[arg]
+    if arg in proper_orb_name_list:
+        return arg
+    else:
+        errmsg = arg + ": (composed) orbital name was not defined."
+        raise ValueError(errmsg)
