@@ -384,7 +384,7 @@ class BandWithProjection(object):
         self.__n_bands = 0
         self.__kvectors = list()
         self.kdistance = list()
-        self.__sitecomposed = []
+        self.sitecomposed = []
         self.__orbitals = 0
         self.__phases = 0
         self.__energies = 0
@@ -559,10 +559,6 @@ class BandWithProjection(object):
         '''
         self.__energies -= fermi
 
-    @property
-    def sitecomposed(self):
-        return self.__sitecomposed
-
     def compose_sites(self, arg):
         '''Make sitecomposed ndarray
 
@@ -580,12 +576,12 @@ class BandWithProjection(object):
                  if x in site_numbers],
                 axis=0)] for j in range(len(self.available_band))]
                                 for i in range(self.numk)])
-            if self.__sitecomposed:
-                self.__sitecomposed[0] = np.concatenate(
-                    (self.__sitecomposed[0], cmporbs),
+            if self.sitecomposed:
+                self.sitecomposed[0] = np.concatenate(
+                    (self.sitecomposed[0], cmporbs),
                     axis=2)
             else:
-                self.__sitecomposed = [cmporbs]
+                self.sitecomposed = [cmporbs]
         if len(self.spininfo) == 2:
             upspin_orbitals = self.orbitals[0]
             downspin_orbitals = self.orbitals[1]
@@ -605,15 +601,15 @@ class BandWithProjection(object):
             self.__orbitals[1] = np.concatenate((self.__orbitals[1],
                                                  cmporbsDown),
                                                 axis=2)
-            if self.__sitecomposed:
-                self.__sitecomposed[0] = np.concatenate(
-                    (self.__sitecomposed[0], cmporbsUp),
+            if self.sitecomposed:
+                self.sitecomposed[0] = np.concatenate(
+                    (self.sitecomposed[0], cmporbsUp),
                     axis=2)
-                self.__sitecomposed[1] = np.concatenate(
-                    (self.__sitecomposed[1], cmporbsDown),
+                self.sitecomposed[1] = np.concatenate(
+                    (self.sitecomposed[1], cmporbsDown),
                     axis=2)
             else:
-                self.__sitecomposed = [cmporbsUp, cmporbsDown]
+                self.sitecomposed = [cmporbsUp, cmporbsDown]
         if len(self.spininfo) == 4:
             site_numbers_mT = tuple(x + self.n_atoms *
                                     0 for x in site_numbers)
@@ -644,21 +640,21 @@ class BandWithProjection(object):
                  if x in site_numbers_mZ],
                 axis=0)] for j in range(len(self.available_band))]
                                    for i in range(self.numk)])
-            if self.__sitecomposed:
-                self.__sitecomposed[0] = np.concatenate(
-                    (self.__sitecomposed[0], cmporbs_mT),
+            if self.sitecomposed:
+                self.sitecomposed[0] = np.concatenate(
+                    (self.sitecomposed[0], cmporbs_mT),
                     axis=2)
-                self.__sitecomposed[1] = np.concatenate(
-                    (self.__sitecomposed[1], cmporbs_mX),
+                self.sitecomposed[1] = np.concatenate(
+                    (self.sitecomposed[1], cmporbs_mX),
                     axis=2)
-                self.__sitecomposed[2] = np.concatenate(
-                    (self.__sitecomposed[2], cmporbs_mY),
+                self.sitecomposed[2] = np.concatenate(
+                    (self.sitecomposed[2], cmporbs_mY),
                     axis=2)
-                self.__sitecomposed[3] = np.concatenate(
-                    (self.__sitecomposed[3], cmporbs_mZ),
+                self.sitecomposed[3] = np.concatenate(
+                    (self.sitecomposed[3], cmporbs_mZ),
                     axis=2)
             else:
-                self.__sitecomposed = [cmporbs_mT,
+                self.sitecomposed = [cmporbs_mT,
                                        cmporbs_mX, cmporbs_mY, cmporbs_mZ]
 
     def check_orb_name(self, arg):
