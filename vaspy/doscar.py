@@ -53,7 +53,9 @@ import matplotlib.pyplot as plt
 
 
 class DOSCAR(object):  # Version safety
-    '''Class for DOSCAR file
+    '''.. py:class:: DOSCAR(doscarfile)
+
+    Class for DOSCAR file
 
     A container of DOS object
 
@@ -70,10 +72,6 @@ class DOSCAR(object):  # Version safety
     :py:attr:`dos_container` is a python list object that
     stores the DOS object. By default, the first item is the TDOS, and the
     latter items are PDOS.
-
-
-    :author: Ryuichi Arafune
-    :version: 2.1
     '''
 
     def __init__(self, arg=None):
@@ -126,8 +124,9 @@ class DOSCAR(object):  # Version safety
 
 
 class DOS(object):  # Version safety
+    '''.. py:class:: DOS
 
-    '''Class for DOS
+    Class for DOS
 
     List object consisting two elements.
     The first element is the the energy.
@@ -321,7 +320,9 @@ class PDOS(DOS):
         pass
 
     def __add__(self, other):
-        '''x.__add__(y) <-> x+y
+        '''.. py:method:: __add__(other)
+
+        x.__add__(y) <-> x+y
 
         :param other: len(other.energies) must be equal to  len(self.energies).
         :type other: PDOS

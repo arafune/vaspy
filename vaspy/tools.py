@@ -19,7 +19,9 @@ else:
 
 
 def each_slice(iterable, n, fillvalue=None):
-    '''each_slice(iterable, n[, fillvalue]) => iterator
+    '''.. py:function:: each_slice(iterable, n, fillvalue)
+
+    each_slice(iterable, n[, fillvalue]) => iterator
 
 make new iterator object which get n item from [iterable] at once.
 '''
@@ -28,7 +30,9 @@ make new iterator object which get n item from [iterable] at once.
 
 
 def removeall(L, value):
-    '''remove all *value* in [list] L
+    '''.. py:function:: removeall(L, value)
+
+    remove all *value* in [list] L
 
     .. note:: Currently, this function is not used. (Obsolute?)
     '''
@@ -38,7 +42,9 @@ def removeall(L, value):
 
 
 def flatten(nested, target=Iterable, ignore=FLATTEN_IGNORE):
-    '''flatten(iterable) => list
+    '''.. py:function:: flatten(nested, target, ignore)
+
+    flatten(iterable) => list
 
     flatten nested iterable.
     expand object which is included in *target*
@@ -71,7 +77,9 @@ _RESINGLE = re.compile(r'\d+')
 
 
 def parse_Atomselection(L):
-    '''Return list of ordered "String" represents the number
+    '''.. py:function:: parse_Atomselection(L)
+
+Return list of ordered "String" represents the number
 
     :param L: range of the atoms. the numbers deliminated by "-" or ","
     :type L: str
@@ -96,7 +104,9 @@ def parse_Atomselection(L):
 
 
 def parse_AtomselectionNum(L):
-    '''Very similar with parse_Atomselection but returns the array of the
+    '''.. py:function:: parse_AtomselectionNum(L)
+
+    Very similar with parse_Atomselection but returns the array of the
     number not array of the string.
 
     :param L: range of the atoms. the numbers deliminated by "-" or ","

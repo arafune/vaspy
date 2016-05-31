@@ -14,9 +14,6 @@ class OUTCAR(object):  # Version safety
 
     Class for OUTCAR file that stores calculation details
     and/or calculation progress
-
-    :Author: Ryuichi Arafune
-    :version: 2.1
     '''
 
     def __init__(self, arg=None):
@@ -114,7 +111,7 @@ class OUTCAR(object):  # Version safety
 
     def select_posforce_header(self, posforce_flag, *sites):
         '''.. py:method:: select_posforce_header(posforce_flag, *sites)
-'''
+        '''
         if sites == () or sites[0] == []:
             sites = range(1, self.nions + 1)
         if isinstance(sites[0], (list, tuple)):
