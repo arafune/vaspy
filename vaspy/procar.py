@@ -855,11 +855,17 @@ class BandWithProjection(object):
 
     def get_sitecomposed_data(self, sitenames, orbnames):
         '''Return band structure with (gathered) orbital
-contributions as string'''
+        contributions as string
+
+        :param sitename:
+        :param orbnames:
+
+        :return str output: Tab deliminated site composed data
+        '''
         header = map(str, self.set_header(sitenames, orbnames))
         output = "\t".join(header) + "\n"
         lists = self.list_sitecomposed_data(orbnames)
-        for l in lists:
-            l = map(str, l)
-            output += "\t".join(l) + "\n"
+        for line in lists:
+            line = map(str, line)
+            output += "\t".join(line) + "\n"
         return output
