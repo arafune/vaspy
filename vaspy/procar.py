@@ -394,7 +394,7 @@ class BandWithProjection(object):
                           'dxy', 'dyz', 'dz2', 'dxz', 'dx2',
                           'tot']
 
-    def isready(self):  #checked
+    def isready(self):
         '''.. py:method:: isready()
 
         Return True if numk, n_bands, n_atoms, spininfo, and
@@ -420,7 +420,7 @@ class BandWithProjection(object):
             raise ValueError("orb_names is not correctly set")
         return True
 
-    @property  # checked
+    @property
     def n_bands(self):
         '''Number of bands'''
         return self.__n_bands
@@ -430,7 +430,7 @@ class BandWithProjection(object):
         self.__n_bands = arg
         self.available_band = list(range(self.n_bands))
 
-    @property    # checked
+    @property
     def orbitals(self):
         '''Number of bands'''
         return self.__orbitals
@@ -473,7 +473,7 @@ class BandWithProjection(object):
         return self.__phases
 
     @phases.setter
-    def phases(self, arg):
+    def phases(self, arg):  # not checked
         '''Phases
 
         Return is 4-rank tensor for the standard (i.e. ISPIN = 0) or SOI
@@ -502,7 +502,7 @@ class BandWithProjection(object):
                                                len(self.orb_names) - 1)
                 self.__phases = (self.__phases[0], self.__phases[1])
 
-    @property    # checked
+    @property
     def kvectors(self):
         '''setter for kvector'''
         return self.__kvectors
@@ -548,7 +548,7 @@ class BandWithProjection(object):
                                 self.numk, self.n_bands))
                 self.__energies = np.array(self.__energies)
 
-    def fermi_correction(self, fermi):  # checked
+    def fermi_correction(self, fermi):
         '''Correct the Fermi level
 
         .. py:method:: fermi_correction(fermi)
@@ -557,7 +557,6 @@ class BandWithProjection(object):
         :type fermi: float
         '''
         self.__energies -= fermi
-
 
     @property
     def sitecomposed(self):
@@ -678,8 +677,10 @@ class BandWithProjection(object):
                           'pxpypz': 'p', 'pxpzpy': 'p', 'pypxpz': 'p',
                           'pypzpx': 'p', 'pzpxpy': 'p', 'pzpypx': 'p',
                           'spd': 'tot'}
-        proper_orb_name_list = self.orb_names + [
-            'sp', 'p', 'pxpy', 'pxpz', 'pypz', 'spd', 'd']
+        proper_orb_name_list = ['s', 'py', 'pz', 'px',
+                                'dxy', 'dyz', 'dz2', 'dxz', 'dx2',
+                                'tot'] + ['sp', 'p',
+                                          'pxpy', 'pxpz', 'pypz', 'spd', 'd']
         if arg in translate_dict.keys():
             arg = translate_dict[arg]
         if arg in proper_orb_name_list:
@@ -775,7 +776,7 @@ class BandWithProjection(object):
                         axis=3)
                 self.orb_names.append(orb)
 
-    def del_band(self, band_indexes):
+    def del_band(self, band_indexes):  # not checked
         '''not yet impremented'''
         if not self.sitecomposed:
             err = "This method operates with on sitecomposed attribute,"
@@ -789,6 +790,8 @@ class BandWithProjection(object):
         :type sitenames: tuple, list
         :param orbnames: orbital names e.g., (('s', 'pxpy',), ('pxpy', 'p'))
         :type orbnames: tuple, list
+        :return: header
+        :rtype: list
         '''
         if len(sitenames) != len(orbnames):
             raise ValueError("Length of sitenames and orbnames is not same.")
@@ -829,7 +832,7 @@ class BandWithProjection(object):
         return tuple(tuple(self.orb_names.index(orb) for orb in orbs)
                      for orbs in orbnames)
 
-    def list_sitecomposed_data(self, orbnames):
+    def list_sitecomposed_data(self, orbnames):  # not checked
         '''.. py:method::list_sitecomposed_data(orbnames)
 
         Return list of sitecomposed attribute to 2D-list
@@ -882,7 +885,7 @@ class BandWithProjection(object):
             raise RuntimeError("spininfo is incorrect")
         return table
 
-    def get_sitecomposed_data(self, sitenames, orbnames):
+    def get_sitecomposed_data(self, sitenames, orbnames):  # not checked
         '''Return band structure with (gathered) orbital
         contributions as string'''
         header = map(str, self.set_header(sitenames, orbnames))

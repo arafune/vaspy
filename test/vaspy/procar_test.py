@@ -119,6 +119,48 @@ class TestSinglePROCAR(object):
             ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2',
              'dxz', 'dx2', 'tot', 'p', 'pxpy', 'd'])
 
+    @with_setup(setup=setup)
+    def test_singleprocar_band_get_orbnums(self):
+        '''test for Band_with_projection.get_orbnums
+        '''
+        self.singleband.compose_sites((0, 2))
+        self.singleband.compose_orbital(('p', 'pxpy', 'd'))
+        result = self.singleband.get_orbnums((('p', 'pxpy', 'd'),))
+        eq_(((10, 11, 12), ), result)
+        result = self.singleband.get_orbnums((('d', 'pxpy', 'p'),))
+        eq_(((12, 11, 10), ), result)
+        result = self.singleband.get_orbnums((['p', 'pxpy', 'd'],))
+        eq_(((10, 11, 12), ), result)
+        result = self.singleband.get_orbnums([('d', 'pxpy', 'p')])
+        eq_(((12, 11, 10), ), result)
+
+    @with_setup(setup=setup)
+    def test_singleprocar_band_get_orb_index(self):
+        '''test for Band_with_projection.get_orbnums
+        '''
+        self.singleband.compose_sites((0, 2))
+        self.singleband.compose_orbital(('p', 'pxpy', 'd'))
+        eq_(self.singleband.get_orb_index('p'), (3, 1, 2))
+        eq_(self.singleband.get_orb_index('d'), (4, 5, 8, 7, 6))
+        eq_(self.singleband.get_orb_index('pxpy'), (3, 1))
+
+    @raises(ValueError)
+    @with_setup(setup=setup)
+    def test_singleprocar_band_check_orb_name(self):
+        '''test for Band_with_projection.check_orb_name
+        '''
+        self.singleband.compose_sites((0, 2))
+        eq_(self.singleband.check_orb_name('p'), 'p')
+        self.singleband.check_orb_name('k')
+
+    @with_setup(setup=setup)
+    def test_singleprocar_setheader(self):
+        '''test for Band_with_projection.check_orb_name
+        '''
+        self.singleband.compose_sites((0, 2))
+        self.singleband.compose_orbital(('p', 'pxpy', 'd'))
+        eq_(self.singleband.set_header((('test'), ), (('p', 'pxpy', 'd'), )),
+            ['#k', 'energy', 'test_p', 'test_pxpy', 'test_d'])
 
 # ------------------------------
 
@@ -234,6 +276,16 @@ class TestSpinPolarizedPROCAR(object):
         eq_(self.spinband.orb_names,
             ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2',
              'dxz', 'dx2', 'tot', 'p', 'pxpy', 'd'])
+
+    @with_setup(setup=setup)
+    def test_spinprocar_setheader(self):
+        '''test for Band_with_projection.set_header  (SPIN)
+        '''
+        self.spinband.compose_sites((0, 2))
+        self.spinband.compose_orbital(('p', 'pxpy', 'd'))
+        eq_(self.spinband.set_header((('test'), ), (('p', 'pxpy', 'd'), )),
+            ['#k', 'energy_up', 'test_p_up', 'test_pxpy_up', 'test_d_up',
+             'energy_down', 'test_p_down', 'test_pxpy_down', 'test_d_down'])
 
 
 # -------------------------
@@ -367,6 +419,20 @@ class TestSOIPROCAR(object):
         eq_(self.soiband.orb_names,
             ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2',
              'dxz', 'dx2', 'tot', 'p', 'pxpy', 'd'])
+
+    @with_setup(setup=setup)
+    def test_soiprocar_setheader(self):
+        '''test for Band_with_projection.set_header  (SOI)
+        '''
+        self.soiband.compose_sites((0, 2))
+        self.soiband.compose_orbital(('p', 'pxpy', 'd'))
+        eq_(self.soiband.set_header((('test'), ), (('p', 'pxpy', 'd'), )),
+            ['#k', 'energy',
+             'test_p_mT', 'test_pxpy_mT', 'test_d_mT',
+             'test_p_mX', 'test_pxpy_mX', 'test_d_mX',
+             'test_p_mY', 'test_pxpy_mY', 'test_d_mY',
+             'test_p_mZ', 'test_pxpy_mZ', 'test_d_mZ'])
+
 
 '''
 
