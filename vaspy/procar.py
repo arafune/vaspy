@@ -21,13 +21,12 @@ import os
 import sys
 # import csv
 # import functools as ft
-import numpy as np
-import matplotlib.pyplot as plt
 if sys.version_info[0] >= 3:     # Version safety
     from io import StringIO
 else:
     from cStringIO import StringIO
-
+import numpy as np
+import matplotlib.pyplot as plt
 try:
     from vaspy import tools
 except ImportError:
@@ -389,6 +388,8 @@ class BandWithProjection(object):
         self.__orbitals = 0
         self.__phases = 0
         self.__energies = 0
+        self.numk = 0
+        self.n_atoms = 0
         self.spininfo = tuple()
         self.orb_names = ['s', 'py', 'pz', 'px',
                           'dxy', 'dyz', 'dz2', 'dxz', 'dx2',
@@ -752,7 +753,7 @@ class BandWithProjection(object):
             err = "This method operates with on sitecomposed attribute,"
             err += " but it's null"
             raise RuntimeError(err)
-        if type(arg) == str:
+        if isinstance(arg, str):
             if ':' in arg:
                 arg = arg.split(':')
             else:
