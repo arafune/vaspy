@@ -67,7 +67,11 @@ class OUTCAR(object):  # Version safety
 
         Effectively, this is a constructor of OUTCAR object.
 
-        :param arg: File name of "OUTCAR"
+        Parameters
+        ----------
+
+        arg: str
+            File name of "OUTCAR"
         '''
         # local variables
         section = []
@@ -129,7 +133,9 @@ class OUTCAR(object):  # Version safety
 
         Return the posforce corresponding the posforce_flag
 
-        .. note:: posforce_flag: An 6-element True/False list that indicates
+        Notes
+        -------
+        posforce_flag: An 6-element True/False list that indicates \
                   the output (ex.) [True, True, False, True, True, False]
         '''
         if sites == () or sites[0] == []:

@@ -3,7 +3,7 @@
    VASPy
    ======
 
-    modules made for VASP pre\postprocess
+   modules for VASP pre/post-process
 """
 import os.path
 import re
@@ -23,11 +23,18 @@ def load(filename, type=None):
 
     load file
 
-    :param str filename: filename
+    Parameters
+    ----------
 
-    :param str type: optional argument type
+    filename: str
+        filename
 
-        * This is the optional argument, because this function judges
+    type: str
+       optional argument type
+
+    Notes
+    -----
+        * 'type' is the optional argument, because this function judges
     the file type mainly from its name
         * type is poscar, outcar, chgcar, procar (case insensitive)
     '''
@@ -35,7 +42,7 @@ def load(filename, type=None):
     filenamebase = os.path.basename(filename).lower()
     if isinstance(type, str):
         type = type.lower()
-    if re.search(r'poscar|vasp', filenamebase) or type == 'poscar':
+    if re.search(r'poscar|vasp|contcar', filenamebase) or type == 'poscar':
         output = poscar.POSCAR(filename)
     elif re.search(r'outcar', filenamebase) or type == 'outcar':
         output = outcar.OUTCAR(filename)
@@ -50,5 +57,3 @@ def load(filename, type=None):
     else:
         raise RuntimeError("The file type cannot be identified!  Set 'type'")        
     return output
-        
-        

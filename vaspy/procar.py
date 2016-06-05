@@ -40,9 +40,14 @@ class PROCAR(object):  # Version safety
 
     Class for storing the data saved in PROCAR file.
 
-    :param str PROCAR_file: File name of "PROCAR".
-    :param phase_read: Set True is you read phase data.
-    :type phase_read: boolean
+    Parameters
+    -----------
+
+    PROCAR_file: str
+        File name of "PROCAR".
+    phase_read: boolean
+        Set True is you read phase data.
+
 
     PROCAR consists of these lines.  Appear once per file.
 
@@ -63,7 +68,10 @@ class PROCAR(object):  # Version safety
 
         k-point    1 :    0.00000 0.00000 0.00000 weight = 0.02000000
 
-      .. note:: that the first character is "blank".
+    Notes
+    -----
+
+        that the first character is "blank".
 
     4. band character
 
@@ -111,8 +119,13 @@ class PROCAR(object):  # Version safety
 
         A virtual parser of PROCAR
 
-        :param str file: filename of *PROCAR* file
-        :param Boolean phase_read: Switch for loading phase characters
+        Parameters
+        ----------
+
+        file: str
+             Filename of *PROCAR* file
+        phase_read: boolean
+             Switch for loading phase characters
         '''
         procar_file = open(file)
         first_line = procar_file.readline()
@@ -209,7 +222,10 @@ class PROCAR(object):  # Version safety
 
         Return Band_with_projection object
 
-        :rtype: BandWithProjection
+        Returns
+        -------
+
+        BandWithProjection
         '''
         band = BandWithProjection()
         band.kvectors = self.kvectors[0:self.numk]
@@ -229,10 +245,13 @@ class EnergyBand(object):
 
     Simple band structure object for analyzing by using ipython.
 
-    :param kvectors: 1D array data of k-vectors.
-    :type kvectors: np.array
-    :param energies: 1D array data of energies
-    :type energies: np.array
+    Parameters
+    -----------
+
+    kvectors: numpy.ndarray
+         1D array data of k-vectors.
+    energies: numpy.ndarray
+         1D array data of energies
 '''
 
     def __init__(self, kvectors, energies):
@@ -251,8 +270,11 @@ class EnergyBand(object):
 
         Correct the Fermi level
 
-        :param fermi: value of the Fermi level.
-        :type fermi: float
+        Parameters
+        ----------
+
+        fermi: float
+             value of the Fermi level.
 '''
         self.energies -= fermi
 
@@ -262,9 +284,12 @@ class EnergyBand(object):
         Draw band structure by using maptlotlib
         For 'just seeing' use.
 
-        :param yrange: Minimum and maximum value of the y-axis. \
+        Parameters
+        ----------
+
+        yrange: tuple
+             Minimum and maximum value of the y-axis. \
         If not specified, use the matplotlib default value.
-        :type yrange: tuple
 '''
         energies = np.swapaxes(self.energies, 1, 0)
         for i in range(0, energies.shape[0]):
@@ -315,13 +340,25 @@ class Projection(object):
 
         Return summantion of states
 
-        :param states: tuple of tuple of site index and orbital name
-        :type state: tuple
-        :note: site index starts '1' not 0.
-        :param axis: quantization axis for SOI calculation. 'x', 'y' or 'z'.
-        :type axis: str
-        :Example: ((1, "px"), (1, "py")) # to produce pxpy projection
-        :Example: ((1, "pz"), (43, "pz")) # to produce pz orbital projection \
+        Parameters
+        ----------
+
+        states: tuple
+             tuple of tuple of site index and orbital name
+        axis: str
+             quantization axis for SOI calculation. 'x', 'y' or 'z'.
+
+        Notes
+        ------
+
+        site index starts '1' not 0.
+
+        Example
+        --------
+
+        ((1, "px"), (1, "py")) # to produce pxpy projection on the 1st element.
+
+        ((1, "pz"), (43, "pz")) # to produce pz orbital projection \
         for 'surface' atom (Here, the 43 atoms is included in the unit cell \
         and 1st and 43the atoms are assumed to be identical.)
         '''
@@ -349,10 +386,13 @@ class Projection(object):
 
         Construct states for output.
 
-        :param name: name of the (summed) state.  Used for the header.
-        :param state: orbital projection data.  From sum_states method.
-        :type name: str
-        :type state: np.array
+        Parameters
+        -----------
+
+        name: str
+             name of the (summed) state.  Used for the header.
+        state: numpy.ndarray
+             orbital projection data.  From sum_states method.
         '''
         if name in self.output_headerlist:
             raise ValueError("Unique state nume is required")
@@ -376,7 +416,10 @@ class BandWithProjection(object):
 
     :class variables: kvectors, energies, states, spin, orb_names
 
-    .. note:: Finally, Band, Orbital, State classes can be removed ?
+    Notes
+    -------
+
+    Band, Orbital, State classes can be removed ?
 
     '''
 
@@ -469,7 +512,10 @@ class BandWithProjection(object):
     def phases(self):
         '''Phase data
 
-        .. note:: At present I have no idea about this parameter. How to use it?
+        Notes
+        ------
+
+        At present I have no idea about this parameter. How to use it?
         '''
         return self.__phases
 
@@ -550,12 +596,14 @@ class BandWithProjection(object):
                 self.__energies = np.array(self.__energies)
 
     def fermi_correction(self, fermi):
-        '''Correct the Fermi level
+        '''.. py:method:: fermi_correction(fermi)
+        Correct the Fermi level
 
-        .. py:method:: fermi_correction(fermi)
+        Parameters
+        -----------
 
-        :param fermi: value of the Fermi level (from OUTCAR or vasprun.xml).
-        :type fermi: float
+        fermi: float
+             value of the Fermi level (from OUTCAR or vasprun.xml).
         '''
         self.__energies -= fermi
 
@@ -564,8 +612,10 @@ class BandWithProjection(object):
 
         When sitecomposed ndarray has elements, the values remain.
 
-        :param arg: site indexes to be composed. it contains unique numbers.
-        :type arg: list, tuple, set
+        Parameters
+        -----------
+        arg: list, tuple, set
+             site indexes to be composed. it contains unique numbers.
         '''
         # the element of site_number_list must be unique.
         site_numbers = tuple(set(arg))
@@ -669,10 +719,18 @@ class BandWithProjection(object):
         orbital ((ex.) sp, pxpy), returns the indexes of the orbitals to be
         composed as the tuple.
 
-        :param arg: name of (composed) orbital
-        :type arg: str
-        :return: number corresponding to (composed) orbital name.
-        :rtype: tuple
+
+        Parameters
+        ----------
+
+        arg: str
+            name of (composed) orbital
+
+        Returns
+        --------
+
+        tuple
+            number corresponding to (composed) orbital name.
         '''
         orbname = check_orb_name(arg)
         if (orbname in self.orb_names and
@@ -713,8 +771,11 @@ class BandWithProjection(object):
         Add composed orbital contribution in
         each 'sites' stored in BandStructure.sitecomposed.
 
-        :param arg: orbital names
-        :type arg: str, list, tuple
+        Parameters
+        -----------
+
+        arg: str, list, tuple
+             orbital names
         '''
         if not self.sitecomposed:
             err = "This method operates with on sitecomposed attribute,"
@@ -754,12 +815,19 @@ class BandWithProjection(object):
     def set_header(self, sitenames, orbnames):
         '''Return header of table
 
-        :param sitenames: site names e.g., 'Ag', 'Graphene', '2ndLayer'...
-        :type sitenames: tuple, list
-        :param orbnames: orbital names e.g., (('s', 'pxpy',), ('pxpy', 'p'))
-        :type orbnames: tuple, list
-        :return: header
-        :rtype: list
+        Parameters
+        -----------
+
+        sitenames: tuple, list
+            site names e.g., 'Ag', 'Graphene', '2ndLayer'...
+        orbnames: tuple, list
+            orbital names e.g., (('s', 'pxpy',), ('pxpy', 'p'))
+
+        Returns
+        --------
+
+        list
+             header
         '''
         if len(sitenames) != len(orbnames):
             raise ValueError("Length of sitenames and orbnames is not same.")
@@ -793,9 +861,16 @@ class BandWithProjection(object):
         Return tuple whose size is same as that of arg, but
         the element is number determied from orb_names
 
-        :param orbnames: orbital names e.g., (('s','pxpy','tot'),('s','p'))
-        :type orbnames: list, tuple
-        :rtype: tuple
+        Parameters
+        -----------
+
+        orbnames: list, tuple
+            orbital names e.g., (('s','pxpy','tot'),('s','p'))
+
+        Returns
+        ---------
+
+        tuple
         '''
         return tuple(tuple(self.orb_names.index(orb) for orb in orbs)
                      for orbs in orbnames)
@@ -805,8 +880,11 @@ class BandWithProjection(object):
 
         Return list of sitecomposed attribute to 2D-list
 
-        :param orbnames: orbital names  e.g., (('s','pxpy','p'),('s','pz','p'))
-        :type orbnames: list, tuple
+        Parameters
+        ----------
+
+        orbnames: list, tuple
+            orbital names  e.g., (('s','pxpy','p'),('s','pz','p'))
         '''
         orbnums = self.get_orbnums(orbnames)
         numk, numband, numsite, norbs = self.sitecomposed[0].shape
@@ -873,9 +951,16 @@ def check_orb_name(arg):
     name, return it as is.  If arg is neither the appropriate
     orbital name nor the alias, raise ValueError.
 
-    :param arg: the string to be checked as the orbital name
-    :type arg: str
-    :rtype: str
+    Parameters
+    ----------
+
+    arg: str
+        the string to be checked as the orbital name
+
+    Returns
+    --------
+
+    str
     '''
     translate_dict = {'pypx': 'pxpy', 'pzpx': 'pxpz', 'pzpy': 'pypz',
                       'pxpypz': 'p', 'pxpzpy': 'p', 'pypxpz': 'p',

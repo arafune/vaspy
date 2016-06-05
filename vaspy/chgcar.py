@@ -43,10 +43,15 @@ class CHGCAR(poscar.POSCAR):
              0.047680  0.261795  0.361962          #9th line   poscar.POSCAR[8]
              ....
 
-    :attribute: chg_array, mesh_x, mesh_y, mesh_z, spininfo
+    Attributes
+    ----------
 
-    .. note:: the current verstion ignores
-              "augmentation occupacies".
+    chg_array, mesh_x, mesh_y, mesh_z, spininfo
+
+    Notes
+    -----
+
+    the current verstion ignores "augmentation occupacies".
     '''
     # accessor: chg_array, mesh_x-y-z
 
@@ -65,8 +70,11 @@ class CHGCAR(poscar.POSCAR):
 
         Parse CHGCAR file to construct CHGCAR object
 
-        :param chgcarfile: CHGCAR file name
-        :type chgcarfile: str
+        Parameters
+        ----------
+
+        chgcarfile: str
+            CHGCAR file name
         '''
         section = 'poscar'
         separator = None
@@ -145,10 +153,17 @@ class CHGCAR(poscar.POSCAR):
         not make a sense.  For non-collinear CHGCAR, direction
         should be one of 'x', 'y', and 'z'
 
-        :param direction: specify x, y, or z in noncollinear calculation
-        :type direction: str
-        :return: CHGCAR of the spin-distribution
-        :rtype: CHGCAR
+        Parameters
+        ----------
+
+        direction: str
+            specify x, y, or z in noncollinear calculation
+
+        Returns
+        -------
+
+        CHGCAR
+             CHGCAR of the spin-distribution
         '''
         if len(self.spininfo) == 1:
             raise RuntimeError("This CHGCAR is not spinresolved version")
@@ -186,9 +201,11 @@ class CHGCAR(poscar.POSCAR):
         This method is for CHGCAR given by ``ISPIN=2`` but not-SOI
         calculations.
 
-        :return: CHGCAR for the majority spin charge
-        :rtype:  CHGCAR
+        Returns
+        -------
 
+        CHGCAR
+            CHGCAR for the majority spin charge
         '''
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
@@ -210,9 +227,11 @@ class CHGCAR(poscar.POSCAR):
         This method is for CHGCAR given by ``ISPIN=2`` but not-SOI
         calculations.
 
-        :return: CHGCAR for the minority  spin charge
-        :rtype: CHGCAR
+        Returns
+        -------
 
+        CHGCAR
+            CHGCAR for the minority  spin charge
         '''
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
@@ -231,12 +250,23 @@ class CHGCAR(poscar.POSCAR):
 
         x.__add__(y) <=> x + y
 
-        :param CHGCAR: other addition CHGCAR object
-        :return: CHGCAR of the result by summing two CHGCARs:
-        :rtype: CHGCAR
-        :note:
-        in the returned CHGCAR :
-        the charge distribution is just summantion of two CHGCARs,
+        Parameters
+        ----------
+
+        other : CHGCAR
+            addition CHGCAR object
+
+        Returns
+        -------
+
+        CHGCAR
+            CHGCAR of the result by summing two CHGCARs:
+
+        Notes
+        -----
+
+        In the returned CHGCAR, \
+        the charge distribution is just summantion of two CHGCARs, \
         and the atoms are also summantion of two CHGCARs.
         '''
         # augend + aggend
@@ -260,14 +290,24 @@ class CHGCAR(poscar.POSCAR):
 
         x.__sub__y <=> x - y
 
-        :param other: difference CHGCAR object
-        :type other: CHGCAR
-        :return: CHGCAR of the result of difference between two CHGCARs:
-        :rtype: CHGCAR
-        :note:  in the returned CHGCAR :
-        the charge distribution is just difference
-        of two CHGCARs, and the atoms are used
-        for "munuend" CHGCAR, not difference.
+        Parameters
+        -----------
+
+        other: CHGCAR
+            difference CHGCAR object
+
+        Returns
+        -------
+
+        CHGCAR
+            CHGCAR of the result of difference between two CHGCARs:
+
+        Notes
+        -----
+
+        In the returned CHGCAR, the charge distribution is \ 
+        just difference of two CHGCARs, and the atoms are used \
+        for "munuend" CHGCAR, not difference. \ 
         The atoms in subtrahend CHGCAR are totally ignored.
         '''
         # minuend - subtrahend
@@ -292,8 +332,11 @@ class CHGCAR(poscar.POSCAR):
 
         x.__str__() <=> str(x)
 
-        :return: a string representation of CHGCAR.
-        :rtype: str
+        Returns
+        -------
+
+        str
+            a string representation of CHGCAR.
         '''
         outputstring = ''
         tmp = self.chg_array
@@ -314,8 +357,11 @@ class CHGCAR(poscar.POSCAR):
 
         Save CHGCAR object as CHGCAR file style
 
-        :param filename: file name
-        :type filename: str
+        Parameters
+        -----------
+
+        filename: str
+            file name
         '''
         try:  # Version safety
             thefile = open(filename, mode='w', newline='\n')

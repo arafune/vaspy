@@ -125,16 +125,18 @@ class TestPOSCAR(unittest.TestCase):
                          self.testposcar.atom_identifer)
 
     def test_is_cartesian(self):
-        self.assertFalse(self.testposcar.is_cartesian)
+        self.assertFalse(self.testposcar.is_cartesian())
         self.testposcar.to_cartesian()
-        self.assertTrue(self.testposcar.is_cartesian)
+        self.assertTrue(self.testposcar.is_cartesian())
 
     def test_is_direct(self):
-        self.assertTrue(self.testposcar.is_direct)
+        self.assertTrue(self.testposcar.is_direct())
+        self.testposcar.to_cartesian()
+        self.assertFalse(self.testposcar.is_direct())
 
     def test_is_selective(self):
-        self.assertTrue(self.testposcar.is_selective)
-        self.assertFalse(self.blancposcar.is_selective)
+        self.assertTrue(self.testposcar.selective)
+        self.assertFalse(self.blancposcar.selective)
 
     def test_pos(self):
         np.testing.assert_array_equal(np.array([0., 0.5, 0.5]),
@@ -273,9 +275,9 @@ class TestPOSCAR(unittest.TestCase):
                       self.testposcar.position[0][2]/1]))
         np.testing.assert_allclose(
             supercell.position[1],
-            np.array([self.testposcar.position[0][0]/3 * 2 ,
-                      self.testposcar.position[0][1]/2,
-                      self.testposcar.position[0][2]/1]))
+            np.array([self.testposcar.position[0][0] / 3 + 1 * (1 / 3),
+                      self.testposcar.position[0][1] / 2,
+                      self.testposcar.position[0][2] / 1]))
 
     def test_poscar_supercell5(self):
         supercell = self.testposcar.supercell(3, 2, 1)
