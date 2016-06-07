@@ -5,7 +5,7 @@ import unittest
 import os
 import tempfile
 import numpy as np
-from vaspy.poscar import POSCAR
+import vaspy.poscar
 
 
 class TestPOSCAR(unittest.TestCase):
@@ -16,8 +16,8 @@ class TestPOSCAR(unittest.TestCase):
         f = open(filePOSCAR[1], 'w')
         f.write(test_poscar_string)
         f.close()
-        self.testposcar = POSCAR(filePOSCAR[1])
-        self.blancposcar = POSCAR()
+        self.testposcar = vaspy.poscar.POSCAR(filePOSCAR[1])
+        self.blancposcar = vaspy.poscar.POSCAR()
         os.remove(filePOSCAR[1])
 
     def test_system_name(self):
@@ -26,37 +26,36 @@ class TestPOSCAR(unittest.TestCase):
 
     def test_cell_vec1(self):
         np.testing.assert_allclose(np.array([0.866025404, -0.5, 0.]),
-                                      self.testposcar.cell_vecs[0])
+                                   self.testposcar.cell_vecs[0])
 
     def test_cell_vec2(self):
         np.testing.assert_allclose(np.array([0.866025404, 0.5, 0.]),
-                                      self.testposcar.cell_vecs[1])
+                                   self.testposcar.cell_vecs[1])
 
     def test_cell_vec3_setter(self):
-        self.testposcar.cell_vecs[2] = (1,0,0)
+        self.testposcar.cell_vecs[2] = (1, 0, 0)
         np.testing.assert_allclose(np.array([1, 0, 0]),
                                    self.testposcar.cell_vecs[2])
-  
+
     def test_cell_vec3(self):
         np.testing.assert_allclose(np.array([0.0, 0.0, 1.02529049]),
-                                      self.testposcar.cell_vecs[2])
+                                   self.testposcar.cell_vecs[2])
 
-        
     def test_point_in_box(self):
-        self.assertFalse(self.testposcar.point_in_box(
+        self.assertFalse(vaspy.poscar.point_in_box(
             (0.5, 0.5, 0.2), self.testposcar.cell_vecs))
-        self.assertTrue(self.testposcar.point_in_box(
+        self.assertTrue(vaspy.poscar.point_in_box(
             (0.5, 0.1, 0.2), self.testposcar.cell_vecs))
-        self.assertTrue(self.testposcar.point_in_box(
-            (0.5, 0.5, 0.2), ((1, 0, 0), (0, 1, 0),(0, 0, 1))))
-        
+        self.assertTrue(vaspy.poscar.point_in_box(
+            (0.5, 0.5, 0.2), ((1, 0, 0), (0, 1, 0), (0, 0, 1))))
+
     def test_poscar_pos_1(self):
-        pos=self.testposcar.pos(4)
+        pos = self.testposcar.pos(4)
         np.testing.assert_allclose(
             np.array([0.237639553, 0.429027113, 0.5]), pos)
 
     def test_poscar_pos_2(self):
-        pos=self.testposcar.pos(4,5,6)
+        pos = self.testposcar.pos(4, 5, 6)
         np.testing.assert_allclose(
             [np.array([0.237639553, 0.429027113, 0.5]),
              np.array([0.237639553, 0.333333333, 0.5]),
@@ -64,7 +63,7 @@ class TestPOSCAR(unittest.TestCase):
             pos)
 
     def test_poscar_pos_3(self):
-        pos=self.testposcar.pos(5,4,6)
+        pos = self.testposcar.pos(5, 4, 6)
         np.testing.assert_allclose(
             [np.array([0.237639553, 0.333333333, 0.5]),
              np.array([0.237639553, 0.429027113, 0.5]),
@@ -72,14 +71,14 @@ class TestPOSCAR(unittest.TestCase):
             pos)
 
     def test_poscar_pos_4(self):  # Ver. 2 fails
-        pos=self.testposcar.pos((4,6))
+        pos = self.testposcar.pos((4, 6))
         np.testing.assert_allclose(
             [np.array([0.237639553, 0.429027113, 0.5]),
              np.array([0.333333333, 0.237639553, 0.5])],
             pos)
 
     def test_poscar_pos_5(self):  # Ver. 2 fails
-        pos=self.testposcar.pos(1, (4,6))
+        pos = self.testposcar.pos(1, (4, 6))
         np.testing.assert_allclose(
             [np.array([0.5, 0.5, 0.5]),
              np.array([0.237639553, 0.429027113, 0.5]),
@@ -87,23 +86,23 @@ class TestPOSCAR(unittest.TestCase):
             pos)
 
     def test_poscar_pos_6(self):  # Ver. 2 fails
-        pos=self.testposcar.pos(1, range(4,8))  # 1, 4, 5, 6, 7
+        pos = self.testposcar.pos(1, range(4, 8))  # 1, 4, 5, 6, 7
         np.testing.assert_allclose(
             [np.array([0.5, 0.5, 0.5]),
              np.array([0.237639553, 0.429027113, 0.5]),
              np.array([0.237639553, 0.333333333, 0.5]),
              np.array([0.333333333, 0.237639553, 0.5]),
-             np.array([0.429027113, 0.237639553, 0.5])],             
+             np.array([0.429027113, 0.237639553, 0.5])],
             pos)
 
     def test_poscar_average_position(self):
-        pos=self.testposcar.average_position(1, range(4,8))
+        pos = self.testposcar.average_position(1, range(4, 8))
         np.testing.assert_allclose(
             np.array([0.3475279104, 0.3475279104, 0.5]),
             pos)
 
     def test_poscar_average_position2(self):
-        pos=self.testposcar.average_position(1, 4, 5, 6, 7)
+        pos = self.testposcar.average_position(1, 4, 5, 6, 7)
         np.testing.assert_allclose(
             np.array([0.3475279104, 0.3475279104, 0.5]),
             pos)
@@ -125,16 +124,18 @@ class TestPOSCAR(unittest.TestCase):
                          self.testposcar.atom_identifer)
 
     def test_is_cartesian(self):
-        self.assertFalse(self.testposcar.is_cartesian)
+        self.assertFalse(self.testposcar.is_cartesian())
         self.testposcar.to_cartesian()
-        self.assertTrue(self.testposcar.is_cartesian)
+        self.assertTrue(self.testposcar.is_cartesian())
 
     def test_is_direct(self):
-        self.assertTrue(self.testposcar.is_direct)
+        self.assertTrue(self.testposcar.is_direct())
+        self.testposcar.to_cartesian()
+        self.assertFalse(self.testposcar.is_direct())
 
     def test_is_selective(self):
-        self.assertTrue(self.testposcar.is_selective)
-        self.assertFalse(self.blancposcar.is_selective)
+        self.assertTrue(self.testposcar.selective)
+        self.assertFalse(self.blancposcar.selective)
 
     def test_pos(self):
         np.testing.assert_array_equal(np.array([0., 0.5, 0.5]),
@@ -161,14 +162,14 @@ class TestPOSCAR(unittest.TestCase):
                                       self.testposcar.pos(7))
 
     def test_pos_raise_value_error(self):
-        self.assertRaises(ValueError, self.testposcar.pos,-1)
-        self.assertRaises(ValueError, self.testposcar.pos,0)
-        
+        self.assertRaises(ValueError, self.testposcar.pos, -1)
+        self.assertRaises(ValueError, self.testposcar.pos, 0)
+
     def test_tune_scaling_factor(self):
         self.testposcar.tune_scaling_factor(1.0)
         np.testing.assert_allclose(
             np.array([12.66995166052, -7.315, 0.0]),
-            self.testposcar.cell_vecs[0], 
+            self.testposcar.cell_vecs[0],
             rtol=1e-07)
 
     def test_tune_scaling_factor_withCartesian(self):
@@ -176,7 +177,7 @@ class TestPOSCAR(unittest.TestCase):
         self.testposcar.tune_scaling_factor(1.0)
         np.testing.assert_allclose(
             np.array([12.66995166052, -7.315, 0.0]),
-            self.testposcar.cell_vecs[0], 
+            self.testposcar.cell_vecs[0],
             rtol=1e-07)
         np.testing.assert_allclose(
             np.array([12.66995166052, 0.0, 7.5000000001850005]),
@@ -273,15 +274,15 @@ class TestPOSCAR(unittest.TestCase):
                       self.testposcar.position[0][2]/1]))
         np.testing.assert_allclose(
             supercell.position[1],
-            np.array([self.testposcar.position[0][0]/3 * 2 ,
-                      self.testposcar.position[0][1]/2,
-                      self.testposcar.position[0][2]/1]))
+            np.array([self.testposcar.position[0][0] / 3 + 1 * (1 / 3),
+                      self.testposcar.position[0][1] / 2,
+                      self.testposcar.position[0][2] / 1]))
 
     def test_poscar_supercell5(self):
         supercell = self.testposcar.supercell(3, 2, 1)
         self.assertEqual(6*len(self.testposcar.position),
                          len(supercell.position))
-        
+
     def test_nearest(self):
         pass
 

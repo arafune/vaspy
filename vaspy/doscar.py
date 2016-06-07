@@ -87,8 +87,12 @@ class DOSCAR(object):  # Version safety
 
         Parse DOSCAR file and store it in memory
 
-        :param doscar_file: file name of "DOSCAR"
-        :type doscar_file: str
+
+        Parameters
+        -----------
+
+        doscar_file: str
+            file name of "DOSCAR"
 '''
         a_dos = list()
         thefile = open(doscarfile)
@@ -132,7 +136,10 @@ class DOS(object):  # Version safety
     The first element is the the energy.
     The latter element is list for the density.
 
-    .. py:attribute: dos
+
+    Attributes
+    -----------
+    dos
 
     :py:attribute:`dos` is the python linst object that stores dos data.
     By default, the first column is the energy, the latter is the density.
@@ -152,8 +159,11 @@ class DOS(object):  # Version safety
 
         Fermi level Correction
 
-        :param fermi: fermi level
-        :type fermi: float
+        Parameters
+        ----------
+
+        fermi: float
+            fermi level
         '''
         self.dos[0] -= fermi
 
@@ -162,11 +172,17 @@ class DOS(object):  # Version safety
 
         Return the *i*-th energy of the object
 
-        :param i: index #
-        :type i: int
-        :return: the energy value of the i-th point when i set.
-                 If arg is null, return the all energies in DOS object.
-        :rtype: np.ndarray
+        Parameters
+        ----------
+        i : int
+             index #
+
+        Returns
+        --------
+
+        np.ndarray
+              the energy value of the i-th point when i set. \
+        If arg is null, return the all energies in DOS object.
         '''
         if i is None:
             return self.dos[0]
@@ -196,10 +212,16 @@ class TDOS(DOS):
 
     Class for total DOS
 
-    :param array: DOS data
-    :type array: np.array
+    Parameters
+    ----------
 
-    .. py:attribute:: header
+    array: np.array
+        DOS data
+
+    Attributes
+    ----------
+
+    header
     '''
 
     def __init__(self, array):
@@ -241,10 +263,13 @@ class PDOS(DOS):
     (If non-spin calculated results, :py:attr:`orbital_spin` is
     just orbital name)
 
-    :param array: DOS data
-    :type array: numpy.array
-    :param site: site name
-    :type site: str
+    Parameters
+    -----------
+
+    array: numpy.ndarray
+        DOS data
+    site: str
+        site name
     '''
     def __init__(self, array=None, site=None):
         super(PDOS, self).__init__(array)
@@ -309,12 +334,18 @@ class PDOS(DOS):
     def plot_dos(self, orbitals, fermi=0.0):  # Not implemented yet
         '''.. py:method:: plot_dos(orbitals[, fermi=0.0])
 
-        plot DOS spectra with matplotlib.pyplot
+        Plot DOS spectra with matplotlib.pyplot
 
-        :param orbitals: orbital name
-        :type orbitals: str
+        Parameters
+        ----------
 
-        .. warning:: not implemented yet!!
+        orbitals: str
+             orbital name
+
+        Warning
+        --------
+
+        not implemented yet!!
 
         '''
         pass
@@ -324,10 +355,16 @@ class PDOS(DOS):
 
         x.__add__(y) <-> x+y
 
-        :param other: len(other.energies) must be equal to  len(self.energies).
-        :type other: PDOS
-        :return: PDOS
-        :rtype: PDOS
+        Parameters
+        -----------
+
+        other: PDOS
+            len(other.energies) must be equal to  len(self.energies).
+
+        Returns
+        -------
+
+        PDOS
         '''
         if not isinstance(other, PDOS):
             return NotImplemented

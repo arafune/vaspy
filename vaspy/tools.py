@@ -23,7 +23,7 @@ def each_slice(iterable, n, fillvalue=None):
 
     each_slice(iterable, n[, fillvalue]) => iterator
 
-make new iterator object which get n item from [iterable] at once.
+    make new iterator object which get n item from [iterable] at once.
 '''
     args = [iter(iterable)] * n
     return ZIPLONG(*args, fillvalue=fillvalue)  # Version safety
@@ -34,7 +34,10 @@ def removeall(L, value):
 
     remove all *value* in [list] L
 
-    .. note:: Currently, this function is not used. (Obsolute?)
+    Note
+    ----
+
+    Currently, this function is not used. (Obsolute?)
     '''
     while L.count(value):
         L.remove(value)
@@ -79,14 +82,22 @@ _RESINGLE = re.compile(r'\d+')
 def parse_Atomselection(L):
     '''.. py:function:: parse_Atomselection(L)
 
-Return list of ordered "String" represents the number
+    Return list of ordered "String" represents the number
 
-    :param L: range of the atoms. the numbers deliminated by "-" or ","
-    :type L: str
-    :return: ordered "String" represents the number.
-    :rtype: list
+    Parameters
+    ----------
 
-    :Example:
+    L: str
+        range of the atoms. the numbers deliminated by "-" or ","
+
+    Returns
+    --------
+
+    list
+       ordered "String" represents the number.
+
+    Example
+    --------
 
     >>> parse_Atomselection("1-5,8,8,9-15,10")
     ['1', '10', '11', '12', '13', '14', '15', '2', '3', '4', '5', '8', '9']
@@ -109,12 +120,20 @@ def parse_AtomselectionNum(L):
     Very similar with parse_Atomselection but returns the array of the
     number not array of the string.
 
-    :param L: range of the atoms. the numbers deliminated by "-" or ","
-    :type L: str
-    :return: ordered int represents the number.
-    :rtype: list
+    Parameters
+    ------------
 
-    :Example:
+    L: str
+        range of the atoms. the numbers deliminated by "-" or ","
+
+    Returns
+    ----------
+
+    list
+        ordered int represents the number.
+
+    Example
+    --------
 
     >>> parse_AtomselectionNum("1-5,8,8,9-15,10")
     [1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15]

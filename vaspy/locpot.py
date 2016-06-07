@@ -27,7 +27,10 @@ class LOCPOT(poscar.POSCAR):
 
     LOCPOT format is essentially same as that of CHGCAR
 
-    :attribute: mesh_x, mesh_y, mesh_z, potlist
+    Attributes
+    -----------
+
+    mesh_x, mesh_y, mesh_z, potlist
 '''
 
     def __init__(self, arg=None):
@@ -44,9 +47,15 @@ class LOCPOT(poscar.POSCAR):
 
         Parse LOCPOT file to construct LOCPOT object
 
-        :param locpotfile: file name of 'LOCPOT'
-        :type locpotfile: str
-        :return: LOCPOT
+        Parameters
+        ----------
+        locpotfile: str
+             file name of 'LOCPOT'
+
+        Returns
+        --------
+
+        LOCPOT
         '''
         section = 'poscar'
         separator = None
@@ -104,8 +113,11 @@ class LOCPOT(poscar.POSCAR):
 
         Return mesh size
 
-        :return: (mesh_x, mesh_y, mesh_z)
-        :rtype: tuple
+        Returns
+        -------
+        tuple
+
+            (mesh_x, mesh_y, mesh_z)
         '''
         return self.mesh_x, self.mesh_y, self.mesh_z
 
@@ -114,11 +126,18 @@ class LOCPOT(poscar.POSCAR):
 
         Calculate average value of potential along 'axis'
 
-        :param axis_name: 'X', 'Y', or 'Z'
-        :type axis_name: str
-        :param str pottype: 'pottype' (very optional)
-        :return: averaged potential
-        :rtype: np.array
+        Parameters
+        ----------
+
+        axis_name: str
+             'X', 'Y', or 'Z'
+        pottype: str
+             'pottype' (very optional)
+
+        Returns
+        -------
+        numpy.ndarray
+            averaged potential
         '''
         axis_name = axis_name.capitalize()
         if pottype == 'former':
@@ -148,11 +167,18 @@ class LOCPOT(poscar.POSCAR):
 
         Calculate minimum value of potential along 'axis'
 
-        :param axis_name: 'X', 'Y', or 'Z'
-        :type axis_name: str
-        :param str pottype: 'pottype' (very optional)
-        :return: min potential
-        :rtype: np.array
+        Parameters
+        -----------
+
+        axis_name: str
+            'X', 'Y', or 'Z'
+        pottype: str
+            'pottype' (very optional)
+
+        Returns
+        -------
+        numpy.ndarray
+            min potential
         '''
         axis_name = axis_name.capitalize()
         if pottype == 'former':
@@ -180,11 +206,20 @@ class LOCPOT(poscar.POSCAR):
     def max_along_axis(self, axis_name, pottype='former'):
         '''.. py:method:: man_along_axis(axis_name, pottype)
 
-        :param axis_name: 'X', 'Y', or 'Z'
-        :type axis_name: str
-        :param str pottype: 'pottype' (very optional)
-        :return: maximum potential
-        :rtype: np.ndarray
+        Calculate maximum value of potential along 'axis'
+
+        Parameters
+        -----------
+
+        axis_name: str
+            'X', 'Y', or 'Z'
+        pottype: str
+            'pottype' (very optional)
+
+        Returns
+        -------
+        numpy.ndarray
+            max potential
         '''
         axis_name = axis_name.capitalize()
         if pottype == 'former':
@@ -214,11 +249,18 @@ class LOCPOT(poscar.POSCAR):
 
         Calculate median value of potential along 'axis'
 
-        :param axis_name: 'X', 'Y', or 'Z'
-        :type axis_name: str
-        :param str pottype: 'pottype' (very optional)
-        :return: median potential
-        :rtype: np.ndarray
+        Parameters
+        -----------
+
+        axis_name: str
+            'X', 'Y', or 'Z'
+        pottype: str
+            'pottype' (very optional)
+
+        Returns
+        -------
+        numpy.ndarray
+            median potential
         '''
         axis_name = axis_name.capitalize()
         if pottype == 'former':
@@ -248,8 +290,11 @@ class LOCPOT(poscar.POSCAR):
 
         Return cell axis lengthes
 
-        :return: cell axis length of x, y, and z
-        :rtype: tuple
+        Returns
+        -------
+
+        tuple
+            cell axis length of x, y, and z
         '''
         cell_x = np.linalg.norm(self.cell_vecs[0] * self.scaling_factor)
         cell_y = np.linalg.norm(self.cell_vecs[1] * self.scaling_factor)
@@ -261,9 +306,13 @@ class LOCPOT(poscar.POSCAR):
 
         Plot potential curve along the axis
 
-        :param axis_name: the name of the axis (X, Y, or Z)
-        :param str pottype: 'pottype' (very optional)
-        :type axis_name: str
+        Parameters
+        ----------
+
+        axis_name: str
+            the name of the axis (X, Y, or Z)
+        potential: str
+            'pottype' (very optional)
         '''
         axis_name = axis_name.capitalize()
         axes_length = self.get_axes_lengthes()
