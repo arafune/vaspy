@@ -412,78 +412,6 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         if original_is_cartesian:
             self.to_cartesian()
 
-    def rotate_x(self, theta):
-        ''' .. py:method:: rotate_x(theta)
-
-        Rotation matrix around X-axis
-
-        Parameters
-        ----------
-
-        theta: float
-            angle of rotation (Degrees)
-
-        Returns
-        -------
-
-        numpy.ndarray
-            rotation matrix
-
-        Example
-        ---------
-
-        >>> t = POSCAR()
-        >>> t.rotate_x(60)
-        array([[ 1.       ,  0.       ,  0.       ],
-               [ 0.       ,  0.5      , -0.8660254],
-               [ 0.       ,  0.8660254,  0.5      ]])
-        '''
-        degree = np.pi / 180.0
-        return np.array(
-            [[1.0, 0.0, 0.0],
-             [0.0, np.cos(theta * degree), -np.sin(theta * degree)],
-             [0.0, np.sin(theta * degree), np.cos(theta * degree)]])
-
-    def rotate_y(self, theta):
-        '''.. py:method:: rotate_y(theta)
-
-        Rotation matrix around Y-axis
-
-        Example
-        --------
-
-        >>> t = POSCAR()
-        >>> t.rotate_y(60)
-        array([[ 0.5      ,  0.       ,  0.8660254],
-               [ 0.       ,  1.       ,  0.       ],
-               [-0.8660254,  0.       ,  0.5      ]])
-        '''
-        degree = np.pi / 180.0
-        return np.array(
-            [[np.cos(theta * degree), 0.0, np.sin(theta * degree)],
-             [0.0, 1.0, 0.0],
-             [-np.sin(theta * degree), 0.0, np.cos(theta * degree)]])
-
-    def rotate_z(self, theta):
-        '''.. py:method:: rotate_y(theta)
-
-        Rotation matrix around Z-axis
-
-        Example
-        --------
-
-        >>> t = POSCAR()
-        >>> t.rotate_z(60)
-        array([[ 0.5      , -0.8660254,  0.       ],
-               [ 0.8660254,  0.5      ,  0.       ],
-               [ 0.       ,  0.       ,  1.       ]])
-        '''
-        degree = np.pi / 180.0
-        return np.array(
-            [[np.cos(theta * degree), -np.sin(theta * degree), 0.0],
-             [np.sin(theta * degree), np.cos(theta * degree), 0.0],
-             [0.0, 0.0, 1.0]])
-
     # class method? or independent function?
     def nearest(self, array, point):
         '''.. py:method:: nearest(array, point)
@@ -562,7 +490,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         center = _vectorize(center)
         if len(center) != 3:
             raise ValueError
-        if not self.point_in_box(center / self.scaling_factor, self.cell_vecs):
+        if not point_in_box(center / self.scaling_factor, self.cell_vecs):
             raise ValueError('the center must be in the Braves lattice')
         if not isinstance(site, int):
             raise ValueError('argument error in atom_rotate method')
@@ -570,8 +498,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             self.to_cartesian()
         position = self.pos(site)
         position -= center / self.scaling_factor
-        position = getattr(self, 'rotate_' +
-                           axis_name.lower())(theta).dot(position)
+        position = globals()["rotate_"+axis_name.lower()](theta).dot(position)
         position += center / self.scaling_factor
         self.pos_replace(site, position)
 
@@ -585,7 +512,7 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             list array of site for rotation (The first atom is "1".).
         axis_name:
             "X", "x", "Y", "y", "Z",or "z".  Rotation axis.
-        thete: float
+        theta: float
              Rotation angle (Degrees).
         center: numpy.ndarray, list, tuple
              Position of rotation center
@@ -613,11 +540,11 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         axis_name = axis_name.capitalize()
 
         if axis_name == 'X':
-            self.cell_vecs = np.dot(self.rotate_x(theta), self.cell_vecs.T).T
+            self.cell_vecs = np.dot(rotate_x(theta), self.cell_vecs.T).T
         elif axis_name == 'Y':
-            self.cell_vecs = np.dot(self.rotate_y(theta), self.cell_vecs.T).T
+            self.cell_vecs = np.dot(rotate_y(theta), self.cell_vecs.T).T
         elif axis_name == 'Z':
-            self.cell_vecs = np.dot(self.rotate_z(theta), self.cell_vecs.T).T
+            self.cell_vecs = np.dot(rotate_z(theta), self.cell_vecs.T).T
         if original_is_cartesian:
             self.to_cartesian()
 
@@ -967,31 +894,104 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         with file:
             file.write(str(self))
 
-    def point_in_box(self, point, cell_vecs):
-        '''.. py:method::point_in_box(point, cell_vecs)
 
-        Return True if point is located in the box
+def point_in_box(point, cell_vecs):
+    '''.. py:function:: point_in_box(point, cell_vecs)
 
-        Parameters
-        -----------
+    Return True if point is located in the box
 
-        point: numpy.ndarray, numpy.matrix, list, tuple
-             vector representing the "point"
-        cell_vecs: numpy.ndarray, numpy.matrix, list, tuple
-             vectors defining the "box"
+    Parameters
+    -----------
 
-        Returns
-        ---------
+    point: numpy.ndarray, numpy.matrix, list, tuple
+        vector representing the "point"
+    cell_vecs: numpy.ndarray, numpy.matrix, list, tuple
+        vectors defining the "box"
 
-        boolean
-        '''
-        if three_by_three(cell_vecs):
-            point = np.array(point).flatten()
-            cell_vecs = np.array(cell_vecs)
-            result = np.dot(np.linalg.inv(cell_vecs.T), point)
-            return all((0 <= float(q) <= 1) for q in result)
-        else:
-            raise TypeError
+    Returns
+    ---------
+
+    boolean
+    '''
+    if three_by_three(cell_vecs):
+        point = np.array(point).flatten()
+        cell_vecs = np.array(cell_vecs)
+        result = np.dot(np.linalg.inv(cell_vecs.T), point)
+        return all((0 <= float(q) <= 1) for q in result)
+    else:
+        raise TypeError
+
+
+def rotate_x(theta):
+    ''' .. py:function:: rotate_x(theta)
+
+    Rotation matrix around X-axis
+
+    Parameters
+    ----------
+
+    theta: float
+        angle of rotation (Degrees)
+
+    Returns
+    -------
+
+    numpy.ndarray
+        rotation matrix
+
+    Example
+    ---------
+
+    >>> rotate_x(60)
+    array([[ 1.       ,  0.       ,  0.       ],
+           [ 0.       ,  0.5      , -0.8660254],
+           [ 0.       ,  0.8660254,  0.5      ]])
+    '''
+    degree = np.pi / 180.0
+    return np.array(
+        [[1.0, 0.0, 0.0],
+         [0.0, np.cos(theta * degree), -np.sin(theta * degree)],
+         [0.0, np.sin(theta * degree), np.cos(theta * degree)]])
+
+
+def rotate_y(theta):
+    '''.. py:function:: rotate_y(theta)
+
+    Rotation matrix around Y-axis
+
+    Example
+    --------
+
+    >>> rotate_y(60)
+    array([[ 0.5      ,  0.       ,  0.8660254],
+           [ 0.       ,  1.       ,  0.       ],
+           [-0.8660254,  0.       ,  0.5      ]])
+    '''
+    degree = np.pi / 180.0
+    return np.array(
+        [[np.cos(theta * degree), 0.0, np.sin(theta * degree)],
+         [0.0, 1.0, 0.0],
+         [-np.sin(theta * degree), 0.0, np.cos(theta * degree)]])
+
+
+def rotate_z(theta):
+    '''.. py:function:: rotate_y(theta)
+
+    Rotation matrix around Z-axis
+
+    Example
+    --------
+
+    >>> rotate_z(60)
+    array([[ 0.5      , -0.8660254,  0.       ],
+           [ 0.8660254,  0.5      ,  0.       ],
+           [ 0.       ,  0.       ,  1.       ]])
+    '''
+    degree = np.pi / 180.0
+    return np.array(
+        [[np.cos(theta * degree), -np.sin(theta * degree), 0.0],
+         [np.sin(theta * degree), np.cos(theta * degree), 0.0],
+         [0.0, 0.0, 1.0]])
 
 
 def three_by_three(vec):
