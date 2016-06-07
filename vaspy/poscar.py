@@ -73,6 +73,7 @@ class POSCAR(object):
         '''
         Parameters
         -----------
+
         arg: str
             POSCAR file name, or list of POSCAR text.
         '''
