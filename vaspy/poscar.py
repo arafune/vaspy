@@ -330,11 +330,13 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         sposition = [np.array([x[0] / nx, x[1] / ny, x[2] / nz])
                      for x in sposition]
         for spos in sposition:
-            for iz in range(1, nz+1):
-                for iy in range(1, ny+1):
-                    for ix in range(1, nx+1):
+            for iz in range(0, nz):
+                for iy in range(0, ny):
+                    for ix in range(0, nx):
                         sposcar.position.append(np.array(
-                            [spos[0]*ix, spos[1]*iy, spos[2]*iz]))
+                            [spos[0] + ix / nx,
+                             spos[1] + iy / ny,
+                             spos[2] + iz / nz]))
         sposcar.coordinate_changeflags = []
         for flags in self.coordinate_changeflags:
             for i in range(nx * ny * nz):
