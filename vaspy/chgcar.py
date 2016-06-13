@@ -11,6 +11,7 @@ import re
 import copy
 import os
 import sys
+import bz2
 
 try:
     from vaspy import poscar, tools
@@ -79,7 +80,11 @@ class CHGCAR(poscar.POSCAR):
         section = 'poscar'
         separator = None
         tmp = []
-        with open(chgcarfile) as thefile:
+        if os.path.splittext(chgcarfile)[1] == '.bz2':
+            thefile = bz2.open(chgcarfile, mode='rt')
+        else:
+            thefile = open(chgcarfile)
+        with thefile:
             for line in thefile:
                 line = line.rstrip('\n')
                 if section == 'poscar':

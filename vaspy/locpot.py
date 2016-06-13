@@ -8,6 +8,7 @@ from __future__ import division
 from __future__ import print_function
 import os
 import sys
+import bz2
 import numpy as np
 import matplotlib.pyplot as plt
 try:
@@ -60,7 +61,11 @@ class LOCPOT(poscar.POSCAR):
         section = 'poscar'
         separator = None
         tmp = []
-        with open(locpotfile) as locpot_file:
+        if os.path.splitext(locpotfile)[1] == '.bz2':
+            locpot_file = bz2.open(locpotfile, mode='rt')
+        else:
+            locpot_file = open(locpotfile)
+        with locpot_file:
             for line in locpot_file:
                 if section == 'poscar':
                     if line.isspace():

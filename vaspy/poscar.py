@@ -44,6 +44,7 @@ import copy
 import re
 import os
 import sys
+import bz2
 try:
     from vaspy import tools
 except ImportError:
