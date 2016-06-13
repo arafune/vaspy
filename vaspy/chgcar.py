@@ -32,16 +32,22 @@ class CHGCAR(poscar.POSCAR):
 
      An example of the first few lines of CHGCAR. ::
 
-           hBN-Cu                                  #1st line   poscar.POSCAR[0]
-           1.00000000000000                        #2nd line   poscar.POSCAR[1]
-             6.762964    0.000000    0.000000      #3rd line   poscar.POSCAR[2]
-             3.381482    5.856898    0.000000      #4th line   poscar.POSCAR[3]
-             0.000000    0.000000   29.004836      #5th line   poscar.POSCAR[4]
-           B    Cu   N    Si                       #6th line   poscar.POSCAR[5]
-             7    21     7     6                   #7th line   poscar.POSCAR[6]
-           Direct                                  #8th line   poscar.POSCAR[7]
-             0.047680  0.261795  0.361962          #9th line   poscar.POSCAR[8]
+           hBN-Cu                               #1st line   poscar.POSCAR[0]
+           1.00000000000000                     #2nd line   poscar.POSCAR[1]
+             6.762964    0.000000    0.000000   #3rd line   poscar.POSCAR[2]
+             3.381482    5.856898    0.000000   #4th line   poscar.POSCAR[3]
+             0.000000    0.000000   29.004836   #5th line   poscar.POSCAR[4]
+           B    Cu   N    Si                    #6th line   poscar.POSCAR[5]
+             7    21     7     6                #7th line   poscar.POSCAR[6]
+           Direct                               #8th line   poscar.POSCAR[7]
+             0.047680  0.261795  0.361962       #9th line   poscar.POSCAR[8]
              ....
+                                                # the single blanck line
+           240   240   288                      # number of gridmesh
+           0.0000 0.0005 0.0002 0.0020 0.0001   # five columns in each line
+           0.0030 0.0025 0.0001 0.0023 0.0003   #  ...
+           ...                                  #  ...
+
 
     Attributes
     ----------
@@ -151,13 +157,14 @@ class CHGCAR(poscar.POSCAR):
 
         For collinear spinpolarized calculation the argument does
         not make a sense.  For non-collinear CHGCAR, direction
-        should be one of 'x', 'y', and 'z'
+        should be one of 'x', 'y', 'z' and 't'
 
         Parameters
         ----------
 
         direction: str
-            specify x, y, or z in noncollinear calculation
+            specify x, y, z or t in noncollinear calculation.
+            't' means the total.
 
         Returns
         -------
@@ -180,8 +187,9 @@ class CHGCAR(poscar.POSCAR):
                                                     self.mesh_x *
                                                     self.mesh_y *
                                                     self.mesh_z)
-            if direction is None:
-                direction = 'x'
+            if direction is None or direction == 't':
+                dest_chgcar.chg_array = list(total)
+                dest_chgcar.spininfo = ["mT"]
             if direction == 'x':
                 dest_chgcar.chg_array = list(sd1)
                 dest_chgcar.spininfo = ["mX"]
@@ -305,9 +313,9 @@ class CHGCAR(poscar.POSCAR):
         Notes
         -----
 
-        In the returned CHGCAR, the charge distribution is \ 
+        In the returned CHGCAR, the charge distribution is \
         just difference of two CHGCARs, and the atoms are used \
-        for "munuend" CHGCAR, not difference. \ 
+        for "munuend" CHGCAR, not difference. \
         The atoms in subtrahend CHGCAR are totally ignored.
         '''
         # minuend - subtrahend
