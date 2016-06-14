@@ -1,7 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import unittest
 import os
+from nose.tools import eq_
+from nose.tools import ok_
+from nose.tools import with_setup
+from nose.tools import assert_equal
+from nose.tools import raises
 import vaspy.chgcar
 import numpy as np
 
