@@ -129,7 +129,10 @@ class PROCAR(object):  # Version safety
              Switch for loading phase characters
         '''
         if os.path.splitext(filename)[1] == ".bz2":
-            procar_file = bz2.open(filename, mode='rt')
+            try:
+                procar_file = bz2.open(filename, mode='rt')
+            except AttributeError:
+                procar_file = bz2.BZ2File(filename, mode='rt')
         else:
             procar_file = open(filename)
         first_line = procar_file.readline()
