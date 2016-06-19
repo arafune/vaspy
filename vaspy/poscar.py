@@ -358,7 +358,9 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             raise ValueError("arguments must be positive integer")
         #
         sposcar = copy.deepcopy(self)
-        sposcar.to_direct()
+        original_is_cartesian = sposcar.is_cartesian()
+        if original_is_cartesian:
+            sposcar.to_direct()
         sposcar.repack_in_cell()
         sposcar.cell_vecs[0] = sposcar.cell_vecs[0] * nx
         sposcar.cell_vecs[1] = sposcar.cell_vecs[1] * ny
@@ -381,6 +383,8 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             for i in range(nx * ny * nz):
                 sposcar.coordinate_changeflags.append(flags)
         sposcar.__atom_identifer = []
+        if original_is_cartesian:
+            sposcar.to_cartesian()
         return sposcar
 
     def sort(self, from_index, to_index):
