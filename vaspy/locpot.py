@@ -62,10 +62,7 @@ class LOCPOT(poscar.POSCAR):
         separator = None
         tmp = []
         if os.path.splitext(locpotfile)[1] == '.bz2':
-            try:
-                locpot_file = bz2.open(locpotfile, mode='rt')
-            except AttributeError:
-                locpot_file = bz2.BZ2File(locpotfile, mode='r')
+            locpot_file = bz2.BZ2File(locpotfile, mode='r')
         else:
             locpot_file = open(locpotfile)
         with locpot_file:
