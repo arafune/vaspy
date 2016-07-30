@@ -86,7 +86,7 @@ class CHGCAR(poscar.POSCAR):
         section = 'poscar'
         separator = None
         tmp = []
-        if os.path.splittext(chgcarfile)[1] == '.bz2':
+        if os.path.splitext(chgcarfile)[1] == '.bz2':
             thefile = bz2.BZ2File(chgcarfile, mode='r')
         else:
             thefile = open(chgcarfile)
