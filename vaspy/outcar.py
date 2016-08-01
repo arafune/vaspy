@@ -78,7 +78,7 @@ class OUTCAR(object):  # Version safety
         section = []
         posforce = []
         # parse
-        if os.path.splitext(arg)[1] == 'bz2':
+        if os.path.splitext(arg)[1] == '.bz2':
             thefile = bz2.BZ2File(arg, mode='r')
         else:
             thefile = open(arg)
