@@ -19,6 +19,7 @@ import re
 # import copy
 import os
 import sys
+import bz2
 # import csv
 # import functools as ft
 import numpy as np
@@ -114,20 +115,26 @@ class PROCAR(object):  # Version safety
         else:
             raise RuntimeError("the arg of PROCAR() should be the filename")
 
-    def load_from_file(self, file, phase_read=False):
-        '''.. py:method::  load_fromfile(file, [phase_read=False])
+    def load_from_file(self, filename, phase_read=False):
+        '''.. py:method::  load_fromfile(filename, [phase_read=False])
 
         A virtual parser of PROCAR
 
         Parameters
         ----------
 
-        file: str
+        filename: str
              Filename of *PROCAR* file
         phase_read: boolean
              Switch for loading phase characters
         '''
-        procar_file = open(file)
+        if os.path.splitext(filename)[1] == ".bz2":
+            try:
+                procar_file = bz2.open(filename, mode='rt')
+            except AttributeError:
+                procar_file = bz2.BZ2File(filename, mode='r')
+        else:
+            procar_file = open(filename)
         first_line = procar_file.readline()
         if 'PROCAR lm decomposed + phase' not in first_line:
             procar_file.close()

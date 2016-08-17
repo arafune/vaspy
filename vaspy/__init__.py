@@ -42,7 +42,7 @@ def load(filename, type=None):
     filenamebase = os.path.basename(filename).lower()
     if isinstance(type, str):
         type = type.lower()
-    if re.search(r'poscar|vasp|contcar', filenamebase) or type == 'poscar':
+    if re.search(r'poscar|contcar', filenamebase) or type == 'poscar':
         output = poscar.POSCAR(filename)
     elif re.search(r'outcar', filenamebase) or type == 'outcar':
         output = outcar.OUTCAR(filename)
@@ -54,6 +54,8 @@ def load(filename, type=None):
         output = locpot.LOCPOT(filename)
     elif re.search(r'doscar', filenamebase) or type == 'doscar':
         output = doscar.DOSCAR(filename)
+    elif re.search(r'vasp', filenamebase):
+        output = poscar.POSCAR(filename)
     else:
         raise RuntimeError("The file type cannot be identified!  Set 'type'")        
     return output
