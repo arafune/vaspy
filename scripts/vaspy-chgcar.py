@@ -11,9 +11,9 @@ from vaspy.chgcar import CHGCAR
 # they are called with just one argument, CHGCAR instance.
 spinmethods = {
     'mag': CHGCAR.magnetization,
-    'magX': (lambda chg: chg.magnetiztion('x')),   # < Error !! FixMe
-    'magY': (lambda chg: chg.magnetiztion('y')),   # < Error !! FixMe
-    'magZ': (lambda chg: chg.magnetiztion('z')),   # < Error !! FixMe
+    'magX': (lambda chg: chg.magnetization('x')),   # < Error !! FixMe
+    'magY': (lambda chg: chg.magnetization('y')),   # < Error !! FixMe
+    'magZ': (lambda chg: chg.magnetization('z')),   # < Error !! FixMe
     'majority': CHGCAR.majorityspin,
     'minority': CHGCAR.minorityspin,
 }
@@ -30,13 +30,13 @@ group.add_argument('--spin', metavar='spin_operation',
 when this option is set --add, -diff are ignored,
 and CHGCAR_file_2 must not be set.
 spin operation is one of the followings:
-mag : show the magnetisation
+mag : show the magnetization
       density (for spin resolved calculations)
-magX : show the magnetisation density in
+magX : show the magnetization density in
        the X direction (for non collinear calc.)
-magY : show the magnetisation density in
+magY : show the magnetization density in
        the Y direction (for non collinear calc.)
-magZ : show the magnetisation density in
+magZ : show the magnetization density in
        the Z direction (for non collinear calc.)
 majority : extract the part for the
            majority spin (for spin resolved calc.)
@@ -59,13 +59,13 @@ if args.spin is not None:
         parser.error("Only one CHGCAR file for --spin operations")
     if args.spin in spinmethods:
         if args.spin == 'magX':
-            dest_chgcar = args.CHGCAR_file_1.magnetiztion('x')
+            dest_chgcar = args.CHGCAR_file_1.magnetization('x')
         elif args.spin == 'magY':
-            dest_chgcar = args.CHGCAR_file_1.magnetiztion('y')
+            dest_chgcar = args.CHGCAR_file_1.magnetization('y')
         elif args.spin == 'magZ':
-            dest_chgcar = args.CHGCAR_file_1.magnetiztion('z')
+            dest_chgcar = args.CHGCAR_file_1.magnetization('z')
         elif args.spin == 'mag':
-            dest_chgcar = args.CHGCAR_file_1.magnetiztion()
+            dest_chgcar = args.CHGCAR_file_1.magnetization()
         elif args.spin == 'majority':
             dest_chgcar = args.CHGCAR_file_1.majorityspin()
         elif args.spin == 'minority':
