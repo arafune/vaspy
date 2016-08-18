@@ -285,11 +285,9 @@ class CHGCAR(poscar.POSCAR):
                 self.mesh_y != other.mesh_y,
                 self.mesh_z != other.mesh_z]):
             raise RuntimeError('Mesh sizes are inconsistent')
-        augend = self.chg_array
-        addend = other.chg_array
-        if len(augend) == len(addend):
-            add_chgcar.chg_array = [x + y for x, y in zip(augend, addend)]
-        else:
+        try:
+            add_chgcar.chg_array = self.chg_array + other.chg_array
+        except ValueError:
             raise RuntimeError('the mesh sies are different.')
         return add_chgcar
 
@@ -326,12 +324,9 @@ class CHGCAR(poscar.POSCAR):
                 self.mesh_y != other.mesh_y,
                 self.mesh_z != other.mesh_z]):
             raise RuntimeError('Mesh sizes are incinsistent')
-        minuend = self.chg_array
-        subtrahend = other.chg_array
-        if len(minuend) == len(subtrahend):
-            diff_chgcar.chg_array = [x - y for x, y in
-                                     zip(minuend, subtrahend)]
-        else:
+        try:
+            diff_chgcar.chg_array = self.chg_array - other.chg_array
+        except ValueError:
             raise RuntimeError('the mesh sizes are different.')
         return diff_chgcar
 
@@ -347,9 +342,8 @@ class CHGCAR(poscar.POSCAR):
             a string representation of CHGCAR.
         '''
         outputstring = ''
-        tmp = self.chg_array
-        for tmp in tools.each_slice(self.chg_array,
-                                    self.mesh_x * self.mesh_y * self.mesh_z):
+        chgarray = self.chg_array.reshape(len(self.spininfo))
+        for tmp in chgarray:
             output = []
             outputstring += '\n  {0}  {1}  {2}\n'.format(self.mesh_x,
                                                          self.mesh_y,
