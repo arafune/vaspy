@@ -192,7 +192,6 @@ class CHGCAR(poscar.POSCAR):
                                                                       self.mesh_x,
                                                                       self.mesh_y,
                                                                       self.mesh_z)[1]
-
                 dest_chgcar.spininfo = ["mX"]
             elif direction == 'y':
                 dest_chgcar.chg_array = dest_chgcar.chg_array.reshape(4,
