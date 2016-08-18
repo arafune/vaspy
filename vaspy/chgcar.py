@@ -12,6 +12,7 @@ import copy
 import os
 import sys
 import bz2
+import numpy as np
 
 try:
     from vaspy import poscar, tools
@@ -121,11 +122,10 @@ class CHGCAR(poscar.POSCAR):
                     elif separator in line:
                         pass
                     else:
-                        # self.chg_array.extend(map(float, line.split()))
-                        # same as above?
-                        self.chg_array.extend([float(item)
-                                               for item
-                                               in line.split()])
+                        self.chg_array.extend(line.split())
+        #                
+        self.chg_array = np.array(self.chg_array, np.float64)
+        #
         if divmod(len(self.chg_array),
                   self.mesh_x * self.mesh_y * self.mesh_z) == (1, 0):
             self.spininfo = [""]
@@ -174,28 +174,37 @@ class CHGCAR(poscar.POSCAR):
             raise RuntimeError("This CHGCAR is not spinresolved version")
         dest_chgcar = copy.deepcopy(self)
         if len(self.spininfo) == 2:
-            total, sd1 = tools.each_slice(self.chg_array,
-                                          self.mesh_x *
-                                          self.mesh_y *
-                                          self.mesh_z)
-            dest_chgcar.chg_array = list(sd1)
+            dest_chgcar.chg_array = dest_chgcar.chg_array.reshape(2,
+                                                                  self.mesh_x,
+                                                                  self.mesh_y,
+                                                                  self.mesh_z)[1]
             dest_chgcar.spininfo = ["up-down"]
         elif len(self.spininfo) == 4:
-            total, sd1, sd2, sd3 = tools.each_slice(self.chg_array,
-                                                    self.mesh_x *
-                                                    self.mesh_y *
-                                                    self.mesh_z)
+            dest_chgcar.chg_array.reshape(4, self.mesh_x, self.mesh_y, self.mesh_z)
             if direction is None or direction == 't':
-                dest_chgcar.chg_array = list(total)
+                dest_chgcar.chg_array = dest_chgcar.chg_array.reshape(4,
+                                                                      self.mesh_x,
+                                                                      self.mesh_y,
+                                                                      self.mesh_z)[0]
                 dest_chgcar.spininfo = ["mT"]
             if direction == 'x':
-                dest_chgcar.chg_array = list(sd1)
+                dest_chgcar.chg_array = dest_chgcar.chg_array.reshape(4,
+                                                                      self.mesh_x,
+                                                                      self.mesh_y,
+                                                                      self.mesh_z)[1]
+
                 dest_chgcar.spininfo = ["mX"]
             elif direction == 'y':
-                dest_chgcar.chg_array = list(sd2)
+                dest_chgcar.chg_array = dest_chgcar.chg_array.reshape(4,
+                                                                      self.mesh_x,
+                                                                      self.mesh_y,
+                                                                      self.mesh_z)[2]
                 dest_chgcar.spininfo = ["mY"]
             elif direction == 'z':
-                dest_chgcar.chg_array = list(sd3)
+                dest_chgcar.chg_array = dest_chgcar.chg_array.reshape(4,
+                                                                      self.mesh_x,
+                                                                      self.mesh_y,
+                                                                      self.mesh_z)[3]
                 dest_chgcar.spininfo = ["mZ"]
         return dest_chgcar
 
@@ -216,12 +225,9 @@ class CHGCAR(poscar.POSCAR):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         dest_chgcar = copy.deepcopy(self)
-        total, magnetization = tools.each_slice(self.chg_array,
-                                                self.mesh_x *
-                                                self.mesh_y *
-                                                self.mesh_z)
-        dest_chgcar.chg_array = [
-            (up + down) / 2 for up, down in zip(total, magnetization)]
+        tmp = dest_chgcar.chg_array.reshape(2, self.mesh_x, self.mesh_y, self.mesh_z)
+        
+        dest_chgcar.chg_array = (tmp[0] + tmp[1]) / 2
         dest_chgcar.spininfo = ["up"]
         return dest_chgcar
 
@@ -242,13 +248,10 @@ class CHGCAR(poscar.POSCAR):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         dest_chgcar = copy.deepcopy(self)
-        total, magnetization = tools.each_slice(self.chg_array,
-                                                self.mesh_x *
-                                                self.mesh_y *
-                                                self.mesh_z)
-        dest_chgcar.chg_array = [
-            (up - down) / 2 for up, down in zip(total, magnetization)]
-        dest_chgcar.spininfo = ["down"]
+        tmp = dest_chgcar.chg_array.reshape(2, self.mesh_x, self.mesh_y, self.mesh_z)
+        
+        dest_chgcar.chg_array = (tmp[0] - tmp[1]) / 2
+        dest_chgcar.spininfo = ["up"]
         return dest_chgcar
 
     def __add__(self, other):
