@@ -33,21 +33,21 @@ class CHGCAR(poscar.POSCAR):
 
      An example of the first few lines of CHGCAR. ::
 
-           hBN-Cu                               #1st line   poscar.POSCAR[0]
-           1.00000000000000                     #2nd line   poscar.POSCAR[1]
-             6.762964    0.000000    0.000000   #3rd line   poscar.POSCAR[2]
-             3.381482    5.856898    0.000000   #4th line   poscar.POSCAR[3]
-             0.000000    0.000000   29.004836   #5th line   poscar.POSCAR[4]
-           B    Cu   N    Si                    #6th line   poscar.POSCAR[5]
-             7    21     7     6                #7th line   poscar.POSCAR[6]
-           Direct                               #8th line   poscar.POSCAR[7]
-             0.047680  0.261795  0.361962       #9th line   poscar.POSCAR[8]
+           hBN-Cu                              # 1st line poscar.POSCAR[0]
+           1.00000000000000                    # 2nd line poscar.POSCAR[1]
+             6.762964    0.000000    0.000000  # 3rd line poscar.POSCAR[2]
+             3.381482    5.856898    0.000000  # 4th line poscar.POSCAR[3]
+             0.000000    0.000000   29.004836  # 5th line poscar.POSCAR[4]
+           B    Cu   N    Si                   # 6th line poscar.POSCAR[5]
+             7    21     7     6               # 7th line poscar.POSCAR[6]
+           Direct                              # 8th line poscar.POSCAR[7]
+             0.047680  0.261795  0.361962      # 9th line poscar.POSCAR[8]
              ....
-                                                # the single blanck line
-           240   240   288                      # number of gridmesh
-           0.0000 0.0005 0.0002 0.0020 0.0001   # five columns in each line
-           0.0030 0.0025 0.0001 0.0023 0.0003   #  ...
-           ...                                  #  ...
+                                               # the single blanck line
+           240   240   288                     # number of gridmesh
+           0.0000 0.0005 0.0002 0.0020 0.0001  # five columns in each line
+           0.0030 0.0025 0.0001 0.0023 0.0003  #  ...
+           ...                                 #  ...
 
 
     Attributes
@@ -126,24 +126,14 @@ class CHGCAR(poscar.POSCAR):
                         self.chg_array.extend([float(item)
                                                for item
                                                in line.split()])
-        if len(self.chg_array) % (self.mesh_x *
-                                  self.mesh_y *
-                                  self.mesh_z) != 0:
-            print(len(self.chg_array), ": Should be ",
-                  self.mesh_x * self.mesh_y * self.mesh_z, "x 1, 2, 4")
-            print(len(self.chg_array) % (self.mesh_x *
-                                         self.mesh_y *
-                                         self.mesh_z),
-                  ": Should be zero")
-            raise RuntimeError('Failed: Construction')
-        self.spininfo = len(self.chg_array) // (self.mesh_x *
-                                                self.mesh_y *
-                                                self.mesh_z)
-        if self.spininfo == 1:
+        if divmod(len(self.chg_array),
+                  self.mesh_x * self.mesh_y * self.mesh_z) == (1, 0):
             self.spininfo = [""]
-        elif self.spininfo == 2:
+        elif divmod(len(self.chg_array),
+                  self.mesh_x * self.mesh_y * self.mesh_z) == (2, 0):
             self.spininfo = ["up+down", "up-down"]
-        elif self.spininfo == 4:
+        elif divmod(len(self.chg_array),
+                  self.mesh_x * self.mesh_y * self.mesh_z) == (4, 0):
             self.spininfo = ["mT", "mX", "mY", "mZ"]
         else:
             raise RuntimeError("CHGCAR is correct?")
