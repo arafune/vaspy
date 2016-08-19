@@ -320,7 +320,7 @@ class CHGCAR(poscar.POSCAR):
 
         In the returned CHGCAR, the charge distribution is \
         just difference of two CHGCARs, and the atoms are used \
-        for "munuend" CHGCAR, not difference. \
+        for "minuend" CHGCAR, not difference. \
         The atoms in subtrahend CHGCAR are totally ignored.
         '''
         # minuend - subtrahend
