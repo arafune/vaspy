@@ -121,9 +121,9 @@ class VASPGrid(poscar.POSCAR):
                 self.mesh3d = self.mesh3d.reshape(4, self.mesh_x *
                                                   self.mesh_y *
                                                   self.mesh_z +
-                                                  self.ionnums)
-                self.additional = self.mesh3d[:, -self.ionnums:]
-                self.mesh3d = np.delete(self.mesh3d, np.s_[-self.ionnums:])
+                                                  sum(self.ionnums))
+                self.additional = self.mesh3d[:, -sum(self.ionnums):]
+                self.mesh3d = np.delete(self.mesh3d, np.s_[-sum(self.ionnums):])
 
     def get_mesh(self):
         '''.. py:method:: get_mesh()
