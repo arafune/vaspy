@@ -868,6 +868,22 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
             self.to_direct()
         return self.position
 
+    def get_axes_lengthes(self):
+        '''.. py:method:: get_axes_lengthes()
+
+        Return cell axis lengthes
+
+        Returns
+        -------
+
+        tuple
+            cell axis length of x, y, and z
+        '''
+        cell_x = np.linalg.norm(self.cell_vecs[0] * self.scaling_factor)
+        cell_y = np.linalg.norm(self.cell_vecs[1] * self.scaling_factor)
+        cell_z = np.linalg.norm(self.cell_vecs[2] * self.scaling_factor)
+        return (cell_x, cell_y, cell_z)
+
     def translate_all(self, vector):
         '''.. py:method::translate_all(vector)
 
