@@ -123,17 +123,17 @@ class CHGCAR(poscar.POSCAR):
                         pass
                     else:
                         self.chg_array.extend(line.split())
-        #                
-        self.chg_array = np.array(self.chg_array, np.float64)
+        #
+        self.chg_array = np.array(self.chg_array, dtype=np.float64)
         #
         if divmod(len(self.chg_array),
                   self.mesh_x * self.mesh_y * self.mesh_z) == (1, 0):
             self.spininfo = [""]
         elif divmod(len(self.chg_array),
-                  self.mesh_x * self.mesh_y * self.mesh_z) == (2, 0):
+                    self.mesh_x * self.mesh_y * self.mesh_z) == (2, 0):
             self.spininfo = ["up+down", "up-down"]
         elif divmod(len(self.chg_array),
-                  self.mesh_x * self.mesh_y * self.mesh_z) == (4, 0):
+                    self.mesh_x * self.mesh_y * self.mesh_z) == (4, 0):
             self.spininfo = ["mT", "mX", "mY", "mZ"]
         else:
             raise RuntimeError("CHGCAR is correct?")
@@ -180,7 +180,10 @@ class CHGCAR(poscar.POSCAR):
                                                                   self.mesh_z)[1]
             dest_chgcar.spininfo = ["up-down"]
         elif len(self.spininfo) == 4:
-            dest_chgcar.chg_array.reshape(4, self.mesh_x, self.mesh_y, self.mesh_z)
+            dest_chgcar.chg_array.reshape(4,
+                                          self.mesh_x,
+                                          self.mesh_y,
+                                          self.mesh_z)
             if direction is None or direction == 't':
                 dest_chgcar.chg_array = dest_chgcar.chg_array.reshape(4,
                                                                       self.mesh_x,
@@ -224,8 +227,10 @@ class CHGCAR(poscar.POSCAR):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         dest_chgcar = copy.deepcopy(self)
-        tmp = dest_chgcar.chg_array.reshape(2, self.mesh_x, self.mesh_y, self.mesh_z)
-        
+        tmp = dest_chgcar.chg_array.reshape(2,
+                                            self.mesh_x,
+                                            self.mesh_y,
+                                            self.mesh_z)
         dest_chgcar.chg_array = (tmp[0] + tmp[1]) / 2
         dest_chgcar.spininfo = ["up"]
         return dest_chgcar
@@ -247,8 +252,10 @@ class CHGCAR(poscar.POSCAR):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         dest_chgcar = copy.deepcopy(self)
-        tmp = dest_chgcar.chg_array.reshape(2, self.mesh_x, self.mesh_y, self.mesh_z)
-        
+        tmp = dest_chgcar.chg_array.reshape(2,
+                                            self.mesh_x,
+                                            self.mesh_y,
+                                            self.mesh_z)
         dest_chgcar.chg_array = (tmp[0] - tmp[1]) / 2
         dest_chgcar.spininfo = ["up"]
         return dest_chgcar
@@ -342,7 +349,10 @@ class CHGCAR(poscar.POSCAR):
             a string representation of CHGCAR.
         '''
         outputstring = ''
-        chgarray = self.chg_array.reshape(len(self.spininfo))
+        chgarray = self.chg_array.reshape(len(self.spininfo),
+                                          self.mesh_x *
+                                          self.mesh_y *
+                                          self.mesh_z)
         for tmp in chgarray:
             output = []
             outputstring += '\n  {0}  {1}  {2}\n'.format(self.mesh_x,
