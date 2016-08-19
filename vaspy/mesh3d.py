@@ -55,7 +55,7 @@ class VASPGrid(poscar.POSCAR):
     mesh3d, additional, mesh_x, mesh_y, mesh_z
     '''
     def __init__(self, filename=None):
-        super(VASPGrid, self).__init__(None)
+        super(VASPGrid, self).__init__()
         self.mesh_x, self.mesh_y, self.mesh_z = 0, 0, 0
         self.mesh3d = []
         self.additional = []
@@ -116,7 +116,7 @@ class VASPGrid(poscar.POSCAR):
             # check the mesh size to detemine whether mesh is
             # potential or charge this algorithm is, of course, very
             # ad-hoc.
-            if len(self.mesh3d) % (self.mesh_x * self.mesh_y *
+            if not len(self.mesh3d) % (self.mesh_x * self.mesh_y *
                                    self.mesh_z) == 0:
                 self.mesh3d = self.mesh3d.reshape(4, self.mesh_x *
                                                   self.mesh_y *
