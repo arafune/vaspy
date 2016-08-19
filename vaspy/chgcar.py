@@ -25,7 +25,7 @@ _RE_AUG_OCC = re.compile(r'\baugmentation occupancies')
 
 
 class CHGCAR(mesh3d.VASPGrid):
-    '''.. py:class:: CHGCAR
+    '''.. py:class:: CHGCAR(chgcarfile)
 
     Class for CHGCAR
 
@@ -51,7 +51,7 @@ class CHGCAR(mesh3d.VASPGrid):
     Attributes
     ----------
 
-    chg_array, mesh_x, mesh_y, mesh_z, spininfo
+    spininfo
 
     Notes
     -----

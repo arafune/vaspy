@@ -251,6 +251,138 @@ class VASPGrid(poscar.POSCAR):
         with thefile:
             thefile.write(str(self))
 
+    def average_along_axis(self, axis_name, type=0):
+        '''.. py:method:: average_along_axis(axis_name, type)
+
+        Calculate average value of potential along 'axis'
+
+        Parameters
+        ----------
+
+        axis_name: str
+             'X', 'Y', or 'Z'
+        type: int
+             select meshdata by integer
+
+        Returns
+        -------
+        numpy.ndarray
+            average value along the axis
+        '''
+        axis_name = axis_name.capitalize()
+        meshdata = self.mesh3d.reshape(self.mesh_z, self.mesh_y,
+                                       self.mesh_x)[type]
+        if axis_name == 'X':
+            meshdata = np.average(np.average(
+                np.transpose(meshdata, (2, 0, 1)), axis=2), axis=1)
+        elif axis_name == 'Y':
+            meshdata = np.average(np.average(
+                np.transpose(meshdata, (1, 0, 2)), axis=2), axis=1)
+        elif axis_name == 'Z':
+            meshdata = np.average(np.average(meshdata, axis=2), axis=1)
+        else:
+            raise ('Wrong axis name set')
+        return meshdata
+
+    def min_along_axis(self, axis_name, type=0):
+        '''.. py:method:: min_along_axis(axis_name, pottype)
+
+        Calculate minimum value of potential along 'axis'
+
+        Parameters
+        -----------
+
+        axis_name: str
+             'X', 'Y', or 'Z'
+        type: int
+             select meshdata by integer
+
+        Returns
+        -------
+        numpy.ndarray
+            minimum value along the axis
+        '''
+        axis_name = axis_name.capitalize()
+        meshdata = self.mesh3d.reshape(self.mesh_z, self.mesh_y,
+                                       self.mesh_x)[type]
+        if axis_name == 'X':
+            meshdata = np.min(np.min(
+                np.transpose(meshdata, (2, 0, 1)), axis=2), axis=1)
+        elif axis_name == 'Y':
+            meshdata = np.min(np.min(
+                np.transpose(meshdata, (1, 0, 2)), axis=2), axis=1)
+        elif axis_name == 'Z':
+            meshdata = np.min(np.min(meshdata, axis=2), axis=1)
+        else:
+            raise ('Wrong axis name set')
+        return meshdata
+
+    def max_along_axis(self, axis_name, type=0):
+        '''.. py:method:: man_along_axis(axis_name, pottype)
+
+        Calculate maximum value of potential along 'axis'
+
+        Parameters
+        -----------
+
+        axis_name: str
+             'X', 'Y', or 'Z'
+        type: int
+             select meshdata by integer
+
+        Returns
+        -------
+        numpy.ndarray
+            maximum value along the axis
+        '''
+        axis_name = axis_name.capitalize()
+        meshdata = self.mesh3d.reshape(self.mesh_z, self.mesh_y,
+                                       self.mesh_x)[type]
+        if axis_name == 'X':
+            meshdata = np.max(np.max(
+                np.transpose(meshdata, (2, 0, 1)), axis=2), axis=1)
+        elif axis_name == 'Y':
+            meshdata = np.max(np.max(
+                np.transpose(meshdata, (1, 0, 2)), axis=2), axis=1)
+        elif axis_name == 'Z':
+            meshdata = np.max(np.max(meshdata, axis=2), axis=1)
+        else:
+            raise ('Wrong axis name set')
+        return meshdata
+
+    def median_along_axis(self, axis_name, type=0):
+        '''.. py:method:: median_along_axis(axis_name, pottype)
+
+        Calculate median value of potential along 'axis'
+
+        Parameters
+        -----------
+
+        axis_name: str
+             'X', 'Y', or 'Z'
+        type: int
+             select meshdata by integer
+
+        Returns
+        -------
+        numpy.ndarray
+            median value along the axis
+        '''
+        axis_name = axis_name.capitalize()
+        meshdata = self.mesh3d.reshape(self.mesh_z, self.mesh_y,
+                                       self.mesh_x)[type]
+        if axis_name == 'X':
+            meshdata = np.median(np.median(
+                np.transpose(meshdata, (2, 0, 1)), axis=2), axis=1)
+        elif axis_name == 'Y':
+            meshdata = np.median(np.median(
+                np.transpose(meshdata, (1, 0, 2)), axis=2), axis=1)
+        elif axis_name == 'Z':
+            meshdata = np.median(np.median(meshdata, axis=2), axis=1)
+        else:
+            raise ('Wrong axis name set')
+        return meshdata
+
 
 class FFTGRID(object):
     '''.. py:class:: FFTGRID(meshsize, meshdata)
