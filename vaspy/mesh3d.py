@@ -267,7 +267,6 @@ class FFTGRID(object):
     meshdata: list or numpy.array
         1D-list or 1D-numpy array.  The length of grid is mesh_x *
     mesh_y * mesh_z
-
     '''
     def __init__(self, meshsize, meshdata):
         if len(meshdata) == meshsize(0) * meshsize(1) * meshsize(2):
