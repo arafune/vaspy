@@ -97,9 +97,16 @@ class VASPGrid(poscar.POSCAR):
                     if self.mesh_x == self.mesh_y == self.mesh_z == 0:
                         self.mesh_x, self.mesh_y, self.mesh_z = \
                                     [int(str) for str in line.split()]
+                    mesh_n = self.mesh_x * self.mesh_y * self.mesh_z
+                    if mesh_n % 5 == 0:
+                        lines_for_mesh = mesh_n // 5
+                    else:
+                        lines_for_mesh = mesh_n // 5 + 1
+                    self.mesh3d.extend([next(thefile).split() for i in range(lines_for_mesh)])
                     section = 'grid'
                 elif section == 'aug':
                     if separator in line:
+                        self.mesh3d.extend([next(thefile).split() for i in range(lines_for_mesh)])
                         section = 'grid'
                     elif "augmentation occupancies " in line:
                         pass  # Used for CHGCAR, not LOCPOT. not implementd
@@ -109,22 +116,11 @@ class VASPGrid(poscar.POSCAR):
                     if "augmentation occupancies " in line:
                         section = 'aug'
                     elif separator in line:
-                        pass  # Used for CHGCAR, not LOCPOT. not implementd
-                    else:
-                        self.mesh3d.extend(line.split())
+                        self.mesh3d.extend([next(thefile).split() for i in range(lines_for_mesh)])
+                    else:                        
+                        self.additional.extend(line.split())  # for unused data stored in LOCPOT
             self.mesh3d = np.array(self.mesh3d, dtype=np.float64)
-            # check the mesh size to detemine whether mesh is
-            # potential or charge this algorithm is, of course, very
-            # ad-hoc.
-            if not len(self.mesh3d) % (self.mesh_x * self.mesh_y *
-                                       self.mesh_z) == 0:
-                self.mesh3d = self.mesh3d.reshape(4, self.mesh_x *
-                                                  self.mesh_y *
-                                                  self.mesh_z +
-                                                  sum(self.ionnums))
-                self.additional = self.mesh3d[:, -sum(self.ionnums):]
-                self.mesh3d = np.delete(self.mesh3d,
-                                        np.s_[-sum(self.ionnums):])
+            self.mesh3d = self.mesh3d.reshape(self.mesh3d.shape[0] * self.mesh3d.shape[1])
 
     def get_mesh(self):
         '''.. py:method:: get_mesh()
