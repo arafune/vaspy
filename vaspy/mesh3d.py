@@ -117,13 +117,14 @@ class VASPGrid(poscar.POSCAR):
             # potential or charge this algorithm is, of course, very
             # ad-hoc.
             if not len(self.mesh3d) % (self.mesh_x * self.mesh_y *
-                                   self.mesh_z) == 0:
+                                       self.mesh_z) == 0:
                 self.mesh3d = self.mesh3d.reshape(4, self.mesh_x *
                                                   self.mesh_y *
                                                   self.mesh_z +
                                                   sum(self.ionnums))
                 self.additional = self.mesh3d[:, -sum(self.ionnums):]
-                self.mesh3d = np.delete(self.mesh3d, np.s_[-sum(self.ionnums):])
+                self.mesh3d = np.delete(self.mesh3d,
+                                        np.s_[-sum(self.ionnums):])
 
     def get_mesh(self):
         '''.. py:method:: get_mesh()
