@@ -95,7 +95,13 @@ class DOSCAR(object):  # Version safety
             file name of "DOSCAR"
 '''
         a_dos = list()
-        thefile = open(doscarfile)
+        if os.path.splitext(doscarfile)[1] == ".bz2":
+            try:
+                thefile = bz2.open(doscarfile, mode='rt')
+            except AttributeError:
+                thefile = bz2.BZ2File(doscarfile, mode='r')
+        else:
+            thefile = open(doscarfile)
         line = thefile.readline()
         self.natom = int(line.split()[0])  # 1st line
         line = [thefile.readline() for i in range(4)]
