@@ -164,13 +164,13 @@ class PROCAR(object):  # Version safety
                     if section == ['orbital']:
                         if "tot " in line[0:4]:
                             continue
-                        tmp = [float(i) for i in line.split()[1:]]
-                        self.orbital.append(tmp)
+                        self.orbital.append([float(i)
+                                             for i in line.split()[1:]])
                     elif section == ['phase']:
                         if not phase_read:
                             continue
-                        tmp = [float(i) for i in line.split()[1:]]
-                        self.phase.append(tmp)
+                        self.phase.append([float(i)
+                                           for i in line.split()[1:]])
 #
         self.spininfo = (len(self.orbital) //
                          (self.numk * self.n_bands * self.n_atoms))
