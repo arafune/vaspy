@@ -18,22 +18,11 @@ from __future__ import division        # Version safety
 import re
 # import copy
 import os
-import sys
 import bz2
 # import csv
 # import functools as ft
 import numpy as np
 import matplotlib.pyplot as plt
-if sys.version_info[0] >= 3:     # Version safety
-    from io import StringIO
-else:
-    from cStringIO import StringIO
-try:
-    from vaspy import tools
-except ImportError:
-    mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
-    sys.path.append(os.path.dirname(os.path.abspath(mypath)))
-    import tools
 
 
 class PROCAR(object):  # Version safety
@@ -80,7 +69,8 @@ class PROCAR(object):  # Version safety
 
     5. orbital contribution.
 
-      :Example:    1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
+      :Example: 1 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000\
+      0.000 0.000
 
     .. py:attribute:: orbital
 
@@ -97,6 +87,7 @@ class PROCAR(object):  # Version safety
         * nospin: ('',)
         * spinresolved: ('_up', '_down')
         * soi: ('_mT', '_mX', '_mY', '_mZ')
+
     '''
 
     def __init__(self, arg=None, phase_read=False):
