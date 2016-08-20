@@ -33,15 +33,15 @@ class CHGCAR(poscar.POSCAR):
 
      An example of the first few lines of CHGCAR. ::
 
-           hBN-Cu                                  #1st line   poscar.POSCAR[0]
-           1.00000000000000                        #2nd line   poscar.POSCAR[1]
-             6.762964    0.000000    0.000000      #3rd line   poscar.POSCAR[2]
-             3.381482    5.856898    0.000000      #4th line   poscar.POSCAR[3]
-             0.000000    0.000000   29.004836      #5th line   poscar.POSCAR[4]
-           B    Cu   N    Si                       #6th line   poscar.POSCAR[5]
-             7    21     7     6                   #7th line   poscar.POSCAR[6]
-           Direct                                  #8th line   poscar.POSCAR[7]
-             0.047680  0.261795  0.361962          #9th line   poscar.POSCAR[8]
+           hBN-Cu                                  #1st line poscar.POSCAR[0]
+           1.00000000000000                        #2nd line poscar.POSCAR[1]
+             6.762964    0.000000    0.000000      #3rd line poscar.POSCAR[2]
+             3.381482    5.856898    0.000000      #4th line poscar.POSCAR[3]
+             0.000000    0.000000   29.004836      #5th line poscar.POSCAR[4]
+           B    Cu   N    Si                       #6th line poscar.POSCAR[5]
+             7    21     7     6                   #7th line poscar.POSCAR[6]
+           Direct                                  #8th line poscar.POSCAR[7]
+             0.047680  0.261795  0.361962          #9th line poscar.POSCAR[8]
              ....
 
     Attributes
