@@ -19,4 +19,5 @@
 		    Wall time: 53.6 s
 		    CPU times: user 1min 9s, sys: 11.3 s, total: 1min 20s
 		    Wall time: 1min 24s
+	* Use bz2 module in chgcar.py, doscar.py, outcar.py, and procar.py, 
 
