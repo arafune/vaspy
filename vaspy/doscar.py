@@ -43,9 +43,11 @@ From VASP webpage::
 
 from __future__ import print_function  # Version safety
 from __future__ import division  # Version safety
+import bz2
 import copy
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 # if _sys.version_info[0] >= 3:  # Version safety
 #     from io import StringIO as _StringIO
 # else:
