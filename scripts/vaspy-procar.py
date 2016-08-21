@@ -7,6 +7,7 @@ script to use (demonstrate) vaspy.procar (Ver.3) module.
 import re
 import functools as ft
 import argparse
+from itertools import chain
 from vaspy import tools
 from vaspy.outcar import OUTCAR
 import vaspy.procar as procar
@@ -57,8 +58,8 @@ elif args.fermi is not None:
 else:
     fermi = 0.0
 
-sitenames = tuple(set([e for inner in args.atomsetname for e in inner]))
-flat_orbitals = tuple(set([e for inner in args.orbital for e in inner]))
+sitenames = tuple(chain.from_iterable(args.atomsetname))
+flat_orbitals = tuple(chain.from_iterable(args.orbital))
 
 # As atomindex used here begins with "1", but siteindex used in procar.py
 # internaly begins with "0".  (This is because VASP is fortran program !)

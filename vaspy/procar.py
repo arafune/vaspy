@@ -126,7 +126,7 @@ class PROCAR(object):  # Version safety
                 procar_file = bz2.BZ2File(filename, mode='r')
         else:
             procar_file = open(filename)
-        first_line = procar_file.readline()
+        first_line = next(procar_file)
         if 'PROCAR lm decomposed + phase' not in first_line:
             procar_file.close()
             raise RuntimeError("This PROCAR is not a proper format\n \
