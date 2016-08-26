@@ -255,8 +255,9 @@ class POSCAR(object):
         Warning
         -------
 
-        Now, you **cannot** set the index range by using tuple.\
-Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
+        Now, you **cannot** set the index range by using tuple.
+        Use range object instead.  
+        ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         '''
         dest = []
         for thearg in i:
@@ -274,6 +275,31 @@ Use range object instead.  ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
         if len(dest) == 1:
             dest = dest[0]
         return dest
+
+    def sort(s_site=None, e_site=None, axis='z'):
+        '''.. py:method:: sort(s_site, e_site, axis='z')
+
+        Sort element position by the position
+
+        Parameters
+        -----------
+
+        s_site: int
+            start site index for sort
+
+        e_site: int
+            end site index for sort
+        
+        axis: str
+            Axis used for sort (Default Z)
+
+        Warning
+        ------------
+        
+        The site index number starts with "1", not "0".
+        The element difference is **not** taken into account.
+        '''
+        pass
 
     def average_position(self, *i):
         '''.. py:method:: average_position(*i)
