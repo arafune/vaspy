@@ -96,20 +96,23 @@ class VASPGrid(poscar.POSCAR):
                     separator = line if separator is None else separator
                     if self.mesh_x == self.mesh_y == self.mesh_z == 0:
                         self.mesh_x, self.mesh_y, self.mesh_z = \
-                                    [int(str) for str in line.split()]
+                                    [int(string) for string in line.split()]
                     mesh_n = self.mesh_x * self.mesh_y * self.mesh_z
-                    gridfirstline = next(thefile).rstrip().replace('***********', 'Nan').split()
+                    gridfirstline = next(thefile).rstrip().replace('***********',
+                                                                   'Nan').split()
                     self.mesh3d.extend([gridfirstline])
                     if mesh_n % len(gridfirstline) == 0:
                         lines_for_mesh = mesh_n // len(gridfirstline)
                     else:
                         lines_for_mesh = mesh_n // len(gridfirstline) + 1
-                    self.mesh3d.extend([next(thefile).rstrip().replace('***********', 'Nan').split()
+                    self.mesh3d.extend([next(thefile).rstrip().replace('***********',
+                                                                       'Nan').split()
                                         for i in range(lines_for_mesh-1)])
                     section = 'grid'
                 elif section == 'aug':
                     if separator in line:
-                        self.mesh3d.extend([next(thefile).rstrip().replace('***********', 'Nan').split()
+                        self.mesh3d.extend([next(thefile).rstrip().replace('***********',
+                                                                           'Nan').split()
                                             for i in range(lines_for_mesh)])
                         section = 'grid'
                     elif "augmentation occupancies " in line:
@@ -120,9 +123,10 @@ class VASPGrid(poscar.POSCAR):
                     if "augmentation occupancies " in line:
                         section = 'aug'
                     elif separator in line:
-                        self.mesh3d.extend([next(thefile).rstrip().replace('***********', 'Nan').split()
+                        self.mesh3d.extend([next(thefile).rstrip().replace('***********',
+                                                                           'Nan').split()
                                             for i in range(lines_for_mesh)])
-                    else:                        
+                    else:
                         self.additional.extend(line.split())  # for unused data stored in LOCPOT
             self.mesh3d = np.array(self.mesh3d, dtype=np.float64)
             self.mesh3d = self.mesh3d.reshape(self.mesh3d.shape[0] * self.mesh3d.shape[1])
@@ -283,7 +287,7 @@ class VASPGrid(poscar.POSCAR):
         elif axis_name == 'Z':
             meshdata = np.average(np.average(meshdata, axis=2), axis=1)
         else:
-            raise ('Wrong axis name set')
+            raise 'Wrong axis name set'
         return meshdata
 
     def min_along_axis(self, axis_name, type=0):
@@ -316,7 +320,7 @@ class VASPGrid(poscar.POSCAR):
         elif axis_name == 'Z':
             meshdata = np.min(np.min(meshdata, axis=2), axis=1)
         else:
-            raise ('Wrong axis name set')
+            raise 'Wrong axis name set'
         return meshdata
 
     def max_along_axis(self, axis_name, type=0):
@@ -349,7 +353,7 @@ class VASPGrid(poscar.POSCAR):
         elif axis_name == 'Z':
             meshdata = np.max(np.max(meshdata, axis=2), axis=1)
         else:
-            raise ('Wrong axis name set')
+            raise 'Wrong axis name set'
         return meshdata
 
     def median_along_axis(self, axis_name, type=0):
@@ -382,7 +386,7 @@ class VASPGrid(poscar.POSCAR):
         elif axis_name == 'Z':
             meshdata = np.median(np.median(meshdata, axis=2), axis=1)
         else:
-            raise ('Wrong axis name set')
+            raise 'Wrong axis name set'
         return meshdata
 
 
