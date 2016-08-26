@@ -276,7 +276,7 @@ class POSCAR(object):
             dest = dest[0]
         return dest
 
-    def sort(self, s_site=None, e_site=None, axis='z'):
+    def sort(self, s_site=1, e_site=None, axis='z'):
         '''.. py:method:: sort(s_site, e_site, axis='z')
 
         Sort element position by the position
@@ -299,7 +299,18 @@ class POSCAR(object):
         The site index number starts with "1", not "0".
         The element difference is **not** taken into account.
         '''
-        pass
+        if e_site is None:
+            e_site = sum(self.ionnums)
+
+        if axis == 'x' or axis == 'X' or axis == 0:
+            axis = 0
+        elif axis == 'y' or axis == 'Y' or axis == 1:
+            axis = 1
+        elif axis == 'z' or axis == 'Z' or axis == 2:
+            axis = 2
+        self.position = self.position[0:s_site-1] + sorted(
+            self.position[s_site-1:e_site],
+            key=lambda sortaxis: sortaxis[axis]) + self.position[e_site:]
 
     def average_position(self, *i):
         '''.. py:method:: average_position(*i)
