@@ -276,42 +276,6 @@ class POSCAR(object):
             dest = dest[0]
         return dest
 
-    def sort(self, s_site=1, e_site=None, axis='z'):
-        '''.. py:method:: sort(s_site, e_site, axis='z')
-
-        Sort element position by the position
-
-        Parameters
-        -----------
-
-        s_site: int
-            start site index for sort
-
-        e_site: int
-            end site index for sort
-
-        axis: str
-            Axis used for sort (Default Z)
-
-        Warning
-        ------------
-
-        The site index number starts with "1", not "0".
-        The element difference is **not** taken into account.
-        '''
-        if e_site is None:
-            e_site = sum(self.ionnums)
-
-        if axis == 'x' or axis == 'X' or axis == 0:
-            axis = 0
-        elif axis == 'y' or axis == 'Y' or axis == 1:
-            axis = 1
-        elif axis == 'z' or axis == 'Z' or axis == 2:
-            axis = 2
-        self.position = self.position[0:s_site-1] + sorted(
-            self.position[s_site-1:e_site],
-            key=lambda sortaxis: sortaxis[axis]) + self.position[e_site:]
-
     def average_position(self, *i):
         '''.. py:method:: average_position(*i)
 
@@ -424,36 +388,41 @@ class POSCAR(object):
             sposcar.to_cartesian()
         return sposcar
 
-    def sort(self, from_index, to_index):
-        '''.. py:method:: sort(from_index, to_index)
+    def sort(self, from_site=1, to_site=None, axis='z'):
+        '''.. py:method:: sort(from_index, to_index, axis='z')
 
         Sort positions attribute by coordinate
 
         Parameters
         -----------
 
-        from_index: int
+        from_site: int
             first index # for sort
-        to_index: int
+
+        to_site: int
             last index # for sort
+
+        axis: str
+            Axis used for sort (Default Z)
 
 
         Notes
         -----
 
-        the first site # is "1", not "0" to follow VESTA's way.
+        The first site # is "1", not "0" to follow VESTA's way.
+        The element difference is **not** taken into account.
         '''
-        original_is_cartesian = False
-        if self.is_cartesian():
-            original_is_cartesian = True
-            self.to_direct()
-        self.repack_in_cell()
-        poslists = self.pos(range(from_index, to_index+1))
-        poslists.sort(keys=lambda x: (x[0], x[1], x[2]))
-        for i in range(from_index, to_index + 1):
-            self.pos_replace(i, poslists.pop(0))
-        if original_is_cartesian:
-            self.to_cartesian()
+        if to_site is None:
+            to_site = sum(self.ionnums)
+        if axis == 'x' or axis == 'X' or axis == 0:
+            axis = 0
+        elif axis == 'y' or axis == 'Y' or axis == 1:
+            axis = 1
+        elif axis == 'z' or axis == 'Z' or axis == 2:
+            axis = 2
+        self.position = self.position[0:from_site-1] + sorted(
+            self.position[from_site-1:to_site],
+            key=lambda sortaxis: sortaxis[axis]) + self.position[to_site:]
 
     # class method? or independent function?
     def nearest(self, array, point):
