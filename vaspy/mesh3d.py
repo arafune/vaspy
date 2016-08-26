@@ -98,11 +98,13 @@ class VASPGrid(poscar.POSCAR):
                         self.mesh_x, self.mesh_y, self.mesh_z = \
                                     [int(str) for str in line.split()]
                     mesh_n = self.mesh_x * self.mesh_y * self.mesh_z
-                    if mesh_n % 5 == 0:
-                        lines_for_mesh = mesh_n // 5
+                    gridfirstline = next(thefile).rstrip().split()
+                    self.mesh3d.extend([gridfirstline])
+                    if mesh_n % len(gridfirstline) == 0:
+                        lines_for_mesh = mesh_n // len(gridfirstline)
                     else:
-                        lines_for_mesh = mesh_n // 5 + 1
-                    self.mesh3d.extend([next(thefile).split() for i in range(lines_for_mesh)])
+                        lines_for_mesh = mesh_n // len(gridfirstline) + 1
+                    self.mesh3d.extend([next(thefile).split() for i in range(lines_for_mesh-1)])
                     section = 'grid'
                 elif section == 'aug':
                     if separator in line:
