@@ -18,8 +18,8 @@ __all__ = ['chgcar',
 
 from vaspy import *
 
-def load(filename, type=None):
-    ''' .. py:function:: load(filename, type)
+def load(filename, mode=None):
+    ''' .. py:function:: load(filename, mode)
 
     load file
 
@@ -29,33 +29,33 @@ def load(filename, type=None):
     filename: str
         filename
 
-    type: str
-       optional argument type
+    mode: str
+       optional argument mode
 
     Notes
     -----
-        * 'type' is the optional argument, because this function judges
-    the file type mainly from its name
-        * type is poscar, outcar, chgcar, procar (case insensitive)
+        * 'mode' is the optional argument, because this function judges
+    the file mode mainly from its name
+        * mode is poscar, outcar, chgcar, procar (case insensitive)
     '''
     from . import poscar, outcar, chgcar, doscar, locpot, procar
     filenamebase = os.path.basename(filename).lower()
-    if isinstance(type, str):
-        type = type.lower()
-    if re.search(r'poscar|contcar', filenamebase) or type == 'poscar':
+    if isinstance(mode, str):
+        mode = mode.lower()
+    if re.search(r'poscar|contcar', filenamebase) or mode == 'poscar':
         output = poscar.POSCAR(filename)
-    elif re.search(r'outcar', filenamebase) or type == 'outcar':
+    elif re.search(r'outcar', filenamebase) or mode == 'outcar':
         output = outcar.OUTCAR(filename)
-    elif re.search(r'chgcar', filenamebase) or type == 'chgcar':
+    elif re.search(r'chgcar', filenamebase) or mode == 'chgcar':
         output = chgcar.CHGCAR(filename)
-    elif re.search(r'procar', filenamebase) or type == 'procar':
+    elif re.search(r'procar', filenamebase) or mode == 'procar':
         output = procar.PROCAR(filename)
-    elif re.search(r'locpot', filenamebase) or type == 'locpot':
+    elif re.search(r'locpot', filenamebase) or mode == 'locpot':
         output = locpot.LOCPOT(filename)
-    elif re.search(r'doscar', filenamebase) or type == 'doscar':
+    elif re.search(r'doscar', filenamebase) or mode == 'doscar':
         output = doscar.DOSCAR(filename)
     elif re.search(r'vasp', filenamebase):
         output = poscar.POSCAR(filename)
     else:
-        raise RuntimeError("The file type cannot be identified!  Set 'type'")        
+        raise RuntimeError("The loding mode cannot be identified!  Set 'mode'")        
     return output
