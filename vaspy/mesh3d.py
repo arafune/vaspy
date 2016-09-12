@@ -98,22 +98,24 @@ class VASPGrid(poscar.POSCAR):
                         self.mesh_x, self.mesh_y, self.mesh_z = \
                                     [int(string) for string in line.split()]
                     mesh_n = self.mesh_x * self.mesh_y * self.mesh_z
-                    gridfirstline = next(thefile).rstrip().replace('***********',
-                                                                   'Nan').split()
+                    gridfirstline = next(thefile).rstrip().replace(
+                        '***********', 'Nan').split()
                     self.mesh3d.extend([gridfirstline])
                     if mesh_n % len(gridfirstline) == 0:
                         lines_for_mesh = mesh_n // len(gridfirstline)
                     else:
                         lines_for_mesh = mesh_n // len(gridfirstline) + 1
-                    self.mesh3d.extend([next(thefile).rstrip().replace('***********',
-                                                                       'Nan').split()
-                                        for i in range(lines_for_mesh-1)])
+                    self.mesh3d.extend(
+                        [next(thefile).rstrip().replace('***********',
+                                                        'Nan').split()
+                         for i in range(lines_for_mesh-1)])
                     section = 'grid'
                 elif section == 'aug':
                     if separator in line:
-                        self.mesh3d.extend([next(thefile).rstrip().replace('***********',
-                                                                           'Nan').split()
-                                            for i in range(lines_for_mesh)])
+                        self.mesh3d.extend([
+                            next(thefile).rstrip().replace('***********',
+                                                           'Nan').split()
+                            for i in range(lines_for_mesh)])
                         section = 'grid'
                     elif "augmentation occupancies " in line:
                         pass  # Used for CHGCAR, not LOCPOT. not implementd
@@ -123,13 +125,16 @@ class VASPGrid(poscar.POSCAR):
                     if "augmentation occupancies " in line:
                         section = 'aug'
                     elif separator in line:
-                        self.mesh3d.extend([next(thefile).rstrip().replace('***********',
-                                                                           'Nan').split()
-                                            for i in range(lines_for_mesh)])
+                        self.mesh3d.extend([
+                            next(thefile).rstrip().replace('***********',
+                                                           'Nan').split()
+                            for i in range(lines_for_mesh)])
                     else:
-                        self.additional.extend(line.split())  # for unused data stored in LOCPOT
+                        # for unused data stored in LOCPOT
+                        self.additional.extend(line.split())
             self.mesh3d = np.array(self.mesh3d, dtype=np.float64)
-            self.mesh3d = self.mesh3d.reshape(self.mesh3d.shape[0] * self.mesh3d.shape[1])
+            self.mesh3d = self.mesh3d.reshape(self.mesh3d.shape[0] *
+                                              self.mesh3d.shape[1])
 
     def get_mesh(self):
         '''.. py:method:: get_mesh()
