@@ -262,8 +262,8 @@ class VASPGrid(poscar.POSCAR):
         with thefile:
             thefile.write(str(self))
 
-    def average_along_axis(self, axis_name, type=0):
-        '''.. py:method:: average_along_axis(axis_name, type)
+    def average_along_axis(self, axis_name, mode=0):
+        '''.. py:method:: average_along_axis(axis_name, mode)
 
         Calculate average value of potential along 'axis'
 
@@ -272,7 +272,7 @@ class VASPGrid(poscar.POSCAR):
 
         axis_name: str
              'X', 'Y', or 'Z'
-        type: int
+        mode: int
              select meshdata by integer
 
         Returns
@@ -282,7 +282,7 @@ class VASPGrid(poscar.POSCAR):
         '''
         axis_name = axis_name.capitalize()
         meshdata = self.mesh3d.reshape(self.mesh_z, self.mesh_y,
-                                       self.mesh_x)[type]
+                                       self.mesh_x)[mode]
         if axis_name == 'X':
             meshdata = np.average(np.average(
                 np.transpose(meshdata, (2, 0, 1)), axis=2), axis=1)
@@ -295,8 +295,8 @@ class VASPGrid(poscar.POSCAR):
             raise 'Wrong axis name set'
         return meshdata
 
-    def min_along_axis(self, axis_name, type=0):
-        '''.. py:method:: min_along_axis(axis_name, pottype)
+    def min_along_axis(self, axis_name, mode=0):
+        '''.. py:method:: min_along_axis(axis_name, potmode)
 
         Calculate minimum value of potential along 'axis'
 
@@ -305,7 +305,7 @@ class VASPGrid(poscar.POSCAR):
 
         axis_name: str
              'X', 'Y', or 'Z'
-        type: int
+        mode: int
              select meshdata by integer
 
         Returns
@@ -315,7 +315,7 @@ class VASPGrid(poscar.POSCAR):
         '''
         axis_name = axis_name.capitalize()
         meshdata = self.mesh3d.reshape(self.mesh_z, self.mesh_y,
-                                       self.mesh_x)[type]
+                                       self.mesh_x)[mode]
         if axis_name == 'X':
             meshdata = np.min(np.min(
                 np.transpose(meshdata, (2, 0, 1)), axis=2), axis=1)
@@ -328,8 +328,8 @@ class VASPGrid(poscar.POSCAR):
             raise 'Wrong axis name set'
         return meshdata
 
-    def max_along_axis(self, axis_name, type=0):
-        '''.. py:method:: man_along_axis(axis_name, pottype)
+    def max_along_axis(self, axis_name, mode=0):
+        '''.. py:method:: man_along_axis(axis_name, potmode)
 
         Calculate maximum value of potential along 'axis'
 
@@ -338,7 +338,7 @@ class VASPGrid(poscar.POSCAR):
 
         axis_name: str
              'X', 'Y', or 'Z'
-        type: int
+        mode: int
              select meshdata by integer
 
         Returns
@@ -348,7 +348,7 @@ class VASPGrid(poscar.POSCAR):
         '''
         axis_name = axis_name.capitalize()
         meshdata = self.mesh3d.reshape(self.mesh_z, self.mesh_y,
-                                       self.mesh_x)[type]
+                                       self.mesh_x)[mode]
         if axis_name == 'X':
             meshdata = np.max(np.max(
                 np.transpose(meshdata, (2, 0, 1)), axis=2), axis=1)
@@ -361,8 +361,8 @@ class VASPGrid(poscar.POSCAR):
             raise 'Wrong axis name set'
         return meshdata
 
-    def median_along_axis(self, axis_name, type=0):
-        '''.. py:method:: median_along_axis(axis_name, pottype)
+    def median_along_axis(self, axis_name, mode=0):
+        '''.. py:method:: median_along_axis(axis_name, potmode)
 
         Calculate median value of potential along 'axis'
 
@@ -371,7 +371,7 @@ class VASPGrid(poscar.POSCAR):
 
         axis_name: str
              'X', 'Y', or 'Z'
-        type: int
+        mode: int
              select meshdata by integer
 
         Returns
@@ -381,7 +381,7 @@ class VASPGrid(poscar.POSCAR):
         '''
         axis_name = axis_name.capitalize()
         meshdata = self.mesh3d.reshape(self.mesh_z, self.mesh_y,
-                                       self.mesh_x)[type]
+                                       self.mesh_x)[mode]
         if axis_name == 'X':
             meshdata = np.median(np.median(
                 np.transpose(meshdata, (2, 0, 1)), axis=2), axis=1)
