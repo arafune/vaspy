@@ -7,7 +7,8 @@ This module provides OUTCAR class
 
 from __future__ import unicode_literals  # Version safety
 from __future__ import print_function  # Version safety
-
+import os.path
+import bz2
 
 class OUTCAR(object):  # Version safety
     '''.. py:class:: OUTCAR(outcar_file)
@@ -77,7 +78,13 @@ class OUTCAR(object):  # Version safety
         section = []
         posforce = []
         # parse
-        thefile = open(arg)
+        if os.path.splitext(arg)[1] == '.bz2':
+            try:
+                thefile = bz2.open(arg, mode='rt')
+            except AttributeError:
+                thefile = bz2.BZ2File(arg, mode='r')
+        else:
+            thefile = open(arg)
         for line in thefile:
             if section == ["force"]:
                 if "total drift" in line:

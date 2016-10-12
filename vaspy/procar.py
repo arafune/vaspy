@@ -18,22 +18,11 @@ from __future__ import division        # Version safety
 import re
 # import copy
 import os
-import sys
 import bz2
 # import csv
 # import functools as ft
 import numpy as np
 import matplotlib.pyplot as plt
-if sys.version_info[0] >= 3:     # Version safety
-    from io import StringIO
-else:
-    from cStringIO import StringIO
-try:
-    from vaspy import tools
-except ImportError:
-    mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
-    sys.path.append(os.path.dirname(os.path.abspath(mypath)))
-    import tools
 
 
 class PROCAR(object):  # Version safety
@@ -80,7 +69,8 @@ class PROCAR(object):  # Version safety
 
     5. orbital contribution.
 
-      :Example:    1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
+      :Example: 1 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000\
+      0.000 0.000
 
     .. py:attribute:: orbital
 
@@ -97,6 +87,7 @@ class PROCAR(object):  # Version safety
         * nospin: ('',)
         * spinresolved: ('_up', '_down')
         * soi: ('_mT', '_mX', '_mY', '_mZ')
+
     '''
 
     def __init__(self, arg=None, phase_read=False):
@@ -129,10 +120,13 @@ class PROCAR(object):  # Version safety
              Switch for loading phase characters
         '''
         if os.path.splitext(filename)[1] == ".bz2":
-            procar_file = bz2.open(filename, mode='rt')
+            try:
+                procar_file = bz2.open(filename, mode='rt')
+            except AttributeError:
+                procar_file = bz2.BZ2File(filename, mode='r')
         else:
             procar_file = open(filename)
-        first_line = procar_file.readline()
+        first_line = next(procar_file)
         if 'PROCAR lm decomposed + phase' not in first_line:
             procar_file.close()
             raise RuntimeError("This PROCAR is not a proper format\n \
@@ -170,13 +164,13 @@ class PROCAR(object):  # Version safety
                     if section == ['orbital']:
                         if "tot " in line[0:4]:
                             continue
-                        tmp = [float(i) for i in line.split()[1:]]
-                        self.orbital.append(tmp)
+                        self.orbital.append([float(i)
+                                             for i in line.split()[1:]])
                     elif section == ['phase']:
                         if not phase_read:
                             continue
-                        tmp = [float(i) for i in line.split()[1:]]
-                        self.phase.append(tmp)
+                        self.phase.append([float(i)
+                                           for i in line.split()[1:]])
 #
         self.spininfo = (len(self.orbital) //
                          (self.numk * self.n_bands * self.n_atoms))

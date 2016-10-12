@@ -43,9 +43,11 @@ From VASP webpage::
 
 from __future__ import print_function  # Version safety
 from __future__ import division  # Version safety
+import bz2
 import copy
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 # if _sys.version_info[0] >= 3:  # Version safety
 #     from io import StringIO as _StringIO
 # else:
@@ -83,48 +85,51 @@ class DOSCAR(object):  # Version safety
             self.load_doscar_file(arg)
 
     def load_doscar_file(self, doscarfile):
-        '''.. py:method load_doscar_file(doscarfile)
-
-        Parse DOSCAR file and store it in memory
-
-
+        '''.. py:method load_dosca_file(doscarfile)
+        
+        parse DOSCAR file and store it in memory
+        
         Parameters
-        -----------
-
-        doscar_file: str
-            file name of "DOSCAR"
-'''
-        a_dos = list()
-        thefile = open(doscarfile)
-        line = thefile.readline()
-        self.natom = int(line.split()[0])  # 1st line
-        line = [thefile.readline() for i in range(4)]
-        # for i in range(4):
-        #    line = thefile.readline()      # 2-5 lines
-        line = thefile.readline()          # 6 line
-        try:
-            self.nenergypnts = int(line.split()[2])
-        except ValueError:
-            self.nenergypnts = int(line[32:37])
-        for dummy in range(self.nenergypnts):  # TDOS
-            line = thefile.readline()
-            data = line.split()
-            if len(data) == 3:    # SOI or non-spin
-                data = data[0:2]
-            elif len(data) == 5:  # spin-collinear
-                data = data[0:3]
-            a_dos.append([float(i) for i in data])
-        self.dos_container.append(np.array(a_dos))
-        #
-        for dummy in range(self.natom):  # PDOS
-            thefile.readline()
-            a_dos = list()
-            for dummy2 in range(self.nenergypnts):
-                line = thefile.readline()
-                data = line.split()
-                a_dos.append([float(i) for i in data])
-            self.dos_container.append(np.array(a_dos))
-        thefile.close()
+        ------------
+        
+        doscarfile: str
+            filename of "DOSCAR"
+        '''
+        if os.path.splitext(doscarfile)[1] == '.bz2':
+            try:
+                thefile = bz2.open(doscarfile, mode='rt')
+            except AttributeError:
+                thefile = bz2.BZ2File(doscarfile, mode='r')
+        else:
+            thefile = open(doscarfile)
+        with thefile:
+            firstline = thefile.readline()
+            self.natom = int(firstline[0:4])
+            [thefile.readline() for i in range(4)]
+            header = thefile.readline()
+            self.nenergypnts = int(header[32:37])
+            tdos = np.array([next(thefile).rstrip().split()
+                                          for i in range(self.nenergypnts)],
+                                         dtype=np.float64)
+            if tdos.shape[1] == 3:
+                tdos = tdos[:, 0:2]
+            elif tdos.shape[1] == 5:
+                tdos = tdos[:, 0:3]
+            else:
+                raise (RuntimeError)
+            self.dos_container=[tdos]
+            try:
+                nextheader = next(thefile)
+            except StopIteration:
+                nextheader = ""
+            while nextheader == header:
+                self.dos_container.append(np.array([next(thefile).rstrip().split()
+                                                    for i in range(self.nenergypnts)],
+                                                   dtype=np.float64))
+                try:
+                    nextheader = next(thefile)
+                except StopIteration:
+                    nextheader = ""
 
 
 class DOS(object):  # Version safety

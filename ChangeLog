@@ -1,0 +1,23 @@
+2016-08-20  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
+
+	* raise version 0.2.3
+	* Improve CHGCAR operation (__add__, __sub__)
+		- %time a = chgcar.CHGCAR("CHGCAR.F16Cupc")
+		  %time b = chgcar.CHGCAR("CHGCAR.InSi111")
+		  %time c = a+b
+		  new:
+		    CPU times: user 52.7 s, sys: 1min 6s, total: 1min 59s
+		    Wall time: 2min 35s
+   		    CPU times: user 50.4 s, sys: 1min, total: 1min 51s
+		    Wall time: 2min 14s
+		    CPU times: user 684 ms, sys: 2 s, total: 2.68 s
+		    Wall time: 4.88 s
+		    old:
+	            CPU times: user 50.7 s, sys: 1.83 s, total: 52.5 s
+		    Wall time: 53.2 s
+	            CPU times: user 51 s, sys: 2 s, total: 53 s
+		    Wall time: 53.6 s
+		    CPU times: user 1min 9s, sys: 11.3 s, total: 1min 20s
+		    Wall time: 1min 24s
+	* Use bz2 module in chgcar.py, doscar.py, outcar.py, and procar.py, 
+
