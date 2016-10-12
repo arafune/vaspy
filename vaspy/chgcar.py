@@ -21,7 +21,7 @@ except ImportError:
     import tools
 
 
-_RE_BLANK = re.compile(r'^[\s]*$')
+_RE_BLANK = re.compile(r'^[\s]*$')   # << should use other than regexp
 _RE_AUG_OCC = re.compile(r'\baugmentation occupancies')
 
 
