@@ -86,12 +86,12 @@ class DOSCAR(object):  # Version safety
 
     def load_doscar_file(self, doscarfile):
         '''.. py:method load_dosca_file(doscarfile)
-        
+
         parse DOSCAR file and store it in memory
-        
+
         Parameters
         ------------
-        
+
         doscarfile: str
             filename of "DOSCAR"
         '''
@@ -109,23 +109,24 @@ class DOSCAR(object):  # Version safety
             header = thefile.readline()
             self.nenergypnts = int(header[32:37])
             tdos = np.array([next(thefile).rstrip().split()
-                                          for i in range(self.nenergypnts)],
-                                         dtype=np.float64)
+                             for i in range(self.nenergypnts)],
+                            dtype=np.float64)
             if tdos.shape[1] == 3:
                 tdos = tdos[:, 0:2]
             elif tdos.shape[1] == 5:
                 tdos = tdos[:, 0:3]
             else:
                 raise (RuntimeError)
-            self.dos_container=[tdos]
+            self.dos_container = [tdos]
             try:
                 nextheader = next(thefile)
             except StopIteration:
                 nextheader = ""
             while nextheader == header:
-                self.dos_container.append(np.array([next(thefile).rstrip().split()
-                                                    for i in range(self.nenergypnts)],
-                                                   dtype=np.float64))
+                self.dos_container.append(
+                    np.array([next(thefile).rstrip().split()
+                              for i in range(self.nenergypnts)],
+                             dtype=np.float64))
                 try:
                     nextheader = next(thefile)
                 except StopIteration:

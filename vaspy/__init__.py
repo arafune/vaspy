@@ -18,6 +18,7 @@ __all__ = ['chgcar',
 
 from vaspy import *
 
+
 def load(filename, mode=None):
     ''' .. py:function:: load(filename, mode)
 
@@ -57,5 +58,5 @@ def load(filename, mode=None):
     elif re.search(r'vasp', filenamebase):
         output = poscar.POSCAR(filename)
     else:
-        raise RuntimeError("The loding mode cannot be identified!  Set 'mode'")        
+        raise RuntimeError("The loding mode cannot be identified!  Set 'mode'")
     return output
