@@ -124,16 +124,15 @@ class VASPGrid(poscar.POSCAR):
                     if "augmentation occupancies " in line:
                         section = 'aug'
                     elif separator in line:
-                        for i in range(lines_for_mesh):
-                            self.mesh3d.extend([
+                        self.mesh3d.extend([
                             next(thefile).rstrip().replace('***********',
-                                                                 'Nan').split()
+                                                           'Nan').split()
                             for i in range(lines_for_mesh)])
                     else:
                         # for unused data stored in LOCPOT
                         self.additional.extend(line.split())
             self.mesh3d = np.array([elem for sublist in self.mesh3d
-                               for elem in sublist], dtype=np.float64)
+                                    for elem in sublist], dtype=np.float64)
 #            self.mesh3d = self.mesh3d.reshape(self.mesh3d.shape[0] *
 #                                              self.mesh3d.shape[1])
 
