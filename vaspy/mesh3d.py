@@ -353,7 +353,9 @@ class VASPGrid(poscar.POSCAR):
             maximum value along the axis
         '''
         axis_name = axis_name.capitalize()
-        meshdata = self.mesh3d.reshape(self.mesh_z, self.mesh_y,
+        meshdata = self.mesh3d.reshape(self.n_frame,
+                                       self.mesh_z,
+                                       self.mesh_y,
                                        self.mesh_x)[mode]
         if axis_name == 'X':
             meshdata = np.max(np.max(
