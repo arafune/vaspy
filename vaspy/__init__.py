@@ -46,7 +46,7 @@ def load(filename, mode=None):
         output = poscar.POSCAR(filename)
     elif re.search(r'outcar', filenamebase) or mode == 'outcar':
         output = outcar.OUTCAR(filename)
-    elif re.search(r'chgcar', filenamebase) or mode == 'chgcar':
+    elif re.search(r'chgcar|parchg', filenamebase) or mode == 'chgcar':
         output = chgcar.CHGCAR(filename)
     elif re.search(r'procar', filenamebase) or mode == 'procar':
         output = procar.PROCAR(filename)
