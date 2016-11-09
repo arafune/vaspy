@@ -133,6 +133,8 @@ class VASPGrid(poscar.POSCAR):
                         self.additional.extend(line.split())
             self.mesh3d = np.array([elem for sublist in self.mesh3d
                                     for elem in sublist], dtype=np.float64)
+            self.n_frame = divmod(len(self.mesh3d),
+                                  self.mesh_x * self.mesh_y * self.mesh_z)[0]
 #            self.mesh3d = self.mesh3d.reshape(self.mesh3d.shape[0] *
 #                                              self.mesh3d.shape[1])
 
@@ -180,7 +182,7 @@ class VASPGrid(poscar.POSCAR):
             raise RuntimeError('The mesh sizes are different each other')
         return add_vaspgrid
 
-    def __sub__self(self, other):
+    def __sub__(self, other):
         '''.. py:method:: __sub__(other)
 
         x.__sub__(y) <=> x - y
@@ -281,7 +283,9 @@ class VASPGrid(poscar.POSCAR):
             average value along the axis
         '''
         axis_name = axis_name.capitalize()
-        meshdata = self.mesh3d.reshape(self.mesh_z, self.mesh_y,
+        meshdata = self.mesh3d.reshape(self.n_frame,
+                                       self.mesh_z,
+                                       self.mesh_y,
                                        self.mesh_x)[mode]
         if axis_name == 'X':
             meshdata = np.average(np.average(
@@ -314,7 +318,9 @@ class VASPGrid(poscar.POSCAR):
             minimum value along the axis
         '''
         axis_name = axis_name.capitalize()
-        meshdata = self.mesh3d.reshape(self.mesh_z, self.mesh_y,
+        meshdata = self.mesh3d.reshape(self.n_frame,
+                                       self.mesh_z,
+                                       self.mesh_y,
                                        self.mesh_x)[mode]
         if axis_name == 'X':
             meshdata = np.min(np.min(
@@ -380,7 +386,9 @@ class VASPGrid(poscar.POSCAR):
             median value along the axis
         '''
         axis_name = axis_name.capitalize()
-        meshdata = self.mesh3d.reshape(self.mesh_z, self.mesh_y,
+        meshdata = self.mesh3d.reshape(self.n_frame,
+                                       self.mesh_z,
+                                       self.mesh_y,
                                        self.mesh_x)[mode]
         if axis_name == 'X':
             meshdata = np.median(np.median(
