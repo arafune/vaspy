@@ -20,10 +20,10 @@ class TestCHGCAR(object):
         data_file2 = datadir + 'CHGCAR_2'
         data_file_spin = datadir + 'CHGCAR_spin'
         data_file_soi =  datadir + 'CHGCAR_soi'
-        self.chgcar1 = vaspy.chgcar.CHGCAR(data_file1)
-        self.chgcar2 = vaspy.chgcar.CHGCAR(data_file2)
-        self.chgcar_spin = vasp.chgcar.CHGCAR(data_file_spin)
-        self.chgcar_soi = vasp.chgcar.CHGCAR(data_file_soi)
+        #self.chgcar1 = vaspy.chgcar.CHGCAR(data_file1)
+        #self.chgcar2 = vaspy.chgcar.CHGCAR(data_file2)
+        #self.chgcar_spin = vasp.chgcar.CHGCAR(data_file_spin)
+        #self.chgcar_soi = vasp.chgcar.CHGCAR(data_file_soi)
 
     @with_setup(setup=setup)
     def testCHGsum(self):
