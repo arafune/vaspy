@@ -53,7 +53,8 @@ if not len(args.atomindex) == len(args.orbital) == len(args.atomsetname):
 if args.outcar is not None:
     outcar = OUTCAR(args.outcar)
     fermi = outcar.fermi
-    recvec = outcar.recvec 
+    recvec = [[v * 6.283185307179586 for v in recv]
+              for recv in outcar.recvec]
 elif args.fermi is not None:
     fermi = args.fermi
 else:
