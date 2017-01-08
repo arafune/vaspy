@@ -53,6 +53,7 @@ if not len(args.atomindex) == len(args.orbital) == len(args.atomsetname):
 if args.outcar is not None:
     outcar = OUTCAR(args.outcar)
     fermi = outcar.fermi
+    recvec = outcar.recvec 
 elif args.fermi is not None:
     fermi = args.fermi
 else:
@@ -66,7 +67,10 @@ flat_orbitals = tuple(chain.from_iterable(args.orbital))
 siteindex = [[i-1 for i in internal] for internal in args.atomindex]
 
 procar = procar.PROCAR(args.procar)
-band = procar.band()
+if recvec:
+    band = procar.band(recvec)
+else:
+    band = procar.band()
 del procar  # for memory saving
 if fermi != 0.0:
     band.fermi_correction(fermi)
