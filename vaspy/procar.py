@@ -645,31 +645,31 @@ class BandWithProjection(object):
         if len(self.spininfo) == 2:
             upspin_orbitals = self.orbitals[0]
             downspin_orbitals = self.orbitals[1]
-            cmporbsUp = np.array([[[np.sum(
+            cmporbs_up = np.array([[[np.sum(
                 [y for x, y in enumerate(upspin_orbitals[i, j])
                  if x in site_numbers],
                 axis=0)] for j in range(len(self.available_band))]
-                                  for i in range(self.numk)])
-            cmporbsDown = np.array([[[np.sum(
+                                   for i in range(self.numk)])
+            cmporbs_down = np.array([[[np.sum(
                 [y for x, y in enumerate(downspin_orbitals[i, j])
                  if x in site_numbers],
                 axis=0)] for j in range(len(self.available_band))]
-                                    for i in range(self.numk)])
+                                     for i in range(self.numk)])
             self.__orbitals[0] = np.concatenate((self.__orbitals[0],
-                                                 cmporbsUp),
+                                                 cmporbs_up),
                                                 axis=2)
             self.__orbitals[1] = np.concatenate((self.__orbitals[1],
-                                                 cmporbsDown),
+                                                 cmporbs_down),
                                                 axis=2)
             if self.sitecomposed:
                 self.sitecomposed[0] = np.concatenate(
-                    (self.sitecomposed[0], cmporbsUp),
+                    (self.sitecomposed[0], cmporbs_up),
                     axis=2)
                 self.sitecomposed[1] = np.concatenate(
-                    (self.sitecomposed[1], cmporbsDown),
+                    (self.sitecomposed[1], cmporbs_down),
                     axis=2)
             else:
-                self.sitecomposed = [cmporbsUp, cmporbsDown]
+                self.sitecomposed = [cmporbs_up, cmporbs_down]
         if len(self.spininfo) == 4:
             site_numbers_mT = tuple(x + self.n_atoms *
                                     0 for x in site_numbers)

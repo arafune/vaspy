@@ -51,7 +51,8 @@ class TestSinglePROCAR(object):
     def test_singleprocar_band(self):
         '''Band_with_projection object test generated from PROCAR_single'''
         eq_(self.singleband.n_bands, self.singleprocar.n_bands)
-        eq_(self.singleband.kvectors, self.singleprocar.kvectors)
+        np.testing.assert_array_equal(self.singleband.kvectors,
+                                      self.singleprocar.kvectors)
         eq_(self.singleband.spininfo, self.singleprocar.spininfo)
         ok_(self.singleband.isready())
         np.testing.assert_array_equal(self.singleband.kdistance,
@@ -213,7 +214,8 @@ class TestSpinPolarizedPROCAR(object):
     def test_spinprocar_band(self):
         '''Band_with_projection object test generated from PROCAR_spin_dummy'''
         eq_(self.spinband.n_bands, self.spinprocar.n_bands)
-        eq_(self.spinband.kvectors, self.spinprocar.kvectors[0:3])
+        np.testing.assert_array_almost_equal(self.spinband.kvectors,
+                                             self.spinprocar.kvectors[0:3])
         eq_(self.spinband.spininfo, self.spinprocar.spininfo)
         ok_(self.spinband.isready())
         np.testing.assert_array_almost_equal(self.spinband.kdistance,
@@ -336,7 +338,8 @@ class TestSOIPROCAR(object):
     def test_soiprocar_band(self):
         '''Band_with_projection object test generated from PROCAR_soi_dummy'''
         eq_(self.soiband.n_bands, self.soiprocar.n_bands)
-        eq_(self.soiband.kvectors, self.soiprocar.kvectors[0:3])
+        np.testing.assert_array_almost_equal(self.soiband.kvectors,
+                                             self.soiprocar.kvectors[0:3])
         eq_(self.soiband.spininfo, self.soiprocar.spininfo)
         ok_(self.soiband.isready())
         np.testing.assert_array_almost_equal(self.soiband.kdistance,
