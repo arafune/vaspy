@@ -234,9 +234,9 @@ class PROCAR(object):  # Version safety
 
         BandWithProjection
         '''
-        recvec = np.array(recvec).T
+        recvecarray = np.array(recvec).T
         band = BandWithProjection()
-        band.kvectors = [recvec.dot(kvector) for kvector in
+        band.kvectors = [recvecarray.dot(kvector) for kvector in
                          self.kvectors[0:self.numk]]
         band.n_bands = self.n_bands
         band.n_atoms = self.n_atoms
@@ -271,7 +271,7 @@ class EnergyBand(object):
                     (np.array([[0, 0, 0]]),
                      np.diff(kvectors, axis=0))), axis=1))
         self.numk = len(self.kvectors)
-        self.nbands = len(energies)//len(kvectors)
+        self.nbands = len(energies) // len(kvectors)
         self.energies = np.array(energies).reshape(self.numk, self.nbands)
 
     def fermi_correction(self, fermi):
@@ -297,8 +297,8 @@ class EnergyBand(object):
         ----------
 
         yrange: tuple
-             Minimum and maximum value of the y-axis. \
-        If not specified, use the matplotlib default value.
+             Minimum and maximum value of the y-axis.
+             If not specified, use the matplotlib default value.
 '''
         energies = np.swapaxes(self.energies, 1, 0)
         for i in range(0, energies.shape[0]):
@@ -318,6 +318,7 @@ class Projection(object):
 
     Orbital projection object for analyzing by using python.
 '''
+
     def __init__(self, projection, natom=0, numk=0, nbands=0, soi=False):
         self.proj = np.array(projection)
         self.natom = natom
@@ -387,7 +388,7 @@ class Projection(object):
                 orbindex += 20
             elif self.soi and (axis == 'z' or axis == 'Z' or axis == 2):
                 orbindex += 30
-            result += self.proj[orbindex][a_state[0]-1]
+            result += self.proj[orbindex][a_state[0] - 1]
         return np.array([result])
 
     def add_output_states(self, name, state):
