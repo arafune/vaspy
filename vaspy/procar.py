@@ -39,13 +39,13 @@ class PROCAR(object):  # Version safety
         Set True is you read phase data.
 
 
-    PROCAR consists of these lines.  Appear once per file.
+    PROCAR consists of the following lines.  Appear once per file.
 
-    1. the first line
+    1. The first line is used just as a comment.
 
       :Example:   PROCAR lm decomposed + phase
 
-    2. set number of k-points, bands and ions.
+    2. Number of k-points, bands and ions.
        (Appear once when spin-integrated, twice when spin-resolved.)
 
       :Example:
@@ -58,12 +58,9 @@ class PROCAR(object):  # Version safety
 
         k-point    1 :    0.00000 0.00000 0.00000 weight = 0.02000000
 
-    Notes
-    -----
+        .. Notes::  That the first character must be "blank".
 
-        that the first character is "blank".
-
-    4. band character
+    4. Band character
 
       :Example:  band   1 # energy  -11.87868466 # occ.  2.00000000
 
@@ -215,18 +212,32 @@ class PROCAR(object):  # Version safety
     def __iter__(self):
         return iter(self.orbital)
 
-    def band(self):
+    def band(self, recvec=[[1.0, 0.0, 0.0],
+                           [0.0, 1.0, 0.0],
+                           [0.0, 0.0, 1.0]]):
         '''.. py:method:: band()
 
         Return Band_with_projection object
+
+        Parameters
+        -----------
+
+        recvec: array, numpy.ndarray
+            reciprocal vector.
+
+            .. Note:: Don't forget that the reciprocal vector
+                      used in VASP need 2Pi to match
+                      the conventional unit of the wavevector.
 
         Returns
         -------
 
         BandWithProjection
         '''
+        recvecarray = np.array(recvec).T
         band = BandWithProjection()
-        band.kvectors = self.kvectors[0:self.numk]
+        band.kvectors = [recvecarray.dot(kvector) for kvector in
+                         self.kvectors[0:self.numk]]
         band.n_bands = self.n_bands
         band.n_atoms = self.n_atoms
         band.spininfo = self.spininfo
@@ -260,7 +271,7 @@ class EnergyBand(object):
                     (np.array([[0, 0, 0]]),
                      np.diff(kvectors, axis=0))), axis=1))
         self.numk = len(self.kvectors)
-        self.nbands = len(energies)//len(kvectors)
+        self.nbands = len(energies) // len(kvectors)
         self.energies = np.array(energies).reshape(self.numk, self.nbands)
 
     def fermi_correction(self, fermi):
@@ -279,15 +290,15 @@ class EnergyBand(object):
     def showband(self, yrange=None):  # How to set default value?
         '''.. py:method:: showband(yrange)
 
-        Draw band structure by using maptlotlib
+        Draw band structure by using maptlotlib.
         For 'just seeing' use.
 
         Parameters
         ----------
 
         yrange: tuple
-             Minimum and maximum value of the y-axis. \
-        If not specified, use the matplotlib default value.
+             Minimum and maximum value of the y-axis.
+             If not specified, use the matplotlib default value.
 '''
         energies = np.swapaxes(self.energies, 1, 0)
         for i in range(0, energies.shape[0]):
@@ -307,6 +318,7 @@ class Projection(object):
 
     Orbital projection object for analyzing by using python.
 '''
+
     def __init__(self, projection, natom=0, numk=0, nbands=0, soi=False):
         self.proj = np.array(projection)
         self.natom = natom
@@ -376,7 +388,7 @@ class Projection(object):
                 orbindex += 20
             elif self.soi and (axis == 'z' or axis == 'Z' or axis == 2):
                 orbindex += 30
-            result += self.proj[orbindex][a_state[0]-1]
+            result += self.proj[orbindex][a_state[0] - 1]
         return np.array([result])
 
     def add_output_states(self, name, state):
@@ -633,31 +645,31 @@ class BandWithProjection(object):
         if len(self.spininfo) == 2:
             upspin_orbitals = self.orbitals[0]
             downspin_orbitals = self.orbitals[1]
-            cmporbsUp = np.array([[[np.sum(
+            cmporbs_up = np.array([[[np.sum(
                 [y for x, y in enumerate(upspin_orbitals[i, j])
                  if x in site_numbers],
                 axis=0)] for j in range(len(self.available_band))]
-                                  for i in range(self.numk)])
-            cmporbsDown = np.array([[[np.sum(
+                                   for i in range(self.numk)])
+            cmporbs_down = np.array([[[np.sum(
                 [y for x, y in enumerate(downspin_orbitals[i, j])
                  if x in site_numbers],
                 axis=0)] for j in range(len(self.available_band))]
-                                    for i in range(self.numk)])
+                                     for i in range(self.numk)])
             self.__orbitals[0] = np.concatenate((self.__orbitals[0],
-                                                 cmporbsUp),
+                                                 cmporbs_up),
                                                 axis=2)
             self.__orbitals[1] = np.concatenate((self.__orbitals[1],
-                                                 cmporbsDown),
+                                                 cmporbs_down),
                                                 axis=2)
             if self.sitecomposed:
                 self.sitecomposed[0] = np.concatenate(
-                    (self.sitecomposed[0], cmporbsUp),
+                    (self.sitecomposed[0], cmporbs_up),
                     axis=2)
                 self.sitecomposed[1] = np.concatenate(
-                    (self.sitecomposed[1], cmporbsDown),
+                    (self.sitecomposed[1], cmporbs_down),
                     axis=2)
             else:
-                self.sitecomposed = [cmporbsUp, cmporbsDown]
+                self.sitecomposed = [cmporbs_up, cmporbs_down]
         if len(self.spininfo) == 4:
             site_numbers_mT = tuple(x + self.n_atoms *
                                     0 for x in site_numbers)
