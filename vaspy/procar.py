@@ -39,13 +39,13 @@ class PROCAR(object):  # Version safety
         Set True is you read phase data.
 
 
-    PROCAR consists of these lines.  Appear once per file.
+    PROCAR consists of the following lines.  Appear once per file.
 
-    1. the first line
+    1. The first line is used just as a comment.
 
       :Example:   PROCAR lm decomposed + phase
 
-    2. set number of k-points, bands and ions.
+    2. Number of k-points, bands and ions.
        (Appear once when spin-integrated, twice when spin-resolved.)
 
       :Example:
@@ -58,12 +58,9 @@ class PROCAR(object):  # Version safety
 
         k-point    1 :    0.00000 0.00000 0.00000 weight = 0.02000000
 
-    Notes
-    -----
+        .. Notes::  That the first character must be "blank".
 
-        that the first character is "blank".
-
-    4. band character
+    4. Band character
 
       :Example:  band   1 # energy  -11.87868466 # occ.  2.00000000
 
@@ -228,8 +225,9 @@ class PROCAR(object):  # Version safety
         recvec: array, numpy.ndarray
             reciprocal vector.
 
-            .. Note:: reciprocal vector used in VASP need 2Pi to match
-            the conventional unit of the wavevector.
+            .. Note:: Don't forget that the reciprocal vector
+                      used in VASP need 2Pi to match
+                      the conventional unit of the wavevector.
 
         Returns
         -------
@@ -292,7 +290,7 @@ class EnergyBand(object):
     def showband(self, yrange=None):  # How to set default value?
         '''.. py:method:: showband(yrange)
 
-        Draw band structure by using maptlotlib
+        Draw band structure by using maptlotlib.
         For 'just seeing' use.
 
         Parameters
