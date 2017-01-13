@@ -262,10 +262,10 @@ class EnergyBand(object):
     energies: numpy.ndarray
          1D array data of energies
     spininfo: int, tuple
-         Spin type.  1 or ("",) means No-spin.  2 or ('_up', '_down') 
+         Spin type.  1 or ("",) means No-spin.  2 or ('_up', '_down')
          means collinear spin, 4 or ('_mT', '_mX', '_mY', '_mZ') means
          collinear spin. This class does not distinguish  non-collinear spin
-         and No-spin 
+         and No-spin.
 '''
 
     def __init__(self, kvectors, energies, spininfo=1):
@@ -313,8 +313,21 @@ class EnergyBand(object):
         str
             a string represntation of EnergyBand.  Useful for gnuplot and Igor.
         '''
-        pass
-
+        if self.spininfo == 2 or len(self.spininfo) == 2:
+            output = '#k\tEnergy_up\tEnergy_down\n'
+            for k_i in range(self.numk):
+                for k, up, down in zip(self.kdistance,
+                                       self.energies[0][k_i],
+                                       self.energies[1][k_i]):
+                    output += '{0}\t{1}\t{2}\n'.format(k, up, down)
+                output += '\n'
+        else:
+            output = '#k\tEnergy\n'
+            for k_i in range(self.numk):
+                for k, en in zip(self.kdistance, self.energies[k_i]):
+                    output += '{0}\t{1}\n'.format(k, en)
+                output += '\n'
+        return output
 
     def showband(self, yrange=None, spin=None):  # How to set default value?
         '''.. py:method:: showband(yrange)
