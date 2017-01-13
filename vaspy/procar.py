@@ -250,7 +250,7 @@ class PROCAR(object):  # Version safety
 
 
 class EnergyBand(object):
-    '''.. py:class:: EnergyBand(kvectors, energies)
+    '''.. py:class:: EnergyBand(kvectors, energies, spininfo)
 
     Simple band structure object for analyzing by using ipython.
 
@@ -261,9 +261,14 @@ class EnergyBand(object):
          1D array data of k-vectors.
     energies: numpy.ndarray
          1D array data of energies
+    spininfo: int, tuple
+         Spin type.  1 or ("",) means No-spin.  2 or ('_up', '_down') 
+         means collinear spin, 4 or ('_mT', '_mX', '_mY', '_mZ') means
+         collinear spin. This class does not distinguish  non-collinear spin
+         and No-spin 
 '''
 
-    def __init__(self, kvectors, energies):
+    def __init__(self, kvectors, energies, spininfo=1):
         self.kvectors = np.array(kvectors)
         self.kdistances = np.cumsum(
             np.linalg.norm(
@@ -272,7 +277,19 @@ class EnergyBand(object):
                      np.diff(kvectors, axis=0))), axis=1))
         self.numk = len(self.kvectors)
         self.nbands = len(energies) // len(kvectors)
-        self.energies = np.array(energies).reshape(self.numk, self.nbands)
+        self.spininfo == spininfo
+        if self.spininfo == 1:  # standard
+            self.spininfo = ('',)
+        elif self.spininfo == 2:   # collinear
+            self.spininfo = ('_up', '_down')
+        elif self.spininfo == 4:  # non-collinear
+            self.spininfo = ('_mT', '_mX', '_mY', '_mZ')
+        if spininfo == 2 or spininfo == ('_up', '_down'):
+            self.energies = np.array(energies).reshape(
+                (2, self.numk, self.nbands))
+        else:
+            self.energies = np.array(energies).reshape(
+                (self.numk, self.nbands))
 
     def fermi_correction(self, fermi):
         '''.. py:method:: fermi_correction(fermi)
@@ -287,7 +304,19 @@ class EnergyBand(object):
 '''
         self.energies -= fermi
 
-    def showband(self, yrange=None):  # How to set default value?
+    def __str__(self):
+        '''.. py:method:: __str__()
+
+        Returns
+        --------
+
+        str
+            a string represntation of EnergyBand.  Useful for gnuplot and Igor.
+        '''
+        pass
+
+
+    def showband(self, yrange=None, spin=None):  # How to set default value?
         '''.. py:method:: showband(yrange)
 
         Draw band structure by using maptlotlib.
@@ -300,7 +329,12 @@ class EnergyBand(object):
              Minimum and maximum value of the y-axis.
              If not specified, use the matplotlib default value.
 '''
-        energies = np.swapaxes(self.energies, 1, 0)
+        if self.spininfo == 2 and spin=='up':
+            energies = np.swapaxes(self.energies[0], 1, 0)
+        elif self.spininfo == 2 and spin=='down':
+            energies = np.swapaxes(self.energies[1], 1, 0)
+        else:
+            energies = np.swapaxes(self.energies, 1, 0)
         for i in range(0, energies.shape[0]):
             plt.plot(self.kdistances,
                      energies[i],
