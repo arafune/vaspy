@@ -212,6 +212,33 @@ class PROCAR(object):  # Version safety
     def __iter__(self):
         return iter(self.orbital)
 
+    def onlyband(self, recvec=[[1.0, 0.0, 0.0],
+                                       [0.0, 1.0, 0.0],
+                                       [0.0, 0.0, 1.0]]):
+        '''.. py:method:: onlyband()
+
+        Return Band_with_projection object
+
+        Parameters
+        -----------
+
+        recvec: array, numpy.ndarray
+            reciprocal vector.
+
+            .. Note:: Don't forget that the reciprocal vector
+                      used in VASP need 2Pi to match
+                      the conventional unit of the wavevector.
+
+        Returns
+        -------
+
+        EnergyBand
+        '''        
+        recvecarray = np.array(recvec).T
+        physical_kvector = [recvecarray.dot(kvector) for kvector in
+                            self.kvectors[0:self.numk]]
+        return EnergyBand(physical_kvector, self.energies, self.spininfo)
+
     def band(self, recvec=[[1.0, 0.0, 0.0],
                            [0.0, 1.0, 0.0],
                            [0.0, 0.0, 1.0]]):
