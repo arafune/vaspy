@@ -75,15 +75,28 @@ class EIGENVAL(object):
             _, self.numk , self.n_bands = [int(i) for i in next(thefile).strip().split()]
             for ki in range(self.numk):
                 next(thefile)  # the first line in the sigleset begin with the blank line
-                self.kvalues.append(np.array([float(i) for
+                self.kvectors.append(np.array([float(i) for
                                               i in next(thefile).strip().split()[0:3]]))
                 for bi in range(self.n_bands):
                     if self.spininfo == 1:
-                        self.energies.append(
-                            np.array(float(next(thefile).strip().split()[1])))
+                        self.energies.append(float(next(thefile).strip().split()[1]))
                     else:
                         self.energies.append(np.array(
                             [float(i) for i in next(thefile).strip().split()[1:3]]))
+        self.energies = np.array(self.energies)
+
+    def fermi_correction(self, fermi):
+        '''.. py:method:: fermi_correction(fermi)
+
+        Correct the Fermi level
+
+        Parameters
+        ----------
+
+        fermi: float
+             value of the Fermi level.
+'''
+        self.energies -= fermi
 
     def __str__(self):
         '''..py:method:: __str__()
