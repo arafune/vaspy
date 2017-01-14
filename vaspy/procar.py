@@ -347,13 +347,13 @@ class EnergyBand(object):
                 for k, up, down in zip(self.kdistances,
                                        self.energies[0][k_i],
                                        self.energies[1][k_i]):
-                    output += '{0}\t{1}\t{2}\n'.format(k, up, down)
+                    output += '{0:.9e}\t{1:.9e}\t{2:.9e}\n'.format(k, up, down)
                 output += '\n'
         else:
             output = '#k\tEnergy\n'
             for k_i in range(self.numk):
                 for k, en in zip(self.kdistances, self.energies[k_i]):
-                    output += '{0}\t{1}\n'.format(k, en)
+                    output += '{0:.9e}\t{1:.9e}\n'.format(k, en)
                 output += '\n'
         return output
 
