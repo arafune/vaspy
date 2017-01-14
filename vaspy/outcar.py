@@ -106,6 +106,10 @@ class OUTCAR(object):  # Version safety
                     section.append("force")
                 elif "E-fermi" in line:
                     self.fermi = float(line.split()[2])
+                elif "reciprocal lattice vectors" in line:
+                    self.recvec = [[float(i) for i in
+                                    next(thefile).strip().split()[3:]]
+                                   for i in range(3)]
                 else:
                     pass
         self.atom_identifer = [name + ":#" + str(index + 1)

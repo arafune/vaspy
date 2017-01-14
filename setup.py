@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-
+'''Setup script for vaspy
+'''
 from distutils.core import setup
 import sys
 
@@ -8,7 +9,7 @@ if sys.hexversion < 0x20700f0 or 0x30000f0 <= sys.hexversion < 0x30200f0:
     reqpkgs.append('argparse')
 
 setup(name='VASPy',
-      version='0.2.2',
+      version='0.3.0',
       author='Mao Kanno',
       author_email='mkanno.t.k@13.alumni.u-tokyo.ac.jp',
       maintainer='Ryuichi Arafune',
@@ -22,13 +23,12 @@ setup(name='VASPy',
           'vaspy.procar',
           'vaspy.locpot',
           'vaspy.tools',
+          'vaspy.mesh3d',
       ],
       scripts=['scripts/vaspy-chgcar.py',
                'scripts/vaspy-doscar.py',
                'scripts/vaspy-outcar.py',
                'scripts/vaspy-poscar.py',
-               'scripts/vaspy-procar.py',
-               ],
+               'scripts/vaspy-procar.py'],
       requires=reqpkgs,
-      data_files=[('etc', ['rmvaspy.py']),]
-      )
+      data_files=[('etc', ['rmvaspy.py'])])

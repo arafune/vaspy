@@ -18,22 +18,11 @@ from __future__ import division        # Version safety
 import re
 # import copy
 import os
-import sys
 import bz2
 # import csv
 # import functools as ft
 import numpy as np
 import matplotlib.pyplot as plt
-if sys.version_info[0] >= 3:     # Version safety
-    from io import StringIO
-else:
-    from cStringIO import StringIO
-try:
-    from vaspy import tools
-except ImportError:
-    mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
-    sys.path.append(os.path.dirname(os.path.abspath(mypath)))
-    import tools
 
 
 class PROCAR(object):  # Version safety
@@ -50,13 +39,13 @@ class PROCAR(object):  # Version safety
         Set True is you read phase data.
 
 
-    PROCAR consists of these lines.  Appear once per file.
+    PROCAR consists of the following lines.  Appear once per file.
 
-    1. the first line
+    1. The first line is used just as a comment.
 
       :Example:   PROCAR lm decomposed + phase
 
-    2. set number of k-points, bands and ions.
+    2. Number of k-points, bands and ions.
        (Appear once when spin-integrated, twice when spin-resolved.)
 
       :Example:
@@ -69,18 +58,16 @@ class PROCAR(object):  # Version safety
 
         k-point    1 :    0.00000 0.00000 0.00000 weight = 0.02000000
 
-    Notes
-    -----
+        .. Notes::  That the first character must be "blank".
 
-        that the first character is "blank".
-
-    4. band character
+    4. Band character
 
       :Example:  band   1 # energy  -11.87868466 # occ.  2.00000000
 
     5. orbital contribution.
 
-      :Example:    1  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000
+      :Example: 1 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000\
+      0.000 0.000
 
     .. py:attribute:: orbital
 
@@ -97,6 +84,7 @@ class PROCAR(object):  # Version safety
         * nospin: ('',)
         * spinresolved: ('_up', '_down')
         * soi: ('_mT', '_mX', '_mY', '_mZ')
+
     '''
 
     def __init__(self, arg=None, phase_read=False):
@@ -135,7 +123,7 @@ class PROCAR(object):  # Version safety
                 procar_file = bz2.BZ2File(filename, mode='r')
         else:
             procar_file = open(filename)
-        first_line = procar_file.readline()
+        first_line = next(procar_file)
         if 'PROCAR lm decomposed + phase' not in first_line:
             procar_file.close()
             raise RuntimeError("This PROCAR is not a proper format\n \
@@ -173,13 +161,13 @@ class PROCAR(object):  # Version safety
                     if section == ['orbital']:
                         if "tot " in line[0:4]:
                             continue
-                        tmp = [float(i) for i in line.split()[1:]]
-                        self.orbital.append(tmp)
+                        self.orbital.append([float(i)
+                                             for i in line.split()[1:]])
                     elif section == ['phase']:
                         if not phase_read:
                             continue
-                        tmp = [float(i) for i in line.split()[1:]]
-                        self.phase.append(tmp)
+                        self.phase.append([float(i)
+                                           for i in line.split()[1:]])
 #
         self.spininfo = (len(self.orbital) //
                          (self.numk * self.n_bands * self.n_atoms))
@@ -224,18 +212,59 @@ class PROCAR(object):  # Version safety
     def __iter__(self):
         return iter(self.orbital)
 
-    def band(self):
+    def onlyband(self, recvec=[[1.0, 0.0, 0.0],
+                                       [0.0, 1.0, 0.0],
+                                       [0.0, 0.0, 1.0]]):
+        '''.. py:method:: onlyband(recvec)
+
+        Return Band_with_projection object
+
+        Parameters
+        -----------
+
+        recvec: array, numpy.ndarray
+            reciprocal vector.
+
+            .. Note:: Don't forget that the reciprocal vector
+                      used in VASP need 2Pi to match
+                      the conventional unit of the wavevector.
+
+        Returns
+        -------
+
+        EnergyBand
+        '''        
+        recvecarray = np.array(recvec).T
+        physical_kvector = [recvecarray.dot(kvector) for kvector in
+                            self.kvectors[0:self.numk]]
+        return EnergyBand(physical_kvector, self.energies, self.spininfo)
+
+    def band(self, recvec=[[1.0, 0.0, 0.0],
+                           [0.0, 1.0, 0.0],
+                           [0.0, 0.0, 1.0]]):
         '''.. py:method:: band()
 
         Return Band_with_projection object
+
+        Parameters
+        -----------
+
+        recvec: array, numpy.ndarray
+            reciprocal vector.
+
+            .. Note:: Don't forget that the reciprocal vector
+                      used in VASP need 2Pi to match
+                      the conventional unit of the wavevector.
 
         Returns
         -------
 
         BandWithProjection
         '''
+        recvecarray = np.array(recvec).T
         band = BandWithProjection()
-        band.kvectors = self.kvectors[0:self.numk]
+        band.kvectors = [recvecarray.dot(kvector) for kvector in
+                         self.kvectors[0:self.numk]]
         band.n_bands = self.n_bands
         band.n_atoms = self.n_atoms
         band.spininfo = self.spininfo
@@ -248,7 +277,7 @@ class PROCAR(object):  # Version safety
 
 
 class EnergyBand(object):
-    '''.. py:class:: EnergyBand(kvectors, energies)
+    '''.. py:class:: EnergyBand(kvectors, energies, spininfo)
 
     Simple band structure object for analyzing by using ipython.
 
@@ -259,9 +288,14 @@ class EnergyBand(object):
          1D array data of k-vectors.
     energies: numpy.ndarray
          1D array data of energies
+    spininfo: int, tuple
+         Spin type.  1 or ("",) means No-spin.  2 or ('_up', '_down')
+         means collinear spin, 4 or ('_mT', '_mX', '_mY', '_mZ') means
+         collinear spin. This class does not distinguish  non-collinear spin
+         and No-spin.
 '''
 
-    def __init__(self, kvectors, energies):
+    def __init__(self, kvectors, energies, spininfo=1):
         self.kvectors = np.array(kvectors)
         self.kdistances = np.cumsum(
             np.linalg.norm(
@@ -269,8 +303,21 @@ class EnergyBand(object):
                     (np.array([[0, 0, 0]]),
                      np.diff(kvectors, axis=0))), axis=1))
         self.numk = len(self.kvectors)
-        self.nbands = len(energies)//len(kvectors)
-        self.energies = np.array(energies).reshape(self.numk, self.nbands)
+        self.nbands = len(energies) // len(kvectors)            
+        self.spininfo = spininfo
+        if self.spininfo == 1:  # standard
+            self.spininfo = ('',)
+        elif self.spininfo == 2 or len(self.spininfo) == 2:   # collinear
+            self.spininfo = ('_up', '_down')
+            self.nbands = self.nbands // 2
+        elif self.spininfo == 4:  # non-collinear
+            self.spininfo = ('_mT', '_mX', '_mY', '_mZ')
+        if spininfo == 2 or spininfo == ('_up', '_down'):
+            self.energies = np.array(energies).reshape(
+                (2, self.numk, self.nbands))
+        else:
+            self.energies = np.array(energies).reshape(
+                (self.numk, self.nbands))
 
     def fermi_correction(self, fermi):
         '''.. py:method:: fermi_correction(fermi)
@@ -285,20 +332,50 @@ class EnergyBand(object):
 '''
         self.energies -= fermi
 
-    def showband(self, yrange=None):  # How to set default value?
+    def __str__(self):
+        '''.. py:method:: __str__()
+
+        Returns
+        --------
+
+        str
+            a string represntation of EnergyBand.  Useful for gnuplot and Igor.
+        '''
+        if self.spininfo == 2 or len(self.spininfo) == 2:
+            output = '#k\tEnergy_up\tEnergy_down\n'
+            for k_i in range(self.numk):
+                for k, up, down in zip(self.kdistances,
+                                       self.energies[0][k_i],
+                                       self.energies[1][k_i]):
+                    output += '{0:.9e}\t{1:.9e}\t{2:.9e}\n'.format(k, up, down)
+                output += '\n'
+        else:
+            output = '#k\tEnergy\n'
+            for k_i in range(self.numk):
+                for k, en in zip(self.kdistances, self.energies[k_i]):
+                    output += '{0:.9e}\t{1:.9e}\n'.format(k, en)
+                output += '\n'
+        return output
+
+    def showband(self, yrange=None, spin=None):  # How to set default value?
         '''.. py:method:: showband(yrange)
 
-        Draw band structure by using maptlotlib
+        Draw band structure by using maptlotlib.
         For 'just seeing' use.
 
         Parameters
         ----------
 
         yrange: tuple
-             Minimum and maximum value of the y-axis. \
-        If not specified, use the matplotlib default value.
+             Minimum and maximum value of the y-axis.
+             If not specified, use the matplotlib default value.
 '''
-        energies = np.swapaxes(self.energies, 1, 0)
+        if self.spininfo == 2 and spin=='up':
+            energies = np.swapaxes(self.energies[0], 1, 0)
+        elif self.spininfo == 2 and spin=='down':
+            energies = np.swapaxes(self.energies[1], 1, 0)
+        else:
+            energies = np.swapaxes(self.energies, 1, 0)
         for i in range(0, energies.shape[0]):
             plt.plot(self.kdistances,
                      energies[i],
@@ -316,6 +393,7 @@ class Projection(object):
 
     Orbital projection object for analyzing by using python.
 '''
+
     def __init__(self, projection, natom=0, numk=0, nbands=0, soi=False):
         self.proj = np.array(projection)
         self.natom = natom
@@ -385,7 +463,7 @@ class Projection(object):
                 orbindex += 20
             elif self.soi and (axis == 'z' or axis == 'Z' or axis == 2):
                 orbindex += 30
-            result += self.proj[orbindex][a_state[0]-1]
+            result += self.proj[orbindex][a_state[0] - 1]
         return np.array([result])
 
     def add_output_states(self, name, state):
@@ -642,31 +720,31 @@ class BandWithProjection(object):
         if len(self.spininfo) == 2:
             upspin_orbitals = self.orbitals[0]
             downspin_orbitals = self.orbitals[1]
-            cmporbsUp = np.array([[[np.sum(
+            cmporbs_up = np.array([[[np.sum(
                 [y for x, y in enumerate(upspin_orbitals[i, j])
                  if x in site_numbers],
                 axis=0)] for j in range(len(self.available_band))]
-                                  for i in range(self.numk)])
-            cmporbsDown = np.array([[[np.sum(
+                                   for i in range(self.numk)])
+            cmporbs_down = np.array([[[np.sum(
                 [y for x, y in enumerate(downspin_orbitals[i, j])
                  if x in site_numbers],
                 axis=0)] for j in range(len(self.available_band))]
-                                    for i in range(self.numk)])
+                                     for i in range(self.numk)])
             self.__orbitals[0] = np.concatenate((self.__orbitals[0],
-                                                 cmporbsUp),
+                                                 cmporbs_up),
                                                 axis=2)
             self.__orbitals[1] = np.concatenate((self.__orbitals[1],
-                                                 cmporbsDown),
+                                                 cmporbs_down),
                                                 axis=2)
             if self.sitecomposed:
                 self.sitecomposed[0] = np.concatenate(
-                    (self.sitecomposed[0], cmporbsUp),
+                    (self.sitecomposed[0], cmporbs_up),
                     axis=2)
                 self.sitecomposed[1] = np.concatenate(
-                    (self.sitecomposed[1], cmporbsDown),
+                    (self.sitecomposed[1], cmporbs_down),
                     axis=2)
             else:
-                self.sitecomposed = [cmporbsUp, cmporbsDown]
+                self.sitecomposed = [cmporbs_up, cmporbs_down]
         if len(self.spininfo) == 4:
             site_numbers_mT = tuple(x + self.n_atoms *
                                     0 for x in site_numbers)
