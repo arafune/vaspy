@@ -215,7 +215,7 @@ class PROCAR(object):  # Version safety
     def onlyband(self, recvec=[[1.0, 0.0, 0.0],
                                        [0.0, 1.0, 0.0],
                                        [0.0, 0.0, 1.0]]):
-        '''.. py:method:: onlyband()
+        '''.. py:method:: onlyband(recvec)
 
         Return Band_with_projection object
 
