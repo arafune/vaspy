@@ -1,7 +1,9 @@
 2016-08-20  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
 
 	* Version 0.3.0
+	* New function, vaspy.load(), is provided, which is useful for Jupyter.
 	* vaspy-procar now accepts no --site, --as, --orbital to produce band data only w/o orbital occupation.
+	* New class mesh3d
 
 2016-08-20  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
 
