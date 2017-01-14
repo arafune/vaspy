@@ -13,6 +13,7 @@ __all__ = ['chgcar',
            'poscar',
            'procar',
            'locpot',
+           'eigenval',
            'tools',
            ]
 
@@ -39,7 +40,7 @@ def load(filename, mode=None):
     the file mode mainly from its name
         * mode is poscar, outcar, chgcar, procar (case insensitive)
     '''
-    from . import poscar, outcar, chgcar, doscar, locpot, procar
+    from . import poscar, outcar, chgcar, doscar, locpot, procar, eigenval
     filenamebase = os.path.basename(filename).lower()
     if isinstance(mode, str):
         mode = mode.lower()
@@ -57,6 +58,8 @@ def load(filename, mode=None):
         output = doscar.DOSCAR(filename)
     elif re.search(r'vasp', filenamebase):
         output = poscar.POSCAR(filename)
+    elif re.search(r'eigenval', filenamebase) or mode == 'eigenval':
+        output = eigenval.EIGENVAL(filename)
     else:
         raise RuntimeError("The loding mode cannot be identified!  Set 'mode'")
     return output
