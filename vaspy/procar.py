@@ -303,12 +303,13 @@ class EnergyBand(object):
                     (np.array([[0, 0, 0]]),
                      np.diff(kvectors, axis=0))), axis=1))
         self.numk = len(self.kvectors)
-        self.nbands = len(energies) // len(kvectors)
-        self.spininfo == spininfo
+        self.nbands = len(energies) // len(kvectors)            
+        self.spininfo = spininfo
         if self.spininfo == 1:  # standard
             self.spininfo = ('',)
-        elif self.spininfo == 2:   # collinear
+        elif self.spininfo == 2 or len(self.spininfo) == 2:   # collinear
             self.spininfo = ('_up', '_down')
+            self.nbands = self.nbands // 2
         elif self.spininfo == 4:  # non-collinear
             self.spininfo = ('_mT', '_mX', '_mY', '_mZ')
         if spininfo == 2 or spininfo == ('_up', '_down'):
@@ -343,7 +344,7 @@ class EnergyBand(object):
         if self.spininfo == 2 or len(self.spininfo) == 2:
             output = '#k\tEnergy_up\tEnergy_down\n'
             for k_i in range(self.numk):
-                for k, up, down in zip(self.kdistance,
+                for k, up, down in zip(self.kdistances,
                                        self.energies[0][k_i],
                                        self.energies[1][k_i]):
                     output += '{0}\t{1}\t{2}\n'.format(k, up, down)
@@ -351,7 +352,7 @@ class EnergyBand(object):
         else:
             output = '#k\tEnergy\n'
             for k_i in range(self.numk):
-                for k, en in zip(self.kdistance, self.energies[k_i]):
+                for k, en in zip(self.kdistances, self.energies[k_i]):
                     output += '{0}\t{1}\n'.format(k, en)
                 output += '\n'
         return output
