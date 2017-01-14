@@ -1,5 +1,10 @@
 2016-08-20  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
 
+	* Version 0.3.0
+	* vaspy-procar now accepts no --site, --as, --orbital to produce band data only w/o orbital occupation.
+
+2016-08-20  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
+
 	* raise version 0.2.3
 	* Improve CHGCAR operation (__add__, __sub__)
 		- %time a = chgcar.CHGCAR("CHGCAR.F16Cupc")
