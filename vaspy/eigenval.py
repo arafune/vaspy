@@ -98,6 +98,33 @@ class EIGENVAL(object):
 '''
         self.energies -= fermi
 
+    def onlyband(self, recvec=[[1.0, 0.0, 0.0],
+                               [0.0, 1.0, 0.0],
+                               [0.0, 0.0, 1.0]]):
+        '''.. py:method:: onlyband(recvec)
+
+        Return Band_with_projection object
+
+        Parameters
+        -----------
+
+        recvec: array, numpy.ndarray
+            reciprocal vector
+
+            .. Note:: Don't forget that the reciprocal vector used 
+                      in VASP needs 2PI to match  the conventional
+                      unit of the wavevector.
+
+        Returns
+        ---------
+
+        EnergyBand
+'''
+        recvecarray = np.array(recvec).T
+        physical_kvector = [recvecarray.dot(kvector) for kvector in
+                            self.kvectors[0:self.numk]]
+        return procar.EnergyBand(physical_kvector, self.energies, self.spininfo)    
+
     def __str__(self):
         '''..py:method:: __str__()
 

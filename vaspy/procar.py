@@ -226,7 +226,7 @@ class PROCAR(object):  # Version safety
             reciprocal vector.
 
             .. Note:: Don't forget that the reciprocal vector
-                      used in VASP need 2Pi to match
+                      used in VASP needs 2Pi to match
                       the conventional unit of the wavevector.
 
         Returns
