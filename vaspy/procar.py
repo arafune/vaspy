@@ -88,14 +88,14 @@ class PROCAR(object):  # Version safety
     '''
 
     def __init__(self, arg=None, phase_read=False):
+        self.n_atoms = 0
+        self.numk = 0
+        self.kvectors = list()
+        self.n_bands = 0
+        self.energies = list()
+        self.spininfo = 0   # nospin: 1, spinresolved: 2, soi: 4
         self.orbital = list()
         self.phase = list()
-        self.spininfo = 0   # nospin: 1, spinresolved: 2, soi: 4
-        self.numk = 0
-        self.n_bands = 0
-        self.n_atoms = 0
-        self.kvectors = list()
-        self.energies = list()
         self.orb_names = tuple()
 #
         if isinstance(arg, str):

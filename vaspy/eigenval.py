@@ -39,11 +39,11 @@ class EIGENVAL(object):
 
     def __init__(self, arg=None):
         self.n_atoms = 0
-        self.spininfo = 0  #  
         self.numk = 0
         self.kvectors = list()
-        self.n_bands = 0 
+        self.n_bands = 0        
         self.energies = list()
+        self.spininfo = 0  #          
         #
         if isinstance(arg, str):
             self.load_from_file(arg)
@@ -84,19 +84,6 @@ class EIGENVAL(object):
                         self.energies.append(np.array(
                             [float(i) for i in next(thefile).strip().split()[1:3]]))
         self.energies = np.array(self.energies)
-
-    def fermi_correction(self, fermi):
-        '''.. py:method:: fermi_correction(fermi)
-
-        Correct the Fermi level
-
-        Parameters
-        ----------
-
-        fermi: float
-             value of the Fermi level.
-'''
-        self.energies -= fermi
 
     def onlyband(self, recvec=[[1.0, 0.0, 0.0],
                                [0.0, 1.0, 0.0],
