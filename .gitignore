@@ -1,8 +1,8 @@
-docs
 *.pyc
-build
+_build
 install-vaspy.txt
 testPOSCAR
 *.ipynb
 dist
 MANIFEST
+build

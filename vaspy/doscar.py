@@ -69,7 +69,7 @@ class DOSCAR(object):  # Version safety
 
     :py:attr:`nenergypnts` is number of energy points.  (VASP defaults is 301.)
 
-    .. py:attribute:dos_container
+    .. py:attribute: dos_container
 
     :py:attr:`dos_container` is a python list object that
     stores the DOS object. By default, the first item is the TDOS, and the
@@ -147,7 +147,7 @@ class DOS(object):  # Version safety
     -----------
     dos
 
-    :py:attribute:`dos` is the python linst object that stores dos data.
+    :py:attr:`dos` is the python linst object for storing the dos data.
     By default, the first column is the energy, the latter is the density.
     '''
 
