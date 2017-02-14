@@ -16,7 +16,6 @@ __all__ = ['chgcar',
            'eigenval',
            'tools',
            ]
-
 from vaspy import *
 
 

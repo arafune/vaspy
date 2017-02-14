@@ -10,6 +10,7 @@ from __future__ import print_function  # Version safety
 import os.path
 import bz2
 
+
 class OUTCAR(object):  # Version safety
     '''.. py:class:: OUTCAR(outcar_file)
 
@@ -27,7 +28,7 @@ class OUTCAR(object):  # Version safety
         self.fermi = 0.0
         self.atom_identifer = []
         self.nkpts = 0
-        self.nkdim =0
+        self.nkdim = 0
         self.nbands = 0
         if arg is not None:
             self.load_from_file(arg)
