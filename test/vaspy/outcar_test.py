@@ -21,6 +21,10 @@ class TestOUTCAR(object):
     def test_fermi(self):
         eq_(-0.7681, self.outcar.fermi)
 
+    @with_setup(setup=setup)
+    def test_nbands(self):
+        eq_(54, self.outcar.nbands)
+
     def test_recvec(self):
         np.testing.assert_almost_equal(
             np.array([0.389375981, -0.224806327, 0.000000000]),
@@ -31,3 +35,4 @@ class TestOUTCAR(object):
         np.testing.assert_almost_equal(
             np.array([0.000000000, 0.000000000, 0.023484312]),
             self.outcar.recvec[2])
+

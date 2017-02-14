@@ -10,6 +10,7 @@ from __future__ import print_function  # Version safety
 import os.path
 import bz2
 
+
 class OUTCAR(object):  # Version safety
     '''.. py:class:: OUTCAR(outcar_file)
 
@@ -26,6 +27,9 @@ class OUTCAR(object):  # Version safety
         self.atom_names = []
         self.fermi = 0.0
         self.atom_identifer = []
+        self.nkpts = 0
+        self.nkdim = 0
+        self.nbands = 0
         if arg is not None:
             self.load_from_file(arg)
 
@@ -106,6 +110,10 @@ class OUTCAR(object):  # Version safety
                     section.append("force")
                 elif "E-fermi" in line:
                     self.fermi = float(line.split()[2])
+                elif "NBANDS" in line:
+                    self.nnkpts = int(line.strip().split()[3])
+                    self.nkdim = int(line.strip().split()[9])
+                    self.nbands = int(line.strip().split()[14])
                 elif "reciprocal lattice vectors" in line:
                     self.recvec = [[float(i) for i in
                                     next(thefile).strip().split()[3:]]

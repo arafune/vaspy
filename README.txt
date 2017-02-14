@@ -5,7 +5,7 @@ What is this?
     Translated from scRipt4VASP written by Ryuichi Arafune.
 
 Requirement
-    Python (2.6 or newer)
+    Python (2.6 or newer.  Newer than 3.4 is strongly recommended.)
     NumPy (any version)
     argparse (for Python 2.6, 3.0, 3.1)
     matplotlib (only when using outcar and locpot script)
