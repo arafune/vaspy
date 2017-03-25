@@ -797,7 +797,7 @@ class POSCAR(object):
             target_atom = self.pos(site)
             atoms27 = self.make27candidate(target_atom)
 
-            def func(pos):
+            def func(pos, center):
                 molecule[index] = pos
                 if center is not None:  # bool([np.ndarray]) => Error
                     center = _vectorize(center)
@@ -814,7 +814,7 @@ class POSCAR(object):
                     for vectors in it.product(molecule, molecule):
                         s += np.linalg.norm(vectors[0] - vectors[1])
                     return s
-            newpos = min(atoms27, key=func)
+            newpos = min(atoms27, key=(lambda x: func(x, center)))
             molecule[index] = newpos
         return molecule
 
