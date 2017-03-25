@@ -772,7 +772,7 @@ class POSCAR(object):
         -----------
 
         site_list: list
-            list of site number
+            list of site number (the number begins with #1)
         center: list
             center position of "molecule" (Optional).
 
