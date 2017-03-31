@@ -237,15 +237,16 @@ class VASPGrid(poscar.POSCAR):
         poscar = []
         poscar.append(self.system_name)
         poscar.append('{0:>19.14f}'.format(self.scaling_factor))
-        poscar.append('{0:>13.6f}{1:>12.6f}{2:>12.6f}'.format(self.cell_vecs[0][0],
-                                                              self.cell_vecs[0][1],
-                                                              self.cell_vecs[0][2]))
-        poscar.append('{0:>13.6f}{1:>12.6f}{2:>12.6f}'.format(self.cell_vecs[1][0],
-                                                              self.cell_vecs[1][1],
-                                                              self.cell_vecs[1][2]))
-        poscar.append('{0:>13.6f}{1:>12.6f}{2:>12.6f}'.format(self.cell_vecs[2][0],
-                                                              self.cell_vecs[2][1],
-                                                              self.cell_vecs[2][2]))
+        cellvecformat = '{0:>13.6f}{1:>12.6f}{2:>12.6f}'
+        poscar.append(cellvecformat.format(self.cell_vecs[0][0],
+                                           self.cell_vecs[0][1],
+                                           self.cell_vecs[0][2]))
+        poscar.append(cellvecformat.format(self.cell_vecs[1][0],
+                                           self.cell_vecs[1][1],
+                                           self.cell_vecs[1][2]))
+        poscar.append(cellvecformat.format(self.cell_vecs[2][0],
+                                           self.cell_vecs[2][1],
+                                           self.cell_vecs[2][2]))
         if not self.iontype[0].isdigit():
             tmplist = '   '
             for i in self.iontype:
@@ -259,7 +260,9 @@ class VASPGrid(poscar.POSCAR):
             poscar.append('Selective Dynamics')
         poscar.append(self.coordinate_type)
         for pos in self.position:
-            poscar.append(' {0:>9.6f}{1:>10.6f}{2:>10.6f}'.format(pos[0],pos[1],pos[2]))
+            poscar.append(' {0:>9.6f}{1:>10.6f}{2:>10.6f}'.format(pos[0],
+                                                                  pos[1],
+                                                                  pos[2]))
         outputstring = '\n'.join(poscar) + '\n'
         for tmp in mesharray:
             output = []
