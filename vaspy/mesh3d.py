@@ -228,13 +228,39 @@ class VASPGrid(poscar.POSCAR):
         str
             a string representation of VASPGrid object
         '''
-        outputstring = ''
         mesharray = self.mesh3d.reshape(self.mesh3d.size // (self.mesh_x *
                                                              self.mesh_y *
                                                              self.mesh_z),
                                         self.mesh_x *
                                         self.mesh_y *
                                         self.mesh_z)
+        poscar = []
+        poscar.append(self.system_name)
+        poscar.append('{0:>19.14f}'.format(self.scaling_factor))
+        poscar.append('{0:>13.6f}{1:>12.6f}{2:>12.6f}'.format(self.cell_vecs[0][0],
+                                                              self.cell_vecs[0][1],
+                                                              self.cell_vecs[0][2]))
+        poscar.append('{0:>13.6f}{1:>12.6f}{2:>12.6f}'.format(self.cell_vecs[1][0],
+                                                              self.cell_vecs[1][1],
+                                                              self.cell_vecs[1][2]))
+        poscar.append('{0:>13.6f}{1:>12.6f}{2:>12.6f}'.format(self.cell_vecs[2][0],
+                                                              self.cell_vecs[2][1],
+                                                              self.cell_vecs[2][2]))
+        if not self.iontype[0].isdigit():
+            tmplist = '   '
+            for i in self.iontype:
+                tmplist += '{0:5s}'.format(i)
+            poscar.append(tmplist)
+        tmplist = ''
+        for i in self.ionnums:
+            tmplist += '{0:>6}'.format(i)
+        poscar.append(tmplist)
+        if self.selective:
+            poscar.append('Selective Dynamics')
+        poscar.append(self.coordinate_type)
+        for pos in self.position:
+            poscar.append(' {0:>9.6f}{1:>10.6f}{2:>10.6f}'.format(pos[0],pos[1],pos[2]))
+        outputstring = '\n'.join(poscar) + '\n'
         for tmp in mesharray:
             output = []
             outputstring += '\n  {0}  {1}  {2}\n'.format(self.mesh_x,
@@ -244,7 +270,7 @@ class VASPGrid(poscar.POSCAR):
                 output.append(''.join('  {0:18.11E}'.format(i)
                                       for i in array if i is not None))
             outputstring += '\n'.join(output)
-        return super(VASPGrid, self).__str__() + outputstring + '\n'
+        return outputstring + '\n'
 
     def save(self, filename):
         '''.. py:method:: save(filename)
