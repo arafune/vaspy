@@ -229,7 +229,7 @@ class VASPGrid(poscar.POSCAR):
             a string representation of VASPGrid object
         '''
         outputstring = ''
-        mesharray = self.mesh3d.reshape(len(self.mesh3d) // (self.mesh_x *
+        mesharray = self.mesh3d.reshape(self.mesh3d.size // (self.mesh_x *
                                                              self.mesh_y *
                                                              self.mesh_z),
                                         self.mesh_x *
