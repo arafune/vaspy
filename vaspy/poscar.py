@@ -699,8 +699,8 @@ class POSCAR(object):
                            self.cell_vecs[1]))
         tmp.append(''.join('   {0:20.17f}'.format(i) for i in
                            self.cell_vecs[2]))
-        if not self.iontype[0].isdigit():
-            tmp.append(' ' + ' '.join(self.iontype))
+        if not self.iontypes[0].isdigit():
+            tmp.append(' ' + ' '.join(self.iontypes))
         tmp.append(' ' + ' '.join(str(i) for i in self.ionnums))
         if self.selective:
             tmp.append('Selective Dynamics')
