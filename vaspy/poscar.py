@@ -54,6 +54,242 @@ except ImportError:
 import numpy as np
 
 
+class POSCAR_HEAD(object):
+    '''.. py:class:: POSCAR_HEAD()
+    One of the parent classes of POSCAR class
+'''
+    def __init__(self):
+        self.__cell_vecs=np.array([[0., 0., 0.],
+                                   [0., 0., 0.],
+                                   [0., 0., 0.]])
+        self.system_name = ""
+        self.scaling_factor = 0.
+        self.iontypes = []
+        self.ionnums = []
+        self.__atom_identifer = []        
+
+    @property
+    def cell_vecs(self):
+        '''Return the matrix of the unit cell'''
+        return self.__cell_vecs
+
+    @cell_vecs.setter
+    def cell_vecs(self, vec):
+        '''Setter of cell matrix'''
+        if three_by_three(vec):
+            self.__cell_vecs = np.array(vec)
+        else:
+            raise TypeError
+
+    @property
+    def atom_identifer(self):
+        '''Return list style of "atom_identifer" (e.g.  "#1:Ag1")'''
+        # self.__atom_identifer = []
+        # ii = 1
+        # for elm, n in zip(self.iontypes, self.ionnums):
+        #     self.__atom_identifer.extend(
+        #         '#{0}:{1}{2}'.format(ii + m, elm, m + 1) for m in range(n))
+        #     ii += n
+        # return self.__atom_identifer
+        self.__atom_identifer = []
+        atomnames = []
+        for elm, ionnums in zip(self.iontypes, self.ionnums):
+            for j in range(1, ionnums + 1):
+                tmp = elm + str(j)
+                if tmp not in atomnames:
+                    atomnames.append(tmp)
+                else:
+                    while tmp in atomnames:
+                        j = j + 1
+                        tmp = elm + str(j)
+                    else:
+                        atomnames.append(tmp)
+        self.__atom_identifer = [
+            "#" + str(s) + ":" + a for s, a in
+            zip(range(1, len(atomnames) + 1), atomnames)]
+        return self.__atom_identifer
+
+    @atom_identifer.setter
+    def atom_identifer(self, value):
+        self.__atom_identifer = value
+
+
+class POSCAR_POS():
+    '''.. py:class:: POSCAR_POS()
+'''
+    def __init__(self):
+        self.coordinate_type = ""
+        self.position = []
+        self.coordinate_changeflags = []
+        self.selective = False
+
+    def is_cartesian(self):
+        '''.. py:method:: is_cartesian()
+
+        Return True if Cartesian coordinate is set
+
+        Returns
+        --------
+
+        boolean
+            True if coordinate is cartesian
+        '''
+        return bool(re.search(r'^[ck]', self.coordinate_type, re.I))
+
+    def is_direct(self):
+        '''.. py:method:: is_direct()
+
+        Return True if DIRECT coordinate is set
+
+        Returns
+        --------
+
+        Boolean
+            True if coordinate is direct (not cartesian)
+        '''
+        return not self.is_cartesian()
+
+
+    def pos(self, *i):
+        '''.. py:method:: pos(i)
+
+        Accessor of POSCAR.position.
+
+        As in VASP, the atom index starts with "1", not "0".
+
+        Parameters
+        -----------
+
+        i: int, tuple, list, range
+             site indexes
+
+        Returns
+        --------
+
+        numpy.ndarray, list of numpy.ndarray
+             atom's position (When single value is set as i,\
+                             return just an atom position)
+
+        Warning
+        --------
+
+        the first site # is "1", not "0". (Follow VESTA's way.)
+
+        Warning
+        -------
+
+        Now, you **cannot** set the index range by using tuple.
+        Use range object instead.
+        ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
+        '''
+        dest = []
+        for thearg in i:
+            if isinstance(thearg, int):
+                if thearg <= 0:
+                    raise ValueError
+                else:
+                    dest.append(self.position[thearg - 1])
+            elif isinstance(thearg, (tuple, list, range)):
+                for site_index in thearg:
+                    if site_index <= 0:
+                        raise ValueError
+                    else:
+                        dest.append(self.position[site_index - 1])
+        if len(dest) == 1:
+            dest = dest[0]
+        return dest
+
+    def average_position(self, *i):
+        '''.. py:method:: average_position(*i)
+
+        Return the average position of the sites
+
+        Parameters
+        -----------
+
+        i: int, tuple, list, range
+            site indexes
+
+        Returns
+        --------
+
+        numpy.ndarray
+            atom's position
+        '''
+        sitelist = []
+        for thearg in i:
+            if isinstance(thearg, int):
+                sitelist.append(thearg)
+            elif isinstance(thearg, (tuple, list, range)):
+                for site_index in thearg:
+                    sitelist.append(site_index)
+        pos = self.pos(sitelist)
+        if isinstance(pos, np.ndarray):
+            return pos
+        elif isinstance(pos, list):
+            return sum(pos)/len(pos)
+
+    def pos_replace(self, i, vector):
+        '''.. py:method:: pos_replace(i, vector)
+
+        Parameters
+        -----------
+        i: int
+            site #
+        vector: list, tuple, numpy.ndarray
+            list of the i-th atom position.
+
+        Notes
+        ------
+
+        the first site # is "1", not "0" to follow VESTA's way.
+        '''
+        vector = _vectorize(vector)
+        if not isinstance(i, int):
+            raise ValueError
+        if not self.is_cartesian():
+            message = 'poscar_replace method is implemented for'
+            message += ' Cartesian coordinate'
+            raise RuntimeError(message)
+        self.position[i - 1] = vector
+
+    def sort(self, from_site=1, to_site=None, axis='z'):
+        '''.. py:method:: sort(from_index, to_index, axis='z')
+
+        Sort positions attribute by coordinate
+
+        Parameters
+        -----------
+
+        from_site: int
+            first index # for sort
+
+        to_site: int
+            last index # for sort
+
+        axis: str
+            Axis used for sort (Default Z)
+
+
+        Notes
+        -----
+
+        The first site # is "1", not "0" to follow VESTA's way.
+        The element difference is **not** taken into account.
+        '''
+        if to_site is None:
+            to_site = sum(self.ionnums)
+        if axis == 'x' or axis == 'X' or axis == 0:
+            axis = 0
+        elif axis == 'y' or axis == 'Y' or axis == 1:
+            axis = 1
+        elif axis == 'z' or axis == 'Z' or axis == 2:
+            axis = 2
+        self.position = self.position[0:from_site-1] + sorted(
+            self.position[from_site-1:to_site],
+            key=lambda sortaxis: sortaxis[axis]) + self.position[to_site:]
+
+    
 class POSCAR(object):
     '''.. py:class:: POSCAR(file or array)
 
