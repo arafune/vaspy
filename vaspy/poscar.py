@@ -59,14 +59,14 @@ class POSCAR_HEAD(object):
     One of the parent classes of POSCAR class
 '''
     def __init__(self):
-        self.__cell_vecs=np.array([[0., 0., 0.],
-                                   [0., 0., 0.],
-                                   [0., 0., 0.]])
+        self.__cell_vecs = np.array([[0., 0., 0.],
+                                     [0., 0., 0.],
+                                     [0., 0., 0.]])
         self.system_name = ""
         self.scaling_factor = 0.
         self.iontypes = []
         self.ionnums = []
-        self.__atom_identifer = []        
+        self.__atom_identifer = []
 
     @property
     def cell_vecs(self):
@@ -114,12 +114,12 @@ class POSCAR_HEAD(object):
         self.__atom_identifer = value
 
 
-class POSCAR_POS():
+class POSCAR_POS(object):
     '''.. py:class:: POSCAR_POS()
 '''
     def __init__(self):
         self.coordinate_type = ""
-        self.position = []
+        self.positions = []
         self.coordinate_changeflags = []
         self.selective = False
 
@@ -188,13 +188,13 @@ class POSCAR_POS():
                 if thearg <= 0:
                     raise ValueError
                 else:
-                    dest.append(self.position[thearg - 1])
+                    dest.append(self.positions[thearg - 1])
             elif isinstance(thearg, (tuple, list, range)):
                 for site_index in thearg:
                     if site_index <= 0:
                         raise ValueError
                     else:
-                        dest.append(self.position[site_index - 1])
+                        dest.append(self.positions[site_index - 1])
         if len(dest) == 1:
             dest = dest[0]
         return dest
@@ -251,7 +251,7 @@ class POSCAR_POS():
             message = 'poscar_replace method is implemented for'
             message += ' Cartesian coordinate'
             raise RuntimeError(message)
-        self.position[i - 1] = vector
+        self.positions[i - 1] = vector
 
     def sort(self, from_site=1, to_site=None, axis='z'):
         '''.. py:method:: sort(from_index, to_index, axis='z')
@@ -285,12 +285,12 @@ class POSCAR_POS():
             axis = 1
         elif axis == 'z' or axis == 'Z' or axis == 2:
             axis = 2
-        self.position = self.position[0:from_site-1] + sorted(
-            self.position[from_site-1:to_site],
-            key=lambda sortaxis: sortaxis[axis]) + self.position[to_site:]
+        self.positions = self.positions[0:from_site-1] + sorted(
+            self.positions[from_site-1:to_site],
+            key=lambda sortaxis: sortaxis[axis]) + self.positions[to_site:]
 
-    
-class POSCAR(object):
+
+class POSCAR(POSCAR_HEAD, POSCAR_POS):
     '''.. py:class:: POSCAR(file or array)
 
     Class for POSCAR (CONTCAR) format
@@ -314,36 +314,14 @@ class POSCAR(object):
         arg: str
             POSCAR file name, or list of POSCAR text.
         '''
-        self.system_name = ""
-        self.scaling_factor = 0.
-        self.__cell_vecs = np.array([[0., 0., 0.],
-                                     [0., 0., 0.],
-                                     [0., 0., 0.]])
-        self.iontype = []
-        self.ionnums = []
-        self.coordinate_type = ""
-        self.position = []
-        self.coordinate_changeflags = []
-        self.__atom_identifer = []
-        self.selective = False
+        super(POSCAR, self).__init__()
+        super(POSCAR_HEAD, self).__init__()
         if isinstance(arg, str):
             poscar = open(arg).readlines()
             self.load_from_array(poscar)
         if isinstance(arg, (list, tuple)):
             self.load_from_array(arg)
 
-    @property
-    def cell_vecs(self):
-        '''Return the matrix of the unit cell'''
-        return self.__cell_vecs
-
-    @cell_vecs.setter
-    def cell_vecs(self, vec):
-        '''Setter of cell matrix'''
-        if three_by_three(vec):
-            self.__cell_vecs = np.array(vec)
-        else:
-            raise TypeError
 
     def load_from_array(self, poscar):
         '''.. :py:method:: load_from_array(poscar)
@@ -362,17 +340,17 @@ class POSCAR(object):
         self.cell_vecs[0] = [float(x) for x in next(poscar).split()]
         self.cell_vecs[1] = [float(x) for x in next(poscar).split()]
         self.cell_vecs[2] = [float(x) for x in next(poscar).split()]
-        self.iontype = next(poscar).split()
+        self.iontypes = next(poscar).split()
         # parse POSCAR evenif the element names are not set.
         # At present, the String representation number
         #   are used for the  dummy name.
-        if self.iontype[0].isdigit():
-            self.ionnums = [int(i) for i in self.iontype]
+        if self.iontypes[0].isdigit():
+            self.ionnums = [int(i) for i in self.iontypes]
         else:
             self.ionnums = [int(x) for x in next(poscar).split()]
         self.__atom_identifer = []
         atomnames = []
-        for elm, ionnums in zip(self.iontype, self.ionnums):
+        for elm, ionnums in zip(self.iontypes, self.ionnums):
             for j in range(1, ionnums + 1):
                 tmp = elm + str(j)
                 if tmp not in atomnames:
@@ -397,44 +375,13 @@ class POSCAR(object):
         for line, elem in zip(poscar, self.atom_identifer):
             # if not elem: break
             tmp = line.split()
-            self.position.append(np.float_(np.array(tmp[:3])))
+            self.positions.append(np.float_(np.array(tmp[:3])))
             if self.selective:
                 self.coordinate_changeflags.append(' '.join(tmp[3:]))
 
-    @property
-    def atom_identifer(self):
-        '''Return list style of "atom_identifer" (e.g.  "#1:Ag1")'''
-        # self.__atom_identifer = []
-        # ii = 1
-        # for elm, n in zip(self.iontype, self.ionnums):
-        #     self.__atom_identifer.extend(
-        #         '#{0}:{1}{2}'.format(ii + m, elm, m + 1) for m in range(n))
-        #     ii += n
-        # return self.__atom_identifer
-        self.__atom_identifer = []
-        atomnames = []
-        for elm, ionnums in zip(self.iontype, self.ionnums):
-            for j in range(1, ionnums + 1):
-                tmp = elm + str(j)
-                if tmp not in atomnames:
-                    atomnames.append(tmp)
-                else:
-                    while tmp in atomnames:
-                        j = j + 1
-                        tmp = elm + str(j)
-                    else:
-                        atomnames.append(tmp)
-        self.__atom_identifer = [
-            "#" + str(s) + ":" + a for s, a in
-            zip(range(1, len(atomnames) + 1), atomnames)]
-        return self.__atom_identifer
-
-    @atom_identifer.setter
-    def atom_identifer(self, value):
-        self.__atom_identifer = value
 
     def __iter__(self):
-        for each in self.position:
+        for each in self.positions:
             yield each
 
     def is_cartesian(self):
@@ -501,13 +448,13 @@ class POSCAR(object):
                 if thearg <= 0:
                     raise ValueError
                 else:
-                    dest.append(self.position[thearg - 1])
+                    dest.append(self.positions[thearg - 1])
             elif isinstance(thearg, (tuple, list, range)):
                 for site_index in thearg:
                     if site_index <= 0:
                         raise ValueError
                     else:
-                        dest.append(self.position[site_index - 1])
+                        dest.append(self.positions[site_index - 1])
         if len(dest) == 1:
             dest = dest[0]
         return dest
@@ -564,7 +511,7 @@ class POSCAR(object):
             message = 'poscar_replace method is implemented for'
             message += ' Cartesian coordinate'
             raise RuntimeError(message)
-        self.position[i - 1] = vector
+        self.positions[i - 1] = vector
 
     def supercell(self, nx, ny, nz):
         '''.. py:method:: supercell(nx, ny, nz)
@@ -603,15 +550,15 @@ class POSCAR(object):
         sposcar.cell_vecs[1] = sposcar.cell_vecs[1] * ny
         sposcar.cell_vecs[2] = sposcar.cell_vecs[2] * nz
         sposcar.ionnums = [i * nx * ny * nz for i in sposcar.ionnums]
-        sposition = sposcar.position
-        sposcar.position = []
-        sposition = [np.array([x[0] / nx, x[1] / ny, x[2] / nz])
+        spositions = sposcar.positions
+        sposcar.positions = []
+        spositions = [np.array([x[0] / nx, x[1] / ny, x[2] / nz])
                      for x in sposition]
-        for spos in sposition:
+        for spos in spositions:
             for iz in range(0, nz):
                 for iy in range(0, ny):
                     for ix in range(0, nx):
-                        sposcar.position.append(np.array(
+                        sposcar.positions.append(np.array(
                             [spos[0] + ix / nx,
                              spos[1] + iy / ny,
                              spos[2] + iz / nz]))
@@ -656,9 +603,9 @@ class POSCAR(object):
             axis = 1
         elif axis == 'z' or axis == 'Z' or axis == 2:
             axis = 2
-        self.position = self.position[0:from_site-1] + sorted(
-            self.position[from_site-1:to_site],
-            key=lambda sortaxis: sortaxis[axis]) + self.position[to_site:]
+        self.positions = self.positions[0:from_site-1] + sorted(
+            self.positions[from_site-1:to_site],
+            key=lambda sortaxis: sortaxis[axis]) + self.positions[to_site:]
 
     # class method? or independent function?
     def nearest(self, array, point):
@@ -807,7 +754,7 @@ class POSCAR(object):
         if self.is_cartesian():
             original_is_cartesian = True
             self.to_direct()
-        for pos in self.position:
+        for pos in self.positions:
             for i in (0, 1, 2):
                 while pos[i] < 0.0 or pos[i] > 1.0:
                     if pos[i] < 0.0:
@@ -841,9 +788,9 @@ class POSCAR(object):
             raise ValueError('scaling factor is different.')
         if np.linalg.norm(dest_poscar.cell_vecs - other.cell_vecs) != 0:
             raise ValueError('lattice vectors (cell matrix) are different.')
-        dest_poscar.iontype.extend(other.iontype)
+        dest_poscar.iontypes.extend(other.iontypes)
         dest_poscar.ionnums.extend(other.ionnums)
-        dest_poscar.position.extend(other.position)
+        dest_poscar.positions.extend(other.positions)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
 #        dest_poscar.atom_identifer
         return dest_poscar
@@ -880,9 +827,9 @@ class POSCAR(object):
         original_scaling_factor = dest_poscar.scaling_factor
         other_poscar.tune_scaling_factor(original_scaling_factor)
         other_poscar.to_cartesian()
-        dest_poscar.iontype.extend(other.iontype)
+        dest_poscar.iontypes.extend(other.iontypes)
         dest_poscar.ionnums.extend(other.ionnums)
-        dest_poscar.position.extend(other.position)
+        dest_poscar.positions.extend(other.positions)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
 #        dest_poscar.atom_identifer
         if original_is_direct:
@@ -906,13 +853,13 @@ class POSCAR(object):
         out_list.append(self.cell_vecs[0])
         out_list.append(self.cell_vecs[1])
         out_list.append(self.cell_vecs[2])
-        if not self.iontype[0].isdigit():
-            out_list.append(self.iontype)
+        if not self.iontypes[0].isdigit():
+            out_list.append(self.iontypes)
         out_list.append(self.ionnums)
         if self.selective:
             out_list.append("Selective Dynamics")
         out_list.append(self.coordinate_type)
-        out_list.append(self.position)
+        out_list.append(self.positions)
         out_list.append(self.coordinate_changeflags)
         out_list.append(self.atom_identifer)
         return out_list
@@ -941,7 +888,7 @@ class POSCAR(object):
         if self.selective:
             tmp.append('Selective Dynamics')
         tmp.append(self.coordinate_type)
-        for pos, t_or_f, atom in tools.ZIPLONG(self.position,  # Version safety
+        for pos, t_or_f, atom in tools.ZIPLONG(self.positions,  # Version safety
                                                self.coordinate_changeflags,
                                                self.atom_identifer,
                                                fillvalue=''):
@@ -974,8 +921,8 @@ class POSCAR(object):
         self.cell_vecs *= (old / new_scaling_factor)
         self.scaling_factor = new_scaling_factor
         if self.is_cartesian():
-            self.position = [i * old / new_scaling_factor
-                             for i in self.position]
+            self.positions = [i * old / new_scaling_factor
+                              for i in self.positions]
 
     def to_cartesian(self):
         '''.. py:method:: to_cartesian()
@@ -985,7 +932,7 @@ class POSCAR(object):
         if self.is_direct():
             self.coordinate_type = "Cartesian"
             mat = self.cell_vecs.transpose()
-            self.position = [mat.dot(v) for v in self.position]
+            self.positions = [mat.dot(v) for v in self.positions]
 
     def to_direct(self):
         '''.. py:method:: to_direct()
@@ -995,7 +942,7 @@ class POSCAR(object):
         if self.is_cartesian():
             self.coordinate_type = "Direct"
             mat = np.linalg.inv(np.transpose(self.cell_vecs))
-            self.position = [mat.dot(v) for v in self.position]
+            self.positions = [mat.dot(v) for v in self.positions]
 
     def guess_molecule(self, site_list, center=None):
         '''.. py:method:: guess_molecule(site_list, center)
@@ -1099,16 +1046,16 @@ class POSCAR(object):
         if self.is_cartesian():
             vector = _vectorize(vector)
             for i in atomlist:
-                self.position[i - 1] = (self.position[i - 1] +
+                self.positions[i - 1] = (self.positions[i - 1] +
                                         vector / self.scaling_factor)
         else:
             vector = _vectorize(vector)
             self.to_cartesian()
             for i in atomlist:
-                self.position[i - 1] = (self.position[i - 1] +
+                self.positions[i - 1] = (self.positions[i - 1] +
                                         vector / self.scaling_factor)
             self.to_direct()
-        return self.position
+        return self.positions
 
     def get_axes_lengthes(self):
         '''.. py:method:: get_axes_lengthes()

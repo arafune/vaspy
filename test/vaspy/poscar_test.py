@@ -256,7 +256,7 @@ class TestPOSCAR(unittest.TestCase):
     def test_poscar_supercell2(self):
         supercell = self.testposcar.supercell(3, 2, 1)
         self.assertEqual('NiC4S4', supercell.system_name)
-        self.assertEqual(['Ni', 'C', 'S'], supercell.iontype)
+        self.assertEqual(['Ni', 'C', 'S'], supercell.iontypes)
         self.assertEqual([18, 72, 72], supercell.ionnums)
 
     def test_poscar_supercell3(self):
