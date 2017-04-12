@@ -384,31 +384,6 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         for each in self.positions:
             yield each
 
-    def is_cartesian(self):
-        '''.. py:method:: is_cartesian()
-
-        Return True if Cartesian coordinate is set
-
-        Returns
-        --------
-
-        boolean
-            True if coordinate is cartesian
-        '''
-        return bool(re.search(r'^[ck]', self.coordinate_type, re.I))
-
-    def is_direct(self):
-        '''.. py:method:: is_direct()
-
-        Return True if DIRECT coordinate is set
-
-        Returns
-        --------
-
-        Boolean
-            True if coordinate is direct (not cartesian)
-        '''
-        return not self.is_cartesian()
 
     def pos(self, *i):
         '''.. py:method:: pos(i)
@@ -489,30 +464,6 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         elif isinstance(pos, list):
             return sum(pos)/len(pos)
 
-    def pos_replace(self, i, vector):
-        '''.. py:method:: pos_replace(i, vector)
-
-        Parameters
-        -----------
-        i: int
-            site #
-        vector: list, tuple, numpy.ndarray
-            list of the i-th atom position.
-
-        Notes
-        ------
-
-        the first site # is "1", not "0" to follow VESTA's way.
-        '''
-        vector = _vectorize(vector)
-        if not isinstance(i, int):
-            raise ValueError
-        if not self.is_cartesian():
-            message = 'poscar_replace method is implemented for'
-            message += ' Cartesian coordinate'
-            raise RuntimeError(message)
-        self.positions[i - 1] = vector
-
     def supercell(self, nx, ny, nz):
         '''.. py:method:: supercell(nx, ny, nz)
 
@@ -553,7 +504,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         spositions = sposcar.positions
         sposcar.positions = []
         spositions = [np.array([x[0] / nx, x[1] / ny, x[2] / nz])
-                     for x in sposition]
+                      for x in spositions]
         for spos in spositions:
             for iz in range(0, nz):
                 for iy in range(0, ny):
@@ -571,41 +522,6 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             sposcar.to_cartesian()
         return sposcar
 
-    def sort(self, from_site=1, to_site=None, axis='z'):
-        '''.. py:method:: sort(from_index, to_index, axis='z')
-
-        Sort positions attribute by coordinate
-
-        Parameters
-        -----------
-
-        from_site: int
-            first index # for sort
-
-        to_site: int
-            last index # for sort
-
-        axis: str
-            Axis used for sort (Default Z)
-
-
-        Notes
-        -----
-
-        The first site # is "1", not "0" to follow VESTA's way.
-        The element difference is **not** taken into account.
-        '''
-        if to_site is None:
-            to_site = sum(self.ionnums)
-        if axis == 'x' or axis == 'X' or axis == 0:
-            axis = 0
-        elif axis == 'y' or axis == 'Y' or axis == 1:
-            axis = 1
-        elif axis == 'z' or axis == 'Z' or axis == 2:
-            axis = 2
-        self.positions = self.positions[0:from_site-1] + sorted(
-            self.positions[from_site-1:to_site],
-            key=lambda sortaxis: sortaxis[axis]) + self.positions[to_site:]
 
     # class method? or independent function?
     def nearest(self, array, point):
