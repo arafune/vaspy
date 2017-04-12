@@ -262,26 +262,26 @@ class TestPOSCAR(unittest.TestCase):
     def test_poscar_supercell3(self):
         supercell = self.testposcar.supercell(1, 1, 1)
         np.testing.assert_allclose(
-            self.testposcar.position[0],
-            supercell.position[0])
+            self.testposcar.positions[0],
+            supercell.positions[0])
 
     def test_poscar_supercell4(self):
         supercell = self.testposcar.supercell(3, 2, 1)
         np.testing.assert_allclose(
-            supercell.position[0],
-            np.array([self.testposcar.position[0][0]/3,
-                      self.testposcar.position[0][1]/2,
-                      self.testposcar.position[0][2]/1]))
+            supercell.positions[0],
+            np.array([self.testposcar.positions[0][0]/3,
+                      self.testposcar.positions[0][1]/2,
+                      self.testposcar.positions[0][2]/1]))
         np.testing.assert_allclose(
-            supercell.position[1],
-            np.array([self.testposcar.position[0][0] / 3 + 1 * (1 / 3),
-                      self.testposcar.position[0][1] / 2,
-                      self.testposcar.position[0][2] / 1]))
+            supercell.positions[1],
+            np.array([self.testposcar.positions[0][0] / 3 + 1 * (1 / 3),
+                      self.testposcar.positions[0][1] / 2,
+                      self.testposcar.positions[0][2] / 1]))
 
     def test_poscar_supercell5(self):
         supercell = self.testposcar.supercell(3, 2, 1)
-        self.assertEqual(6*len(self.testposcar.position),
-                         len(supercell.position))
+        self.assertEqual(6*len(self.testposcar.positions),
+                         len(supercell.positions))
 
     def test_nearest(self):
         pass

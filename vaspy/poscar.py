@@ -384,56 +384,6 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         for each in self.positions:
             yield each
 
-
-    def pos(self, *i):
-        '''.. py:method:: pos(i)
-
-        Accessor of POSCAR.position.
-
-        As in VASP, the atom index starts with "1", not "0".
-
-        Parameters
-        -----------
-
-        i: int, tuple, list, range
-             site indexes
-
-        Returns
-        --------
-
-        numpy.ndarray, list of numpy.ndarray
-             atom's position (When single value is set as i,\
-                             return just an atom position)
-
-        Warning
-        --------
-
-        the first site # is "1", not "0". (Follow VESTA's way.)
-
-        Warning
-        -------
-
-        Now, you **cannot** set the index range by using tuple.
-        Use range object instead.
-        ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
-        '''
-        dest = []
-        for thearg in i:
-            if isinstance(thearg, int):
-                if thearg <= 0:
-                    raise ValueError
-                else:
-                    dest.append(self.positions[thearg - 1])
-            elif isinstance(thearg, (tuple, list, range)):
-                for site_index in thearg:
-                    if site_index <= 0:
-                        raise ValueError
-                    else:
-                        dest.append(self.positions[site_index - 1])
-        if len(dest) == 1:
-            dest = dest[0]
-        return dest
-
     def average_position(self, *i):
         '''.. py:method:: average_position(*i)
 
