@@ -348,22 +348,6 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.ionnums = [int(i) for i in self.iontypes]
         else:
             self.ionnums = [int(x) for x in next(poscar).split()]
-        self.__atom_identifer = []
-        atomnames = []
-        for elm, ionnums in zip(self.iontypes, self.ionnums):
-            for j in range(1, ionnums + 1):
-                tmp = elm + str(j)
-                if tmp not in atomnames:
-                    atomnames.append(tmp)
-                else:
-                    while tmp in atomnames:
-                        j = j + 1
-                        tmp = elm + str(j)
-                    else:
-                        atomnames.append(tmp)
-        self.__atom_identifer = [
-            "#" + str(s) + ":" + a for s, a in
-            zip(range(1, len(atomnames) + 1), atomnames)]
         line7 = next(poscar)
         if re.search(r'^[\s]*Selective\b', line7, re.I):
             self.selective = True
@@ -467,7 +451,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         for flags in self.coordinate_changeflags:
             for i in range(nx * ny * nz):
                 sposcar.coordinate_changeflags.append(flags)
-        sposcar.__atom_identifer = []
+        sposcar.atom_identifer = []
         if original_is_cartesian:
             sposcar.to_cartesian()
         return sposcar
