@@ -253,42 +253,6 @@ class POSCAR_POS(object):
             raise RuntimeError(message)
         self.positions[i - 1] = vector
 
-    def sort(self, from_site=1, to_site=None, axis='z'):
-        '''.. py:method:: sort(from_index, to_index, axis='z')
-
-        Sort positions attribute by coordinate
-
-        Parameters
-        -----------
-
-        from_site: int
-            first index # for sort
-
-        to_site: int
-            last index # for sort
-
-        axis: str
-            Axis used for sort (Default Z)
-
-
-        Notes
-        -----
-
-        The first site # is "1", not "0" to follow VESTA's way.
-        The element difference is **not** taken into account.
-        '''
-        if to_site is None:
-            to_site = sum(self.ionnums)
-        if axis == 'x' or axis == 'X' or axis == 0:
-            axis = 0
-        elif axis == 'y' or axis == 'Y' or axis == 1:
-            axis = 1
-        elif axis == 'z' or axis == 'Z' or axis == 2:
-            axis = 2
-        self.positions = self.positions[0:from_site-1] + sorted(
-            self.positions[from_site-1:to_site],
-            key=lambda sortaxis: sortaxis[axis]) + self.positions[to_site:]
-
 
 class POSCAR(POSCAR_HEAD, POSCAR_POS):
     '''.. py:class:: POSCAR(file or array)
@@ -368,35 +332,42 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         for each in self.positions:
             yield each
 
-    def average_position(self, *i):
-        '''.. py:method:: average_position(*i)
+    def sort(self, from_site=1, to_site=None, axis='z'):
+        '''.. py:method:: sort(from_index, to_index, axis='z')
 
-        Return the average position of the sites
+        Sort positions attribute by coordinate
 
         Parameters
         -----------
 
-        i: int, tuple, list, range
-            site indexes
+        from_site: int
+            first index # for sort
 
-        Returns
-        --------
+        to_site: int
+            last index # for sort
 
-        numpy.ndarray
-            atom's position
+        axis: str
+            Axis used for sort (Default Z)
+
+
+        Notes
+        -----
+
+        The first site # is "1", not "0" to follow VESTA's way.
+        The element difference is **not** taken into account.
         '''
-        sitelist = []
-        for thearg in i:
-            if isinstance(thearg, int):
-                sitelist.append(thearg)
-            elif isinstance(thearg, (tuple, list, range)):
-                for site_index in thearg:
-                    sitelist.append(site_index)
-        pos = self.pos(sitelist)
-        if isinstance(pos, np.ndarray):
-            return pos
-        elif isinstance(pos, list):
-            return sum(pos)/len(pos)
+        if to_site is None:
+            to_site = sum(self.ionnums)
+        if axis == 'x' or axis == 'X' or axis == 0:
+            axis = 0
+        elif axis == 'y' or axis == 'Y' or axis == 1:
+            axis = 1
+        elif axis == 'z' or axis == 'Z' or axis == 2:
+            axis = 2
+        self.positions = self.positions[0:from_site-1] + sorted(
+            self.positions[from_site-1:to_site],
+            key=lambda sortaxis: sortaxis[axis]) + self.positions[to_site:]
+
 
     def supercell(self, nx, ny, nz):
         '''.. py:method:: supercell(nx, ny, nz)
@@ -897,13 +868,13 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             vector = _vectorize(vector)
             for i in atomlist:
                 self.positions[i - 1] = (self.positions[i - 1] +
-                                        vector / self.scaling_factor)
+                                         vector / self.scaling_factor)
         else:
             vector = _vectorize(vector)
             self.to_cartesian()
             for i in atomlist:
                 self.positions[i - 1] = (self.positions[i - 1] +
-                                        vector / self.scaling_factor)
+                                         vector / self.scaling_factor)
             self.to_direct()
         return self.positions
 
