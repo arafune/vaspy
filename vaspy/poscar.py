@@ -44,7 +44,7 @@ import copy
 import re
 import os
 import sys
-import bz2
+
 try:
     from vaspy import tools
 except ImportError:
@@ -369,18 +369,18 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             key=lambda sortaxis: sortaxis[axis]) + self.positions[to_site:]
 
 
-    def supercell(self, nx, ny, nz):
-        '''.. py:method:: supercell(nx, ny, nz)
+    def supercell(self, n_x, n_y, n_z):
+        '''.. py:method:: supercell(n_x, n_y, n_z)
 
-        Return the :math:`(nx \\times ny \\times nz)` supercell
+        Return the :math:`(n_x \\times n_y \\times n_z)` supercell
 
         Parameters
         -----------
-        nz: int
+        n_x: int
             repeat number along x axis
-        ny: int
+        n_y: int
             repeat number along y axis
-        nz: int
+        n_z: int
             repeat number along z axis
 
 
@@ -390,11 +390,11 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         POSCAR
             POSCAR object of the supercell
         '''
-        if not isinstance(nx, int) \
-           or not isinstance(ny, int) \
-           or not isinstance(nz, int):
+        if not isinstance(n_x, int) \
+           or not isinstance(n_y, int) \
+           or not isinstance(n_z, int):
             raise ValueError("arguments must be positive integer")
-        if nx <= 0 or ny <= 0 or nz <= 0:
+        if n_x <= 0 or n_y <= 0 or n_z <= 0:
             raise ValueError("arguments must be positive integer")
         #
         sposcar = copy.deepcopy(self)
@@ -402,25 +402,25 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if original_is_cartesian:
             sposcar.to_direct()
         sposcar.repack_in_cell()
-        sposcar.cell_vecs[0] = sposcar.cell_vecs[0] * nx
-        sposcar.cell_vecs[1] = sposcar.cell_vecs[1] * ny
-        sposcar.cell_vecs[2] = sposcar.cell_vecs[2] * nz
-        sposcar.ionnums = [i * nx * ny * nz for i in sposcar.ionnums]
+        sposcar.cell_vecs[0] = sposcar.cell_vecs[0] * n_x
+        sposcar.cell_vecs[1] = sposcar.cell_vecs[1] * n_y
+        sposcar.cell_vecs[2] = sposcar.cell_vecs[2] * n_z
+        sposcar.ionnums = [i * n_x * n_y * n_z for i in sposcar.ionnums]
         spositions = sposcar.positions
         sposcar.positions = []
-        spositions = [np.array([x[0] / nx, x[1] / ny, x[2] / nz])
+        spositions = [np.array([x[0] / n_x, x[1] / n_y, x[2] / n_z])
                       for x in spositions]
         for spos in spositions:
-            for iz in range(0, nz):
-                for iy in range(0, ny):
-                    for ix in range(0, nx):
+            for i_z in range(0, n_z):
+                for i_y in range(0, n_y):
+                    for i_x in range(0, n_x):
                         sposcar.positions.append(np.array(
-                            [spos[0] + ix / nx,
-                             spos[1] + iy / ny,
-                             spos[2] + iz / nz]))
+                            [spos[0] + i_x / n_x,
+                             spos[1] + i_y / n_y,
+                             spos[2] + i_z / n_z]))
         sposcar.coordinate_changeflags = []
         for flags in self.coordinate_changeflags:
-            for i in range(nx * ny * nz):
+            for i in range(n_x * n_y * n_z):
                 sposcar.coordinate_changeflags.append(flags)
         sposcar.atom_identifer = []
         if original_is_cartesian:
@@ -468,16 +468,16 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         position = _vectorize(position)
         candidates27 = []
         if self.is_cartesian():
-            for l, m, n in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
-                candidates27.append(l * self.cell_vecs[0] +
-                                    m * self.cell_vecs[1] +
-                                    n * self.cell_vecs[2] +
+            for i, j, k in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
+                candidates27.append(i * self.cell_vecs[0] +
+                                    j * self.cell_vecs[1] +
+                                    k * self.cell_vecs[2] +
                                     position)
         else:
-            for l, m, n in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
-                candidates27.append(l * np.array([1., 0., 0.]) +
-                                    m * np.array([0., 1., 0.]) +
-                                    n * np.array([0., 0., 1.]) +
+            for i, j, k in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
+                candidates27.append(i * np.array([1., 0., 0.]) +
+                                    j * np.array([0., 1., 0.]) +
+                                    k * np.array([0., 0., 1.]) +
                                     position)
         return candidates27
 
