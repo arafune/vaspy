@@ -83,7 +83,7 @@ class POSCAR(object):
         self.__cell_vecs = np.array([[0., 0., 0.],
                                      [0., 0., 0.],
                                      [0., 0., 0.]])
-        self.iontype = []
+        self.iontypes = []
         self.ionnums = []
         self.coordinate_type = ""
         self.position = []
@@ -126,17 +126,17 @@ class POSCAR(object):
         self.cell_vecs[0] = [float(x) for x in next(poscar).split()]
         self.cell_vecs[1] = [float(x) for x in next(poscar).split()]
         self.cell_vecs[2] = [float(x) for x in next(poscar).split()]
-        self.iontype = next(poscar).split()
+        self.iontypes = next(poscar).split()
         # parse POSCAR evenif the element names are not set.
         # At present, the String representation number
         #   are used for the  dummy name.
-        if self.iontype[0].isdigit():
-            self.ionnums = [int(i) for i in self.iontype]
+        if self.iontypes[0].isdigit():
+            self.ionnums = [int(i) for i in self.iontypes]
         else:
             self.ionnums = [int(x) for x in next(poscar).split()]
         self.__atom_identifer = []
         atomnames = []
-        for elm, ionnums in zip(self.iontype, self.ionnums):
+        for elm, ionnums in zip(self.iontypes, self.ionnums):
             for j in range(1, ionnums + 1):
                 tmp = elm + str(j)
                 if tmp not in atomnames:
@@ -170,14 +170,14 @@ class POSCAR(object):
         '''Return list style of "atom_identifer" (e.g.  "#1:Ag1")'''
         # self.__atom_identifer = []
         # ii = 1
-        # for elm, n in zip(self.iontype, self.ionnums):
+        # for elm, n in zip(self.iontypes, self.ionnums):
         #     self.__atom_identifer.extend(
         #         '#{0}:{1}{2}'.format(ii + m, elm, m + 1) for m in range(n))
         #     ii += n
         # return self.__atom_identifer
         self.__atom_identifer = []
         atomnames = []
-        for elm, ionnums in zip(self.iontype, self.ionnums):
+        for elm, ionnums in zip(self.iontypes, self.ionnums):
             for j in range(1, ionnums + 1):
                 tmp = elm + str(j)
                 if tmp not in atomnames:
@@ -606,7 +606,7 @@ class POSCAR(object):
             raise ValueError('scaling factor is different.')
         if np.linalg.norm(dest_poscar.cell_vecs - other.cell_vecs) != 0:
             raise ValueError('lattice vectors (cell matrix) are different.')
-        dest_poscar.iontype.extend(other.iontype)
+        dest_poscar.iontypes.extend(other.iontypes)
         dest_poscar.ionnums.extend(other.ionnums)
         dest_poscar.position.extend(other.position)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
@@ -645,7 +645,7 @@ class POSCAR(object):
         original_scaling_factor = dest_poscar.scaling_factor
         other_poscar.tune_scaling_factor(original_scaling_factor)
         other_poscar.to_cartesian()
-        dest_poscar.iontype.extend(other.iontype)
+        dest_poscar.iontypes.extend(other.iontypes)
         dest_poscar.ionnums.extend(other.ionnums)
         dest_poscar.position.extend(other.position)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
@@ -671,8 +671,8 @@ class POSCAR(object):
         out_list.append(self.cell_vecs[0])
         out_list.append(self.cell_vecs[1])
         out_list.append(self.cell_vecs[2])
-        if not self.iontype[0].isdigit():
-            out_list.append(self.iontype)
+        if not self.iontypes[0].isdigit():
+            out_list.append(self.iontypes)
         out_list.append(self.ionnums)
         if self.selective:
             out_list.append("Selective Dynamics")
@@ -700,8 +700,8 @@ class POSCAR(object):
                            self.cell_vecs[1]))
         tmp.append(''.join('   {0:20.17f}'.format(i) for i in
                            self.cell_vecs[2]))
-        if not self.iontype[0].isdigit():
-            tmp.append(' ' + ' '.join(self.iontype))
+        if not self.iontypes[0].isdigit():
+            tmp.append(' ' + ' '.join(self.iontypes))
         tmp.append(' ' + ' '.join(str(i) for i in self.ionnums))
         if self.selective:
             tmp.append('Selective Dynamics')
