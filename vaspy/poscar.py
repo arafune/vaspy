@@ -514,7 +514,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.to_cartesian()
         position = self.pos(site)
         position -= center / self.scaling_factor
-        position = globals()["rotate_"+axis_name.lower()](theta_deg).dot(position)
+        position = globals()["rotate_" +
+                             axis_name.lower()](theta_deg).dot(position)
         position += center / self.scaling_factor
         self.pos_replace(site, position)
 
