@@ -481,8 +481,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                                     position)
         return candidates27
 
-    def atom_rotate(self, site, axis_name, theta, center):
-        '''.. py:atom_rotate(site, axis_name, theta, center)
+    def atom_rotate(self, site, axis_name, theta_deg, center):
+        '''.. py:atom_rotate(site, axis_name, theta_deg, center)
 
         Rotate the atom
 
@@ -493,7 +493,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             site # for rotation (The first atom is "1".).
         axis_name: str
             "X", "x", "Y", "y", "Z", or "z". Rotation axis.
-        theta: float
+        theta_deg: float
             Rotation angle (Degrees).
         center: numpy.ndarray, list, tuple
             center position for rotation.
@@ -514,11 +514,11 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.to_cartesian()
         position = self.pos(site)
         position -= center / self.scaling_factor
-        position = globals()["rotate_"+axis_name.lower()](theta).dot(position)
+        position = globals()["rotate_"+axis_name.lower()](theta_deg).dot(position)
         position += center / self.scaling_factor
         self.pos_replace(site, position)
 
-    def atoms_rotate(self, site_list, axis_name, theta, center):
+    def atoms_rotate(self, site_list, axis_name, theta_deg, center):
         '''Rotate atoms
 
         Parameters
@@ -528,15 +528,15 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             list array of site for rotation (The first atom is "1".).
         axis_name:
             "X", "x", "Y", "y", "Z",or "z".  Rotation axis.
-        theta: float
+        theta_deg: float
              Rotation angle (Degrees).
         center: numpy.ndarray, list, tuple
              Position of rotation center
         '''
         for site in site_list:
-            self.atom_rotate(site, axis_name, theta, center)
+            self.atom_rotate(site, axis_name, theta_deg, center)
 
-    def cell_rotate(self, theta, axis_name='Z'):
+    def cell_rotate(self, theta_deg, axis_name='Z'):
         '''.. py:method:: cell_rotate(theta, axis_name)
 
         Rotate unit-cell (rotation angle is set by degree.)
@@ -544,7 +544,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         Parameters
         ----------
 
-        theta: float
+        theta_deg: float
             rotation angle
         axis_name: str
             axis name for rotation (x, y, or z)
@@ -556,11 +556,11 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         axis_name = axis_name.capitalize()
 
         if axis_name == 'X':
-            self.cell_vecs = np.dot(rotate_x(theta), self.cell_vecs.T).T
+            self.cell_vecs = np.dot(rotate_x(theta_deg), self.cell_vecs.T).T
         elif axis_name == 'Y':
-            self.cell_vecs = np.dot(rotate_y(theta), self.cell_vecs.T).T
+            self.cell_vecs = np.dot(rotate_y(theta_deg), self.cell_vecs.T).T
         elif axis_name == 'Z':
-            self.cell_vecs = np.dot(rotate_z(theta), self.cell_vecs.T).T
+            self.cell_vecs = np.dot(rotate_z(theta_deg), self.cell_vecs.T).T
         if original_is_cartesian:
             self.to_cartesian()
 
@@ -954,15 +954,15 @@ def point_in_box(point, cell_vecs):
         raise TypeError
 
 
-def rotate_x(theta):
-    ''' .. py:function:: rotate_x(theta)
+def rotate_x(theta_deg):
+    ''' .. py:function:: rotate_x(theta_deg)
 
     Rotation matrix around X-axis
 
     Parameters
     ----------
 
-    theta: float
+    theta_deg: float
         angle of rotation (Degrees)
 
     Returns
@@ -982,12 +982,12 @@ def rotate_x(theta):
     degree = np.pi / 180.0
     return np.array(
         [[1.0, 0.0, 0.0],
-         [0.0, np.cos(theta * degree), -np.sin(theta * degree)],
-         [0.0, np.sin(theta * degree), np.cos(theta * degree)]])
+         [0.0, np.cos(theta_deg * degree), -np.sin(theta_deg * degree)],
+         [0.0, np.sin(theta_deg * degree), np.cos(theta_deg * degree)]])
 
 
-def rotate_y(theta):
-    '''.. py:function:: rotate_y(theta)
+def rotate_y(theta_deg):
+    '''.. py:function:: rotate_y(theta_deg)
 
     Rotation matrix around Y-axis
 
@@ -1001,13 +1001,13 @@ def rotate_y(theta):
     '''
     degree = np.pi / 180.0
     return np.array(
-        [[np.cos(theta * degree), 0.0, np.sin(theta * degree)],
+        [[np.cos(theta_deg * degree), 0.0, np.sin(theta_deg * degree)],
          [0.0, 1.0, 0.0],
-         [-np.sin(theta * degree), 0.0, np.cos(theta * degree)]])
+         [-np.sin(theta_deg * degree), 0.0, np.cos(theta_deg * degree)]])
 
 
-def rotate_z(theta):
-    '''.. py:function:: rotate_y(theta)
+def rotate_z(theta_deg):
+    '''.. py:function:: rotate_y(theta_deg)
 
     Rotation matrix around Z-axis
 
@@ -1021,8 +1021,8 @@ def rotate_z(theta):
     '''
     degree = np.pi / 180.0
     return np.array(
-        [[np.cos(theta * degree), -np.sin(theta * degree), 0.0],
-         [np.sin(theta * degree), np.cos(theta * degree), 0.0],
+        [[np.cos(theta_deg * degree), -np.sin(theta_deg * degree), 0.0],
+         [np.sin(theta_deg * degree), np.cos(theta_deg * degree), 0.0],
          [0.0, 0.0, 1.0]])
 
 
