@@ -99,7 +99,7 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
             raise RuntimeError("the arg of PROCAR() should be the filename")
 
     def load_from_file(self, filename, phase_read=False):
-        '''.. py:method::  load_fromfile(filename, [phase_read=False])
+        '''.. py:method::  load_from_file(filename, [phase_read=False])
 
         A virtual parser of PROCAR
 
