@@ -150,110 +150,6 @@ class POSCAR_POS(object):
         return not self.is_cartesian()
 
 
-    def pos(self, *i):
-        '''.. py:method:: pos(i)
-
-        Accessor of POSCAR.position.
-
-        As in VASP, the atom index starts with "1", not "0".
-
-        Parameters
-        -----------
-
-        i: int, tuple, list, range
-             site indexes
-
-        Returns
-        --------
-
-        numpy.ndarray, list of numpy.ndarray
-             atom's position (When single value is set as i,\
-                             return just an atom position)
-
-        Warning
-        --------
-
-        the first site # is "1", not "0". (Follow VESTA's way.)
-
-        Warning
-        -------
-
-        Now, you **cannot** set the index range by using tuple.
-        Use range object instead.
-        ex.) range(3,10) => (3, 4, 5, 6, 7, 8, 9)
-        '''
-        dest = []
-        for thearg in i:
-            if isinstance(thearg, int):
-                if thearg <= 0:
-                    raise ValueError
-                else:
-                    dest.append(self.positions[thearg - 1])
-            elif isinstance(thearg, (tuple, list, range)):
-                for site_index in thearg:
-                    if site_index <= 0:
-                        raise ValueError
-                    else:
-                        dest.append(self.positions[site_index - 1])
-        if len(dest) == 1:
-            dest = dest[0]
-        return dest
-
-    def average_position(self, *i):
-        '''.. py:method:: average_position(*i)
-
-        Return the average position of the sites
-
-        Parameters
-        -----------
-
-        i: int, tuple, list, range
-            site indexes
-
-        Returns
-        --------
-
-        numpy.ndarray
-            atom's position
-        '''
-        sitelist = []
-        for thearg in i:
-            if isinstance(thearg, int):
-                sitelist.append(thearg)
-            elif isinstance(thearg, (tuple, list, range)):
-                for site_index in thearg:
-                    sitelist.append(site_index)
-        pos = self.pos(sitelist)
-        if isinstance(pos, np.ndarray):
-            return pos
-        elif isinstance(pos, list):
-            return sum(pos)/len(pos)
-
-    def pos_replace(self, i, vector):
-        '''.. py:method:: pos_replace(i, vector)
-
-        Parameters
-        -----------
-        i: int
-            site #
-        vector: list, tuple, numpy.ndarray
-            list of the i-th atom position.
-
-        Notes
-        ------
-
-        the first site # is "1", not "0" to follow VESTA's way.
-        '''
-        vector = _vectorize(vector)
-        if not isinstance(i, int):
-            raise ValueError
-        if not self.is_cartesian():
-            message = 'poscar_replace method is implemented for'
-            message += ' Cartesian coordinate'
-            raise RuntimeError(message)
-        self.positions[i - 1] = vector
-
-
 class POSCAR(POSCAR_HEAD, POSCAR_POS):
     '''.. py:class:: POSCAR(file or array)
 
@@ -332,7 +228,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         for each in self.positions:
             yield each
 
-    def sort(self, from_site=1, to_site=None, axis='z'):
+    def sort(self, from_site=0, to_site=None, axis='z'):
         '''.. py:method:: sort(from_index, to_index, axis='z')
 
         Sort positions attribute by coordinate
@@ -353,7 +249,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         Notes
         -----
 
-        The first site # is "1", not "0" to follow VESTA's way.
+        The first site # is "0". It's the pythonic way.
         The element difference is **not** taken into account.
         '''
         if to_site is None:
@@ -364,8 +260,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             axis = 1
         elif axis == 'z' or axis == 'Z' or axis == 2:
             axis = 2
-        self.positions = self.positions[0:from_site-1] + sorted(
-            self.positions[from_site-1:to_site],
+        self.positions = self.positions[0:from_site] + sorted(
+            self.positions[from_site:to_site],
             key=lambda sortaxis: sortaxis[axis]) + self.positions[to_site:]
 
 
@@ -490,7 +386,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         ----------
 
         site: int
-            site # for rotation (The first atom is "1".).
+            site # for rotation (The first atom is "0".).
         axis_name: str
             "X", "x", "Y", "y", "Z", or "z". Rotation axis.
         theta_deg: float
@@ -512,12 +408,12 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             raise ValueError('argument error in atom_rotate method')
         if not self.is_cartesian():
             self.to_cartesian()
-        position = self.pos(site)
+        position = self.positions[site]
         position -= center / self.scaling_factor
         position = globals()["rotate_" +
                              axis_name.lower()](theta_deg).dot(position)
         position += center / self.scaling_factor
-        self.pos_replace(site, position)
+        self.positions[site] = position
 
     def atoms_rotate(self, site_list, axis_name, theta_deg, center):
         '''Rotate atoms
@@ -797,9 +693,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         from what you expect, in spite of time-waste.  The center
         option is highly recommended to form a molecule.
         '''
-        molecule = [self.pos(j) for j in site_list]
+        molecule = [self.positions[j] for j in site_list]
         for index, site in enumerate(site_list):
-            target_atom = self.pos(site)
+            target_atom = self.posisiont[site]
             atoms27 = self.make27candidate(target_atom)
 
             def func(pos, center):
@@ -838,7 +734,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         '''
         molecule = self.guess_molecule(site_list)
         for site, pos_vector in zip(site_list, molecule):
-            self.pos_replace(site, pos_vector)
+            self.positions[site] = pos_vector
 
     def translate(self, vector, atomlist):
         '''.. py:method:: translate(vector, atomlist)
