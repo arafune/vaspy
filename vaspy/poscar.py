@@ -506,7 +506,6 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         dest_poscar.ionnums.extend(other.ionnums)
         dest_poscar.positions.extend(other.positions)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
-#        dest_poscar.atom_identifer
         return dest_poscar
 
     def merge(self, other):
