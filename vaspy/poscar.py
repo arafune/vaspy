@@ -182,7 +182,6 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if isinstance(arg, (list, tuple)):
             self.load_from_array(arg)
 
-
     def load_from_array(self, poscar):
         '''.. :py:method:: load_from_array(poscar)
 
@@ -223,7 +222,6 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             if self.selective:
                 self.coordinate_changeflags.append(' '.join(tmp[3:]))
 
-
     def __iter__(self):
         for each in self.positions:
             yield each
@@ -263,7 +261,6 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         self.positions = self.positions[0:from_site] + sorted(
             self.positions[from_site:to_site],
             key=lambda sortaxis: sortaxis[axis]) + self.positions[to_site:]
-
 
     def supercell(self, n_x, n_y, n_z):
         '''.. py:method:: supercell(n_x, n_y, n_z)
@@ -322,7 +319,6 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if original_is_cartesian:
             sposcar.to_cartesian()
         return sposcar
-
 
     # class method? or independent function?
     def nearest(self, array, point):
@@ -606,7 +602,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if self.selective:
             tmp.append('Selective Dynamics')
         tmp.append(self.coordinate_type)
-        for pos, t_or_f, atom in tools.ZIPLONG(self.positions,  # Version safety
+        for pos, t_or_f, atom in tools.ZIPLONG(self.positions,
                                                self.coordinate_changeflags,
                                                self.atom_identifer,
                                                fillvalue=''):
