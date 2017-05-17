@@ -150,6 +150,13 @@ class VASPGrid(poscar.POSCAR):
         '''
         return self.mesh_x, self.mesh_y, self.mesh_z
 
+    def merge(self, other):
+        '''.. py:method:: merge(other)
+
+        x.merge(y) -> '3D mesh data of x' + '3D mesh data of y'
+        '''
+        pass
+
     def __add__(self, other):
         '''.. py:method:: __add__(other)
 
