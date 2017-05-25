@@ -49,7 +49,7 @@ class EIGENVAL(object):
             self.load_from_file(arg)
 
     def load_from_file(self, filename):
-        '''..py:method:: load_from_file(filename)
+        '''.. py:method:: load_from_file(filename)
 
         A virtual parser of EIGENVAL
 
@@ -90,7 +90,7 @@ class EIGENVAL(object):
                                       next(thefile).strip().split()[1:3]]))
         self.energies = np.array(self.energies)
 
-    def onlyband(self, recvec=[[1.0, 0.0, 0.0],
+    def to_band(self, recvec=[[1.0, 0.0, 0.0],
                                [0.0, 1.0, 0.0],
                                [0.0, 0.0, 1.0]]):
         '''.. py:method:: onlyband(recvec)

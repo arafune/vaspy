@@ -147,7 +147,7 @@ class DOS(object):  # Version safety
     -----------
     dos
 
-    :py:attr:`dos` is the python linst object for storing the dos data.
+    `dos` is the python linst object for storing the dos data.
     By default, the first column is the energy, the latter is the density.
     '''
 
