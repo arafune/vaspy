@@ -2,7 +2,8 @@
 
 	* Version 0.4.0
 	* From this version site index starts from 0 when use POSCAR class
-	directory.  Follow the pythonic way
+	directly.  Follow the pythonic way. This rule is not applied to
+	vaspy-***.py scripts.
 
 2017-02-14  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
 
