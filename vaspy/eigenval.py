@@ -91,9 +91,9 @@ class EIGENVAL(object):
         self.energies = np.array(self.energies)
 
     def to_band(self, recvec=[[1.0, 0.0, 0.0],
-                               [0.0, 1.0, 0.0],
-                               [0.0, 0.0, 1.0]]):
-        '''.. py:method:: onlyband(recvec)
+                              [0.0, 1.0, 0.0],
+                              [0.0, 0.0, 1.0]]):
+        '''.. py:method:: to_band(recvec)
 
         Return Band_with_projection object
 
@@ -165,12 +165,11 @@ class EnergyBand(object):
             self.spininfo = ('',)
         elif self.spininfo == 2 or len(self.spininfo) == 2:   # collinear
             self.spininfo = ('_up', '_down')
-            self.nbands = self.nbands // 2
         elif self.spininfo == 4:  # non-collinear
             self.spininfo = ('_mT', '_mX', '_mY', '_mZ')
         if spininfo == 2 or spininfo == ('_up', '_down'):
             self.energies = np.array(energies).reshape(
-                (2, self.numk, self.nbands))
+                (self.numk, self.nbands, 2))
         else:
             self.energies = np.array(energies).reshape(
                 (self.numk, self.nbands))
@@ -197,18 +196,17 @@ class EnergyBand(object):
         str
             a string represntation of EnergyBand.  Useful for gnuplot and Igor.
         '''
+        energies = np.swapaxes(self.energies, 1, 0)        
         if self.spininfo == 2 or len(self.spininfo) == 2:
             output = '#k\tEnergy_up\tEnergy_down\n'
-            for k_i in range(self.numk):
-                for k, up, down in zip(self.kdistances,
-                                       self.energies[0][k_i],
-                                       self.energies[1][k_i]):
-                    output += '{0:.9e}\t{1:.9e}\t{2:.9e}\n'.format(k, up, down)
+            for b_i in range(self.nbands):
+                for k, en in zip(self.kdistances, energies[b_i]):
+                    output += '{0:.9e}\t{1:.9e}\t{2:.9e}\n'.format(k, en[0], en[1])
                 output += '\n'
         else:
             output = '#k\tEnergy\n'
-            for k_i in range(self.numk):
-                for k, en in zip(self.kdistances, self.energies[k_i]):
+            for b_i in range(self.nbands):
+                for k, en in zip(self.kdistances, energies[b_i]):
                     output += '{0:.9e}\t{1:.9e}\n'.format(k, en)
                 output += '\n'
         return output
@@ -226,16 +224,21 @@ class EnergyBand(object):
              Minimum and maximum value of the y-axis.
              If not specified, use the matplotlib default value.
 '''
-        if self.spininfo == 2 and spin == 'up':
-            energies = np.swapaxes(self.energies[0], 1, 0)
-        elif self.spininfo == 2 and spin == 'down':
-            energies = np.swapaxes(self.energies[1], 1, 0)
+        energies = np.swapaxes(self.energies, 1, 0)
+        if (self.spininfo == 2
+            or len(self.spininfo) == 2) and (spin == 'up' or spin == None):
+            for bi in range(0, self.nbands):
+                plt.plot(self.kdistances, energies[bi].T[0],
+                         color='blue')
+        elif (self.spininfo == 2
+              or len(self.spininfo) == 2) and spin == 'down':
+            for bi in range(0, self.nbands):
+                plt.plot(self.kdistances, energies[bi].T[1],
+                         color='blue')            
         else:
-            energies = np.swapaxes(self.energies, 1, 0)
-        for i in range(0, energies.shape[0]):
-            plt.plot(self.kdistances,
-                     energies[i],
-                     color='blue')
+            for bi in range(0, self.nbands):
+                plt.plot(self.kdistances, energies[bi],
+                         color='blue')            
         if yrange is not None:
             plt.ylim([yrange[0], yrange[1]])
         plt.xlim([self.kdistances[0],
