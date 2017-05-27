@@ -248,12 +248,12 @@ class VASPGrid(poscar.POSCAR):
                                         self.mesh_x *
                                         self.mesh_y *
                                         self.mesh_z)
-        outputstr=self.str_short()
+        outputstr = self.str_short()
         for tmp in mesharray:
             output = []
             outputstr += '\n  {0}  {1}  {2}\n'.format(self.mesh_x,
-                                                         self.mesh_y,
-                                                         self.mesh_z)
+                                                      self.mesh_y,
+                                                      self.mesh_z)
             for array in tools.each_slice(tmp, 5):
                 output.append(''.join('  {0:18.11E}'.format(i)
                                       for i in array if i is not None))
