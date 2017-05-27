@@ -4,6 +4,9 @@
 	* From this version site index starts from 0 when use POSCAR class
 	directly.  Follow the pythonic way. This rule is not applied to
 	vaspy-***.py scripts.
+	* vaspy-chgcar --merge option works.  Useful for Bader charge analysis. Use this option like:
+	vaspy-chgcar.py --merge AECCAR0 AECCAR2 > CHGCAR_ref
+	* EIGENVAL.showbands now works for ISPIN=2 with collinear
 
 2017-02-14  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
 
