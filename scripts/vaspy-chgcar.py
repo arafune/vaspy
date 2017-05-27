@@ -24,7 +24,7 @@ group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('--add', action='store_true', default=False,
                    help="Add two CHGCAR files")
 group.add_argument('--merge', action='store_true', default=False,
-                   help="Add two CHGCAR files (but ion position is not modified")
+                   help="Add two CHGCAR files (ion position is not modified)")
 group.add_argument('--diff', action='store_true', default=False,
                    help="Get difference of two CHGCAR files")
 group.add_argument('--spin', metavar='spin_operation',
@@ -44,7 +44,7 @@ majority : extract the part for the
            majority spin (for spin resolved calc.)
 minority : extract the part for the
            inority spin (for spin resolved calc.)""")
-#k
+
 parser.add_argument('--output', metavar='file_name',
                     help="""output file name
 if not specified, use standard output""")
