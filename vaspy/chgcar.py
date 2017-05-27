@@ -58,10 +58,10 @@ class CHGCAR(mesh3d.VASPGrid):
 
     the current verstion ignores "augmentation occupacies".
     '''
-    # accessor: chg_array, mesh_x-y-z
 
     def __init__(self, chgcar_file=None):
         super(CHGCAR, self).__init__(None)
+#        super().__init__()        
         self.spininfo = 0
         if chgcar_file:
             self.load_from_file(chgcar_file)
@@ -126,7 +126,7 @@ class CHGCAR(mesh3d.VASPGrid):
             raise RuntimeError("This CHGCAR is not spinresolved version")
         dest = copy.deepcopy(self)
         if len(self.spininfo) == 2:
-            dest.mesh3d = dest.chg_array.reshape(2, self.mesh_z,
+            dest.mesh3d = dest.mesh3d.reshape(2, self.mesh_z,
                                                  self.mesh_y,
                                                  self.mesh_x)[1]
             dest.spininfo = ["up-down"]

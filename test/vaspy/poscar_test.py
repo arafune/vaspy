@@ -49,70 +49,6 @@ class TestPOSCAR(unittest.TestCase):
         self.assertTrue(vaspy.poscar.point_in_box(
             (0.5, 0.5, 0.2), ((1, 0, 0), (0, 1, 0), (0, 0, 1))))
 
-    def test_poscar_pos_1(self):
-        pos = self.testposcar.pos(4)
-        np.testing.assert_allclose(
-            np.array([0.237639553, 0.429027113, 0.5]), pos)
-
-    def test_poscar_pos_2(self):
-        pos = self.testposcar.pos(4, 5, 6)
-        np.testing.assert_allclose(
-            [np.array([0.237639553, 0.429027113, 0.5]),
-             np.array([0.237639553, 0.333333333, 0.5]),
-             np.array([0.333333333, 0.237639553, 0.5])],
-            pos)
-
-    def test_poscar_pos_3(self):
-        pos = self.testposcar.pos(5, 4, 6)
-        np.testing.assert_allclose(
-            [np.array([0.237639553, 0.333333333, 0.5]),
-             np.array([0.237639553, 0.429027113, 0.5]),
-             np.array([0.333333333, 0.237639553, 0.5])],
-            pos)
-
-    def test_poscar_pos_4(self):  # Ver. 2 fails
-        pos = self.testposcar.pos((4, 6))
-        np.testing.assert_allclose(
-            [np.array([0.237639553, 0.429027113, 0.5]),
-             np.array([0.333333333, 0.237639553, 0.5])],
-            pos)
-
-    def test_poscar_pos_5(self):  # Ver. 2 fails
-        pos = self.testposcar.pos(1, (4, 6))
-        np.testing.assert_allclose(
-            [np.array([0.5, 0.5, 0.5]),
-             np.array([0.237639553, 0.429027113, 0.5]),
-             np.array([0.333333333, 0.237639553, 0.5])],
-            pos)
-
-    def test_poscar_pos_6(self):  # Ver. 2 fails
-        pos = self.testposcar.pos(1, range(4, 8))  # 1, 4, 5, 6, 7
-        np.testing.assert_allclose(
-            [np.array([0.5, 0.5, 0.5]),
-             np.array([0.237639553, 0.429027113, 0.5]),
-             np.array([0.237639553, 0.333333333, 0.5]),
-             np.array([0.333333333, 0.237639553, 0.5]),
-             np.array([0.429027113, 0.237639553, 0.5])],
-            pos)
-
-    def test_poscar_average_position(self):
-        pos = self.testposcar.average_position(1, range(4, 8))
-        np.testing.assert_allclose(
-            np.array([0.3475279104, 0.3475279104, 0.5]),
-            pos)
-
-    def test_poscar_average_position2(self):
-        pos = self.testposcar.average_position(1, 4, 5, 6, 7)
-        np.testing.assert_allclose(
-            np.array([0.3475279104, 0.3475279104, 0.5]),
-            pos)
-
-    def test_poscar_average_position3(self):
-        pos=self.testposcar.average_position(1)
-        np.testing.assert_allclose(
-            np.array([0.5, 0.5, 0.5]),
-            pos)
-
     def test_atom_identifer(self):
         self.assertEqual(['#1:Ni1', '#2:Ni2', '#3:Ni3',
                           '#4:C1', '#5:C2', '#6:C3', '#7:C4',
@@ -139,31 +75,10 @@ class TestPOSCAR(unittest.TestCase):
 
     def test_pos(self):
         np.testing.assert_array_equal(np.array([0., 0.5, 0.5]),
-                                      self.testposcar.pos(3))
+                                      self.testposcar.positions[2])
         np.testing.assert_allclose(np.array([0.23764, 0.429027113, 0.5]),
-                                   self.testposcar.pos(4),
+                                   self.testposcar.positions[3],
                                    rtol=1e-04)
-
-    def test_pos_replace(self):
-        np.testing.assert_array_equal(
-            np.array([0.333333333, 0.237639553, 0.5]),
-            self.testposcar.pos(6))
-
-        self.assertRaises(RuntimeError,
-                          self.testposcar.pos_replace,
-                          6,
-                          [0, 0, 0])
-        self.testposcar.to_cartesian()
-        self.testposcar.pos_replace(6, [0, 0, 0])
-        np.testing.assert_array_equal(np.array([0, 0, 0]),
-                                      self.testposcar.pos(6))
-        self.testposcar.pos_replace(7, [1, 3, 4])
-        np.testing.assert_array_equal(np.array([1, 3, 4]),
-                                      self.testposcar.pos(7))
-
-    def test_pos_raise_value_error(self):
-        self.assertRaises(ValueError, self.testposcar.pos, -1)
-        self.assertRaises(ValueError, self.testposcar.pos, 0)
 
     def test_tune_scaling_factor(self):
         self.testposcar.tune_scaling_factor(1.0)
@@ -181,30 +96,25 @@ class TestPOSCAR(unittest.TestCase):
             rtol=1e-07)
         np.testing.assert_allclose(
             np.array([12.66995166052, 0.0, 7.5000000001850005]),
-            self.testposcar.pos(1),
+            self.testposcar.positions[0],
             rtol=1e-06)
         np.testing.assert_allclose(
             np.array([8.4466344319, -1.4000000014, 7.500000000185]),
-            self.testposcar.pos(7),
+            self.testposcar.positions[6],
             rtol=1e-06)
 
     def test_to_cartesian(self):
-        tmp = self.testposcar.pos(6)
         self.testposcar.to_cartesian()
         np.testing.assert_allclose(
             np.array([0.494477, -0.047847, 0.512645]),
-            self.testposcar.pos(6),
+            self.testposcar.positions[5],
             rtol=1e-05)
         self.testposcar.to_direct()
-        np.testing.assert_allclose(
-            tmp,
-            self.testposcar.pos(6),
-            rtol=1e-05)
 
     def test_to_direct(self):
-        tmp = self.testposcar.pos(6)
+        tmp = self.testposcar.positions[5]
         self.testposcar.to_direct()
-        np.testing.assert_array_equal(tmp, self.testposcar.pos(6))
+        np.testing.assert_array_equal(tmp, self.testposcar.positions[5])
 
     def test_to_list(self):
         tmp = self.testposcar.to_list()
@@ -236,10 +146,8 @@ class TestPOSCAR(unittest.TestCase):
         global tmpstr_original
         global tmpstr_after_rotate
         self.assertEqual(tmpstr_original, self.testposcar.__str__())
-        self.testposcar.atom_rotate(1, "z", 90, (0, 0, 0))
+        self.testposcar.atom_rotate(0, "z", 90, (0, 0, 0))
         self.testposcar.to_direct()
-#        self.assertEqual(tmpstr_after_rotate,
-#                         self.testposcar.__str__())
 
     def test_poscar_supercell1(self):
         supercell = self.testposcar.supercell(3, 2, 1)
@@ -256,32 +164,32 @@ class TestPOSCAR(unittest.TestCase):
     def test_poscar_supercell2(self):
         supercell = self.testposcar.supercell(3, 2, 1)
         self.assertEqual('NiC4S4', supercell.system_name)
-        self.assertEqual(['Ni', 'C', 'S'], supercell.iontype)
+        self.assertEqual(['Ni', 'C', 'S'], supercell.iontypes)
         self.assertEqual([18, 72, 72], supercell.ionnums)
 
     def test_poscar_supercell3(self):
         supercell = self.testposcar.supercell(1, 1, 1)
         np.testing.assert_allclose(
-            self.testposcar.position[0],
-            supercell.position[0])
+            self.testposcar.positions[0],
+            supercell.positions[0])
 
     def test_poscar_supercell4(self):
         supercell = self.testposcar.supercell(3, 2, 1)
         np.testing.assert_allclose(
-            supercell.position[0],
-            np.array([self.testposcar.position[0][0]/3,
-                      self.testposcar.position[0][1]/2,
-                      self.testposcar.position[0][2]/1]))
+            supercell.positions[0],
+            np.array([self.testposcar.positions[0][0]/3,
+                      self.testposcar.positions[0][1]/2,
+                      self.testposcar.positions[0][2]/1]))
         np.testing.assert_allclose(
-            supercell.position[1],
-            np.array([self.testposcar.position[0][0] / 3 + 1 * (1 / 3),
-                      self.testposcar.position[0][1] / 2,
-                      self.testposcar.position[0][2] / 1]))
+            supercell.positions[1],
+            np.array([self.testposcar.positions[0][0] / 3 + 1 * (1 / 3),
+                      self.testposcar.positions[0][1] / 2,
+                      self.testposcar.positions[0][2] / 1]))
 
     def test_poscar_supercell5(self):
         supercell = self.testposcar.supercell(3, 2, 1)
-        self.assertEqual(6*len(self.testposcar.position),
-                         len(supercell.position))
+        self.assertEqual(6*len(self.testposcar.positions),
+                         len(supercell.positions))
 
     def test_nearest(self):
         pass

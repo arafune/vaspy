@@ -217,6 +217,20 @@ class VASPGrid(poscar.POSCAR):
             raise RuntimeError('The mesh sizes are different each other')
         return diff_vaspgrid
 
+    def merge(self, other):
+        '''.. py:method:: merge(other)
+
+        x.merge(y) -> '3D mesh data of x' + '3D mesh data of y'
+        '''
+        if not isinstance(other, VASPGrid):
+            return NotImplemented
+        merged_vaspgrid = copy.deepcopy(self)
+        try:
+            merged_vaspgrid.mesh3d = self.mesh3d + other.mesh3d
+        except ValueError:
+            raise RuntimeError('The mesh sizes are different each other')
+        return merged_vaspgrid
+
     def __str__(self):
         '''.. py:method:: __str__()
 
@@ -228,23 +242,23 @@ class VASPGrid(poscar.POSCAR):
         str
             a string representation of VASPGrid object
         '''
-        outputstring = ''
-        mesharray = self.mesh3d.reshape(len(self.mesh3d) // (self.mesh_x *
+        mesharray = self.mesh3d.reshape(self.mesh3d.size // (self.mesh_x *
                                                              self.mesh_y *
                                                              self.mesh_z),
                                         self.mesh_x *
                                         self.mesh_y *
                                         self.mesh_z)
+        outputstr=self.str_short()
         for tmp in mesharray:
             output = []
-            outputstring += '\n  {0}  {1}  {2}\n'.format(self.mesh_x,
+            outputstr += '\n  {0}  {1}  {2}\n'.format(self.mesh_x,
                                                          self.mesh_y,
                                                          self.mesh_z)
             for array in tools.each_slice(tmp, 5):
                 output.append(''.join('  {0:18.11E}'.format(i)
                                       for i in array if i is not None))
-            outputstring += '\n'.join(output)
-        return super(VASPGrid, self).__str__() + outputstring + '\n'
+            outputstr += '\n'.join(output)
+        return outputstr + '\n'
 
     def save(self, filename):
         '''.. py:method:: save(filename)
