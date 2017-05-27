@@ -627,14 +627,14 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             tmp.append(''.join('{0:12.6f}'.format(i) for i in
                                self.cell_vecs[k]))
         if not self.iontypes[0].isdigit():
-            tmp.append(' '+ "".join(['{0:>5}'.format(i) for i in self.iontypes]))
+            tmp.append(' ' +
+                       "".join(['{0:>5}'.format(i) for i in self.iontypes]))
         tmp.append(''.join(['{0:>6}'.format(i) for i in self.ionnums]))
-        tmp.append(self.coordinate_type)        
+        tmp.append(self.coordinate_type)
         for pos in self.positions:
             tmp.append(''.join('{0:10.6f}'.format(i) for i in pos))
         return '\n'.join(tmp) + '\n'
 
-        
     def tune_scaling_factor(self, new_scaling_factor=1.0):
         '''.. py:method:: tune_scaling_factor(new_scaling_factor=1.0)
 

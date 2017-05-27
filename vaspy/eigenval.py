@@ -196,12 +196,14 @@ class EnergyBand(object):
         str
             a string represntation of EnergyBand.  Useful for gnuplot and Igor.
         '''
-        energies = np.swapaxes(self.energies, 1, 0)        
+        energies = np.swapaxes(self.energies, 1, 0)
         if self.spininfo == 2 or len(self.spininfo) == 2:
             output = '#k\tEnergy_up\tEnergy_down\n'
             for b_i in range(self.nbands):
                 for k, en in zip(self.kdistances, energies[b_i]):
-                    output += '{0:.9e}\t{1:.9e}\t{2:.9e}\n'.format(k, en[0], en[1])
+                    output += '{0:.9e}\t{1:.9e}\t{2:.9e}\n'.format(k,
+                                                                   en[0],
+                                                                   en[1])
                 output += '\n'
         else:
             output = '#k\tEnergy\n'
@@ -225,20 +227,19 @@ class EnergyBand(object):
              If not specified, use the matplotlib default value.
 '''
         energies = np.swapaxes(self.energies, 1, 0)
-        if (self.spininfo == 2
-            or len(self.spininfo) == 2) and (spin == 'up' or spin == None):
-            for bi in range(0, self.nbands):
-                plt.plot(self.kdistances, energies[bi].T[0],
-                         color='blue')
-        elif (self.spininfo == 2
-              or len(self.spininfo) == 2) and spin == 'down':
-            for bi in range(0, self.nbands):
-                plt.plot(self.kdistances, energies[bi].T[1],
-                         color='blue')            
+        if (self.spininfo == 2 or len(self.spininfo) == 2):
+            if spin == 'down':
+                for bi in range(0, self.nbands):
+                    plt.plot(self.kdistances, energies[bi].T[1],
+                             color='blue')
+            else:
+                for bi in range(0, self.nbands):
+                    plt.plot(self.kdistances, energies[bi].T[0],
+                             color='blue')
         else:
             for bi in range(0, self.nbands):
                 plt.plot(self.kdistances, energies[bi],
-                         color='blue')            
+                         color='blue')
         if yrange is not None:
             plt.ylim([yrange[0], yrange[1]])
         plt.xlim([self.kdistances[0],

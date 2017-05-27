@@ -61,7 +61,6 @@ class CHGCAR(mesh3d.VASPGrid):
 
     def __init__(self, chgcar_file=None):
         super(CHGCAR, self).__init__(None)
-#        super().__init__()        
         self.spininfo = 0
         if chgcar_file:
             self.load_from_file(chgcar_file)
@@ -127,8 +126,8 @@ class CHGCAR(mesh3d.VASPGrid):
         dest = copy.deepcopy(self)
         if len(self.spininfo) == 2:
             dest.mesh3d = dest.mesh3d.reshape(2, self.mesh_z,
-                                                 self.mesh_y,
-                                                 self.mesh_x)[1]
+                                              self.mesh_y,
+                                              self.mesh_x)[1]
             dest.spininfo = ["up-down"]
         elif len(self.spininfo) == 4:
             dest.mesh3d.reshape(4, self.mesh_z, self.mesh_y,
