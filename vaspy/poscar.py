@@ -610,6 +610,31 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                        ' ' + atom)
         return '\n'.join(tmp) + '\n'
 
+    def str_short(self):
+        '''.. py:method:: str_short()
+
+        Returns
+        ---------
+
+        str
+            a string representation of POSCAR, with short (8) digit format.
+            used in CHGCAR
+        '''
+        tmp = []
+        tmp.append(self.system_name)
+        tmp.append('  {0:.14f}'.format(self.scaling_factor))
+        for k in range(3):
+            tmp.append(''.join('{0:12.6f}'.format(i) for i in
+                               self.cell_vecs[k]))
+        if not self.iontypes[0].isdigit():
+            tmp.append(' '+ "".join(['{0:>5}'.format(i) for i in self.iontypes]))
+        tmp.append(''.join(['{0:>6}'.format(i) for i in self.ionnums]))
+        tmp.append(self.coordinate_type)        
+        for pos in self.positions:
+            tmp.append(''.join('{0:10.6f}'.format(i) for i in pos))
+        return '\n'.join(tmp) + '\n'
+
+        
     def tune_scaling_factor(self, new_scaling_factor=1.0):
         '''.. py:method:: tune_scaling_factor(new_scaling_factor=1.0)
 
