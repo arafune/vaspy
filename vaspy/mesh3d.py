@@ -150,13 +150,6 @@ class VASPGrid(poscar.POSCAR):
         '''
         return self.mesh_x, self.mesh_y, self.mesh_z
 
-    def merge(self, other):
-        '''.. py:method:: merge(other)
-
-        x.merge(y) -> '3D mesh data of x' + '3D mesh data of y'
-        '''
-        pass
-
     def __add__(self, other):
         '''.. py:method:: __add__(other)
 
@@ -224,6 +217,20 @@ class VASPGrid(poscar.POSCAR):
             raise RuntimeError('The mesh sizes are different each other')
         return diff_vaspgrid
 
+    def merge(self, other):
+        '''.. py:method:: merge(other)
+
+        x.merge(y) -> '3D mesh data of x' + '3D mesh data of y'
+        '''
+        if not isinstance(other, VASPGrid):
+            return NotImplemented
+        merged_vaspgrid = copy.deepcopy(self)
+        try:
+            merged_vaspgrid.mesh3d = self.mesh3d + other.mesh3d
+        except ValueError:
+            raise RuntimeError('The mesh sizes are different each other')
+        return merged_vaspgrid
+
     def __str__(self):
         '''.. py:method:: __str__()
 
@@ -241,46 +248,17 @@ class VASPGrid(poscar.POSCAR):
                                         self.mesh_x *
                                         self.mesh_y *
                                         self.mesh_z)
-        poscar = []
-        poscar.append(self.system_name)
-        poscar.append('{0:>19.14f}'.format(self.scaling_factor))
-        cellvecformat = '{0:>13.6f}{1:>12.6f}{2:>12.6f}'
-        poscar.append(cellvecformat.format(self.cell_vecs[0][0],
-                                           self.cell_vecs[0][1],
-                                           self.cell_vecs[0][2]))
-        poscar.append(cellvecformat.format(self.cell_vecs[1][0],
-                                           self.cell_vecs[1][1],
-                                           self.cell_vecs[1][2]))
-        poscar.append(cellvecformat.format(self.cell_vecs[2][0],
-                                           self.cell_vecs[2][1],
-                                           self.cell_vecs[2][2]))
-        if not self.iontype[0].isdigit():
-            tmplist = '   '
-            for i in self.iontype:
-                tmplist += '{0:5s}'.format(i)
-            poscar.append(tmplist)
-        tmplist = ''
-        for i in self.ionnums:
-            tmplist += '{0:>6}'.format(i)
-        poscar.append(tmplist)
-        if self.selective:
-            poscar.append('Selective Dynamics')
-        poscar.append(self.coordinate_type)
-        for pos in self.position:
-            poscar.append(' {0:>9.6f}{1:>10.6f}{2:>10.6f}'.format(pos[0],
-                                                                  pos[1],
-                                                                  pos[2]))
-        outputstring = '\n'.join(poscar) + '\n'
+        outputstr=self.str_short()
         for tmp in mesharray:
             output = []
-            outputstring += '\n  {0}  {1}  {2}\n'.format(self.mesh_x,
+            outputstr += '\n  {0}  {1}  {2}\n'.format(self.mesh_x,
                                                          self.mesh_y,
                                                          self.mesh_z)
             for array in tools.each_slice(tmp, 5):
                 output.append(''.join('  {0:18.11E}'.format(i)
                                       for i in array if i is not None))
-            outputstring += '\n'.join(output)
-        return outputstring + '\n'
+            outputstr += '\n'.join(output)
+        return outputstr + '\n'
 
     def save(self, filename):
         '''.. py:method:: save(filename)

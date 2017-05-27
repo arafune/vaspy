@@ -174,8 +174,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         arg: str
             POSCAR file name, or list of POSCAR text.
         '''
-        super(POSCAR, self).__init__()
-        super(POSCAR_HEAD, self).__init__()
+        super().__init__()
+        POSCAR_POS.__init__(self)
         if isinstance(arg, str):
             poscar = open(arg).readlines()
             self.load_from_array(poscar)

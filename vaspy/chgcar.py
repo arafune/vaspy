@@ -61,6 +61,7 @@ class CHGCAR(mesh3d.VASPGrid):
 
     def __init__(self, chgcar_file=None):
         super(CHGCAR, self).__init__(None)
+#        super().__init__()        
         self.spininfo = 0
         if chgcar_file:
             self.load_from_file(chgcar_file)
