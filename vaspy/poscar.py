@@ -418,7 +418,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         ----------
 
         site_list:
-            list array of site for rotation (The first atom is "1".).
+            list array of site for rotation.
         axis_name:
             "X", "x", "Y", "y", "Z",or "z".  Rotation axis.
         theta_deg: float
@@ -715,7 +715,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         '''
         molecule = [self.positions[j] for j in site_list]
         for index, site in enumerate(site_list):
-            target_atom = self.posisiont[site]
+            target_atom = self.positions[site]
             atoms27 = self.make27candidate(target_atom)
 
             def func(pos, center):
