@@ -722,6 +722,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         option is highly recommended to form a molecule.
         '''
         molecule = [self.positions[j] for j in site_list]
+        newposes = []
         for index, site in enumerate(site_list):
             target_atom = self.positions[site]
             atoms27 = self.make27candidate(target_atom)
@@ -744,25 +745,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                         s += np.linalg.norm(vectors[0] - vectors[1])
                     return s
             newpos = min(atoms27, key=(lambda x: func(x, center)))
-            molecule[index] = newpos
-        return molecule
-
-    def guess_molecule2(self, site_list):
-        '''.. py:method::guess_molecule2(site_lsit)
-
-        Arranges atom positions to form a molecule.
-
-        poscar updates
-
-        Parameters
-        -----------
-
-        site_list: list
-            list of site number
-        '''
-        molecule = self.guess_molecule(site_list)
-        for site, pos_vector in zip(site_list, molecule):
-            self.positions[site] = pos_vector
+            newposes.append(newpos)
+        for site, pos in zip(site_list, newposes):
+            self.positions[site] = pos
 
     def translate(self, vector, atomlist):
         '''.. py:method:: translate(vector, atomlist)
