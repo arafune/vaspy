@@ -39,6 +39,7 @@ The below is an example of POSCAR file::
 '''
 
 from __future__ import division, print_function  # Version safety
+import bz2
 import itertools as it
 import copy
 import re
@@ -177,7 +178,14 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         super().__init__()
         POSCAR_POS.__init__(self)
         if isinstance(arg, str):
-            poscar = open(arg).readlines()
+            if os.path.splitext(arg)[1] == '.bz2':
+                try:
+                    thefile = bz2.open(arg, mode='rt')
+                except AttributeError:
+                    thefile = bz2.BZ2File(arg, modr='r')
+            else:
+                thefile = open(arg)
+            poscar = thefile.readlines()
             self.load_from_array(poscar)
         if isinstance(arg, (list, tuple)):
             self.load_from_array(arg)
