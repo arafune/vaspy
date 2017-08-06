@@ -213,7 +213,56 @@ class EnergyBand(object):
                 output += '\n'
         return output
 
-    def showband(self, yrange=None, spin=None):  # How to set default value?
+    def figure(self, color='blue', spin=None):
+        '''.. py:method:: figure()
+
+        Return Axes object of the energy band.  
+        
+
+        Parameters
+        ----------
+
+        color: str
+            color of the band line
+
+        spin: str
+            up or down
+        
+        Returns
+        --------
+        matplotlib.pyplot.Axes
+
+        Example
+        -------
+
+        Here is the typical code::
+
+           fig = plt.figure()
+           ax = band.figure(color='blue')
+           ax.set_ylabel('Energy  ( eV )')
+           ax.set_ylim(-5, 5)
+           ax.set_xlim(0, 4)
+           plt.show()
+
+'''
+        energies = np.swapaxes(self.energies, 1, 0)
+        draws = []
+        if (self.spininfo == 2 or len(self.spininfo) == 2):
+            if spin == 'down':
+                for bi in range(0, self.nbands):
+                    draws.append(plt.plot(self.kdistances, energies[bi].T[1],
+                                    color=color))
+            else:
+                for bi in range(0, self.nbands):
+                    draws.append(plt.plot(self.kdistances, energies[bi].T[0],
+                                   color=color))
+        else:
+            for bi in range(0, self.nbands):
+                draws.append(plt.plot(self.kdistances, energies[bi],
+                                color=color))
+        return plt.gca()
+
+    def show(self, yrange=None, spin=None):  # How to set default value?
         '''.. py:method:: showband(yrange)
 
         Draw band structure by using maptlotlib.
