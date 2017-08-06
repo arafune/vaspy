@@ -58,7 +58,7 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
 
         k-point    1 :    0.00000 0.00000 0.00000 weight = 0.02000000
 
-        .. Notes::  That the first character must be "blank".
+        .. Note::  That the first character must be "blank".
 
     4. Band character
 
@@ -289,7 +289,7 @@ class Projection(object):
         axis: str
              quantization axis for SOI calculation. 'x', 'y' or 'z'.
 
-        Notes
+        Note
         ------
 
         site index starts '1' not 0.
@@ -357,7 +357,7 @@ class BandWithProjection(object):
 
     :class variables: kvectors, energies, states, spin, orb_names
 
-    Notes
+    Note
     -------
 
     Band, Orbital, State classes can be removed ?
@@ -453,7 +453,7 @@ class BandWithProjection(object):
     def phases(self):
         '''Phase data
 
-        Notes
+        Note
         ------
 
         At present I have no idea about this parameter. How to use it?

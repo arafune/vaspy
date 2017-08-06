@@ -252,7 +252,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             Axis used for sort (Default Z)
 
 
-        Notes
+        Note
         -----
 
         The first site # is "0". It's the pythonic way.
@@ -711,7 +711,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         numpy.ndarray
             Array of Vector that represents "molecule".
 
-        Notes
+        Note
         -----
         When the optional argument, center, is set, the atoms are
         re-arranged as to minimize the distance from this center.
@@ -763,7 +763,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
              list of the atom to be moved
 
 
-        Notes
+        Note
         ------
 
         the first atom is "1", not "0".

@@ -152,7 +152,7 @@ class OUTCAR(object):  # Version safety
 
         Return the posforce corresponding the posforce_flag
 
-        Notes
+        Note
         -------
         posforce_flag: An 6-element True/False list that indicates \
                   the output (ex.) [True, True, False, True, True, False]

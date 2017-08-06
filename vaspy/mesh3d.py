@@ -167,7 +167,7 @@ class VASPGrid(poscar.POSCAR):
         VASPGrid
             Rusultant by summing two grid value
 
-        Notes
+        Note
         ----------
 
         The Grid data is summed by this method, of course. And the
@@ -199,7 +199,7 @@ class VASPGrid(poscar.POSCAR):
         VASPGrid
             Resultant by difference between two objects.
 
-        Notes
+        Note
         --------
 
         The resultant grid data is the difference between two objects,

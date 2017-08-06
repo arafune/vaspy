@@ -53,7 +53,7 @@ class CHGCAR(mesh3d.VASPGrid):
 
     spininfo
 
-    Notes
+    Note
     -----
 
     the current verstion ignores "augmentation occupacies".
