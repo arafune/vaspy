@@ -653,7 +653,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
         new_scaling_factor: float
 
-        Notes
+        Note
         -----
 
         **The Braves lattice are corrected (to be equal size)**
@@ -766,7 +766,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         Note
         ------
 
-        the first atom is "1", not "0".
+        the first atom is "0", to follow the pythonic way.
 
         Returns
         --------
@@ -777,13 +777,13 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if self.is_cartesian():
             vector = _vectorize(vector)
             for i in atomlist:
-                self.positions[i - 1] = (self.positions[i - 1] +
+                self.positions[i] = (self.positions[i] +
                                          vector / self.scaling_factor)
         else:
             vector = _vectorize(vector)
             self.to_cartesian()
             for i in atomlist:
-                self.positions[i - 1] = (self.positions[i - 1] +
+                self.positions[i] = (self.positions[i] +
                                          vector / self.scaling_factor)
             self.to_direct()
         return self.positions
