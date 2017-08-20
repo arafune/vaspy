@@ -4,10 +4,9 @@ Module for WAVECAR class
 '''
 
 from __future__ import division, print_function  # Version safety
-import os
-import re
 import numpy as np
 import vaspy.const as const
+
 
 class WAVECAR(object):
     '''.. py:class:: WAVECAR(WAVECAR_file)
@@ -85,7 +84,7 @@ class WAVECAR(object):
         cutof = np.ceil(
             np.sqrt(self.encut / const.RytoeV) / (2*np.pi / (
                 unit_cell_vector_magnitude / const.au_to_A)))
-        self.ngrid = np.array(2 * cutof + 1 , dtype=int)
+        self.ngrid = np.array(2 * cutof + 1, dtype=int)
         #         self.ngrid = np.array(cutof, dtype=int) でよい？
 
     def readband(self):
@@ -122,13 +121,18 @@ class WAVECAR(object):
             self.kpath = None
         return self.kpath, self.bands
 
-    def gvectors(self, k_i, gamma=False):
+    def gvectors(self, k_i=0):
         '''
         G-vectors :math:`G` is determined by the following condition:
             :math:`(G+k)^2 / 2 < E_{cut}`
+
+        Returns
+        ---------
+        numpy.ndarray
+           G vectors
         '''
 
-        kvec=self.kvecs[k_i]
+        kvec = self.kvecs[k_i]
         fx = [ii if ii < self.ngrid[0] / 2 + 1
               else ii - self.ngrid[0]
               for ii in range(self.ngrid[0])]
@@ -145,17 +149,63 @@ class WAVECAR(object):
         energy_k = const.HSQDTM * np.linalg.norm(
             np.dot(kgrid + kvec[np.newaxis, :], 2*np.pi*self.rcpcell),
             axis=1)**2
-        g_vec = kgrid[np.whare(energy_k < self.encut)[0]]
+        g_vec = kgrid[np.where(energy_k < self.encut)[0]]
         return np.asarray(g_vec, dtype=int)
+
+    def bandcoeff(self, spin_i=0, k_i=0, band_i=0, norm=False):
+        '''Read the coefficient of the planewave of the KS
+        states specified by the `spin_i`, `k_i` and `band_i`
+
+        Parameters
+        ----------
+        spin_i: int
+           spin index (0 or 1)
+        k_i: int
+           k index. Starts with 0
+        band_i: int
+            band index. starts with 0
+        norm: Boolean
+            If true the Band coeffients are normliazed
+        '''
+        pos = 2 + spin_i * self.nkpts * (self.nbands + 1)
+        pos += k_i * (self.nbands + 1) + band_i + 1
+        self.wfc.seek(pos * self.recl)
+        nplw = self.nplws[k_i]
+        dump = np.fromfile(self.wfc, dtype=self.wfprec, count=nplw)
+        cg = np.array(dump, dtype=np.complex128)
+        if norm:
+            cg /= np.linalg.norm(cg)
+        return cg
+
+    def realspace_wfc(self, spin_i=0, k_i=0, band_i=0,
+                      gvec=None, ngrid=None, norm=False):
+        '''.. py:method:: realspace_wfc(spin_i, k_i, band_i,
+                                        gvec, ngrid, norm)
+        Calculate the pseudo-wavefunction of the KS states in
+        the real space by using FFT transformation of the reciprocal
+        space planewave coefficients.
+
+        The 3D FE grid size is detemined by ngrid, which defaults
+        to self.ngrid if it is not provided.  GVectors of the KS
+        states is used to put 1D plane wave coefficient back to 3D
+        grid.
+        '''
+        if ngrid is None:
+            ngrid = self.ngrid.copy()
+        else:
+            ngrid = np.array(ngrid, dtype=int)
 
     def __str__(self):
         ''' .. py:method:: __str__()
         Print out the system parameters
         '''
-        string = "record length  =       {0}  spins =           {1}  prec flag        {2}".format(self.recl, self.nspin, self.rtag)
+        the1stline = "record length  =       {0}  "
+        the1stline += "spins =           {1}  "
+        the1stline += "prec flag        {2}"
+        string = the1stline.format(self.recl, self.nspin, self.rtag)
         string += "\nno. k points =          {0}".format(self.nkpts)
         string += "\nno. bands =          {0}".format(self.nbands)
-        string +="\nreal space lattice vectors:"
+        string += "\nreal space lattice vectors:"
         for i in range(3):
             string += "\na"+str(i+1)
             string += " = {0}    {1}    {2}".format(self.realcell[i][0],
