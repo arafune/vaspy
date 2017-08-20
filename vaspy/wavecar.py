@@ -28,6 +28,8 @@ class WAVECAR(object):
         Number of spins
     rtag: numpy.int
         Tag for precsion in WAVECAR
+    nplws: numpy.int
+        Number of plane waves
     nkpts: numpy.int
         Number of k-points
     nbands: numpy.int
@@ -95,20 +97,20 @@ class WAVECAR(object):
                               dtype=float)
         self.occs = np.zeros((self.nspin, self.nkpts, self.nbands),
                              dtype=float)
-        for i_spin in range(self.nspin):
+        for spin_i in range(self.nspin):
             for k_i in range(self.nkpts):
-                pos = 2 + i_spin * self.nkpts * (self.nbands + 1)
+                pos = 2 + spin_i * self.nkpts * (self.nbands + 1)
                 pos += k_i * (self.nbands + 1) + 1 - 1
                 # the last '1' corresponds iband=1
                 self.wfc.seek(pos * self.recl)
                 dump = np.fromfile(self.wfc, dtype=np.float,
                                    count=4+3*self.nbands)
-                if i_spin == 0:
+                if spin_i == 0:
                     self.nplws[k_i] = int(dump[0])
                     self.kvecs[k_i] = dump[1:4]
                 dump = dump[4:].reshape((-1, 3))
-                self.bands[i_spin, k_i, :] = dump[:, 0]
-                self.occs[i_spin, k_i, :] = dump[:, 2]
+                self.bands[spin_i, k_i, :] = dump[:, 0]
+                self.occs[spin_i, k_i, :] = dump[:, 2]
         self.kpath = np.concatenate(([0, ],
                                      np.cumsum(
                                          np.linalg.norm(
@@ -119,6 +121,32 @@ class WAVECAR(object):
         if self.nkpts == 1:
             self.kpath = None
         return self.kpath, self.bands
+
+    def gvectors(self, k_i, gamma=False):
+        '''
+        G-vectors :math:`G` is determined by the following condition:
+            :math:`(G+k)^2 / 2 < E_{cut}`
+        '''
+
+        kvec=self.kvecs[k_i]
+        fx = [ii if ii < self.ngrid[0] / 2 + 1
+              else ii - self.ngrid[0]
+              for ii in range(self.ngrid[0])]
+        fy = [ii if ii < self.ngrid[1] / 2 + 1
+              else ii - self.ngrid[1]
+              for ii in range(self.ngrid[1])]
+        fz = [ii if ii < self.ngrid[2] / 2 + 1
+              else ii - self.ngrid[2]
+              for ii in range(self.ngrid[2])]
+        kgrid = np.array([(fx[ix], fy[iy], fz[iz])
+                          for iz in range(self.ngrid[2])
+                          for iy in range(self.ngrid[1])
+                          for ix in range(self.ngrid[0])], dtype=float)
+        energy_k = const.HSQDTM * np.linalg.norm(
+            np.dot(kgrid + kvec[np.newaxis, :], 2*np.pi*self.rcpcell),
+            axis=1)**2
+        g_vec = kgrid[np.whare(energy_k < self.encut)[0]]
+        return np.asarray(g_vec, dtype=int)
 
     def __str__(self):
         ''' .. py:method:: __str__()
