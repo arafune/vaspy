@@ -96,7 +96,7 @@ class WAVECAR(object):
         '''
         string = "record length  =       {0}  spins =           {1}  prec flag        {2}".format(self.recl, self.nspin, self.rtag)
         string += "\nno. k points =          {0}".format(self.nkpts)
-        string += "\nno. bands =          {0}".format(self.encut)
+        string += "\nno. bands =          {0}".format(self.nbands)
         string +="\nreal space lattice vectors:"
         for i in range(3):
             string += "\na"+str(i+1)
