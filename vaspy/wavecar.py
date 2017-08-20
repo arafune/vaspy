@@ -80,10 +80,36 @@ class WAVECAR(object):
         self.nbands = int(dump[1])
         self.encut = dump[2]
         self.realcell = dump[3:].reshape((3,3))
+        self.volume = np.linalg.det(self.realcell)
         self.rcpcell = np.linalg.inv(self.realcell).T
                            
 
     def readband(self):
-        '''.. py:method:: readBand()
+        '''.. py:method:: readband()
 '''
         pass
+
+
+    def __str__(self):
+        ''' .. py:method:: __str__()
+        Print out the system parameters
+        '''
+        string = "record length  =       {0}  spins =           {1}  prec flag        {2}".format(self.recl, self.nspin, self.rtag)
+        string += "\nno. k points =          {0}".format(self.nkpts)
+        string += "\nno. bands =          {0}".format(self.encut)
+        string +="\nreal space lattice vectors:"
+        for i in range(3):
+            string += "\na"+str(i+1)
+            string += " = {0}    {1}    {2}".format(self.realcell[i][0],
+                                                    self.realcell[i][1],
+                                                    self.realcell[i][2])
+        string += "\n\n"
+        string += "\nvolume unit cell =   {0}".format(self.volume)
+        string += "\nReciprocal lattice vectors:"
+        for i in range(3):
+            string += "\nb" + str(i+1)
+            string += " = {0}    {1}    {2}".format(self.rcpcell[i][0],
+                                                    self.rcpcell[i][1],
+                                                    self.rcpcell[i][2])
+        # string +="\nreciprocal lattice vector magnitudes:"
+        return string
