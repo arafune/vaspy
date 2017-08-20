@@ -7,7 +7,7 @@ from __future__ import division, print_function  # Version safety
 import os
 import re
 import numpy as np
-
+import vaspy.const as const
 
 class WAVECAR(object):
     '''.. py:class:: WAVECAR(WAVECAR_file)
@@ -22,8 +22,6 @@ class WAVECAR(object):
 
     Attributes
     ------------
-    
-
     recl: numpy.int
         Record length
     nspin: numpy.int
@@ -40,19 +38,18 @@ class WAVECAR(object):
         Vectors for the unit cell in real space
     rcpcell: numpy.array
         Vectors for the unit cell in reciprocal space
-        
     '''
 
     def __init__(self, filename='WAVECAR'):
         '''initialization of WAVECAR class'''
-        self.filename =filename
+        self.filename = filename
         self.wfc = open(self.filename, 'rb')
         #
         # read the basic information
         self.readheader()
         # read the band information
         self.readband()
-        self.wfc.close()
+#        self.wfc.close()
 
     def readheader(self):
         '''.. py:method:: readheader()
@@ -72,23 +69,56 @@ class WAVECAR(object):
         elif self.rtag == 45210:
             self.wfprec = np.complex128
         else:
-            raise ValueError('Invalid TAG value: {}'.format(self.rtag)) 
+            raise ValueError('Invalid TAG value: {}'.format(self.rtag))
         self.wfc.seek(self.recl)
         dump = np.fromfile(self.wfc, dtype=np.float, count=12)
 
         self.nkpts = int(dump[0])
         self.nbands = int(dump[1])
         self.encut = dump[2]
-        self.realcell = dump[3:].reshape((3,3))
+        self.realcell = dump[3:].reshape((3, 3))
         self.volume = np.linalg.det(self.realcell)
         self.rcpcell = np.linalg.inv(self.realcell).T
-                           
+        unit_cell_vector_magnitude = np.linalg.norm(self.realcell, axis=1)
+        cutof = np.ceil(
+            np.sqrt(self.encut / const.RytoeV) / (2*np.pi / (
+                unit_cell_vector_magnitude / const.au_to_A)))
+        self.ngrid = np.array(2 * cutof + 1 , dtype=int)
+        #         self.ngrid = np.array(cutof, dtype=int) でよい？
 
     def readband(self):
         '''.. py:method:: readband()
-'''
-        pass
-
+        '''
+        self.nplws = np.zeros(self.nkpts, dtype=int)
+        self.kvecs = np.zeros((self.nkpts, 3), dtype=float)
+        self.bands = np.zeros((self.nspin, self.nkpts, self.nbands),
+                              dtype=float)
+        self.occs = np.zeros((self.nspin, self.nkpts, self.nbands),
+                             dtype=float)
+        for i_spin in range(self.nspin):
+            for k_i in range(self.nkpts):
+                pos = 2 + i_spin * self.nkpts * (self.nbands + 1)
+                pos += k_i * (self.nbands + 1) + 1 - 1
+                # the last '1' corresponds iband=1
+                self.wfc.seek(pos * self.recl)
+                dump = np.fromfile(self.wfc, dtype=np.float,
+                                   count=4+3*self.nbands)
+                if i_spin == 0:
+                    self.nplws[k_i] = int(dump[0])
+                    self.kvecs[k_i] = dump[1:4]
+                dump = dump[4:].reshape((-1, 3))
+                self.bands[i_spin, k_i, :] = dump[:, 0]
+                self.occs[i_spin, k_i, :] = dump[:, 2]
+        self.kpath = np.concatenate(([0, ],
+                                     np.cumsum(
+                                         np.linalg.norm(
+                                             np.dot(
+                                                 np.diff(self.kvecs, axis=0),
+                                                 self.rcpcell),
+                                             axis=1))))
+        if self.nkpts == 1:
+            self.kpath = None
+        return self.kpath, self.bands
 
     def __str__(self):
         ''' .. py:method:: __str__()

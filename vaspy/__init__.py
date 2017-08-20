@@ -40,7 +40,7 @@ def load(filename, mode=None):
     the file mode mainly from its name
         * mode is poscar, outcar, chgcar, procar (case insensitive)
     '''
-    from . import poscar, outcar, chgcar, doscar, locpot, procar, eigenval
+    from . import poscar, outcar, chgcar, doscar, locpot, procar, eigenval, wavecar
     filenamebase = os.path.basename(filename).lower()
     if isinstance(mode, str):
         mode = mode.lower()
