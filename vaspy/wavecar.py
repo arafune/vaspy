@@ -6,7 +6,7 @@ Module for WAVECAR class
 from __future__ import division, print_function  # Version safety
 import numpy as np
 import vaspy.const as const
-
+from scipy.fftpack import ifftn
 
 class WAVECAR(object):
     '''.. py:class:: WAVECAR(WAVECAR_file)
@@ -194,7 +194,16 @@ class WAVECAR(object):
             ngrid = self.ngrid.copy()
         else:
             ngrid = np.array(ngrid, dtype=int)
-
+        if gvec is None:
+            gvec = self.gvectors(k_i)
+        phi_k = np.zeros(ngrid, dtype= np.complex128)
+        gvec %= ngrid[np.newaxis, :]
+        phi_k[gvec[:, 0], gvec[:, 1], gvec[:, 2]] = self.bandcoeff(spin_i,
+                                                                   k_i,
+                                                                   band_i,
+                                                                   norm)
+        return ifftn(phi_k)
+            
     def __str__(self):
         ''' .. py:method:: __str__()
         Print out the system parameters
