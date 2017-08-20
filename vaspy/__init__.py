@@ -14,6 +14,7 @@ __all__ = ['chgcar',
            'procar',
            'locpot',
            'eigenval',
+           'wavecar',
            'tools',
            ]
 from vaspy import *
@@ -44,21 +45,22 @@ def load(filename, mode=None):
     if isinstance(mode, str):
         mode = mode.lower()
     if re.search(r'poscar|contcar', filenamebase) or mode == 'poscar':
-        output = poscar.POSCAR(filename)
+        return poscar.POSCAR(filename)
     elif re.search(r'outcar', filenamebase) or mode == 'outcar':
-        output = outcar.OUTCAR(filename)
+        return outcar.OUTCAR(filename)
     elif re.search(r'chgcar|parchg', filenamebase) or mode == 'chgcar':
-        output = chgcar.CHGCAR(filename)
+        return chgcar.CHGCAR(filename)
     elif re.search(r'procar', filenamebase) or mode == 'procar':
-        output = procar.PROCAR(filename)
+        return procar.PROCAR(filename)
     elif re.search(r'locpot', filenamebase) or mode == 'locpot':
-        output = locpot.LOCPOT(filename)
+        return locpot.LOCPOT(filename)
     elif re.search(r'doscar', filenamebase) or mode == 'doscar':
-        output = doscar.DOSCAR(filename)
+        return doscar.DOSCAR(filename)
     elif re.search(r'vasp', filenamebase):
-        output = poscar.POSCAR(filename)
+        return poscar.POSCAR(filename)
     elif re.search(r'eigenval', filenamebase) or mode == 'eigenval':
-        output = eigenval.EIGENVAL(filename)
+        return eigenval.EIGENVAL(filename)
+    elif re.search(r'wavecar', filenamebase) or mode == 'wavecar':
+        return wavecar.WAVECAR(filename)
     else:
         raise RuntimeError("The loding mode cannot be identified!  Set 'mode'")
-    return output
