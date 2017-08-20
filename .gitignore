@@ -6,3 +6,8 @@ testPOSCAR
 dist
 MANIFEST
 build
+vaspwfc.py
+a.out
+GCOEFF.txt
+WAVECAR
+Results.txt
