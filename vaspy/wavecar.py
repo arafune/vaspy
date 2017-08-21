@@ -39,6 +39,12 @@ class WAVECAR(object):
         Vectors for the unit cell in real space
     rcpcell: numpy.array
         Vectors for the unit cell in reciprocal space
+    kvecs: numpy.array
+        kvector
+    bands: numpy.array
+        Energy
+    occs: numpy.array
+        Occupation
     '''
 
     def __init__(self, filename='WAVECAR'):
@@ -50,7 +56,6 @@ class WAVECAR(object):
         self.readheader()
         # read the band information
         self.readband()
-#        self.wfc.close()
 
     def readheader(self):
         '''.. py:method:: readheader()
@@ -89,6 +94,16 @@ class WAVECAR(object):
 
     def readband(self):
         '''.. py:method:: readband()
+        
+        Read the information about the band from WAVECAR file
+
+        The infomation obtained by this method is as follows:
+
+        * Number of plane waves (nplws)
+        * A integer set for k-vectors
+        * energy of the band (as a function of spin-, k-, and band index)
+        * occupation  (as a function of spin-, k-, and band index)  
+        
         '''
         self.nplws = np.zeros(self.nkpts, dtype=int)
         self.kvecs = np.zeros((self.nkpts, 3), dtype=float)
@@ -164,7 +179,7 @@ class WAVECAR(object):
            k index. Starts with 0
         band_i: int
             band index. starts with 0
-        norm: Boolean
+        norm: bool
             If true the Band coeffients are normliazed
         '''
         pos = 2 + spin_i * self.nkpts * (self.nbands + 1)
@@ -179,8 +194,8 @@ class WAVECAR(object):
 
     def realspace_wfc(self, spin_i=0, k_i=0, band_i=0,
                       gvec=None, ngrid=None, norm=False):
-        '''.. py:method:: realspace_wfc(spin_i, k_i, band_i,
-                                        gvec, ngrid, norm)
+        '''.. py:method:: realspace_wfc(spin_i, k_i, band_i, gvec, ngrid, norm)
+
         Calculate the pseudo-wavefunction of the KS states in
         the real space by using FFT transformation of the reciprocal
         space planewave coefficients.
