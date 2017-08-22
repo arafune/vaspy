@@ -8,6 +8,7 @@ import numpy as np
 import vaspy.const as const
 from scipy.fftpack import ifftn
 
+
 class WAVECAR(object):
     '''.. py:class:: WAVECAR(WAVECAR_file)
 
@@ -50,7 +51,6 @@ class WAVECAR(object):
         self.readheader()
         # read the band information
         self.readband()
-#        self.wfc.close()
 
     def readheader(self):
         '''.. py:method:: readheader()
@@ -126,6 +126,11 @@ class WAVECAR(object):
         G-vectors :math:`G` is determined by the following condition:
             :math:`(G+k)^2 / 2 < E_{cut}`
 
+        Parameters
+        ------------
+        k_i: int
+           k index
+
         Returns
         ---------
         numpy.ndarray
@@ -189,6 +194,21 @@ class WAVECAR(object):
         to self.ngrid if it is not provided.  GVectors of the KS
         states is used to put 1D plane wave coefficient back to 3D
         grid.
+
+        Parameters
+        ----------
+        spin_i: int
+           spin index (0 or 1)
+        k_i: int
+           k index. Starts with 0
+        band_i: int
+            band index. starts with 0
+        norm: Boolean
+            If true the Band coeffients are normliazed
+        gvec: numpy.array
+            G-vector for calculation
+        ngrid: numpy.array
+            Ngrid for calculation
         '''
         if ngrid is None:
             ngrid = self.ngrid.copy()
@@ -196,14 +216,16 @@ class WAVECAR(object):
             ngrid = np.array(ngrid, dtype=int)
         if gvec is None:
             gvec = self.gvectors(k_i)
-        phi_k = np.zeros(ngrid, dtype= np.complex128)
+        phi_k = np.zeros(ngrid, dtype=np.complex128)
         gvec %= ngrid[np.newaxis, :]
-        phi_k[gvec[:, 0], gvec[:, 1], gvec[:, 2]] = self.bandcoeff(spin_i,
-                                                                   k_i,
-                                                                   band_i,
-                                                                   norm)
+        phi_k[gvec[:, 0],
+              gvec[:, 1],
+              gvec[:, 2]] = self.bandcoeff(spin_i,
+                                           k_i,
+                                           band_i,
+                                           norm)
         return ifftn(phi_k)
-            
+
     def __str__(self):
         ''' .. py:method:: __str__()
         Print out the system parameters
