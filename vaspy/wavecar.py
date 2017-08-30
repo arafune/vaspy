@@ -95,7 +95,7 @@ class WAVECAR(object):
 
     def readband(self):
         '''.. py:method:: readband()
-        
+
         Read the information about the band from WAVECAR file
 
         The infomation obtained by this method is as follows:
@@ -103,8 +103,8 @@ class WAVECAR(object):
         * Number of plane waves (nplws)
         * A integer set for k-vectors
         * energy of the band (as a function of spin-, k-, and band index)
-        * occupation  (as a function of spin-, k-, and band index)  
-        
+        * occupation  (as a function of spin-, k-, and band index)
+
         '''
         self.nplws = np.zeros(self.nkpts, dtype=int)
         self.kvecs = np.zeros((self.nkpts, 3), dtype=float)
@@ -216,15 +216,15 @@ class WAVECAR(object):
         spin_i: int
            spin index (0 or 1)
         k_i: int
-           k index. Starts with 0
+           k index. Starts with 0. default is 0
         band_i: int
-            band index. starts with 0
-        norm: Boolean
+            band index. starts with 0. default is 0.
+        norm: bool
             If true the Band coeffients are normliazed
         gvec: numpy.array
-            G-vector for calculation
+            G-vector for calculation. If not set, use gvectors(k_i)
         ngrid: numpy.array
-            Ngrid for calculation
+            Ngrid for calculation. If not set, use self.ngrid.
         '''
         if ngrid is None:
             ngrid = self.ngrid.copy()

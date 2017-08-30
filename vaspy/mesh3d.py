@@ -135,8 +135,6 @@ class VASPGrid(poscar.POSCAR):
                                     for elem in sublist], dtype=np.float64)
             self.n_frame = divmod(len(self.mesh3d),
                                   self.mesh_x * self.mesh_y * self.mesh_z)[0]
-#            self.mesh3d = self.mesh3d.reshape(self.mesh3d.shape[0] *
-#                                              self.mesh3d.shape[1])
 
     def get_mesh(self):
         '''.. py:method:: get_mesh()

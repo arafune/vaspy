@@ -57,6 +57,7 @@ import numpy as np
 
 class POSCAR_HEAD(object):
     '''.. py:class:: POSCAR_HEAD()
+
     One of the parent classes of POSCAR class
 '''
     def __init__(self):
