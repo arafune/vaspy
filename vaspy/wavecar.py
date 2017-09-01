@@ -174,7 +174,9 @@ class WAVECAR(object):
         return np.asarray(g_vec, dtype=int)
 
     def bandcoeff(self, spin_i=0, k_i=0, band_i=0, norm=False):
-        '''Read the coefficient of the planewave of the KS
+        ''' .. py:method:: bandcoeff(spin_i, k_i, band_i, norm)
+
+        Read the coefficient of the planewave of the KS
         states specified by the `spin_i`, `k_i` and `band_i`
 
         Parameters
@@ -212,7 +214,7 @@ class WAVECAR(object):
         grid.
 
         Parameters
-        ----------
+        -----------
         spin_i: int
            spin index (0 or 1)
         k_i: int
@@ -242,8 +244,17 @@ class WAVECAR(object):
                                            norm)
         return ifftn(phi_k)
 
+    def chgcarformat(self, poscar):
+        ''' .. py:method:: chgcarformat(poscar)
+
+        
+'''
+        pass
+
+
     def __str__(self):
         ''' .. py:method:: __str__()
+
         Print out the system parameters
         '''
         the1stline = "record length  =       {0}  "

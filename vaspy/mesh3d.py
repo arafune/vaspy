@@ -438,7 +438,7 @@ class FFTGRID(object):
             self.mesh_x = meshsize(0)
             self.mesy_y = meshsize(1)
             self.mesh_z = meshsize(2)
-            self.meshdata = np.array(meshdata)
+            self.meshdata = np.asarray(meshdata)
         else:
             raise RuntimeError
 
