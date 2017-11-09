@@ -816,7 +816,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         vector: list, numpy.array
              translational vector
         '''
-        atomrange = list(range(1, sum(self.ionnums) + 1))
+        atomrange = list(range(sum(self.ionnums)))
         self.translate(vector, atomrange)
 
     def save(self, filename):
