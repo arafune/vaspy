@@ -83,6 +83,7 @@ class OUTCAR(object):  # Version safety
         # local variables
         section = []
         posforce = []
+        magnetization = []
         # parse
         if os.path.splitext(arg)[1] == '.bz2':
             try:
