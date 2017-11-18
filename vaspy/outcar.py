@@ -30,6 +30,8 @@ class OUTCAR(object):  # Version safety
         self.nkpts = 0
         self.nkdim = 0
         self.nbands = 0
+        self.magnetization = []
+        self.tot_chage = []
         if arg is not None:
             self.load_from_file(arg)
 
@@ -99,6 +101,19 @@ class OUTCAR(object):  # Version safety
                     section.pop()
                 else:
                     posforce.append([float(x) for x in line.split()])
+            elif section == ["magnetization"]:
+                if "---------------------------------" in line:
+                    pass
+                elif "# of ion" in line:
+                    pass
+                elif "tot    " in line:
+                    self.magnetization.append(magnetization)
+                    section.pop()
+                elif len(line) == 2:
+                    pass
+                else:
+                    magnetization.append([
+                        float(x) for x in line.split()[1:4]])
             else:
                 if "number of dos" in line:
                     self.nions = int(line.split()[-1])
@@ -118,6 +133,9 @@ class OUTCAR(object):  # Version safety
                     self.recvec = [[float(i) for i in
                                     next(thefile).strip().split()[3:]]
                                    for i in range(3)]
+                elif " magnetization (x)" in line:
+                    magnetization = []
+                    section.append("magnetization")
                 else:
                     pass
         self.atom_identifer = [name + ":#" + str(index + 1)
