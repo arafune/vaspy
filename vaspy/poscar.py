@@ -85,7 +85,7 @@ class POSCAR_HEAD(object):
 
     @property
     def atom_identifer(self):
-        '''Return list style of "atom_identifer" (e.g.  "#1:Ag1")'''
+        '''Return list style of "atom_identifer" (e.g.  "#0:Ag1")'''
         # self.__atom_identifer = []
         # ii = 1
         # for elm, n in zip(self.iontypes, self.ionnums):
@@ -97,24 +97,25 @@ class POSCAR_HEAD(object):
         atomnames = []
         for elm, ionnums in zip(self.iontypes, self.ionnums):
             for j in range(1, ionnums + 1):
-                tmp = elm + str(j)
-                if tmp not in atomnames:
-                    atomnames.append(tmp)
+                elem_num  = elm + str(j)
+                if elem_num not in atomnames:
+                    atomnames.append(elem_num)
                 else:
-                    while tmp in atomnames:
+                    while elem_num in atomnames:
                         j = j + 1
-                        tmp = elm + str(j)
+                        elem_num = elm + str(j)
                     else:
-                        atomnames.append(tmp)
+                        atomnames.append(elem_num)
         self.__atom_identifer = [
             "#" + str(s) + ":" + a for s, a in
-            zip(range(1, len(atomnames) + 1), atomnames)]
+            zip(range(0, len(atomnames) ), atomnames)]
         return self.__atom_identifer
 
     @atom_identifer.setter
     def atom_identifer(self, value):
         self.__atom_identifer = value
 
+    
 
 class POSCAR_POS(object):
     '''.. py:class:: POSCAR_POS()
@@ -553,7 +554,6 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         dest_poscar.ionnums.extend(other.ionnums)
         dest_poscar.positions.extend(other.positions)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
-#        dest_poscar.atom_identifer
         if original_is_direct:
             dest_poscar.to_direct()
         return dest_poscar
