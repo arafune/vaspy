@@ -18,5 +18,4 @@ class TestPOSCAR_Head(object):
     @with_setup(setup=setup)
     def test_poscar_head(self):
         eq_('testPOSCAR', self.poscar_head.system_name)
-        eq_('#1:Ag1', self.poscar_head.atom_identifer[0])
-        
+        eq_('#0:Ag1', self.poscar_head.atom_identifer[0])
