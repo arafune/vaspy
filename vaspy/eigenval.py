@@ -76,7 +76,7 @@ class EIGENVAL(object):
             _, self.numk, self.n_bands = [int(i) for i in
                                           next(thefile).strip().split()]
             for ki in range(self.numk):
-                # the first line in the sigleset begin with the blank line
+                # the first line in the sigleset begins with the blank
                 next(thefile)
                 self.kvectors.append(np.array(
                     [float(i) for i in next(thefile).strip().split()[0:3]]))
@@ -113,9 +113,9 @@ class EIGENVAL(object):
         EnergyBand
 '''
         recvecarray = np.array(recvec).T
-        physical_kvector = [recvecarray.dot(kvector) for kvector in
+        kvector_physical = [recvecarray.dot(kvector) for kvector in
                             self.kvectors[0:self.numk]]
-        return EnergyBand(physical_kvector, self.energies, self.spininfo)
+        return EnergyBand(kvector_physical, self.energies, self.spininfo)
 
     def __str__(self):
         '''..py:method:: __str__()
@@ -145,9 +145,9 @@ class EnergyBand(object):
     energies: numpy.ndarray
          1D array data of energies
     spininfo: int, tuple
-         Spin type.  1 or ("",) means No-spin.  2 or ('_up', '_down')
-         means collinear spin, 4 or ('_mT', '_mX', '_mY', '_mZ') means
-         collinear spin. This class does not distinguish  non-collinear spin
+         Spin type.  1 or ("",) mean No-spin.  2 or ('_up', '_down')
+         mean collinear spin, 4 or ('_mT', '_mX', '_mY', '_mZ') mean
+         collinear spin. This class does not distinguish non-collinear spin
          and No-spin.
 '''
 
@@ -235,7 +235,7 @@ class EnergyBand(object):
         Example
         -------
 
-        Here is the typical code::
+        Here is a typical code::
 
            fig = plt.figure()
            ax = band.figure(color='blue')
