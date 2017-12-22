@@ -95,7 +95,7 @@ class EIGENVAL(object):
                               [0.0, 0.0, 1.0]]):
         '''.. py:method:: to_band(recvec)
 
-        Return Band_with_projection object
+        Return EnergyBand object
 
         Parameters
         -----------

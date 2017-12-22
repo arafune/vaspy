@@ -164,8 +164,8 @@ class TestSinglePROCAR(object):
             ['#k', 'energy', 'test_p', 'test_pxpy', 'test_d'])
 
     @with_setup(setup=setup)
-    def test_onlyband(self):
-        single_onlyband=self.singleprocar.onlyband()
+    def test_to_yband(self):
+        single_onlyband=self.singleprocar.to_band()
         eq_(single_onlyband.__str__(),
             '''#k	Energy
 0.000000000e+00	-1.500000000e+01
@@ -303,8 +303,8 @@ class TestSpinPolarizedPROCAR(object):
              'energy_down', 'test_p_down', 'test_pxpy_down', 'test_d_down'])
 
     @with_setup(setup=setup)
-    def test_onlyband(self):
-        onlyband=self.spinprocar.onlyband()
+    def test_toband(self):
+        onlyband=self.spinprocar.to_band()
         eq_(onlyband.__str__(),
             '''#k	Energy_up	Energy_down
 0.000000000e+00	-1.000000000e+01	-1.050000000e+01
@@ -466,16 +466,15 @@ class TestSOIPROCAR(object):
 
     @with_setup(setup=setup)
     def test_onlyband(self):
-        onlyband=self.soiprocar.onlyband()
+        onlyband=self.soiprocar.to_band()
         eq_(onlyband.__str__(),
             '''#k	Energy
 0.000000000e+00	-1.000000000e+01
-3.535533906e-01	-5.000000000e+00
+3.535533906e-01	-7.000000000e+00
+7.071067812e-01	-6.000000000e+00
 
-0.000000000e+00	-7.000000000e+00
+0.000000000e+00	-5.000000000e+00
 3.535533906e-01	-4.000000000e+00
-
-0.000000000e+00	-6.000000000e+00
-3.535533906e-01	-1.000000000e+00
+7.071067812e-01	-1.000000000e+00
 
 ''')
