@@ -29,11 +29,13 @@ class EIGENVAL(object):
         Number of atoms
     numk: int
         Number of k vectors
+    n_bands: int
+        Number of bands
     spininfo: int
         No_spin or non-collinear:1 collinear spin: 2
-    kvectors: list or numpy array
+    kvectors[ki]: list or numpy array 
         List of kvalues, the length of kvectors must be equal to numk.
-    energies: list or numpy.array
+    energies[bi+ki*n_bands]: list or numpy.array
         Energy values (two-value array for spin-polarized eigenvalu)
     '''
 
