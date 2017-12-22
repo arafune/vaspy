@@ -21,6 +21,7 @@ class TestEIGENVAL(object):
     def test_check_basic_parameters(self):
         '''Checking the basic parameters stored'''
         eq_(344, self.eigenval_spin.n_atoms)
+        eq_(2, self.eigenval_spin.spininfo)
         eq_(1890, self.eigenval_spin.n_bands)
         eq_(1, self.eigenval_spin.numk)
         eq_((1890, 2), self.eigenval_spin.energies.shape)
@@ -32,10 +33,15 @@ class TestEIGENVAL(object):
                                       self.eigenval_spin.energies[-1])
         #
         eq_(1, self.eigenval_soi.n_atoms)
+        eq_(1, self.eigenval_soi.spininfo)
         eq_(54, self.eigenval_soi.n_bands)
         eq_(625, self.eigenval_soi.numk)
         np.testing.assert_array_equal(-9.548122,
                                       self.eigenval_soi.energies[0])
         np.testing.assert_array_almost_equal(26.193038,
                                       self.eigenval_soi.energies[-1])
-
+        eq_('''The parameter of EIGENVALUE
+# of atoms: 1
+# of kpoints: 625
+# of bands: 54
+''', self.eigenval_soi.__str__())

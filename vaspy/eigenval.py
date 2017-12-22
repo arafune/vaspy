@@ -31,10 +31,10 @@ class EIGENVAL(object):
         Number of k vectors
     spininfo: int
         No_spin or non-collinear:1 collinear spin: 2
-    kvectors: list
+    kvectors: list or numpy array
         List of kvalues, the length of kvectors must be equal to numk.
-    energies: list
-        Energy values
+    energies: list or numpy.array
+        Energy values (two-value array for spin-polarized eigenvalu)
     '''
 
     def __init__(self, arg=None):
