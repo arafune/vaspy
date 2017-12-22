@@ -92,7 +92,7 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
         self.orbital = list()
         self.phase = list()
         self.orb_names = tuple()
-#
+        #
         if isinstance(arg, str):
             self.load_from_file(arg, phase_read)
         else:
@@ -548,7 +548,7 @@ class BandWithProjection(object):
         '''
         self.__energies -= fermi
 
-    def compose_sites(self, arg):
+    def sum_site(self, arg):
         '''Make sitecomposed ndarray
 
         When sitecomposed ndarray has elements, the values remain.
@@ -556,7 +556,7 @@ class BandWithProjection(object):
         Parameters
         -----------
         arg: list, tuple, set
-             site indexes to be composed. it contains unique numbers.
+             site indexes to be aded. it contains unique numbers.
         '''
         # the element of site_number_list must be unique.
         site_numbers = tuple(set(arg))
@@ -602,51 +602,51 @@ class BandWithProjection(object):
             else:
                 self.sitecomposed = [cmporbs_up, cmporbs_down]
         if len(self.spininfo) == 4:
-            site_numbers_mT = tuple(x + self.n_atoms *
-                                    0 for x in site_numbers)
-            site_numbers_mX = tuple(x + self.n_atoms *
+            site_numbers_mtotal = tuple(x + self.n_atoms *
+                                        0 for x in site_numbers)
+            site_numbers_mx = tuple(x + self.n_atoms *
                                     1 for x in site_numbers)
-            site_numbers_mY = tuple(x + self.n_atoms *
+            site_numbers_my = tuple(x + self.n_atoms *
                                     2 for x in site_numbers)
-            site_numbers_mZ = tuple(x + self.n_atoms *
+            site_numbers_mz = tuple(x + self.n_atoms *
                                     3 for x in site_numbers)
             #
-            cmporbs_mT = np.array([[[np.sum(
+            cmporbs_mtotal = np.array([[[np.sum(
                 [y for x, y in enumerate(self.orbitals[i, j])
-                 if x in site_numbers_mT],
+                 if x in site_numbers_mtotal],
+                axis=0)] for j in range(len(self.available_band))]
+                                       for i in range(self.numk)])
+            cmporbs_mx = np.array([[[np.sum(
+                [y for x, y in enumerate(self.orbitals[i, j])
+                 if x in site_numbers_mx],
                 axis=0)] for j in range(len(self.available_band))]
                                    for i in range(self.numk)])
-            cmporbs_mX = np.array([[[np.sum(
+            cmporbs_my = np.array([[[np.sum(
                 [y for x, y in enumerate(self.orbitals[i, j])
-                 if x in site_numbers_mX],
+                 if x in site_numbers_my],
                 axis=0)] for j in range(len(self.available_band))]
                                    for i in range(self.numk)])
-            cmporbs_mY = np.array([[[np.sum(
+            cmporbs_mz = np.array([[[np.sum(
                 [y for x, y in enumerate(self.orbitals[i, j])
-                 if x in site_numbers_mY],
-                axis=0)] for j in range(len(self.available_band))]
-                                   for i in range(self.numk)])
-            cmporbs_mZ = np.array([[[np.sum(
-                [y for x, y in enumerate(self.orbitals[i, j])
-                 if x in site_numbers_mZ],
+                 if x in site_numbers_mz],
                 axis=0)] for j in range(len(self.available_band))]
                                    for i in range(self.numk)])
             if self.sitecomposed:
                 self.sitecomposed[0] = np.concatenate(
-                    (self.sitecomposed[0], cmporbs_mT),
+                    (self.sitecomposed[0], cmporbs_mtotal),
                     axis=2)
                 self.sitecomposed[1] = np.concatenate(
-                    (self.sitecomposed[1], cmporbs_mX),
+                    (self.sitecomposed[1], cmporbs_mx),
                     axis=2)
                 self.sitecomposed[2] = np.concatenate(
-                    (self.sitecomposed[2], cmporbs_mY),
+                    (self.sitecomposed[2], cmporbs_my),
                     axis=2)
                 self.sitecomposed[3] = np.concatenate(
-                    (self.sitecomposed[3], cmporbs_mZ),
+                    (self.sitecomposed[3], cmporbs_mz),
                     axis=2)
             else:
-                self.sitecomposed = [cmporbs_mT,
-                                     cmporbs_mX, cmporbs_mY, cmporbs_mZ]
+                self.sitecomposed = [cmporbs_mtotal,
+                                     cmporbs_mx, cmporbs_my, cmporbs_mz]
 
     def get_orb_index(self, arg):
         '''.. py:method::get_orb_index(arg)
@@ -706,7 +706,7 @@ class BandWithProjection(object):
             raise RuntimeError(err)
         return orb_indexes
 
-    def compose_orbital(self, arg):
+    def sum_orbital(self, arg):
         '''.. py:method:compose_orbital(arg)
 
         Add composed orbital contribution in
