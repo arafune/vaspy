@@ -77,14 +77,12 @@ class CHGCAR(mesh3d.VASPGrid):
             CHGCAR file name
         '''
         super(CHGCAR, self).load_from_file(chgcarfile)
-        if divmod(len(self.mesh3d),
-                  self.mesh_x * self.mesh_y * self.mesh_z) == (1, 0):
+        num_mesh = self.meshsize[0] * self.meshsize[1] * self.meshsize[2]
+        if divmod(len(self.mesh3d), num_mesh) == (1, 0):
             self.spininfo = [""]
-        elif divmod(len(self.mesh3d),
-                    self.mesh_x * self.mesh_y * self.mesh_z) == (2, 0):
+        elif divmod(len(self.mesh3d), num_mesh) == (2, 0):
             self.spininfo = ["up+down", "up-down"]
-        elif divmod(len(self.mesh3d),
-                    self.mesh_x * self.mesh_y * self.mesh_z) == (4, 0):
+        elif divmod(len(self.mesh3d), num_mesh) == (4, 0):
             self.spininfo = ["mT", "mX", "mY", "mZ"]
         else:
             raise RuntimeError("CHGCAR is correct?")
@@ -125,32 +123,32 @@ class CHGCAR(mesh3d.VASPGrid):
             raise RuntimeError("This CHGCAR is not spinresolved version")
         dest = copy.deepcopy(self)
         if len(self.spininfo) == 2:
-            dest.mesh3d = dest.mesh3d.reshape(2, self.mesh_z,
-                                              self.mesh_y,
-                                              self.mesh_x)[1]
+            dest.mesh3d = dest.mesh3d.reshape(2, self.meshsize[2],
+                                              self.meshsize[1],
+                                              self.meshsize[0])[1]
             dest.spininfo = ["up-down"]
         elif len(self.spininfo) == 4:
-            dest.mesh3d.reshape(4, self.mesh_z, self.mesh_y,
-                                self.mesh_x)
+            dest.mesh3d.reshape(4, self.meshsize[2], self.meshsize[1],
+                                self.meshsize[0])
             if direction is None or direction == 't':
-                dest.mesh3d = dest.mesh3d.reshape(4, self.mesh_z,
-                                                  self.mesh_y,
-                                                  self.mesh_x)[0]
+                dest.mesh3d = dest.mesh3d.reshape(4, self.meshsize[2],
+                                                  self.meshsize[1],
+                                                  self.meshsize[0])[0]
                 dest.spininfo = ["mT"]
             if direction == 'x':
-                dest.mesh3d = dest.mesh3d.reshape(4, self.mesh_z,
-                                                  self.mesh_y,
-                                                  self.mesh_x)[1]
+                dest.mesh3d = dest.mesh3d.reshape(4, self.meshsize[2],
+                                                  self.meshsize[1],
+                                                  self.meshsize[0])[1]
                 dest.spininfo = ["mX"]
             elif direction == 'y':
-                dest.mesh3d = dest.mesh3d.reshape(4, self.mesh_z,
-                                                  self.mesh_y,
-                                                  self.mesh_x)[2]
+                dest.mesh3d = dest.mesh3d.reshape(4, self.meshsize[2],
+                                                  self.meshsize[1],
+                                                  self.meshsize[0])[2]
                 dest.spininfo = ["mY"]
             elif direction == 'z':
-                dest.mesh3d = dest.mesh3d.reshape(4, self.mesh_z,
-                                                  self.mesh_y,
-                                                  self.mesh_x)[3]
+                dest.mesh3d = dest.mesh3d.reshape(4, self.meshsize[2],
+                                                  self.meshsize[1],
+                                                  self.meshsize[0])[3]
                 dest.spininfo = ["mZ"]
         return dest
 
@@ -171,9 +169,9 @@ class CHGCAR(mesh3d.VASPGrid):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         dest = copy.deepcopy(self)
-        tmp = dest.mesh3d.reshape(2, self.mesh_z,
-                                  self.mesh_y,
-                                  self.mesh_x)
+        tmp = dest.mesh3d.reshape(2, self.meshsize[2],
+                                  self.meshsize[1],
+                                  self.meshsize[0])
         dest.mesh3d = (tmp[0] + tmp[1]) / 2
         dest.spininfo = ["up"]
         return dest
@@ -195,9 +193,9 @@ class CHGCAR(mesh3d.VASPGrid):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         dest = copy.deepcopy(self)
-        tmp = dest.mesh3d.reshape(2, self.mesh_z,
-                                  self.mesh_y,
-                                  self.mesh_x)
+        tmp = dest.mesh3d.reshape(2, self.meshsize[2],
+                                  self.meshsize[1],
+                                  self.meshsize[0])
         dest.mesh3d = (tmp[0] - tmp[1]) / 2
         dest.spininfo = ["down"]
         return dest
