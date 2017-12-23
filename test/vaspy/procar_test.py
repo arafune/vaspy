@@ -304,6 +304,27 @@ class TestSpinPolarizedPROCAR(object):
              'energy_down', 'test_p_down', 'test_pxpy_down', 'test_d_down'])
 
     @with_setup(setup=setup)
+    def test_to_band_soi(self):
+        '''test for soi energies (SPIN)'''
+        np.testing.assert_array_almost_equal(
+            [[-10., -10.5],
+             [-5., -5.5],
+             [-7., -7.5],
+             [-4., -4.5],
+             [-6., -6.5],
+             [-1., -1.5]],
+            self.spinprocar.energies)        
+        band=self.spinprocar.to_band()
+        np.testing.assert_array_almost_equal(
+            [[[-10. ,  -5. ],
+              [ -7. ,  -4. ],
+              [ -6. ,  -1. ]],
+             [[-10.5,  -5.5],
+              [ -7.5,  -4.5],
+              [ -6.5,  -1.5]]],
+            band.energies)
+        
+    @with_setup(setup=setup)
     def test_toband(self):
         '''test for simple band data output (Spin polarized)'''
         onlyband=self.spinprocar.to_band()
@@ -465,6 +486,19 @@ class TestSOIPROCAR(object):
              'test_p_mY', 'test_pxpy_mY', 'test_d_mY',
              'test_p_mZ', 'test_pxpy_mZ', 'test_d_mZ'])
 
+
+    @with_setup(setup=setup)
+    def test_to_band_soi(self):
+        '''test for soi energies (SOI)'''
+        np.testing.assert_array_almost_equal(
+            [-10.0, -5.0, -7.0, -4.0, -6.0, -1.0],
+            self.soiprocar.energies)        
+        soiband=self.soiprocar.to_band()
+        np.testing.assert_array_almost_equal(
+            [[-10., -5.], [ -7., -4.], [ -6., -1.]],
+            soiband.energies)
+        
+        
     @with_setup(setup=setup)
     def test_onlyband(self):
         onlyband=self.soiprocar.to_band()
