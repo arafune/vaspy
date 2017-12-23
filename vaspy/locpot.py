@@ -32,7 +32,7 @@ class LOCPOT(mesh3d.VASPGrid):
         if arg:
             self.load_from_file(arg)
 
-    def plot_potential_along_axis(self, axis_name, type=0):
+    def plot_potential_along_axis(self, axis_name, type=0):  # FIXME!!
         '''.. py:method:: plot_potential_along_axis(axis_name, pottype)
 
         Plot potential curve along the axis
@@ -46,23 +46,23 @@ class LOCPOT(mesh3d.VASPGrid):
             'select potential type' (very optional)
         '''
         axis_name = axis_name.capitalize()
-        axes_length = self.get_axes_lengthes()
+        axes_length = self.poscar.get_axes_lengthes()
         if axis_name == 'X':
-            horizontal_axis = np.linspace(0, axes_length[0], self.meshsize[0])
+            horizontal_axis = np.linspace(0, axes_length[0], self.grid.shape[0])
             plt.clf()
             plt.xlim(xmax=axes_length[0])
         if axis_name == 'Y':
-            horizontal_axis = np.linspace(0, axes_length[1], self.meshsize[1])
+            horizontal_axis = np.linspace(0, axes_length[1], self.grid.shape[1])
             plt.clf()
             plt.xlim(xmax=axes_length[1])
         if axis_name == 'Z':
-            horizontal_axis = np.linspace(0, axes_length[2], self.meshsize[2])
+            horizontal_axis = np.linspace(0, axes_length[2], self.grid.shape[2])
             plt.clf()
             plt.xlim(xmax=axes_length[2])
-        y_average = self.average_along_axis(axis_name, type)
-        y_max = self.max_along_axis(axis_name, type)
-        y_min = self.min_along_axis(axis_name, type)
-        y_median = self.median_along_axis(axis_name, type)
+        y_average = self.grid.average_along_axis(axis_name, type)
+        y_max = self.grid.max_along_axis(axis_name, type)
+        y_min = self.grid.min_along_axis(axis_name, type)
+        y_median = self.grid.median_along_axis(axis_name, type)
         plt.plot(horizontal_axis, y_average, label='average')
         plt.plot(horizontal_axis, y_max, label='max')
         plt.plot(horizontal_axis, y_min, label='min')

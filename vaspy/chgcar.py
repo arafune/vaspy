@@ -77,12 +77,11 @@ class CHGCAR(mesh3d.VASPGrid):
             CHGCAR file name
         '''
         super(CHGCAR, self).load_from_file(chgcarfile)
-        num_mesh = self.grid.shape[0] * self.grid.shape[1] * self.grid.shape[2]
-        if divmod(self.grid.data.size, num_mesh) == (1, 0):
+        if divmod(self.grid.data.size, self.grid.size) == (1, 0):
             self.spininfo = [""]
-        elif divmod(self.grid.data.size, num_mesh) == (2, 0):
+        elif divmod(self.grid.data.size, self.grid.size) == (2, 0):
             self.spininfo = ["up+down", "up-down"]
-        elif divmod(self.grid.data.size, num_mesh) == (4, 0):
+        elif divmod(self.grid.data.size, self.grid.size) == (4, 0):
             self.spininfo = ["mT", "mX", "mY", "mZ"]
         else:
             raise RuntimeError("CHGCAR is correct?")
@@ -151,9 +150,7 @@ class CHGCAR(mesh3d.VASPGrid):
                                                      self.grid.shape[1],
                                                      self.grid.shape[0])[3]
                 dest.spininfo = ["mZ"]
-        dest.grid.data = dest.grid.data.reshape(self.grid.shape[2] *
-                                                self.grid.shape[1] *
-                                                self.grid.shape[0])
+        dest.grid.data = dest.grid.data.reshape(self.grid.size)
         return dest
 
     def majorityspin(self):
@@ -176,9 +173,7 @@ class CHGCAR(mesh3d.VASPGrid):
         tmp = dest.grid.data.reshape(2, self.grid.shape[2],
                                      self.grid.shape[1],
                                      self.grid.shape[0])
-        dest.grid.data = ((tmp[0] + tmp[1]) / 2).reshape(self.grid.shape[2] *
-                                                         self.grid.shape[1] *
-                                                         self.grid.shape[0])
+        dest.grid.data = ((tmp[0] + tmp[1]) / 2).reshape(self.grid.size)
         dest.spininfo = ["up"]
         return dest
 
@@ -202,8 +197,6 @@ class CHGCAR(mesh3d.VASPGrid):
         tmp = dest.grid.data.reshape(2, self.grid.shape[2],
                                      self.grid.shape[1],
                                      self.grid.shape[0])
-        dest.grid.data = ((tmp[0] - tmp[1]) / 2).reshape(self.grid.shape[2] *
-                                                         self.grid.shape[1] *
-                                                         self.grid.shape[0])
+        dest.grid.data = ((tmp[0] - tmp[1]) / 2).reshape(self.grid.size)
         dest.spininfo = ["down"]
         return dest
