@@ -97,7 +97,7 @@ class POSCAR_HEAD(object):
         atomnames = []
         for elm, ionnums in zip(self.iontypes, self.ionnums):
             for j in range(1, ionnums + 1):
-                elem_num  = elm + str(j)
+                elem_num = elm + str(j)
                 if elem_num not in atomnames:
                     atomnames.append(elem_num)
                 else:
@@ -108,14 +108,13 @@ class POSCAR_HEAD(object):
                         atomnames.append(elem_num)
         self.__atom_identifer = [
             "#" + str(s) + ":" + a for s, a in
-            zip(range(0, len(atomnames) ), atomnames)]
+            zip(range(0, len(atomnames)), atomnames)]
         return self.__atom_identifer
 
     @atom_identifer.setter
     def atom_identifer(self, value):
         self.__atom_identifer = value
 
-    
 
 class POSCAR_POS(object):
     '''.. py:class:: POSCAR_POS()
@@ -184,7 +183,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                 try:
                     thefile = bz2.open(arg, mode='rt')
                 except AttributeError:
-                    thefile = bz2.BZ2File(arg, modr='r')
+                    thefile = bz2.BZ2File(arg, mode='r')
             else:
                 thefile = open(arg)
             poscar = thefile.readlines()
@@ -323,7 +322,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                              spos[2] + i_z / n_z]))
         sposcar.coordinate_changeflags = []
         for flags in self.coordinate_changeflags:
-            for i in range(n_x * n_y * n_z):
+            for _ in range(n_x * n_y * n_z):
                 sposcar.coordinate_changeflags.append(flags)
         sposcar.atom_identifer = []
         if original_is_cartesian:
@@ -779,13 +778,13 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             vector = _vectorize(vector)
             for i in atomlist:
                 self.positions[i] = (self.positions[i] +
-                                         vector / self.scaling_factor)
+                                     vector / self.scaling_factor)
         else:
             vector = _vectorize(vector)
             self.to_cartesian()
             for i in atomlist:
                 self.positions[i] = (self.positions[i] +
-                                         vector / self.scaling_factor)
+                                     vector / self.scaling_factor)
             self.to_direct()
         return self.positions
 

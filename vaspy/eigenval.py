@@ -33,7 +33,7 @@ class EIGENVAL(object):
         Number of bands
     spininfo: int
         No_spin or non-collinear:1 collinear spin: 2
-    kvectors[ki]: list or numpy array 
+    kvectors[ki]: list or numpy array
         List of kvalues, the length of kvectors must be equal to numk.
     energies[bi+ki*n_bands]: list or numpy.array
         Energy values (two-value array for spin-polarized eigenvalu)
@@ -218,8 +218,7 @@ class EnergyBand(object):
     def figure(self, color='blue', spin=None):
         '''.. py:method:: figure()
 
-        Return Axes object of the energy band.  
-        
+        Return Axes object of the energy band.
 
         Parameters
         ----------
@@ -229,7 +228,7 @@ class EnergyBand(object):
 
         spin: str
             up or down
-        
+
         Returns
         --------
         matplotlib.pyplot.Axes
@@ -249,19 +248,19 @@ class EnergyBand(object):
 '''
         energies = np.swapaxes(self.energies, 1, 0)
         draws = []
-        if (self.spininfo == 2 or len(self.spininfo) == 2):
+        if self.spininfo == 2 or len(self.spininfo) == 2:
             if spin == 'down':
                 for bi in range(0, self.nbands):
                     draws.append(plt.plot(self.kdistances, energies[bi].T[1],
-                                    color=color))
+                                          color=color))
             else:
                 for bi in range(0, self.nbands):
                     draws.append(plt.plot(self.kdistances, energies[bi].T[0],
-                                   color=color))
+                                          color=color))
         else:
             for bi in range(0, self.nbands):
                 draws.append(plt.plot(self.kdistances, energies[bi],
-                                color=color))
+                                      color=color))
         return plt.gca()
 
     def show(self, yrange=None, spin=None):  # How to set default value?
@@ -278,7 +277,7 @@ class EnergyBand(object):
              If not specified, use the matplotlib default value.
 '''
         energies = np.swapaxes(self.energies, 1, 0)
-        if (self.spininfo == 2 or len(self.spininfo) == 2):
+        if self.spininfo == 2 or len(self.spininfo) == 2:
             if spin == 'down':
                 for bi in range(0, self.nbands):
                     plt.plot(self.kdistances, energies[bi].T[1],

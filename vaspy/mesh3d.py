@@ -64,7 +64,7 @@ class VASPGrid(object):
             self.load_from_file(filename)
 
     def load_from_file(self, filename):
-        '''.. py:method:: load_from_file(Parse)
+        '''.. py:method:: load_from_file(filename)
 
         filename file to construct the object
 
@@ -106,14 +106,14 @@ class VASPGrid(object):
                         lines_for_mesh = self.grid.size // len(griddata)
                     else:
                         lines_for_mesh = self.grid.size // len(griddata) + 1
-                    for i in range(lines_for_mesh - 1):
+                    for _ in range(lines_for_mesh - 1):
                         griddata.extend([float(val) for val in
                                          next(thefile).rstrip().replace('***********',
                                                                         'Nan').split()])
                     section = 'grid'
                 elif section == 'aug':
                     if separator in line:
-                        for i in range(lines_for_mesh):
+                        for _ in range(lines_for_mesh):
                             griddata.extend([float(val) for val in
                                              next(thefile).rstrip().replace('***********',
                                                                             'Nan').split()])
@@ -126,7 +126,7 @@ class VASPGrid(object):
                     if "augmentation occupancies " in line:
                         section = 'aug'
                     elif separator in line:
-                        for i in range(lines_for_mesh):
+                        for _ in range(lines_for_mesh):
                             griddata.extend([float(val) for val in
                                              next(thefile).rstrip().replace('***********',
                                                                             'Nan').split()])
@@ -273,13 +273,16 @@ class Grid3D(object):
         Number of grid frames
         for example, num_frame is 4 for CHGCAR included SOI
     '''
-    def __init__(self, shape=(0, 0, 0), data=[]):
+    def __init__(self, shape=(0, 0, 0), data=None):
         self.__shape = shape
-        self.data = np.asarray(data)
+        if data is None:
+            self.data = []
+        else:
+            self.data = np.asarray(data)
         self.size = shape[0] * shape[1] * shape[2]
         try:
             self.num_frame = divmod(self.data.size, self.size)[0]
-        except:
+        except (ZeroDivisionError, AttributeError):
             self.num_frame = 0
 
     @property

@@ -65,7 +65,7 @@ class CHGCAR(mesh3d.VASPGrid):
         if chgcar_file:
             self.load_from_file(chgcar_file)
 
-    def load_from_file(self, chgcarfile):
+    def load_from_file(self, filename):
         '''.. py:method:: load_from_file(chgcarfile)
 
         Parse CHGCAR file to construct CHGCAR object
@@ -76,7 +76,7 @@ class CHGCAR(mesh3d.VASPGrid):
         chgcarfile: str
             CHGCAR file name
         '''
-        super(CHGCAR, self).load_from_file(chgcarfile)
+        super(CHGCAR, self).load_from_file(filename)
         if divmod(self.grid.data.size, self.grid.size) == (1, 0):
             self.spininfo = [""]
         elif divmod(self.grid.data.size, self.grid.size) == (2, 0):
