@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+'''Test for PROCAR class'''
 # import unittest
 import os
 # import tempfile
@@ -166,16 +166,12 @@ class TestSinglePROCAR(object):
     @with_setup(setup=setup)
     def test_to_band(self):
         '''test for simple band output'''
-        single_onlyband=self.singleprocar.to_band()
+        single_onlyband = self.singleprocar.to_band()
         eq_(single_onlyband.__str__(),
             '''#k	Energy
 0.000000000e+00	-1.500000000e+01
 
 ''')
-
-
-
-
 
 # ------------------------------
 
@@ -313,21 +309,21 @@ class TestSpinPolarizedPROCAR(object):
              [-4., -4.5],
              [-6., -6.5],
              [-1., -1.5]],
-            self.spinprocar.energies)        
-        band=self.spinprocar.to_band()
+            self.spinprocar.energies)
+        band = self.spinprocar.to_band()
         np.testing.assert_array_almost_equal(
-            [[[-10. ,  -5. ],
-              [ -7. ,  -4. ],
-              [ -6. ,  -1. ]],
-             [[-10.5,  -5.5],
-              [ -7.5,  -4.5],
-              [ -6.5,  -1.5]]],
+            [[[-10., -5.],
+              [ -7., -4.],
+              [ -6., -1.]],
+             [[-10.5, -5.5],
+              [ -7.5, -4.5],
+              [ -6.5, -1.5]]],
             band.energies)
-        
+
     @with_setup(setup=setup)
     def test_toband(self):
         '''test for simple band data output (Spin polarized)'''
-        onlyband=self.spinprocar.to_band()
+        onlyband = self.spinprocar.to_band()
         eq_(onlyband.__str__(),
             '''#k	Energy_up	Energy_down
 0.000000000e+00	-1.000000000e+01	-1.050000000e+01
@@ -486,22 +482,22 @@ class TestSOIPROCAR(object):
              'test_p_mY', 'test_pxpy_mY', 'test_d_mY',
              'test_p_mZ', 'test_pxpy_mZ', 'test_d_mZ'])
 
-
     @with_setup(setup=setup)
     def test_to_band_soi(self):
         '''test for soi energies (SOI)'''
         np.testing.assert_array_almost_equal(
             [-10.0, -5.0, -7.0, -4.0, -6.0, -1.0],
-            self.soiprocar.energies)        
-        soiband=self.soiprocar.to_band()
+            self.soiprocar.energies)
+        soiband = self.soiprocar.to_band()
         np.testing.assert_array_almost_equal(
-            [[-10., -5.], [ -7., -4.], [ -6., -1.]],
+            [[-10., -5.],
+             [ -7., -4.],
+             [ -6., -1.]],
             soiband.energies)
-        
-        
+
     @with_setup(setup=setup)
     def test_onlyband(self):
-        onlyband=self.soiprocar.to_band()
+        onlyband = self.soiprocar.to_band()
         eq_(onlyband.__str__(),
             '''#k	Energy
 0.000000000e+00	-1.000000000e+01
