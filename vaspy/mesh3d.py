@@ -96,7 +96,7 @@ class VASPGrid(poscar.POSCAR):
                         tmp.append(line)
                 elif section == 'define_separator':
                     separator = line if separator is None else separator
-                    if self.meshsize[0] == self.meshsiez[1] == self.meshsize[2] == 0:
+                    if self.meshsize[0] == self.meshsize[1] == self.meshsize[2] == 0:
                         self.meshsize = [int(string) for string in line.split()]
                         num_mesh = self.meshsize[0] * self.meshsize[1] * self.meshsize[2]
                     self.mesh3d.extend([next(thefile).rstrip().replace(

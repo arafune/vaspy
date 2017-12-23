@@ -14,11 +14,11 @@ class TestMesh3d(object):
 
     def setup(self):
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
-        self.eigenval_soi = eigenval.EIGENVAL(datadir + 'EIGENVAL.soi')
+#        self.eigenval_soi = eigenval.EIGENVAL(datadir + 'EIGENVAL.soi')
         
     @with_setup(setup=setup)
     def test_check_basic_parameters(self):
         '''Checking the basic parameters stored'''
         meshdata = list (range(3*4*5))
-        self.simple.mesh3d = mesh3d.Mesh3D((3,4,5), meshdata)
+        self.simple_mesh3d = mesh3d.Mesh3D((3,4,5), meshdata)
         
