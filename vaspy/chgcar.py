@@ -125,8 +125,8 @@ class CHGCAR(mesh3d.VASPGrid):
         dest = copy.deepcopy(self)
         if len(self.spininfo) == 2:
             dest.grid.data = dest.grid.data.reshape(2, self.grid.shape[2],
-                                              self.grid.shape[1],
-                                              self.grid.shape[0])[1]
+                                                    self.grid.shape[1],
+                                                    self.grid.shape[0])[1]
             dest.spininfo = ["up-down"]
         elif len(self.spininfo) == 4:
             dest.grid.data.reshape(4, self.grid.shape[2], self.grid.shape[1],
