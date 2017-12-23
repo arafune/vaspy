@@ -529,7 +529,7 @@ class BandWithProjection(object):
                 self.__energies = np.array(arg).reshape(
                     self.numk, self.n_bands)
             elif len(self.spininfo) == 2:
-                energies = np.array(arg).T.reshape(self.n_bands, self.numk, 2)  # < FixME!! is it OK?
+                energies = np.array(arg).T.reshape(2, self.numk, self.n_bands)
                 print(energies)
                 self.__energies = energies
 

@@ -191,11 +191,20 @@ class TestSpinPolarizedPROCAR(object):
         '''Load test for PROCAR_spin_dummy'''
         eq_(('_up', '_down'), self.spinprocar.spininfo)
         eq_(3, self.spinprocar.n_atoms)
-        eq_(2, self.spinprocar.n_bands)
+        eq_(4, self.spinprocar.n_bands)
         eq_(3, self.spinprocar.numk)
-        eq_([[-10.0, -10.5], [-5.0, -5.5],
-             [-7.0, -7.5], [-4.0, -4.5],
-             [-6.0, -6.5], [-1.0, -1.5]],
+        eq_([[-10.0, -10.5],
+             [-5.0, -5.5],
+             [0.0, -10.0],
+             [5.0, -5.0],
+             [-7.0, -7.5],
+             [-4.0, -4.5],
+             [-1.0, -10.0],
+             [4.0, -5.0],
+             [-6.0, -6.5],
+             [-1.0, -1.5],
+             [-3.0, -10.0],
+             [0.0, -5.0]],
             self.spinprocar.energies)
         eq_(('s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot'),
             self.spinprocar.orb_names)
@@ -206,7 +215,7 @@ class TestSpinPolarizedPROCAR(object):
                                        [1.25, 1.25, 1.00],
                                        [1.50, 1.50, 1.00]],
                                       self.spinprocar.kvectors)
-        np.testing.assert_array_equal(36, len(self.spinprocar.orbital))
+        np.testing.assert_array_equal(72, len(self.spinprocar.orbital))
         np.testing.assert_array_equal([0.0000, 0.0001, 0.0002, 0.0003,
                                        0.0004, 0.0005, 0.0006, 0.0007,
                                        0.0008, 0.0036],
@@ -237,14 +246,14 @@ class TestSpinPolarizedPROCAR(object):
         '''test for Band_with_projection.energies setter (SPIN)
         '''
         spinband = self.spinprocar.band()                
-        eq_(spinband.energies.shape, (2, 3, 2))
+        eq_(spinband.energies.shape, (2, 3, 4))
         np.testing.assert_array_equal(spinband.energies,
-                                      [[[-10, -5],
-                                        [-7, -4],
-                                        [-6, -1]],
-                                       [[-10.5, -5.5],
-                                        [-7.5, -4.5],
-                                        [-6.5, -1.5]]])
+                                      [[[-10, -5,  0, 5.],
+                                        [ -7, -4, -1, 4.],
+                                        [ -6, -1, -3, 0.]],
+                                       [[-10.5, -5.5, -10., -5.],
+                                        [ -7.5, -4.5, -10., -5.],
+                                        [ -6.5, -1.5, -10., -5.]]])
 
     def test_spinband_fermi_correction(self):
         '''test for Band_with_projection.fermi_correction (SPIN)
@@ -252,18 +261,20 @@ class TestSpinPolarizedPROCAR(object):
         spinband = self.spinprocar.band()        
         spinband.fermi_correction(1.0)
         np.testing.assert_array_equal(spinband.energies,
-                                      [[[-11, -6], [-8, -5], [-7, -2]],
-                                       [[-11.5, -6.5],
-                                        [-8.5, -5.5],
-                                        [-7.5, -2.5]]])
+                                      np.array([[[-11., -6., -1., 4.],
+                                        [ -8., -5., -2., 3.],
+                                        [ -7., -2., -4., -1.]],
+                                       [[-11.5, -6.5, -11., -6.],
+                                        [ -8.5, -5.5, -11., -6.],
+                                        [ -7.5, -2.5, -11., -6.]]]))
 
     @with_setup(setup=setup)
     def test_spinprocar_band_orbitalread(self):
         '''test for Band_with_projection.orbitals setter (SPIN)'''
         spinband = self.spinprocar.band()
         ok_(isinstance(spinband.orbitals, list))
-        eq_(spinband.orbitals[0].shape, (3, 2, 3, 10))
-        eq_(spinband.orbitals[1].shape, (3, 2, 3, 10))
+        eq_(spinband.orbitals[0].shape, (3, 4, 3, 10))
+        eq_(spinband.orbitals[1].shape, (3, 4, 3, 10))
         # for up spin, ik = 1, ib = 0, iatom = 2
         #            ->  (In PROCAR, k# =2, band# = 1, atom# = 3)
         #
@@ -311,21 +322,28 @@ class TestSpinPolarizedPROCAR(object):
     def test_to_band_spin(self):
         '''test for energies  (2:SPIN)'''
         np.testing.assert_array_almost_equal(
-            [[-10., -10.5],
-             [-5., -5.5],
-             [-7., -7.5],
-             [-4., -4.5],
-             [-6., -6.5],
-             [-1., -1.5]],
+            np.array(
+            [[-10.0, -10.5],
+             [-5.0, -5.5],
+             [0.0, -10.0],
+             [5.0, -5.0],
+             [-7.0, -7.5],
+             [-4.0, -4.5],
+             [-1.0, -10.0],
+             [4.0, -5.0],
+             [-6.0, -6.5],
+             [-1.0, -1.5],
+             [-3.0, -10.0],
+             [0.0, -5.0]]),
             self.spinprocar.energies)
         band = self.spinprocar.band()
-        np.testing.assert_array_almost_equal(
-            [[[-10., -5.],
-              [ -7., -4.],
-              [ -6., -1.]],
-             [[-10.5, -5.5],
-              [ -7.5, -4.5],
-              [ -6.5, -1.5]]],
+        np.testing.assert_array_almost_equal(np.array(
+            [[[-10., -5., 0., 5.],
+              [ -7., -4., -1., 4.],
+              [ -6., -1., -3., 0.]],
+             [[-10.5, -5.5, -10., -5.],
+              [ -7.5, -4.5, -10., -5.],
+              [ -6.5, -1.5, -10., -5.]]]),
             band.energies)
 
     @with_setup(setup=setup)
@@ -341,6 +359,14 @@ class TestSpinPolarizedPROCAR(object):
 0.000000000e+00	-5.000000000e+00	-5.500000000e+00
 3.535533906e-01	-4.000000000e+00	-4.500000000e+00
 7.071067812e-01	-1.000000000e+00	-1.500000000e+00
+
+0.000000000e+00	0.000000000e+00	-1.000000000e+01
+3.535533906e-01	-1.000000000e+00	-1.000000000e+01
+7.071067812e-01	-3.000000000e+00	-1.000000000e+01
+
+0.000000000e+00	5.000000000e+00	-5.000000000e+00
+3.535533906e-01	4.000000000e+00	-5.000000000e+00
+7.071067812e-01	0.000000000e+00	-5.000000000e+00
 
 ''')
 
