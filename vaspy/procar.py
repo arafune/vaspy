@@ -172,6 +172,10 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
             self.spininfo = ('',)
         elif self.spininfo == 2:   # collinear
             self.spininfo = ('_up', '_down')
+            tmp = list(zip(*[iter(self.energies)]*self.numk*self.n_bands))
+            self.energies = []
+            for up, down in zip(tmp[0], tmp[1]):
+                self.energies.append([up, down])
         elif self.spininfo == 4:  # non-collinear
             self.spininfo = ('_mT', '_mX', '_mY', '_mZ')
 
@@ -525,16 +529,9 @@ class BandWithProjection(object):
                 self.__energies = np.array(arg).reshape(
                     self.numk, self.n_bands)
             elif len(self.spininfo) == 2:
-                self.__energies = (
-                    np.array(
-                        arg[:self.numk *
-                            len(self.available_band)]).reshape(
-                                self.numk, self.n_bands),
-                    np.array(
-                        arg[self.numk *
-                            len(self.available_band):]).reshape(
-                                self.numk, self.n_bands))
-                self.__energies = np.array(self.__energies)
+                energies = np.array(arg).T.reshape(self.n_bands, self.numk, 2)  # < FixME!! is it OK?
+                print(energies)
+                self.__energies = energies
 
     def fermi_correction(self, fermi):
         '''.. py:method:: fermi_correction(fermi)
