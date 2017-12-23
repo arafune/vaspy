@@ -99,16 +99,14 @@ class VASPGrid(object):
                     if self.grid.shape == (0, 0, 0):
                         self.grid.shape = tuple([int(string) for string
                                                  in line.split()])
-                        num_mesh = self.grid.shape[0] * \
-                                   self.grid.shape[1] * \
-                                   self.grid.shape[2]
-                    griddata.extend([float(i) for i in next(thefile).rstrip().replace(
-                        '***********', 'Nan').split()])
-                    if num_mesh % len(griddata) == 0:
-                        lines_for_mesh =  num_mesh // len(griddata)
+                    griddata.extend(
+                        [float(i) for i in next(thefile).rstrip().replace(
+                            '***********', 'Nan').split()])
+                    if self.grid.size % len(griddata) == 0:
+                        lines_for_mesh = self.grid.size // len(griddata)
                     else:
-                        lines_for_mesh = num_mesh // len(griddata) + 1
-                    for i in range(lines_for_mesh - 1 ):
+                        lines_for_mesh = self.grid.size // len(griddata) + 1
+                    for i in range(lines_for_mesh - 1):
                         griddata.extend([float(val) for val in
                                          next(thefile).rstrip().replace('***********',
                                                                         'Nan').split()])
@@ -116,7 +114,7 @@ class VASPGrid(object):
                 elif section == 'aug':
                     if separator in line:
                         for i in range(lines_for_mesh):
-                            griddata.extend([float(val) for val in 
+                            griddata.extend([float(val) for val in
                                              next(thefile).rstrip().replace('***********',
                                                                             'Nan').split()])
                         section = 'grid'
@@ -136,7 +134,7 @@ class VASPGrid(object):
                         # for unused data stored in LOCPOT
                         self.additional.extend(line.split())
             self.grid.data = np.array(griddata, dtype=np.float64)
-            self.grid.num_frame = divmod(len(self.grid.data), num_mesh)[0]
+            self.grid.num_frame = divmod(len(self.grid.data), self.grid.size)[0]
 
     def __str__(self):
         '''.. py:method:: __str__()
@@ -165,7 +163,7 @@ class VASPGrid(object):
             file name
         '''
         try:  # Version safety
-            thefile = open(filename, mode='w', newline= '\n')
+            thefile = open(filename, mode='w', newline='\n')
         except TypeError:
             thefile = open(filename, mode='wb')
         with thefile:
@@ -189,13 +187,13 @@ class VASPGrid(object):
             Rusultant by summing two grid value
 
         '''
-        add_grid = copy.deepcopy(self)        
+        add_grid = copy.deepcopy(self)
         try:
             add_grid.grid.data = self.grid.data + other.grid.data
         except ValueError:
             raise RuntimeError('The mesh shapes are different each other')
         return add_grid
-            
+
     def __add__(self, other):
         '''.. py:method:: __add__(other)
 
@@ -255,6 +253,7 @@ class VASPGrid(object):
             raise RuntimeError('The mesh shapes are different each other')
         return diff_grid
 
+
 class Grid3D(object):
     '''.. py:class:: Mesh3D(size, data)
     Class for NG(X,Y,Z)F in VASP
@@ -275,12 +274,24 @@ class Grid3D(object):
         for example, num_frame is 4 for CHGCAR included SOI
     '''
     def __init__(self, shape=(0, 0, 0), data=[]):
-        self.shape = shape
+        self.__shape = shape
         self.data = np.asarray(data)
+        self.size = shape[0] * shape[1] * shape[2]
         try:
-            self.num_frame = divmod(self.data.selfize, shape[0] * shape[1] * shape[2])[0]
+            self.num_frame = divmod(self.data.size, self.size)[0]
         except:
             self.num_frame = 0
+
+    @property
+    def shape(self):
+        '''getter for shape'''
+        return self.__shape
+
+    @shape.setter
+    def shape(self, arg):
+        '''setter for shape'''
+        self.__shape = tuple(arg)
+        self.size = self.__shape[0] * self.__shape[1] * self.__shape[2]
 
     def slice(self, axis, postition):
         '''.. py:method:: slice(axis, position)
@@ -339,9 +350,8 @@ class Grid3D(object):
             a string representation of VASPGrid object
         '''
         outputstr = ''
-        num_mesh = self.shape[0] * self.shape[1] * self.shape[2]
-        mesharray = self.data.reshape(self.data.size // num_mesh,
-                                      num_mesh)
+        mesharray = self.data.reshape(self.data.size // self.size,
+                                      self.size)
         for tmp in mesharray:
             output = []
             outputstr += '\n  {0}  {1}  {2}\n'.format(self.shape[0],
