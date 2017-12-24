@@ -134,7 +134,6 @@ class VASPGrid(object):
                         # for unused data stored in LOCPOT
                         self.additional.extend(line.split())
             self.grid.data = np.array(griddata, dtype=np.float64)
-            self.grid.num_frame = divmod(len(self.grid.data), self.grid.size)[0]
 
     def __str__(self):
         '''.. py:method:: __str__()
@@ -269,9 +268,6 @@ class Grid3D(object):
     data: list or numpy.array
         1D-list or 1D-numpy array.
         The length of grid is shape[0] * shape[1] * shape[2]
-    num_frame: int
-        Number of grid frames
-        for example, num_frame is 4 for CHGCAR included SOI
     '''
     def __init__(self, shape=(0, 0, 0), data=None):
         self.shape = shape
@@ -279,15 +275,16 @@ class Grid3D(object):
             self.data = []
         else:
             self.data = np.asarray(data)
-        try:
-            self.num_frame = divmod(self.data.size, self.size)[0]
-        except (ZeroDivisionError, AttributeError):
-            self.num_frame = 0
 
     @property
     def size(self):
-        '''Return the number of mesh in the frame'''
+        '''Return the number of meshes in the frame'''
         return self.shape[0] * self.shape[1] * self.shape[2]
+
+    @property
+    def num_frame(self):
+        '''Return the number of grid frames'''
+        return divmod(self.data.size, self.size)[0]
 
     def slice(self, axis, postition):
         '''.. py:method:: slice(axis, position)
