@@ -274,27 +274,20 @@ class Grid3D(object):
         for example, num_frame is 4 for CHGCAR included SOI
     '''
     def __init__(self, shape=(0, 0, 0), data=None):
-        self.__shape = shape
+        self.shape = shape
         if data is None:
             self.data = []
         else:
             self.data = np.asarray(data)
-        self.size = shape[0] * shape[1] * shape[2]
         try:
             self.num_frame = divmod(self.data.size, self.size)[0]
         except (ZeroDivisionError, AttributeError):
             self.num_frame = 0
 
     @property
-    def shape(self):
-        '''getter for shape'''
-        return self.__shape
-
-    @shape.setter
-    def shape(self, arg):
-        '''setter for shape'''
-        self.__shape = tuple(arg)
-        self.size = self.__shape[0] * self.__shape[1] * self.__shape[2]
+    def size(self):
+        '''Return the number of mesh in the frame'''
+        return self.shape[0] * self.shape[1] * self.shape[2]
 
     def slice(self, axis, postition):
         '''.. py:method:: slice(axis, position)
