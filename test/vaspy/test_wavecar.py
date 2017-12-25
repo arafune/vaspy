@@ -18,7 +18,7 @@ class TestCOWavecar(object):
         
     @with_setup(setup=setup)
     def test_wavecar_readheader(self):
-        '''Test for WAVECAR property 
+        '''Test for WAVECAR property
 
         rtag, wfprec
         '''
@@ -26,7 +26,7 @@ class TestCOWavecar(object):
         eq_(2, self.co.nspin)      # spin
         eq_(45200, self.co.rtag)   # precision flag
         eq_(np.complex64, self.co.wfprec)
-        #
+        
         eq_(1, self.co.nkpts)
         eq_(54, self.co.nbands)
         eq_(400, self.co.encut)
@@ -39,5 +39,9 @@ class TestCOWavecar(object):
         
     @with_setup(setup=setup)
     def test_wavecar_readband(self):
-        kpath, bands = co.readband()
-        
+        kpath, kbands = self.co.readband()
+        eq_(None, kpath)
+        eq_((self.co.nspin, self.co.nkpts, self.co.nbands), kbands.shape)
+        np.testing.assert_array_almost_equal(
+            [-29.49120151, -14.03737717, -11.88106463, -11.88106223,  -9.00976389],
+            kbands[0, 0, 0:5])  # The value can be taken from EIGENVAL
