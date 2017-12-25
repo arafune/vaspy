@@ -5,7 +5,6 @@ Module for WAVECAR class
 
 from __future__ import division, print_function  # Version safety
 import numpy as np
-import vaspy.const as const
 from scipy.fftpack import ifftn
 
 
@@ -28,8 +27,8 @@ class WAVECAR(object):
         Number of spins
     rtag: numpy.int
         Tag for precsion in WAVECAR
-    nplws: numpy.int
-        Number of plane waves
+    nplwvs: numpy.int
+        Number of plane waves. 
     nkpts: numpy.int
         Number of k-points
     nbands: numpy.int
@@ -50,15 +49,12 @@ class WAVECAR(object):
 
     def __init__(self, filename='WAVECAR'):
         '''initialization of WAVECAR class'''
-        self.filename = filename
-        self.wfc = open(self.filename, 'rb')
+        self.wfc = open(filename, 'rb')
         #
-        # read the basic information
-        self.readheader()
-        # read the band information
-        self.readband()
+        self.header()
+        self.band()
 
-    def readheader(self):
+    def header(self):
         '''.. py:method:: readheader()
 
         Read the information of the system stored in the first
@@ -67,17 +63,14 @@ class WAVECAR(object):
         rec1: recl, nspin, rtag
         rec2: nkpts, nbands ,encut ((cell(i, j) i=1, 3), j=1, 3)
         '''
+        Ry_in_eV = 13.605826
+        au_in_AA = 0.529177249
         self.wfc.seek(0)
         self.recl, self.nspin, self.rtag = np.array(
             np.fromfile(self.wfc, dtype=np.float, count=3),
             dtype=int)
-        if self.rtag == 45200:
-            self.wfprec = np.complex64
-        elif self.rtag == 45210:
-            self.wfprec = np.complex128
-        else:
-            raise ValueError('Invalid TAG value: {}'.format(self.rtag))
         self.wfc.seek(self.recl)
+        
         dump = np.fromfile(self.wfc, dtype=np.float, count=12)
 
         self.nkpts = int(dump[0])
@@ -88,40 +81,50 @@ class WAVECAR(object):
         self.rcpcell = np.linalg.inv(self.realcell).T
         unit_cell_vector_magnitude = np.linalg.norm(self.realcell, axis=1)
         cutof = np.ceil(
-            np.sqrt(self.encut / const.RytoeV) / (2*np.pi / (
-                unit_cell_vector_magnitude / const.au_to_A)))
+            np.sqrt(self.encut / Ry_in_eV) / (2*np.pi / (
+                unit_cell_vector_magnitude / au_in_AA)))
+        ## FFT Minimum grid size
         self.ngrid = np.array(2 * cutof + 1, dtype=int)
         #         self.ngrid = np.array(cutof, dtype=int) でよい？
 
-    def readband(self):
-        '''.. py:method:: readband()
+    @property
+    def prec(self):
+        '''Return precision determined from self.rtag'''
+        if self.rtag == 45200:
+            return np.complex64
+        elif self.rtag == 45210:
+            return  np.complex128
+        else:
+            raise ValueError('Invalid TAG value: {}'.format(self.rtag))
+
+    def band(self):
+        '''.. py:method:: band()
 
         Read the information about the band from WAVECAR file
 
         The infomation obtained by this method is as follows:
 
-        * Number of plane waves (nplws)
+        * Number of plane waves (nplwv)
         * A integer set for k-vectors
         * energy of the band (as a function of spin-, k-, and band index)
         * occupation  (as a function of spin-, k-, and band index)
 
         '''
-        self.nplws = np.zeros(self.nkpts, dtype=int)
         self.kvecs = np.zeros((self.nkpts, 3), dtype=float)
         self.bands = np.zeros((self.nspin, self.nkpts, self.nbands),
                               dtype=float)
+        self.nplwvs = np.zeros(self.nkpts, dtype=int)        
         self.occs = np.zeros((self.nspin, self.nkpts, self.nbands),
                              dtype=float)
         for spin_i in range(self.nspin):
             for k_i in range(self.nkpts):
                 pos = 2 + spin_i * self.nkpts * (self.nbands + 1)
-                pos += k_i * (self.nbands + 1) + 1 - 1
-                # the last '1' corresponds iband=1
+                pos += k_i * (self.nbands + 1)
                 self.wfc.seek(pos * self.recl)
                 dump = np.fromfile(self.wfc, dtype=np.float,
                                    count=4+3*self.nbands)
                 if spin_i == 0:
-                    self.nplws[k_i] = int(dump[0])
+                    self.nplwvs[k_i] = int(dump[0])
                     self.kvecs[k_i] = dump[1:4]
                 dump = dump[4:].reshape((-1, 3))
                 self.bands[spin_i, k_i, :] = dump[:, 0]
@@ -141,6 +144,11 @@ class WAVECAR(object):
         '''
         G-vectors :math:`G` is determined by the following condition:
             :math:`(G+k)^2 / 2 < E_{cut}`
+
+
+        note: hbar2over2m is :math:'\frac{\hbar^2}{2m}`
+              0.529177249 is au unit in AA
+             13.605826 is Ry unit in eV
 
         Parameters
         ------------
@@ -167,7 +175,8 @@ class WAVECAR(object):
                           for iz in range(self.ngrid[2])
                           for iy in range(self.ngrid[1])
                           for ix in range(self.ngrid[0])], dtype=float)
-        energy_k = const.HSQDTM * np.linalg.norm(
+        hbar2over2m = 13.605826 * 0.529177249 * 0.529177249
+        energy_k = hbar2over2m * np.linalg.norm(
             np.dot(kgrid + kvec[np.newaxis, :], 2*np.pi*self.rcpcell),
             axis=1)**2
         g_vec = kgrid[np.where(energy_k < self.encut)[0]]
@@ -190,11 +199,11 @@ class WAVECAR(object):
         norm: bool
             If true the Band coeffients are normliazed
         '''
-        pos = 2 + spin_i * self.nkpts * (self.nbands + 1)
-        pos += k_i * (self.nbands + 1) + band_i + 1
-        self.wfc.seek(pos * self.recl)
-        nplw = self.nplws[k_i]
-        dump = np.fromfile(self.wfc, dtype=self.wfprec, count=nplw)
+        irec = 3 + spin_i * self.nkpts * (self.nbands + 1)
+        irec += k_i * (self.nbands + 1) + band_i
+        self.wfc.seek(irec * self.recl)
+        nplw = self.nplwvs[k_i]
+        dump = np.fromfile(self.wfc, dtype=self.prec, count=nplw)
         cg = np.array(dump, dtype=np.complex128)
         if norm:
             cg /= np.linalg.norm(cg)
