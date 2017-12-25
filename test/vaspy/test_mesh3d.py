@@ -20,5 +20,5 @@ class TestMesh3d(object):
     def test_check_basic_parameters(self):
         '''Checking the basic parameters stored'''
         meshdata = list (range(3*4*5))
-        self.simple_mesh3d = mesh3d.Mesh3D((3,4,5), meshdata)
+        self.simple_grid = mesh3d.Grid3D((3,4,5), meshdata)
         
