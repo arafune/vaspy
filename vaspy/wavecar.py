@@ -8,6 +8,10 @@ import numpy as np
 from scipy.fftpack import ifftn
 
 
+Ry_in_eV = 13.605826
+au_in_AA = 0.529177249
+
+
 class WAVECAR(object):
     '''.. py:class:: WAVECAR(WAVECAR_file)
 
@@ -63,8 +67,6 @@ class WAVECAR(object):
         rec1: recl, nspin, rtag
         rec2: nkpts, nbands ,encut ((cell(i, j) i=1, 3), j=1, 3)
         '''
-        Ry_in_eV = 13.605826
-        au_in_AA = 0.529177249
         self.wfc.seek(0)
         self.recl, self.nspin, self.rtag = np.array(
             np.fromfile(self.wfc, dtype=np.float, count=3),
