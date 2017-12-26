@@ -55,7 +55,7 @@ class WAVECAR(object):
         self.band()
 
     def header(self):
-        '''.. py:method:: readheader()
+        '''.. py:method:: header()
 
         Read the information of the system stored in the first
         two record in WAVECAR file
@@ -80,11 +80,11 @@ class WAVECAR(object):
         self.volume = np.linalg.det(self.realcell)
         self.rcpcell = np.linalg.inv(self.realcell).T
         unit_cell_vector_magnitude = np.linalg.norm(self.realcell, axis=1)
-        cutof = np.ceil(
+        cutoff = np.ceil(
             np.sqrt(self.encut / Ry_in_eV) / (2*np.pi / (
                 unit_cell_vector_magnitude / au_in_AA)))
         ## FFT Minimum grid size
-        self.ngrid = np.array(2 * cutof + 1, dtype=int)
+        self.ngrid = np.array(2 * cutoff + 1, dtype=int)
         #         self.ngrid = np.array(cutof, dtype=int) でよい？
 
     @property
@@ -145,10 +145,10 @@ class WAVECAR(object):
         G-vectors :math:`G` is determined by the following condition:
             :math:`(G+k)^2 / 2 < E_{cut}`
 
+        note: hbar2over2m is :math:`\hbar^2/2m`
 
-        note: hbar2over2m is :math:'\frac{\hbar^2}{2m}`
-              0.529177249 is au unit in AA
-             13.605826 is Ry unit in eV
+        * 0.529177249 is au unit in AA
+        * 13.605826 is Ry unit in eV
 
         Parameters
         ------------
