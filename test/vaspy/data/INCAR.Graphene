@@ -1,0 +1,15 @@
+general:
+ SYSTEM = Graphene
+ ISTART = 0
+ PREC =  Normal
+ ENCUT = 550
+spin:
+ ISPIN = 1
+electornic relaxation:
+ EDIFF = 1E-06
+ ISMEAR = 1
+ SIGMA = 0.2
+ LREAL = .FALSE.
+ NCORE =  1
+ LORBIT = 12
+ 
