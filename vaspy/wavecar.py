@@ -6,7 +6,8 @@ Module for WAVECAR class
 from __future__ import division, print_function  # Version safety
 import numpy as np
 from scipy.fftpack import ifftn
-
+import vaspy.mesh3d as mesh3d
+import vaspy.poscar as poscar
 
 Ry_in_eV = 13.605826
 au_in_AA = 0.529177249
@@ -32,7 +33,7 @@ class WAVECAR(object):
     rtag: numpy.int
         Tag for precsion in WAVECAR
     nplwvs: numpy.int
-        Number of plane waves. 
+        Number of plane waves.
     nkpts: numpy.int
         Number of k-points
     nbands: numpy.int
@@ -72,9 +73,9 @@ class WAVECAR(object):
             np.fromfile(self.wfc, dtype=np.float, count=3),
             dtype=int)
         self.wfc.seek(self.recl)
-        
+        #
         dump = np.fromfile(self.wfc, dtype=np.float, count=12)
-
+        #
         self.nkpts = int(dump[0])
         self.nbands = int(dump[1])
         self.encut = dump[2]
@@ -85,7 +86,7 @@ class WAVECAR(object):
         cutoff = np.ceil(
             np.sqrt(self.encut / Ry_in_eV) / (2*np.pi / (
                 unit_cell_vector_magnitude / au_in_AA)))
-        ## FFT Minimum grid size
+        # FFT Minimum grid size
         self.ngrid = np.array(2 * cutoff + 1, dtype=int)
         #         self.ngrid = np.array(cutof, dtype=int) でよい？
 
@@ -95,7 +96,7 @@ class WAVECAR(object):
         if self.rtag == 45200:
             return np.complex64
         elif self.rtag == 45210:
-            return  np.complex128
+            return np.complex128
         else:
             raise ValueError('Invalid TAG value: {}'.format(self.rtag))
 
@@ -115,7 +116,7 @@ class WAVECAR(object):
         self.kvecs = np.zeros((self.nkpts, 3), dtype=float)
         self.bands = np.zeros((self.nspin, self.nkpts, self.nbands),
                               dtype=float)
-        self.nplwvs = np.zeros(self.nkpts, dtype=int)        
+        self.nplwvs = np.zeros(self.nkpts, dtype=int)
         self.occs = np.zeros((self.nspin, self.nkpts, self.nbands),
                              dtype=float)
         for spin_i in range(self.nspin):
@@ -212,7 +213,8 @@ class WAVECAR(object):
         return cg
 
     def realspace_wfc(self, spin_i=0, k_i=0, band_i=0,
-                      gvec=None, ngrid=None, norm=False):
+                      gvec=None, ngrid=None, norm=False,
+                      poscar=poscar.POSCAR()):
         '''.. py:method:: realspace_wfc(spin_i, k_i, band_i, gvec, ngrid, norm)
 
         Calculate the pseudo-wavefunction of the KS states in
@@ -238,6 +240,12 @@ class WAVECAR(object):
             G-vector for calculation. If not set, use gvectors(k_i)
         ngrid: numpy.array
             Ngrid for calculation. If not set, use self.ngrid.
+        poscar: vaspy.poscar
+            POSCAR object
+
+        Return
+        -----------
+        VASPGrid
         '''
         if ngrid is None:
             ngrid = self.ngrid.copy()
@@ -247,20 +255,20 @@ class WAVECAR(object):
             gvec = self.gvectors(k_i)
         phi_k = np.zeros(ngrid, dtype=np.complex128)
         gvec %= ngrid[np.newaxis, :]
-        phi_k[gvec[:, 0],
-              gvec[:, 1],
-              gvec[:, 2]] = self.bandcoeff(spin_i,
-                                           k_i,
-                                           band_i,
-                                           norm)
-        return ifftn(phi_k)
-
-    def chgcarformat(self, poscar):
-        ''' .. py:method:: chgcarformat(poscar)
-
-        
-'''
-        pass
+        phi_k[gvec[:, 0], gvec[:, 1], gvec[:, 2]] = self.bandcoeff(spin_i,
+                                                                   k_i,
+                                                                   band_i,
+                                                                   norm)
+        if poscar.scaling_factor == 0.:
+            return ifftn(phi_k)
+        else:
+            vaspgrid = mesh3d.VASPGrid()
+            vaspgrid.poscar = poscar
+            vaspgrid.grid.shape = phi_k.shape
+            re = np.real(phi_k.reshape(vaspgrid.grid.size))
+            im = np.imag(phi_k.reshape(vaspgrid.grid.size))
+            vaspgrid.grid.data = np.concatenate((re, im))
+            return vaspgrid
 
 
     def __str__(self):
@@ -280,7 +288,7 @@ class WAVECAR(object):
             string += " = {0}    {1}    {2}".format(self.realcell[i][0],
                                                     self.realcell[i][1],
                                                     self.realcell[i][2])
-        string += "\n\n"
+        string += "\n"
         string += "\nvolume unit cell =   {0}".format(self.volume)
         string += "\nReciprocal lattice vectors:"
         for i in range(3):
