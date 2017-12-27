@@ -34,7 +34,7 @@ class WAVECAR(object):
         Tag for precsion in WAVECAR
     nplwvs: numpy.int
         Number of plane waves.
-    nkpts: numpy.int
+    numk: numpy.int
         Number of k-points
     nbands: numpy.int
         Number of bands
@@ -66,7 +66,7 @@ class WAVECAR(object):
         two record in WAVECAR file
 
         rec1: recl, nspin, rtag
-        rec2: nkpts, nbands ,encut ((cell(i, j) i=1, 3), j=1, 3)
+        rec2: numk, nbands ,encut ((cell(i, j) i=1, 3), j=1, 3)
         '''
         self.wfc.seek(0)
         self.recl, self.nspin, self.rtag = np.array(
@@ -76,7 +76,7 @@ class WAVECAR(object):
         #
         dump = np.fromfile(self.wfc, dtype=np.float, count=12)
         #
-        self.nkpts = int(dump[0])
+        self.numk = int(dump[0])
         self.nbands = int(dump[1])
         self.encut = dump[2]
         self.realcell = dump[3:].reshape((3, 3))
@@ -112,16 +112,18 @@ class WAVECAR(object):
         * energy of the band (as a function of spin-, k-, and band index)
         * occupation  (as a function of spin-, k-, and band index)
 
+        
+
         '''
-        self.kvecs = np.zeros((self.nkpts, 3), dtype=float)
-        self.bands = np.zeros((self.nspin, self.nkpts, self.nbands),
+        self.kvecs = np.zeros((self.numk, 3), dtype=float)
+        self.bands = np.zeros((self.nspin, self.numk, self.nbands),
                               dtype=float)
-        self.nplwvs = np.zeros(self.nkpts, dtype=int)
-        self.occs = np.zeros((self.nspin, self.nkpts, self.nbands),
+        self.nplwvs = np.zeros(self.numk, dtype=int)
+        self.occs = np.zeros((self.nspin, self.numk, self.nbands),
                              dtype=float)
         for spin_i in range(self.nspin):
-            for k_i in range(self.nkpts):
-                pos = 2 + spin_i * self.nkpts * (self.nbands + 1)
+            for k_i in range(self.numk):
+                pos = 2 + spin_i * self.numk * (self.nbands + 1)
                 pos += k_i * (self.nbands + 1)
                 self.wfc.seek(pos * self.recl)
                 dump = np.fromfile(self.wfc, dtype=np.float,
@@ -139,7 +141,7 @@ class WAVECAR(object):
                                                  np.diff(self.kvecs, axis=0),
                                                  self.rcpcell),
                                              axis=1))))
-        if self.nkpts == 1:
+        if self.numk == 1:
             self.kpath = None
         return self.kpath, self.bands
 
@@ -202,7 +204,7 @@ class WAVECAR(object):
         norm: bool
             If true the Band coeffients are normliazed
         '''
-        irec = 3 + spin_i * self.nkpts * (self.nbands + 1)
+        irec = 3 + spin_i * self.numk * (self.nbands + 1)
         irec += k_i * (self.nbands + 1) + band_i
         self.wfc.seek(irec * self.recl)
         nplw = self.nplwvs[k_i]
@@ -259,17 +261,21 @@ class WAVECAR(object):
                                                                    k_i,
                                                                    band_i,
                                                                    norm)
+        phi_r = ifftn(phi_k)
         if poscar.scaling_factor == 0.:
-            return ifftn(phi_k)
+            return phi_r.T
         else:
             vaspgrid = mesh3d.VASPGrid()
             vaspgrid.poscar = poscar
             vaspgrid.grid.shape = phi_k.shape
-            re = np.real(phi_k.reshape(vaspgrid.grid.size))
-            im = np.imag(phi_k.reshape(vaspgrid.grid.size))
+            # checking consistency between POSCAR and WAVECAR
+            np.testing.assert_array_almost_equal(
+                poscar.scaling_factor * poscar.cell_vecs,
+                self.realcell)
+            re = np.real(phi_r.T.reshape(vaspgrid.grid.size))
+            im = np.imag(phi_r.T.reshape(vaspgrid.grid.size))
             vaspgrid.grid.data = np.concatenate((re, im))
             return vaspgrid
-
 
     def __str__(self):
         ''' .. py:method:: __str__()
@@ -280,7 +286,7 @@ class WAVECAR(object):
         the1stline += "spins =           {1}  "
         the1stline += "prec flag        {2}"
         string = the1stline.format(self.recl, self.nspin, self.rtag)
-        string += "\nno. k points =          {0}".format(self.nkpts)
+        string += "\nno. k points =          {0}".format(self.numk)
         string += "\nno. bands =          {0}".format(self.nbands)
         string += "\nreal space lattice vectors:"
         for i in range(3):
