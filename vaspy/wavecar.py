@@ -34,7 +34,7 @@ class WAVECAR(object):
         Tag for precsion in WAVECAR
     nplwvs: numpy.int
         Number of plane waves.
-    nkpts: numpy.int
+    numk: numpy.int
         Number of k-points
     nbands: numpy.int
         Number of bands
@@ -66,7 +66,7 @@ class WAVECAR(object):
         two record in WAVECAR file
 
         rec1: recl, nspin, rtag
-        rec2: nkpts, nbands ,encut ((cell(i, j) i=1, 3), j=1, 3)
+        rec2: numk, nbands ,encut ((cell(i, j) i=1, 3), j=1, 3)
         '''
         self.wfc.seek(0)
         self.recl, self.nspin, self.rtag = np.array(
@@ -76,7 +76,7 @@ class WAVECAR(object):
         #
         dump = np.fromfile(self.wfc, dtype=np.float, count=12)
         #
-        self.nkpts = int(dump[0])
+        self.numk = int(dump[0])
         self.nbands = int(dump[1])
         self.encut = dump[2]
         self.realcell = dump[3:].reshape((3, 3))
@@ -112,16 +112,18 @@ class WAVECAR(object):
         * energy of the band (as a function of spin-, k-, and band index)
         * occupation  (as a function of spin-, k-, and band index)
 
+        
+
         '''
-        self.kvecs = np.zeros((self.nkpts, 3), dtype=float)
-        self.bands = np.zeros((self.nspin, self.nkpts, self.nbands),
+        self.kvecs = np.zeros((self.numk, 3), dtype=float)
+        self.bands = np.zeros((self.nspin, self.numk, self.nbands),
                               dtype=float)
-        self.nplwvs = np.zeros(self.nkpts, dtype=int)
-        self.occs = np.zeros((self.nspin, self.nkpts, self.nbands),
+        self.nplwvs = np.zeros(self.numk, dtype=int)
+        self.occs = np.zeros((self.nspin, self.numk, self.nbands),
                              dtype=float)
         for spin_i in range(self.nspin):
-            for k_i in range(self.nkpts):
-                pos = 2 + spin_i * self.nkpts * (self.nbands + 1)
+            for k_i in range(self.numk):
+                pos = 2 + spin_i * self.numk * (self.nbands + 1)
                 pos += k_i * (self.nbands + 1)
                 self.wfc.seek(pos * self.recl)
                 dump = np.fromfile(self.wfc, dtype=np.float,
@@ -139,15 +141,13 @@ class WAVECAR(object):
                                                  np.diff(self.kvecs, axis=0),
                                                  self.rcpcell),
                                              axis=1))))
-        if self.nkpts == 1:
+        if self.numk == 1:
             self.kpath = None
         return self.kpath, self.bands
 
     def gvectors(self, k_i=0):
-        ''' ..py:method:: gvectors(k_i)
-
-        Retrurn G-vectors :math:`G` is determined by the following condition:
-            :math:`(G+k)^2 / 2 < E_{cut}`
+        '''
+        G-vectors :math:`G` is determined by the following condition: :math:`(G+k)^2 / 2 < E_{cut}`
 
         note: hbar2over2m is :math:`\hbar^2/2m`
 
@@ -195,15 +195,15 @@ class WAVECAR(object):
         Parameters
         ----------
         spin_i: int
-           spin index (0 or 1)
+           spin index (0 or 1) :math:`s_i`
         k_i: int
-           k index. Starts with 0
+           k index :math:`k_i`. Starts with 0
         band_i: int
-            band index. starts with 0
+            band index :math:`b_i`. starts with 0
         norm: bool
             If true the Band coeffients are normliazed
         '''
-        irec = 3 + spin_i * self.nkpts * (self.nbands + 1)
+        irec = 3 + spin_i * self.numk * (self.nbands + 1)
         irec += k_i * (self.nbands + 1) + band_i
         self.wfc.seek(irec * self.recl)
         nplw = self.nplwvs[k_i]
@@ -222,7 +222,7 @@ class WAVECAR(object):
         the real space by using FFT transformation of the reciprocal
         space planewave coefficients.
 
-        The 3D grid size is detemined by ngrid, which defaults
+        The 3D FE grid size is detemined by ngrid, which defaults
         to self.ngrid if it is not provided.  GVectors of the KS
         states is used to put 1D plane wave coefficient back to 3D
         grid.
@@ -232,9 +232,9 @@ class WAVECAR(object):
         spin_i: int
            spin index (0 or 1)
         k_i: int
-           k index. Starts with 0. default is 0
+           k index :math:`k_i`. Starts with 0. default is 0
         band_i: int
-            band index. starts with 0. default is 0.
+            band index :math:`b_i`. starts with 0. default is 0.
         norm: bool
             If true the Band coeffients are normliazed
         gvec: numpy.array
@@ -262,11 +262,15 @@ class WAVECAR(object):
                                                                    norm)
         phi_r = ifftn(phi_k)
         if poscar.scaling_factor == 0.:
-            return phi_r
+            return phi_r.T
         else:
             vaspgrid = mesh3d.VASPGrid()
             vaspgrid.poscar = poscar
             vaspgrid.grid.shape = phi_k.shape
+            # checking consistency between POSCAR and WAVECAR
+            np.testing.assert_array_almost_equal(
+                poscar.scaling_factor * poscar.cell_vecs,
+                self.realcell)
             re = np.real(phi_r.T.reshape(vaspgrid.grid.size))
             im = np.imag(phi_r.T.reshape(vaspgrid.grid.size))
             vaspgrid.grid.data = np.concatenate((re, im))
@@ -281,7 +285,7 @@ class WAVECAR(object):
         the1stline += "spins =           {1}  "
         the1stline += "prec flag        {2}"
         string = the1stline.format(self.recl, self.nspin, self.rtag)
-        string += "\nno. k points =          {0}".format(self.nkpts)
+        string += "\nno. k points =          {0}".format(self.numk)
         string += "\nno. bands =          {0}".format(self.nbands)
         string += "\nreal space lattice vectors:"
         for i in range(3):

@@ -16,22 +16,38 @@ class OUTCAR(object):  # Version safety
 
     Class for OUTCAR file that stores calculation details
     and/or calculation progress
+
+    Attributes
+    -------------
+
+    nions: int
+        number of ions
+    iontypes: list
+        list of ion name
+    ionnums: list
+        list of number of ions
+    kvecs: list
+        kvector list
+    weights: list
+        weight list
     '''
 
     def __init__(self, arg=None):
         self.nions = 0
-        self.iontype = []
+        self.iontypes = []
         self.ionnums = []
         self.posforce = []
         self.posforce_title = []
         self.atom_names = []
         self.fermi = 0.0
         self.atom_identifer = []
-        self.nkpts = 0
+        self.numk = 0
         self.nkdim = 0
         self.nbands = 0
         self.magnetization = []
         self.tot_chage = []
+        self.kvecs = []
+        self.weights = []
         if arg is not None:
             self.load_from_file(arg)
 
@@ -41,7 +57,7 @@ class OUTCAR(object):  # Version safety
         build atom_names (the list of atomname_with_index)
         '''
         self.atom_names = []
-        for elm, ionnum in zip(self.iontype, self.ionnums):
+        for elm, ionnum in zip(self.iontypes, self.ionnums):
             for j in range(1, ionnum + 1):
                 tmp = elm + str(j)
                 if tmp not in self.atom_names:
@@ -84,6 +100,7 @@ class OUTCAR(object):  # Version safety
         section = []
         posforce = []
         magnetization = []
+        kvec_weight = []
         # parse
         if os.path.splitext(arg)[1] == '.bz2':
             try:
@@ -115,11 +132,17 @@ class OUTCAR(object):  # Version safety
                 else:
                     magnetization.append([
                         float(x) for x in line.split()[1:4]])
+            elif section == ['kvec_weight']:
+                if len(line) > 3:
+                    kvec_weight.append(
+                        [float(x) for x in line.split()])
+                else:
+                    section.pop()
             else:
                 if "number of dos" in line:
                     self.nions = int(line.split()[-1])
                 elif "TITEL  =" in line:
-                    self.iontype.append(line.split()[3])
+                    self.iontypes.append(line.split()[3])
                 elif "ions per type " in line:
                     self.ionnums = [int(x) for x in line.split()[4:]]
                 elif "POSITION" in line and "TOTAL-FORCE" in line:
@@ -127,7 +150,7 @@ class OUTCAR(object):  # Version safety
                 elif "E-fermi" in line:
                     self.fermi = float(line.split()[2])
                 elif "NBANDS" in line:
-                    self.nnkpts = int(line.strip().split()[3])
+                    self.numk = int(line.strip().split()[3])
                     self.nkdim = int(line.strip().split()[9])
                     self.nbands = int(line.strip().split()[14])
                 elif "reciprocal lattice vectors" in line:
@@ -137,19 +160,26 @@ class OUTCAR(object):  # Version safety
                 elif " magnetization (x)" in line:
                     magnetization = []
                     section.append("magnetization")
+                elif " Following reciprocal coordinates:" in line:
+                    next(thefile)
+                    kvec_weight = []
+                    section.append('kvec_weight')
                 else:
                     pass
         self.atom_identifer = [name + ":#" + str(index + 1)
                                for (index, name)
                                in enumerate(
                                    [elm + str(j)
-                                    for (elm, n) in zip(self.iontype,
+                                    for (elm, n) in zip(self.iontypes,
                                                         self.ionnums)
                                     for j in range(1, int(n) + 1)])]
         self.posforce = [posforce[i:i + self.nions]
                          for i in range(0, len(posforce), self.nions)]
         self.set_atom_names()
         self.set_posforce_title()
+        for i in kvec_weight:
+            self.kvecs.append([i[0], i[1], i[2]])
+            self.weights.append(i[3])
 
     def select_posforce_header(self, posforce_flag, *sites):
         '''.. py:method:: select_posforce_header(posforce_flag, *sites)

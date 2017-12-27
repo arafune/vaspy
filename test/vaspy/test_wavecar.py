@@ -27,7 +27,7 @@ class TestCOWavecar(object):
         eq_(45200, self.co.rtag)   # precision flag
         eq_(np.complex64, self.co.prec)
         
-        eq_(1, self.co.nkpts)
+        eq_(1, self.co.numk)
         eq_(54, self.co.nbands)
         eq_(400, self.co.encut)
         np.testing.assert_array_equal(
@@ -42,7 +42,7 @@ class TestCOWavecar(object):
         '''test for CO WAVECAR band'''
         kpath, kbands = self.co.band()
         eq_(None, kpath)
-        eq_((self.co.nspin, self.co.nkpts, self.co.nbands), kbands.shape)
+        eq_((self.co.nspin, self.co.numk, self.co.nbands), kbands.shape)
         np.testing.assert_array_almost_equal(
             [-29.49120151, -14.03737717, -11.88106463, -11.88106223,  -9.00976389],
             kbands[0, 0, 0:5])  # The value can be taken from EIGENVAL
@@ -61,7 +61,7 @@ class TestGrapheneWavecar(object):
         eq_(45200, self.gr.rtag)   # precision flag
         eq_(np.complex64, self.gr.prec)
         
-        eq_(240, self.gr.nkpts)
+        eq_(240, self.gr.numk)
         eq_(27, self.gr.nbands)
         eq_(550, self.gr.encut)
         np.testing.assert_array_almost_equal(
@@ -81,8 +81,8 @@ class TestGrapheneWavecar(object):
         # maximum and minimum number of plane-waves per node :      3857     3785
         eq_(3857, self.gr.nplwvs.max())
         eq_(3785, self.gr.nplwvs.min())
-        eq_((self.gr.nkpts,), kpath.shape)  # gr.nkpts = 240
-        eq_((self.gr.nspin, self.gr.nkpts, self.gr.nbands), kbands.shape)
+        eq_((self.gr.numk,), kpath.shape)  # gr.numk = 240
+        eq_((self.gr.nspin, self.gr.numk, self.gr.nbands), kbands.shape)
         np.testing.assert_array_almost_equal(
             [-22.516876, -10.623282, -6.106901, -6.094072, 0.245639, 1.006991],
             kbands[0, 0, 0:6])  # The value can be taken from EIGENVAL

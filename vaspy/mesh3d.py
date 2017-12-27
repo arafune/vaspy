@@ -109,16 +109,16 @@ class VASPGrid(object):
                     for _ in range(lines_for_mesh - 1):
                         griddata.extend(
                             [float(val) for val in
-                             next(thefile).rstrip().replace('***********',
-                                                            'Nan').split()])
+                                 next(thefile).rstrip().replace('***********',
+                                                                'Nan').split()])
                     section = 'grid'
                 elif section == 'aug':
                     if separator in line:
                         for _ in range(lines_for_mesh):
                             griddata.extend(
                                 [float(val) for val in
-                                 next(thefile).rstrip().replace('***********',
-                                                                'Nan').split()])
+                                     next(thefile).rstrip().replace('***********',
+                                                                    'Nan').split()])
                         section = 'grid'
                     elif "augmentation occupancies " in line:
                         pass  # Used for CHGCAR, not LOCPOT. not implementd
@@ -132,7 +132,7 @@ class VASPGrid(object):
                             griddata.extend(
                                 [float(val) for val in
                                  next(thefile).rstrip().replace('***********',
-                                                                'Nan').split()])
+                                                            'Nan').split()])
                     else:
                         # for unused data stored in LOCPOT
                         self.additional.extend(line.split())
@@ -170,6 +170,21 @@ class VASPGrid(object):
             thefile = open(filename, mode='wb')
         with thefile:
             thefile.write(str(self))
+
+    def frame(self, frame_i):
+        '''.. py:method::  frame(frame_i)
+        Return VASPGrid object for only frame_i th frame
+
+        Parameters
+        ----------
+
+        frame_i: int
+            frame index
+        '''
+        output_VASPGrid = VASPGrid()
+        output_VASPGrid.poscar = self.poscar
+        output_VASPGrid.grid = self.grid.frame(frame_i)
+        return output_VASPGrid
 
     def merge(self, other):
         '''.. py:method:: __add__(other)
@@ -288,6 +303,20 @@ class Grid3D(object):
     def num_frame(self):
         '''Return the number of grid frames'''
         return divmod(self.data.size, self.size)[0]
+
+    def frame(self, frame_i):
+        '''.. py:method::  frame(frame_i)
+        Return the i-th frame
+
+        Parameters
+        -----------
+        frame_i:int
+           frame index
+        '''
+        assert frame_i < self.num_frame
+        dest = copy.deepcopy(self)
+        dest.data = self.data.reshape(self.num_frame, self.size)[frame_i]
+        return dest
 
     def slice(self, axis, postition):
         '''.. py:method:: slice(axis, position)
