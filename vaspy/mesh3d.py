@@ -107,16 +107,18 @@ class VASPGrid(object):
                     else:
                         lines_for_mesh = self.grid.size // len(griddata) + 1
                     for _ in range(lines_for_mesh - 1):
-                        griddata.extend([float(val) for val in
-                                         next(thefile).rstrip().replace('***********',
-                                                                        'Nan').split()])
+                        griddata.extend(
+                            [float(val) for val in
+                                 next(thefile).rstrip().replace('***********',
+                                                                'Nan').split()])
                     section = 'grid'
                 elif section == 'aug':
                     if separator in line:
                         for _ in range(lines_for_mesh):
-                            griddata.extend([float(val) for val in
-                                             next(thefile).rstrip().replace('***********',
-                                                                            'Nan').split()])
+                            griddata.extend(
+                                [float(val) for val in
+                                     next(thefile).rstrip().replace('***********',
+                                                                    'Nan').split()])
                         section = 'grid'
                     elif "augmentation occupancies " in line:
                         pass  # Used for CHGCAR, not LOCPOT. not implementd
@@ -127,9 +129,10 @@ class VASPGrid(object):
                         section = 'aug'
                     elif separator in line:
                         for _ in range(lines_for_mesh):
-                            griddata.extend([float(val) for val in
-                                             next(thefile).rstrip().replace('***********',
-                                                                            'Nan').split()])
+                            griddata.extend(
+                                [float(val) for val in
+                                 next(thefile).rstrip().replace('***********',
+                                                            'Nan').split()])
                     else:
                         # for unused data stored in LOCPOT
                         self.additional.extend(line.split())
@@ -297,7 +300,7 @@ class Grid3D(object):
         return self.shape[0] * self.shape[1] * self.shape[2]
 
     @property
-    def num_frame(self):        
+    def num_frame(self):
         '''Return the number of grid frames'''
         return divmod(self.data.size, self.size)[0]
 
