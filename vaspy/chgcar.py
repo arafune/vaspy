@@ -138,7 +138,7 @@ class CHGCAR(mesh3d.VASPGrid):
             elif direction == 'z':
                 dest.grid = dest.grid.frame(3)
                 dest.spininfo = ["mZ"]
-        dest.grid.data = dest.grid.data.reshape(self.grid.size)
+        dest.grid.data = dest.grid.data.flatten()
         return dest
 
     def majorityspin(self):
@@ -158,10 +158,8 @@ class CHGCAR(mesh3d.VASPGrid):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         dest = copy.deepcopy(self)
-        tmp = dest.grid.data.reshape(2, self.grid.shape[2],
-                                     self.grid.shape[1],
-                                     self.grid.shape[0])
-        dest.grid.data = ((tmp[0] + tmp[1]) / 2).reshape(self.grid.size)
+        tmp = dest.grid.data.reshape(2, self.grid.size)
+        dest.grid.data = ((tmp[0] + tmp[1]) / 2)
         dest.spininfo = ["up"]
         return dest
 
@@ -182,9 +180,7 @@ class CHGCAR(mesh3d.VASPGrid):
         if len(self.spininfo) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         dest = copy.deepcopy(self)
-        tmp = dest.grid.data.reshape(2, self.grid.shape[2],
-                                     self.grid.shape[1],
-                                     self.grid.shape[0])
-        dest.grid.data = ((tmp[0] - tmp[1]) / 2).reshape(self.grid.size)
+        tmp = dest.grid.data.reshape(2, self.grid.size)
+        dest.grid.data = ((tmp[0] - tmp[1]) / 2)
         dest.spininfo = ["down"]
         return dest
