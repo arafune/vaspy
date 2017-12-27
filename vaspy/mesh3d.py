@@ -168,6 +168,21 @@ class VASPGrid(object):
         with thefile:
             thefile.write(str(self))
 
+    def frame(self, frame_i):
+        '''.. py:method::  frame(frame_i)
+        Return VASPGrid object for only frame_i th frame
+
+        Parameters
+        ----------
+
+        frame_i: int
+            frame index
+        '''
+        output_VASPGrid = VASPGrid()
+        output_VASPGrid.poscar = self.poscar
+        output_VASPGrid.grid = self.grid.frame(frame_i)
+        return output_VASPGrid
+
     def merge(self, other):
         '''.. py:method:: __add__(other)
 
@@ -282,9 +297,23 @@ class Grid3D(object):
         return self.shape[0] * self.shape[1] * self.shape[2]
 
     @property
-    def num_frame(self):
+    def num_frame(self):        
         '''Return the number of grid frames'''
         return divmod(self.data.size, self.size)[0]
+
+    def frame(self, frame_i):
+        '''.. py:method::  frame(frame_i)
+        Return the i-th frame
+
+        Parameters
+        -----------
+        frame_i:int
+           frame index
+        '''
+        assert frame_i < self.num_frame
+        dest = copy.deepcopy(self)
+        dest.data = self.data.reshape(self.num_frame, self.size)[frame_i]
+        return dest
 
     def slice(self, axis, postition):
         '''.. py:method:: slice(axis, position)

@@ -53,12 +53,15 @@ class TestCHGCAR(object):
 
     @with_setup(setup=setup)
     def test_mag_spin(self):
+        '''test for CHGCAR magnetization
+        '''
         magCHG = self.chgcar_spin.magnetization()
         eq_(4*4*6, magCHG.grid.data.size)
         np.testing.assert_array_almost_equal(
             [2.57589571650E+00, 2.09247290400E+00, 1.03267062280E+00,
              1.74930752210E-01, -2.99056784380E-02],
             magCHG.grid.data[0:5])
+        eq_(["up-down"], magCHG.spininfo)
 
     @with_setup(setup=setup)
     def test_mag_majority(self):

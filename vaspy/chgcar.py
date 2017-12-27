@@ -77,11 +77,11 @@ class CHGCAR(mesh3d.VASPGrid):
             CHGCAR file name
         '''
         super(CHGCAR, self).load_from_file(filename)
-        if divmod(self.grid.data.size, self.grid.size) == (1, 0):
+        if self.grid.num_frame == 1:
             self.spininfo = [""]
-        elif divmod(self.grid.data.size, self.grid.size) == (2, 0):
+        elif self.grid.num_frame == 2:
             self.spininfo = ["up+down", "up-down"]
-        elif divmod(self.grid.data.size, self.grid.size) == (4, 0):
+        elif self.grid.num_frame == 4:
             self.spininfo = ["mT", "mX", "mY", "mZ"]
         else:
             raise RuntimeError("CHGCAR is correct?")
@@ -123,32 +123,20 @@ class CHGCAR(mesh3d.VASPGrid):
             raise RuntimeError("This CHGCAR is not spinresolved version")
         dest = copy.deepcopy(self)
         if len(self.spininfo) == 2:
-            dest.grid.data = dest.grid.data.reshape(2, self.grid.shape[2],
-                                                    self.grid.shape[1],
-                                                    self.grid.shape[0])[1]
+            dest.grid = dest.grid.frame(1)
             dest.spininfo = ["up-down"]
         elif len(self.spininfo) == 4:
-            dest.grid.data.reshape(4, self.grid.shape[2], self.grid.shape[1],
-                                   self.grid.shape[0])
             if direction is None or direction == 't':
-                dest.mesh3d = dest.grid.data.reshape(4, self.grid.shape[2],
-                                                     self.grid.shape[1],
-                                                     self.grid.shape[0])[0]
+                dest.grid = dest.grid.frame(0)
                 dest.spininfo = ["mT"]
             if direction == 'x':
-                dest.mesh3d = dest.grid.data.reshape(4, self.grid.shape[2],
-                                                     self.grid.shape[1],
-                                                     self.grid.shape[0])[1]
+                dest.grid = dest.grid.frame(1)
                 dest.spininfo = ["mX"]
             elif direction == 'y':
-                dest.mesh3d = dest.grid.data.reshape(4, self.grid.shape[2],
-                                                     self.grid.shape[1],
-                                                     self.grid.shape[0])[2]
+                dest.grid = dest.grid.frame(2)
                 dest.spininfo = ["mY"]
             elif direction == 'z':
-                dest.mesh3d = dest.grid.data.reshape(4, self.grid.shape[2],
-                                                     self.grid.shape[1],
-                                                     self.grid.shape[0])[3]
+                dest.grid = dest.grid.frame(3)
                 dest.spininfo = ["mZ"]
         dest.grid.data = dest.grid.data.reshape(self.grid.size)
         return dest
