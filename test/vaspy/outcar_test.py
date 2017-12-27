@@ -40,7 +40,7 @@ class TestOUTCAR(object):
     @with_setup(setup=setup)
     def test_kvec_weight(self):
         eq_(33, len(self.outcar.kvecs))
-        eq_(33, len(self.outcar.weight))
+        eq_(33, len(self.outcar.weights))
         np.testing.assert_array_almost_equal(
             [[0.000000,  0.000000, 0.000000],
              [0.058824,  0.000000, 0.000000],
@@ -55,6 +55,4 @@ class TestOUTCAR(object):
              6.000000, 6.000000,
              6.000000, 6.000000,
              6.000000],
-            self.outcar.weight[:7])
-
-        
+            self.outcar.weights[:7])
