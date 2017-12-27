@@ -26,6 +26,10 @@ class OUTCAR(object):  # Version safety
         list of ion name
     ionnums: list
         list of number of ions
+    kvecs: list
+        kvector list
+    weight: list
+        weight list
     '''
 
     def __init__(self, arg=None):
@@ -42,7 +46,8 @@ class OUTCAR(object):  # Version safety
         self.nbands = 0
         self.magnetization = []
         self.tot_chage = []
-        self.kvec_weight = []
+        self.kvecs = []
+        self.weight = []
         if arg is not None:
             self.load_from_file(arg)
 
@@ -172,7 +177,9 @@ class OUTCAR(object):  # Version safety
                          for i in range(0, len(posforce), self.nions)]
         self.set_atom_names()
         self.set_posforce_title()
-        self.kvec_weight = kvec_weight
+        for i in kvec_weight:
+            self.kvecs.append([i[0], i[1], i[2]])
+            self.weight.append(i[3])
 
     def select_posforce_header(self, posforce_flag, *sites):
         '''.. py:method:: select_posforce_header(posforce_flag, *sites)
