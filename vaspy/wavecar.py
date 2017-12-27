@@ -144,8 +144,9 @@ class WAVECAR(object):
         return self.kpath, self.bands
 
     def gvectors(self, k_i=0):
-        '''
-        G-vectors :math:`G` is determined by the following condition:
+        ''' ..py:method:: gvectors(k_i)
+
+        Retrurn G-vectors :math:`G` is determined by the following condition:
             :math:`(G+k)^2 / 2 < E_{cut}`
 
         note: hbar2over2m is :math:`\hbar^2/2m`
@@ -221,7 +222,7 @@ class WAVECAR(object):
         the real space by using FFT transformation of the reciprocal
         space planewave coefficients.
 
-        The 3D FE grid size is detemined by ngrid, which defaults
+        The 3D grid size is detemined by ngrid, which defaults
         to self.ngrid if it is not provided.  GVectors of the KS
         states is used to put 1D plane wave coefficient back to 3D
         grid.
@@ -259,17 +260,17 @@ class WAVECAR(object):
                                                                    k_i,
                                                                    band_i,
                                                                    norm)
+        phi_r = ifftn(phi_k)
         if poscar.scaling_factor == 0.:
-            return ifftn(phi_k)
+            return phi_r
         else:
             vaspgrid = mesh3d.VASPGrid()
             vaspgrid.poscar = poscar
             vaspgrid.grid.shape = phi_k.shape
-            re = np.real(phi_k.reshape(vaspgrid.grid.size))
-            im = np.imag(phi_k.reshape(vaspgrid.grid.size))
+            re = np.real(phi_r.T.reshape(vaspgrid.grid.size))
+            im = np.imag(phi_r.T.reshape(vaspgrid.grid.size))
             vaspgrid.grid.data = np.concatenate((re, im))
             return vaspgrid
-
 
     def __str__(self):
         ''' .. py:method:: __str__()
