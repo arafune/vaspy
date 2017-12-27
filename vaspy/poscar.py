@@ -59,6 +59,16 @@ class POSCAR_HEAD(object):
     '''.. py:class:: POSCAR_HEAD()
 
     One of the parent classes of POSCAR class
+
+    Attributes
+    ----------
+
+    system_name: str
+       system name
+    scaling_factor: float
+       scaling factor
+    iontypes : list
+       list of ion name
 '''
     def __init__(self):
         self.__cell_vecs = np.array([[0., 0., 0.],
