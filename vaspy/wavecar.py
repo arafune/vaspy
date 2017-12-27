@@ -147,8 +147,7 @@ class WAVECAR(object):
 
     def gvectors(self, k_i=0):
         '''
-        G-vectors :math:`G` is determined by the following condition:
-            :math:`(G+k)^2 / 2 < E_{cut}`
+        G-vectors :math:`G` is determined by the following condition: :math:`(G+k)^2 / 2 < E_{cut}`
 
         note: hbar2over2m is :math:`\hbar^2/2m`
 
@@ -196,11 +195,11 @@ class WAVECAR(object):
         Parameters
         ----------
         spin_i: int
-           spin index (0 or 1)
+           spin index (0 or 1) :math:`s_i`
         k_i: int
-           k index. Starts with 0
+           k index :math:`k_i`. Starts with 0
         band_i: int
-            band index. starts with 0
+            band index :math:`b_i`. starts with 0
         norm: bool
             If true the Band coeffients are normliazed
         '''
@@ -233,9 +232,9 @@ class WAVECAR(object):
         spin_i: int
            spin index (0 or 1)
         k_i: int
-           k index. Starts with 0. default is 0
+           k index :math:`k_i`. Starts with 0. default is 0
         band_i: int
-            band index. starts with 0. default is 0.
+            band index :math:`b_i`. starts with 0. default is 0.
         norm: bool
             If true the Band coeffients are normliazed
         gvec: numpy.array
