@@ -1,3 +1,8 @@
+2017-12-27  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
+
+	* Version 0.4.1
+	* New module: wavecar.py
+
 2017-05-12  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
 
 	* Version 0.4.0
