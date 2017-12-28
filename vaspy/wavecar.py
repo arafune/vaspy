@@ -145,11 +145,11 @@ class WAVECAR(object):
         return self.kpath, self.bands
 
     def gvectors(self, k_i=0):
-        '''
+        r'''
         G-vectors :math:`G` is determined by the following condition:
-        :math:`(G+k)^2 / 2 < E_{cut}`
+        :math:`\frac{(G+k)^2}{ 2} < E_{cut}`
 
-        note: hbar2over2m is :math:`\hbar^2/2m`
+        note: hbar2over2m is :math:`\frac{\hbar^2}{2m}`
 
         * 0.529177249 is au unit in AA
         * 13.605826 is Ry unit in eV
