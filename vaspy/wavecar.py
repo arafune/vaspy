@@ -290,8 +290,8 @@ class WAVECAR(object):
                 np.testing.assert_array_almost_equal(
                     poscar.scaling_factor * poscar.cell_vecs,
                     self.realcell)
-                re = np.real(phi_r.T.flatten())
-                im = np.imag(phi_r.T.flatten())
+                re = np.real(phi_r.flatten('F'))
+                im = np.imag(phi_r.flatten('F'))
                 vaspgrid.grid.data = np.concatenate((re, im))
                 return vaspgrid
         except ValueError:   # SOI
@@ -314,10 +314,10 @@ class WAVECAR(object):
                 np.testing.assert_array_almost_equal(
                     poscar.scaling_factor * poscar.cell_vecs,
                     self.realcell)
-                up_re = np.real(phi_r.up.T.flatten())
-                up_im = np.imag(phi_r_up.T.flatten())
-                down_re = np.real(phi_r_down.T.flatten())
-                down_im = np.imag(phi_r_down.T.flatten())
+                up_re = np.real(phi_r.up.flatten('F'))
+                up_im = np.imag(phi_r_up.flatten('F'))
+                down_re = np.real(phi_r_down.flatten('F'))
+                down_im = np.imag(phi_r_down.flatten('F'))
                 vaspgrid.grid.data = np.concatenate((up_re, up_im,
                                                      down_re, down_im))
                 return vaspgrid
