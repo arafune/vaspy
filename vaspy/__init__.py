@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-   VASPy
-   ======
+VASPy
+======
 
-   modules for VASP pre/post-process
+modules for VASP pre/post-process
 """
 import os.path
 import re

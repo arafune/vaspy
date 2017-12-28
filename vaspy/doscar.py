@@ -60,7 +60,7 @@ class DOSCAR(object):  # Version safety
     A container of DOS object
 
     Attributes
-    ------------
+    ----------
     natom: int
         number of atoms
 
@@ -144,7 +144,7 @@ class DOS(object):  # Version safety
     Attributes
     -----------
     dos: list
-        `dos` is the python linst object for storing the dos data.
+         the dos data.
          By default, the first column is the energy, the latter is the density.
     '''
 
@@ -249,8 +249,8 @@ class PDOS(DOS):
     ''' 
     Class for partial DOS
 
-    Attribute
-    ---------
+    Attributes
+    ----------
     site: str
         name of the site.
 
