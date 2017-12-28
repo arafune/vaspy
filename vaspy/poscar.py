@@ -69,6 +69,8 @@ class POSCAR_HEAD(object):
        scaling factor
     iontypes : list
        list of ion name
+    ionnums : list
+       list of number of ions. Corresponding to `iontypes`
 '''
     def __init__(self):
         self.__cell_vecs = np.array([[0., 0., 0.],

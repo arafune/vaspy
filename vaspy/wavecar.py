@@ -112,8 +112,6 @@ class WAVECAR(object):
         * energy of the band (as a function of spin-, k-, and band index)
         * occupation  (as a function of spin-, k-, and band index)
 
-        
-
         '''
         self.kvecs = np.zeros((self.numk, 3), dtype=float)
         self.bands = np.zeros((self.nspin, self.numk, self.nbands),
@@ -146,9 +144,9 @@ class WAVECAR(object):
         return self.kpath, self.bands
 
     def gvectors(self, k_i=0):
-        '''
+        '''.. py::method gvectors(k_i)
         G-vectors :math:`G` is determined by the following condition:
-            :math:`(G+k)^2 / 2 < E_{cut}`
+        :math:`(G+k)^2 / 2 < E_{cut}`
 
         note: hbar2over2m is :math:`\hbar^2/2m`
 
@@ -157,8 +155,8 @@ class WAVECAR(object):
 
         Parameters
         ------------
-        k_i: int
-           k index
+        k_i: int, optional
+           k index :math:`k_i` (the default value is 0).
 
         Returns
         ---------
@@ -195,14 +193,14 @@ class WAVECAR(object):
 
         Parameters
         ----------
-        spin_i: int
-           spin index (0 or 1)
-        k_i: int
-           k index. Starts with 0
-        band_i: int
-            band index. starts with 0
-        norm: bool
-            If true the Band coeffients are normliazed
+        spin_i: int, optional
+           spin index (0 or 1) :math:`s_i` (default value is 0)
+        k_i: int, optioanl
+           k index :math:`k_i`. Starts with 0 (default value is 0)
+        band_i: int, optioanl
+            band index :math:`b_i`. starts with 0 (default value is 0)
+        norm: bool, optioanl
+            If true the Band coeffients are normliazed (default is false)
         '''
         irec = 3 + spin_i * self.numk * (self.nbands + 1)
         irec += k_i * (self.nbands + 1) + band_i
@@ -233,21 +231,40 @@ class WAVECAR(object):
         spin_i: int
            spin index (0 or 1)
         k_i: int
-           k index. Starts with 0. default is 0
+           k index :math:`k_i`. Starts with 0. default is 0
         band_i: int
-            band index. starts with 0. default is 0.
+            band index :math:`b_i`. starts with 0. default is 0.
         norm: bool
             If true the Band coeffients are normliazed
         gvec: numpy.array
             G-vector for calculation. If not set, use gvectors(k_i)
         ngrid: numpy.array
             Ngrid for calculation. If not set, use self.ngrid.
-        poscar: vaspy.poscar
-            POSCAR object
+        poscar: vaspy.poscar, optional
+            POSCAR object (defalut is no POSCAR object)
 
-        Return
+        Returns
         -----------
-        VASPGrid
+
+        phi_r.T: numpy.array
+            If poscar is not specified, for Collinear-wavecar file.
+            phi_r is mesh data for the wavefunction in the real space.
+            .T is due to the original data is made by fortran program
+            (i.e. 'VASP', of course.
+
+        phi_r_up.T, phi_r_down.T: tuple of numpy.array
+            If poscar is not specified, for SOI-wavecar file.
+            phi_r_up corresponds to the 'up' spin spinor wavefunction.
+            phi_r_down corresponds to the 'down' spin spinor wavefunction.
+
+        vaspgrid: VASPGrid
+            If poscar is specified, returns VASPGrid object.  The former frame
+            represents the real part of the wavefunction at :math:`k_i` and
+            :math:`b_i` in the real space, the latter frame the imaginary
+            part. On the other hand, the SOI-wavecar has 4 frames
+            The first and second are for the "up" spin, and the third
+            and fourth are "down" spin. (Judging SOI by
+            gvectors(k_i).shape[0] :math:`\neq` bandcoeff(k_i).size)
         '''
         if ngrid is None:
             ngrid = self.ngrid.copy()
@@ -255,27 +272,55 @@ class WAVECAR(object):
             ngrid = np.array(ngrid, dtype=int)
         if gvec is None:
             gvec = self.gvectors(k_i)
-        phi_k = np.zeros(ngrid, dtype=np.complex128)
         gvec %= ngrid[np.newaxis, :]
-        phi_k[gvec[:, 0], gvec[:, 1], gvec[:, 2]] = self.bandcoeff(spin_i,
-                                                                   k_i,
-                                                                   band_i,
-                                                                   norm)
-        phi_r = ifftn(phi_k)
-        if poscar.scaling_factor == 0.:
-            return phi_r.T
-        else:
-            vaspgrid = mesh3d.VASPGrid()
-            vaspgrid.poscar = poscar
-            vaspgrid.grid.shape = phi_k.shape
-            # checking consistency between POSCAR and WAVECAR
-            np.testing.assert_array_almost_equal(
-                poscar.scaling_factor * poscar.cell_vecs,
-                self.realcell)
-            re = np.real(phi_r.T.reshape(vaspgrid.grid.size))
-            im = np.imag(phi_r.T.reshape(vaspgrid.grid.size))
-            vaspgrid.grid.data = np.concatenate((re, im))
-            return vaspgrid
+        try:  # Collininear
+            phi_k = np.zeros(ngrid, dtype=np.complex128)
+            phi_k[gvec[:, 0], gvec[:, 1], gvec[:, 2]] = self.bandcoeff(spin_i,
+                                                                       k_i,
+                                                                       band_i,
+                                                                       norm)
+            phi_r = ifftn(phi_k)
+            if poscar.scaling_factor == 0.:
+                return phi_r.T
+            else:
+                vaspgrid = mesh3d.VASPGrid()
+                vaspgrid.poscar = poscar
+                vaspgrid.grid.shape = phi_k.shape
+                # checking consistency between POSCAR and WAVECAR
+                np.testing.assert_array_almost_equal(
+                    poscar.scaling_factor * poscar.cell_vecs,
+                    self.realcell)
+                re = np.real(phi_r.T.flatten())
+                im = np.imag(phi_r.T.flatten())
+                vaspgrid.grid.data = np.concatenate((re, im))
+                return vaspgrid
+        except ValueError:   # SOI
+            phi_k_up = np.zeros(ngrid, dtype=np.complex128)
+            phi_k_down = np.zeros(ngrid, dtype=np.complex128)
+            bandcoeff = self.bandcoeff(spin_i, k_i, band_i, norm)
+            bandcoeff_up = bandcoeff.reshape(2, bandcoeff.size//2)[0]
+            bandcoeff_down = bandcoeff.reshape(2, bandcoeff.size//2)[1]
+            phi_k_up[gvec[:, 0], gvec[:, 1], gvec[:, 2]] = bandcoeff_up
+            phi_k_down[gvec[:, 0], gvec[:, 1], gvec[:, 2]] = bandcoeff_down
+            phi_r_up = ifftn(phi_k_up)
+            phi_r_down = ifftn(phi_k_down)
+            if poscar.scaling_factor == 0.:
+                return phi_r_up.T, phi_r_down.T
+            else:
+                vaspgrid = mesh3d.VASPGrid()
+                vaspgrid.poscar = poscar
+                vaspgrid.grid.shape = phi_k_up.shape
+                # checking consistency between POSCAR and WAVECAR
+                np.testing.assert_array_almost_equal(
+                    poscar.scaling_factor * poscar.cell_vecs,
+                    self.realcell)
+                up_re = np.real(phi_r.up.T.flatten())
+                up_im = np.imag(phi_r_up.T.flatten())
+                down_re = np.real(phi_r_down.T.flatten())
+                down_im = np.imag(phi_r_down.T.flatten())
+                vaspgrid.grid.data = np.concatenate((up_re, up_im,
+                                                     down_re, down_im))
+                return vaspgrid
 
     def __str__(self):
         ''' .. py:method:: __str__()

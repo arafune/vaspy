@@ -375,7 +375,7 @@ class Grid3D(object):
             a string representation of VASPGrid object
         '''
         outputstr = ''
-        mesharray = self.data.reshape(self.data.size // self.size,
+        mesharray = self.data.reshape(self.num_frame,
                                       self.size)
         for tmp in mesharray:
             output = []
