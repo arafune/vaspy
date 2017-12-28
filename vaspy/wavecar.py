@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''.. py:module:: wavecar
+'''
 Module for WAVECAR class
 '''
 
@@ -14,8 +14,7 @@ au_in_AA = 0.529177249
 
 
 class WAVECAR(object):
-    '''.. py:class:: WAVECAR(WAVECAR_file)
-
+    ''' 
     class for storing the data of WAVECAR file.
 
     Parameters
@@ -60,8 +59,7 @@ class WAVECAR(object):
         self.band()
 
     def header(self):
-        '''.. py:method:: header()
-
+        ''' 
         Read the information of the system stored in the first
         two record in WAVECAR file
 
@@ -101,8 +99,7 @@ class WAVECAR(object):
             raise ValueError('Invalid TAG value: {}'.format(self.rtag))
 
     def band(self):
-        '''.. py:method:: band()
-
+        ''' 
         Read the information about the band from WAVECAR file
 
         The infomation obtained by this method is as follows:
@@ -144,7 +141,7 @@ class WAVECAR(object):
         return self.kpath, self.bands
 
     def gvectors(self, k_i=0):
-        '''.. py::method gvectors(k_i)
+        '''
         G-vectors :math:`G` is determined by the following condition:
         :math:`(G+k)^2 / 2 < E_{cut}`
 
@@ -186,15 +183,14 @@ class WAVECAR(object):
         return np.asarray(g_vec, dtype=int)
 
     def bandcoeff(self, spin_i=0, k_i=0, band_i=0, norm=False):
-        ''' .. py:method:: bandcoeff(spin_i, k_i, band_i, norm)
-
+        ''' 
         Read the coefficient of the planewave of the KS
         states specified by the `spin_i`, `k_i` and `band_i`
 
         Parameters
         ----------
         spin_i: int, optional
-           spin index (0 or 1) :math:`s_i` (default value is 0)
+           spin index :math:`s_i` (0 or 1) (default value is 0)
         k_i: int, optioanl
            k index :math:`k_i`. Starts with 0 (default value is 0)
         band_i: int, optioanl
@@ -215,11 +211,10 @@ class WAVECAR(object):
     def realspace_wfc(self, spin_i=0, k_i=0, band_i=0,
                       gvec=None, ngrid=None, norm=False,
                       poscar=poscar.POSCAR()):
-        '''.. py:method:: realspace_wfc(spin_i, k_i, band_i, gvec, ngrid, norm)
-
+        r''' 
         Calculate the pseudo-wavefunction of the KS states in
         the real space by using FFT transformation of the reciprocal
-        space planewave coefficients.
+        space planewave coefficients. 
 
         The 3D FE grid size is detemined by ngrid, which defaults
         to self.ngrid if it is not provided.  GVectors of the KS
@@ -241,7 +236,7 @@ class WAVECAR(object):
         ngrid: numpy.array
             Ngrid for calculation. If not set, use self.ngrid.
         poscar: vaspy.poscar, optional
-            POSCAR object (defalut is no POSCAR object)
+            POSCAR object (defalut is blank POSCAR object)
 
         Returns
         -----------
@@ -323,8 +318,7 @@ class WAVECAR(object):
                 return vaspgrid
 
     def __str__(self):
-        ''' .. py:method:: __str__()
-
+        ''' 
         Print out the system parameters
         '''
         the1stline = "record length  =       {0}  "

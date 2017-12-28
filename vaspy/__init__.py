@@ -21,9 +21,8 @@ from vaspy import *
 
 
 def load(filename, mode=None):
-    ''' .. py:function:: load(filename, mode)
-
-    load file
+    ''' 
+    load file.  Guess the file type by the filename.  Use `mode` option to specify the file type.
 
     Parameters
     ----------
@@ -31,7 +30,7 @@ def load(filename, mode=None):
     filename: str
         filename
 
-    mode: str
+    mode: str, optional
        optional argument mode
 
     Notes
