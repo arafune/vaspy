@@ -29,7 +29,7 @@ class CHGCAR(mesh3d.VASPGrid):
 
     Class for CHGCAR
 
-     An example of the first few lines of CHGCAR. ::
+    An example of the first few lines of CHGCAR. ::
 
            hBN-Cu                              # 1st line poscar.POSCAR[0]
            1.00000000000000                    # 2nd line poscar.POSCAR[1]

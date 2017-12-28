@@ -258,7 +258,7 @@ class WAVECAR(object):
             phi_r_down corresponds to the 'down' spin spinor wavefunction.
 
         vaspgrid: VASPGrid
-            If poscar is specified, returns VASPGrid object.  The former frame
+            Returns VASPGrid object, if poscar is specified.  The former frame
             represents the real part of the wavefunction at :math:`k_i` and
             :math:`b_i` in the real space, the latter frame the imaginary
             part. On the other hand, the SOI-wavecar has 4 frames
