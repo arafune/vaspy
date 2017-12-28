@@ -85,6 +85,11 @@ class POSCAR_HEAD(object):
         '''Return the matrix of the unit cell'''
         return self.__cell_vecs
 
+    @property
+    def realcell(self):
+        '''Alias of cell_vecs to keep consistency with wavecar.py'''
+        return self.__cell_vecs
+
     @cell_vecs.setter
     def cell_vecs(self, vec):
         '''Setter of cell matrix'''
