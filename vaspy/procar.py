@@ -47,25 +47,25 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
        (Appear once when spin-integrated, twice when spin-resolved.)
 
       :Example:
-
-        # of k-points:   50         # of bands: 576         # of ions:  98
+            # of k-points:   50         # of bands: 576         # of ions:  98
 
     3.  k-point character
 
       :Example:
-
-        k-point    1 :    0.00000 0.00000 0.00000 weight = 0.02000000
+            k-point    1 :    0.00000 0.00000 0.00000 weight = 0.02000000
 
         .. Note::  That the first character must be "blank".
 
     4. Band character
 
-      :Example:  band   1 # energy  -11.87868466 # occ.  2.00000000
+      :Example:
+
+        band   1 # energy  -11.87868466 # occ.  2.00000000
 
     5. orbital contribution.
 
-      :Example: 1 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000\
-      0.000 0.000
+       :Example:
+        1 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000
 
     Attributes
     ----------
@@ -288,12 +288,11 @@ class Projection(object):
 
         site index starts '1' not 0.
 
-        Example
+        Examples
         --------
-
-        ((1, "px"), (1, "py")) # to produce pxpy projection on the 1st element.
-
-        ((1, "pz"), (43, "pz")) # to produce pz orbital projection \
+            ((1, "px"), (1, "py")) # to produce pxpy projection on the 1st element.
+            
+            ((1, "pz"), (43, "pz")) # to produce pz orbital projection \
         for 'surface' atom (Here, the 43 atoms is included in the unit cell \
         and 1st and 43the atoms are assumed to be identical.)
         '''
@@ -632,9 +631,9 @@ class BandWithProjection(object):
                 self.sitecomposed = [cmporbs_mtotal,
                                      cmporbs_mx, cmporbs_my, cmporbs_mz]
 
-    def get_orb_index(self, arg):
+    def orb_index(self, arg):
         ''' 
-        Return the indexes corresponding orbitan name by tuple.
+        Return the indexes corresponding orbital names
 
         This method returns the tuple of orbital number in self.orb_names.
         (i.e. self.orb_names.index(orbitalname).  If the orbital name has not
@@ -714,7 +713,7 @@ class BandWithProjection(object):
             if orb in self.orb_names:
                 continue
             else:
-                orbindex = self.get_orb_index(orb)
+                orbindex = self.orb_index(orb)
                 # calculate composed orbital...
                 for l in range(len(self.sitecomposed)):
                     numk, numband, numsite, norbs = self.sitecomposed[l].shape
@@ -778,7 +777,7 @@ class BandWithProjection(object):
                         header.append(site + "_" + orb + spin)
         return header
 
-    def get_orbnums(self, orbnames):
+    def orbnums(self, orbnames):
         ''' 
         Return tuple whose size is same as that of arg, but
         the element is number determied from orb_names
@@ -807,7 +806,7 @@ class BandWithProjection(object):
         orbnames: list, tuple
             orbital names  e.g., (('s','pxpy','p'),('s','pz','p'))
         '''
-        orbnums = self.get_orbnums(orbnames)
+        orbnums = self.orbnums(orbnames)
         numk, numband, numsite, norbs = self.sitecomposed[0].shape
         table = list()
         if len(self.spininfo) == 1 or len(self.spininfo) == 4:
@@ -852,8 +851,8 @@ class BandWithProjection(object):
             raise RuntimeError("spininfo is incorrect")
         return table
 
-    def get_sitecomposed_data(self, sitenames, orbnames):  # not checked
-        '''Return band structure with (gathered) orbital
+    def str_sitecomposed_data(self, sitenames, orbnames):  # not checked
+        '''Return band structure with (summarized) orbital
         contributions as string'''
         header = map(str, self.set_header(sitenames, orbnames))
         output = "\t".join(header) + "\n"

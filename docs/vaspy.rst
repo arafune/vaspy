@@ -21,7 +21,7 @@ vaspy.doscar module
     :show-inheritance:
 
 vaspy.eigenval module
--------------------
+---------------------
 
 .. automodule:: vaspy.eigenval
     :members:
@@ -61,7 +61,7 @@ vaspy.procar module
     :show-inheritance:
 
 vaspy.wavecar module
--------------------
+---------------------
 
 .. automodule:: vaspy.wavecar
     :members:

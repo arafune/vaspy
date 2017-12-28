@@ -406,10 +406,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         center: numpy.ndarray, list, tuple
             center position for rotation.
 
-        Todo
-        -----
-        check the center in the Braves lattice.
-        take into account the periodic boundary.
+
+        :Todo: check the center in the Braves lattice.
+               take into account the periodic boundary.
         '''
         center = _vectorize(center)
         if len(center) != 3:

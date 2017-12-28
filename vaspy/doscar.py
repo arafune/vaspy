@@ -60,7 +60,7 @@ class DOSCAR(object):  # Version safety
     A container of DOS object
 
     Attributes
-    ------------
+    ----------
     natom: int
         number of atoms
 
@@ -249,8 +249,8 @@ class PDOS(DOS):
     ''' 
     Class for partial DOS
 
-    Attribute
-    ---------
+    Attributes
+    ----------
     site: str
         name of the site.
 

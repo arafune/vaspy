@@ -86,4 +86,4 @@ else:
     for sites in siteindex:
         band.sum_site(sites)
     band.sum_orbital(flat_orbitals)
-    print(band.get_sitecomposed_data(sitenames, args.orbital))
+    print(band.str_sitecomposed_data(sitenames, args.orbital))
