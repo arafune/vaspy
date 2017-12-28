@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-""" 
+"""
 This module provides OUTCAR class
 """
 
@@ -11,7 +11,7 @@ import bz2
 
 
 class OUTCAR(object):  # Version safety
-    ''' 
+    '''
     Class for OUTCAR file that stores calculation details
     and/or calculation progress
 
@@ -50,7 +50,7 @@ class OUTCAR(object):  # Version safety
             self.load_from_file(arg)
 
     def set_atom_names(self):
-        ''' 
+        '''
         build atom_names (the list of atomname_with_index)
         '''
         self.atom_names = []
@@ -69,7 +69,7 @@ class OUTCAR(object):  # Version safety
         return self.atom_names
 
     def set_posforce_title(self):
-        """ 
+        """
         build posforce_title
         """
         self.set_atom_names()
@@ -82,7 +82,7 @@ class OUTCAR(object):  # Version safety
                                for i in self.atom_names]
 
     def load_from_file(self, arg):
-        ''' 
+        '''
         Effectively, this is a constructor of OUTCAR object.
 
         Parameters
@@ -192,7 +192,7 @@ class OUTCAR(object):  # Version safety
 # correct?
 
     def select_posforce(self, posforce_flag, *sites):
-        ''' 
+        '''
         Return the posforce corresponding the posforce_flag
 
         Note
