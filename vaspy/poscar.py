@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 # -*- conding: utf-8 -*-
-'''.. py:module:: poscar
-
+''' 
 This mudule provides POSCAR class
 
 translate from poscar.rb of 2014/2/26, master branch
@@ -39,6 +38,7 @@ The below is an example of POSCAR file::
 '''
 
 from __future__ import division, print_function  # Version safety
+import bz2
 import itertools as it
 import copy
 import re
@@ -55,8 +55,20 @@ import numpy as np
 
 
 class POSCAR_HEAD(object):
-    '''.. py:class:: POSCAR_HEAD()
+    ''' 
     One of the parent classes of POSCAR class
+
+    Attributes
+    ----------
+
+    system_name: str
+       system name
+    scaling_factor: float
+       scaling factor
+    iontypes : list
+       list of ion name
+    ionnums : list
+       list of number of ions. Corresponding to `iontypes`
 '''
     def __init__(self):
         self.__cell_vecs = np.array([[0., 0., 0.],
@@ -73,6 +85,11 @@ class POSCAR_HEAD(object):
         '''Return the matrix of the unit cell'''
         return self.__cell_vecs
 
+    @property
+    def realcell(self):
+        '''Alias of cell_vecs to keep consistency with wavecar.py'''
+        return self.__cell_vecs
+
     @cell_vecs.setter
     def cell_vecs(self, vec):
         '''Setter of cell matrix'''
@@ -83,7 +100,7 @@ class POSCAR_HEAD(object):
 
     @property
     def atom_identifer(self):
-        '''Return list style of "atom_identifer" (e.g.  "#1:Ag1")'''
+        '''Return list style of "atom_identifer" (e.g.  "#0:Ag1")'''
         # self.__atom_identifer = []
         # ii = 1
         # for elm, n in zip(self.iontypes, self.ionnums):
@@ -95,18 +112,18 @@ class POSCAR_HEAD(object):
         atomnames = []
         for elm, ionnums in zip(self.iontypes, self.ionnums):
             for j in range(1, ionnums + 1):
-                tmp = elm + str(j)
-                if tmp not in atomnames:
-                    atomnames.append(tmp)
+                elem_num = elm + str(j)
+                if elem_num not in atomnames:
+                    atomnames.append(elem_num)
                 else:
-                    while tmp in atomnames:
+                    while elem_num in atomnames:
                         j = j + 1
-                        tmp = elm + str(j)
+                        elem_num = elm + str(j)
                     else:
-                        atomnames.append(tmp)
+                        atomnames.append(elem_num)
         self.__atom_identifer = [
             "#" + str(s) + ":" + a for s, a in
-            zip(range(1, len(atomnames) + 1), atomnames)]
+            zip(range(0, len(atomnames)), atomnames)]
         return self.__atom_identifer
 
     @atom_identifer.setter
@@ -115,7 +132,8 @@ class POSCAR_HEAD(object):
 
 
 class POSCAR_POS(object):
-    '''.. py:class:: POSCAR_POS()
+    '''
+    POSCAR_DOS Class
 '''
     def __init__(self):
         self.coordinate_type = ""
@@ -124,7 +142,7 @@ class POSCAR_POS(object):
         self.selective = False
 
     def is_cartesian(self):
-        '''.. py:method:: is_cartesian()
+        '''
 
         Return True if Cartesian coordinate is set
 
@@ -137,8 +155,7 @@ class POSCAR_POS(object):
         return bool(re.search(r'^[ck]', self.coordinate_type, re.I))
 
     def is_direct(self):
-        '''.. py:method:: is_direct()
-
+        ''' 
         Return True if DIRECT coordinate is set
 
         Returns
@@ -151,7 +168,7 @@ class POSCAR_POS(object):
 
 
 class POSCAR(POSCAR_HEAD, POSCAR_POS):
-    '''.. py:class:: POSCAR(file or array)
+    '''
 
     Class for POSCAR (CONTCAR) format
 
@@ -177,7 +194,14 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         super().__init__()
         POSCAR_POS.__init__(self)
         if isinstance(arg, str):
-            poscar = open(arg).readlines()
+            if os.path.splitext(arg)[1] == '.bz2':
+                try:
+                    thefile = bz2.open(arg, mode='rt')
+                except AttributeError:
+                    thefile = bz2.BZ2File(arg, mode='r')
+            else:
+                thefile = open(arg)
+            poscar = thefile.readlines()
             self.load_from_array(poscar)
         if isinstance(arg, (list, tuple)):
             self.load_from_array(arg)
@@ -227,8 +251,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             yield each
 
     def sort(self, from_site=0, to_site=None, axis='z'):
-        '''.. py:method:: sort(from_index, to_index, axis='z')
-
+        '''
         Sort positions attribute by coordinate
 
         Parameters
@@ -244,7 +267,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             Axis used for sort (Default Z)
 
 
-        Notes
+        Note
         -----
 
         The first site # is "0". It's the pythonic way.
@@ -263,8 +286,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             key=lambda sortaxis: sortaxis[axis]) + self.positions[to_site:]
 
     def supercell(self, n_x, n_y, n_z):
-        '''.. py:method:: supercell(n_x, n_y, n_z)
-
+        ''' 
         Return the :math:`(n_x \\times n_y \\times n_z)` supercell
 
         Parameters
@@ -313,7 +335,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                              spos[2] + i_z / n_z]))
         sposcar.coordinate_changeflags = []
         for flags in self.coordinate_changeflags:
-            for i in range(n_x * n_y * n_z):
+            for _ in range(n_x * n_y * n_z):
                 sposcar.coordinate_changeflags.append(flags)
         sposcar.atom_identifer = []
         if original_is_cartesian:
@@ -322,8 +344,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
     # class method? or independent function?
     def nearest(self, array, point):
-        '''.. py:method:: nearest(array, point)
-
+        ''' 
         Parameters
         -----------
 
@@ -340,7 +361,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
     # class method? or independent function?
     def make27candidate(self, position):
-        '''.. py:make27candidate(position)
+        '''
 
         Return 27 vectors set correspond the neiboring
 
@@ -373,8 +394,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                                     position)
         return candidates27
 
-    def atom_rotate(self, site, axis_name, theta_deg, center):
-        '''.. py:atom_rotate(site, axis_name, theta_deg, center)
+    def rotate_atom(self, site, axis_name, theta_deg, center):
+        '''
 
         Rotate the atom
 
@@ -390,10 +411,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         center: numpy.ndarray, list, tuple
             center position for rotation.
 
-        Todo
-        -----
-        check the center in the Braves lattice.
-        take into account the periodic boundary.
+
+        :Todo: check the center in the Braves lattice.
+               take into account the periodic boundary.
         '''
         center = _vectorize(center)
         if len(center) != 3:
@@ -401,7 +421,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if not point_in_box(center / self.scaling_factor, self.cell_vecs):
             raise ValueError('the center must be in the Braves lattice')
         if not isinstance(site, int):
-            raise ValueError('argument error in atom_rotate method')
+            raise ValueError('argument error in rotate_atom method')
         if not self.is_cartesian():
             self.to_cartesian()
         position = self.positions[site]
@@ -411,8 +431,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         position += center / self.scaling_factor
         self.positions[site] = position
 
-    def atoms_rotate(self, site_list, axis_name, theta_deg, center):
-        '''Rotate atoms
+    def rotate_atoms(self, site_list, axis_name, theta_deg, center):
+        '''
+        Rotate atoms
 
         Parameters
         ----------
@@ -427,11 +448,10 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
              Position of rotation center
         '''
         for site in site_list:
-            self.atom_rotate(site, axis_name, theta_deg, center)
+            self.rotate_atom(site, axis_name, theta_deg, center)
 
-    def cell_rotate(self, theta_deg, axis_name='Z'):
-        '''.. py:method:: cell_rotate(theta, axis_name)
-
+    def rotate_cell(self, theta_deg, axis_name='Z'):
+        ''' 
         Rotate unit-cell (rotation angle is set by degree.)
 
         Parameters
@@ -458,8 +478,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.to_cartesian()
 
     def repack_in_cell(self):
-        '''.. py:method:repack_in_cell()
-
+        '''
         Repack all atoms in the unit cell
 
         No negative values in DIRECT coordinate.
@@ -479,8 +498,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.to_cartesian()
 
     def __add__(self, other):
-        '''.. py:method:: __add__(other)
-
+        '''
         Parameters
         ----------
 
@@ -509,8 +527,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return dest_poscar
 
     def merge(self, other):
-        '''.. py:method:: merge(other)
-
+        '''
         lazy __add__: Return POSCAR generated from two POSCARs
 
         Even if the cell vectors and scaling factors are different,
@@ -544,14 +561,12 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         dest_poscar.ionnums.extend(other.ionnums)
         dest_poscar.positions.extend(other.positions)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
-#        dest_poscar.atom_identifer
         if original_is_direct:
             dest_poscar.to_direct()
         return dest_poscar
 
     def to_list(self):
-        '''.. py:method:: to_list()
-
+        '''
         Return POSCAR object by list-style
 
         Returns
@@ -578,8 +593,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return out_list
 
     def __str__(self):
-        '''.. py:method:: __str__()
-
+        '''
         Returns
         --------
 
@@ -611,8 +625,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return '\n'.join(tmp) + '\n'
 
     def str_short(self):
-        '''.. py:method:: str_short()
-
+        '''
         Returns
         ---------
 
@@ -636,8 +649,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return '\n'.join(tmp) + '\n'
 
     def tune_scaling_factor(self, new_scaling_factor=1.0):
-        '''.. py:method:: tune_scaling_factor(new_scaling_factor=1.0)
-
+        ''' 
         Change scaling factor to new value
 
         Parameters
@@ -645,7 +657,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
         new_scaling_factor: float
 
-        Notes
+        Note
         -----
 
         **The Braves lattice are corrected (to be equal size)**
@@ -663,8 +675,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                               for i in self.positions]
 
     def to_cartesian(self):
-        '''.. py:method:: to_cartesian()
-
+        ''' 
         Change the coordinate to cartesian from direct
         '''
         if self.is_direct():
@@ -673,8 +684,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.positions = [mat.dot(v) for v in self.positions]
 
     def to_direct(self):
-        '''.. py:method:: to_direct()
-
+        ''' 
         Change the coordinate to direct from cartesian.
         '''
         if self.is_cartesian():
@@ -683,8 +693,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.positions = [mat.dot(v) for v in self.positions]
 
     def guess_molecule(self, site_list, center=None):
-        '''.. py:method:: guess_molecule(site_list, center)
-
+        '''
         Arrange atom position to form a molecule.
 
         This method is effective to rotate a molecule.
@@ -703,7 +712,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         numpy.ndarray
             Array of Vector that represents "molecule".
 
-        Notes
+        Note
         -----
         When the optional argument, center, is set, the atoms are
         re-arranged as to minimize the distance from this center.
@@ -714,6 +723,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         option is highly recommended to form a molecule.
         '''
         molecule = [self.positions[j] for j in site_list]
+        newposes = []
         for index, site in enumerate(site_list):
             target_atom = self.positions[site]
             atoms27 = self.make27candidate(target_atom)
@@ -736,29 +746,12 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                         s += np.linalg.norm(vectors[0] - vectors[1])
                     return s
             newpos = min(atoms27, key=(lambda x: func(x, center)))
-            molecule[index] = newpos
-        return molecule
-
-    def guess_molecule2(self, site_list):
-        '''.. py:method::guess_molecule2(site_lsit)
-
-        Arranges atom positions to form a molecule.
-
-        poscar updates
-
-        Parameters
-        -----------
-
-        site_list: list
-            list of site number
-        '''
-        molecule = self.guess_molecule(site_list)
-        for site, pos_vector in zip(site_list, molecule):
-            self.positions[site] = pos_vector
+            newposes.append(newpos)
+        for site, pos in zip(site_list, newposes):
+            self.positions[site] = pos
 
     def translate(self, vector, atomlist):
-        '''.. py:method:: translate(vector, atomlist)
-
+        ''' 
         Translate the selected atom(s) by vector
 
         Parameters
@@ -770,10 +763,10 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
              list of the atom to be moved
 
 
-        Notes
+        Note
         ------
 
-        the first atom is "1", not "0".
+        the first atom is "0", to follow the pythonic way.
 
         Returns
         --------
@@ -784,20 +777,20 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if self.is_cartesian():
             vector = _vectorize(vector)
             for i in atomlist:
-                self.positions[i - 1] = (self.positions[i - 1] +
-                                         vector / self.scaling_factor)
+                self.positions[i] = (self.positions[i] +
+                                     vector / self.scaling_factor)
         else:
             vector = _vectorize(vector)
             self.to_cartesian()
             for i in atomlist:
-                self.positions[i - 1] = (self.positions[i - 1] +
-                                         vector / self.scaling_factor)
+                self.positions[i] = (self.positions[i] +
+                                     vector / self.scaling_factor)
             self.to_direct()
         return self.positions
 
-    def get_axes_lengthes(self):
-        '''.. py:method:: get_axes_lengthes()
-
+    @property
+    def axes_lengthes(self):
+        ''' 
         Return cell axis lengthes
 
         Returns
@@ -812,8 +805,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return (cell_x, cell_y, cell_z)
 
     def translate_all(self, vector):
-        '''.. py:method::translate_all(vector)
-
+        ''' 
         Translate **all** atoms by vector
 
         Parameters
@@ -822,12 +814,11 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         vector: list, numpy.array
              translational vector
         '''
-        atomrange = list(range(1, sum(self.ionnums) + 1))
+        atomrange = list(range(sum(self.ionnums)))
         self.translate(vector, atomrange)
 
     def save(self, filename):
-        '''.. py:method::samve(filename)
-
+        ''' 
         Save POSCAR contents to the file named "filename"
 
         Parameters
@@ -845,8 +836,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
 
 def point_in_box(point, cell_vecs):
-    '''.. py:function:: point_in_box(point, cell_vecs)
-
+    ''' 
     Return True if point is located in the box
 
     Parameters
@@ -872,8 +862,7 @@ def point_in_box(point, cell_vecs):
 
 
 def rotate_x(theta_deg):
-    ''' .. py:function:: rotate_x(theta_deg)
-
+    '''
     Rotation matrix around X-axis
 
     Parameters
@@ -904,8 +893,7 @@ def rotate_x(theta_deg):
 
 
 def rotate_y(theta_deg):
-    '''.. py:function:: rotate_y(theta_deg)
-
+    ''' 
     Rotation matrix around Y-axis
 
     Example
@@ -924,8 +912,7 @@ def rotate_y(theta_deg):
 
 
 def rotate_z(theta_deg):
-    '''.. py:function:: rotate_y(theta_deg)
-
+    ''' 
     Rotation matrix around Z-axis
 
     Example
@@ -944,8 +931,7 @@ def rotate_z(theta_deg):
 
 
 def three_by_three(vec):
-    '''.. py:function:three_by_three(vec)
-
+    ''' 
     Return True if vec can be converted into the 3x3 matrix
 
     Parameters

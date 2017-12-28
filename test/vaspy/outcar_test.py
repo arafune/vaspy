@@ -8,6 +8,7 @@ from nose.tools import ok_
 import numpy as np
 import vaspy.outcar
 
+
 class TestOUTCAR(object):
     '''class for test of vaspy.outcar module
     '''
@@ -15,7 +16,6 @@ class TestOUTCAR(object):
         datadir = os.path.abspath(os.path.dirname(__file__)) + '/data/'
         datafile = datadir + 'OUTCAR'
         self.outcar = vaspy.outcar.OUTCAR(datafile)
-
 
     @with_setup(setup=setup)
     def test_fermi(self):
@@ -25,6 +25,7 @@ class TestOUTCAR(object):
     def test_nbands(self):
         eq_(54, self.outcar.nbands)
 
+    @with_setup(setup=setup)
     def test_recvec(self):
         np.testing.assert_almost_equal(
             np.array([0.389375981, -0.224806327, 0.000000000]),
@@ -36,3 +37,22 @@ class TestOUTCAR(object):
             np.array([0.000000000, 0.000000000, 0.023484312]),
             self.outcar.recvec[2])
 
+    @with_setup(setup=setup)
+    def test_kvec_weight(self):
+        eq_(33, len(self.outcar.kvecs))
+        eq_(33, len(self.outcar.weights))
+        np.testing.assert_array_almost_equal(
+            [[0.000000,  0.000000, 0.000000],
+             [0.058824,  0.000000, 0.000000],
+             [0.117647,  0.000000, 0.000000],
+             [0.176471, -0.000000, 0.000000],
+             [0.235294,  0.000000, 0.000000],
+             [0.294118,  0.000000, 0.000000],
+             [0.352941, -0.000000, 0.000000]],
+            self.outcar.kvecs[:7])
+        np.testing.assert_array_almost_equal(
+            [1.000000, 6.000000,
+             6.000000, 6.000000,
+             6.000000, 6.000000,
+             6.000000],
+            self.outcar.weights[:7])

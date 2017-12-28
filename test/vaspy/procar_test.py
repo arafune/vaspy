@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+'''Test for PROCAR class'''
 # import unittest
 import os
 # import tempfile
@@ -78,9 +78,9 @@ class TestSinglePROCAR(object):
                                       self.singleprocar.orbital)
 
     @with_setup(setup=setup)
-    def test_singleprocar_band_compose_sites(self):
-        '''test for Band_with_projection.compose_sites'''
-        self.singleband.compose_sites((0, 2))
+    def test_singleprocar_band_sum_site(self):
+        '''test for Band_with_projection.sum_site'''
+        self.singleband.sum_site((0, 2))
         np.testing.assert_array_almost_equal(self.singleband.sitecomposed,
                                              [[[[[0.0020, 0.0022, 0.0024,
                                                   0.0026, 0.0028, 0.0030,
@@ -95,21 +95,21 @@ class TestSinglePROCAR(object):
 
     @raises(RuntimeError)
     @with_setup(setup=setup)
-    def test_singleprocar_band_compose_orbital0(self):
-        '''test for Band_with_projection.compose_orbital (0)
+    def test_singleprocar_band_sum_orbital0(self):
+        '''test for Band_with_projection.sum_orbital (0)
 
         raise RuntimeError when no item in sitecomposed
         '''
-        self.singleband.compose_orbital(('p', 'pxpy', 'd'))
+        self.singleband.sum_orbital(('p', 'pxpy', 'd'))
 
     @with_setup(setup=setup)
-    def test_singleprocar_band_compose_orbital1(self):
-        '''test for Band_with_projection.compose_orbital ()
+    def test_singleprocar_band_sum_orbital1(self):
+        '''test for Band_with_projection.sum_orbital ()
 
         raise RuntimeError when no item in sitecomposed
         '''
-        self.singleband.compose_sites((0, 2))
-        self.singleband.compose_orbital(('p', 'pxpy', 'd'))
+        self.singleband.sum_site((0, 2))
+        self.singleband.sum_orbital(('p', 'pxpy', 'd'))
         np.testing.assert_allclose(self.singleband.sitecomposed,
                                    [[[[[0.0020, 0.0022, 0.0024,
                                         0.0026, 0.0028, 0.0030,
@@ -121,36 +121,36 @@ class TestSinglePROCAR(object):
              'dxz', 'dx2', 'tot', 'p', 'pxpy', 'd'])
 
     @with_setup(setup=setup)
-    def test_singleprocar_band_get_orbnums(self):
+    def test_singleprocar_band_orbnums(self):
         '''test for Band_with_projection.get_orbnums
         '''
-        self.singleband.compose_sites((0, 2))
-        self.singleband.compose_orbital(('p', 'pxpy', 'd'))
-        result = self.singleband.get_orbnums((('p', 'pxpy', 'd'),))
+        self.singleband.sum_site((0, 2))
+        self.singleband.sum_orbital(('p', 'pxpy', 'd'))
+        result = self.singleband.orbnums((('p', 'pxpy', 'd'),))
         eq_(((10, 11, 12), ), result)
-        result = self.singleband.get_orbnums((('d', 'pxpy', 'p'),))
+        result = self.singleband.orbnums((('d', 'pxpy', 'p'),))
         eq_(((12, 11, 10), ), result)
-        result = self.singleband.get_orbnums((['p', 'pxpy', 'd'],))
+        result = self.singleband.orbnums((['p', 'pxpy', 'd'],))
         eq_(((10, 11, 12), ), result)
-        result = self.singleband.get_orbnums([('d', 'pxpy', 'p')])
+        result = self.singleband.orbnums([('d', 'pxpy', 'p')])
         eq_(((12, 11, 10), ), result)
 
     @with_setup(setup=setup)
-    def test_singleprocar_band_get_orb_index(self):
+    def test_singleprocar_band_orb_index(self):
         '''test for Band_with_projection.get_orbnums
         '''
-        self.singleband.compose_sites((0, 2))
-        self.singleband.compose_orbital(('p', 'pxpy', 'd'))
-        eq_(self.singleband.get_orb_index('p'), (3, 1, 2))
-        eq_(self.singleband.get_orb_index('d'), (4, 5, 8, 7, 6))
-        eq_(self.singleband.get_orb_index('pxpy'), (3, 1))
+        self.singleband.sum_site((0, 2))
+        self.singleband.sum_orbital(('p', 'pxpy', 'd'))
+        eq_(self.singleband.orb_index('p'), (3, 1, 2))
+        eq_(self.singleband.orb_index('d'), (4, 5, 8, 7, 6))
+        eq_(self.singleband.orb_index('pxpy'), (3, 1))
 
     @raises(ValueError)
     @with_setup(setup=setup)
     def test_singleprocar_band_check_orb_name(self):
         '''test for Band_with_projection.check_orb_name
         '''
-        self.singleband.compose_sites((0, 2))
+        self.singleband.sum_site((0, 2))
         eq_(procar.check_orb_name('p'), 'p')
         procar.check_orb_name('k')
 
@@ -158,23 +158,20 @@ class TestSinglePROCAR(object):
     def test_singleprocar_setheader(self):
         '''test for Band_with_projection.set_header
         '''
-        self.singleband.compose_sites((0, 2))
-        self.singleband.compose_orbital(('p', 'pxpy', 'd'))
+        self.singleband.sum_site((0, 2))
+        self.singleband.sum_orbital(('p', 'pxpy', 'd'))
         eq_(self.singleband.set_header((('test'), ), (('p', 'pxpy', 'd'), )),
             ['#k', 'energy', 'test_p', 'test_pxpy', 'test_d'])
 
     @with_setup(setup=setup)
-    def test_onlyband(self):
-        single_onlyband=self.singleprocar.onlyband()
+    def test_to_band(self):
+        '''test for simple band output'''
+        single_onlyband = self.singleprocar.to_band()
         eq_(single_onlyband.__str__(),
             '''#k	Energy
 0.000000000e+00	-1.500000000e+01
 
 ''')
-
-
-
-
 
 # ------------------------------
 
@@ -188,17 +185,26 @@ class TestSpinPolarizedPROCAR(object):
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         data_file = datadir + "PROCAR_spin_dummy"
         self.spinprocar = procar.PROCAR(data_file)
-        self.spinband = self.spinprocar.band()
 
     @with_setup(setup=setup)
     def test_spinprocar_firstcheck(self):
         '''Load test for PROCAR_spin_dummy'''
         eq_(('_up', '_down'), self.spinprocar.spininfo)
         eq_(3, self.spinprocar.n_atoms)
-        eq_(2, self.spinprocar.n_bands)
+        eq_(4, self.spinprocar.n_bands)
         eq_(3, self.spinprocar.numk)
-        eq_([-10.0, -5.0, -7.0, -4.0, -6.0, -1.0,
-             -10.5, -5.5, -7.5, -4.5, -6.5, -1.5],
+        eq_([[-10.0, -10.5],
+             [-5.0, -5.5],
+             [0.0, -10.0],
+             [5.0, -5.0],
+             [-7.0, -7.5],
+             [-4.0, -4.5],
+             [-1.0, -10.0],
+             [4.0, -5.0],
+             [-6.0, -6.5],
+             [-1.0, -1.5],
+             [-3.0, -10.0],
+             [0.0, -5.0]],
             self.spinprocar.energies)
         eq_(('s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot'),
             self.spinprocar.orb_names)
@@ -209,7 +215,7 @@ class TestSpinPolarizedPROCAR(object):
                                        [1.25, 1.25, 1.00],
                                        [1.50, 1.50, 1.00]],
                                       self.spinprocar.kvectors)
-        np.testing.assert_array_equal(36, len(self.spinprocar.orbital))
+        np.testing.assert_array_equal(72, len(self.spinprocar.orbital))
         np.testing.assert_array_equal([0.0000, 0.0001, 0.0002, 0.0003,
                                        0.0004, 0.0005, 0.0006, 0.0007,
                                        0.0008, 0.0036],
@@ -226,69 +232,78 @@ class TestSpinPolarizedPROCAR(object):
     @with_setup(setup=setup)
     def test_spinprocar_band(self):
         '''Band_with_projection object test generated from PROCAR_spin_dummy'''
-        eq_(self.spinband.n_bands, self.spinprocar.n_bands)
-        np.testing.assert_array_almost_equal(self.spinband.kvectors,
+        spinband = self.spinprocar.band()        
+        eq_(spinband.n_bands, self.spinprocar.n_bands)
+        np.testing.assert_array_almost_equal(spinband.kvectors,
                                              self.spinprocar.kvectors[0:3])
-        eq_(self.spinband.spininfo, self.spinprocar.spininfo)
-        ok_(self.spinband.isready())
-        np.testing.assert_array_almost_equal(self.spinband.kdistance,
+        eq_(spinband.spininfo, self.spinprocar.spininfo)
+        ok_(spinband.isready())
+        np.testing.assert_array_almost_equal(spinband.kdistance,
                                              [0., 0.353553, 0.707107])
 
     @with_setup(setup=setup)
-    def test_spinprocar_band_energies(self):
+    def test_spinband_band_energies(self):
         '''test for Band_with_projection.energies setter (SPIN)
         '''
-        eq_(self.spinband.energies.shape, (2, 3, 2))
-        np.testing.assert_array_equal(self.spinband.energies,
-                                      [[[-10, -5], [-7, -4], [-6, -1]],
-                                       [[-10.5, -5.5],
-                                        [-7.5, -4.5],
-                                        [-6.5, -1.5]]])
+        spinband = self.spinprocar.band()                
+        eq_(spinband.energies.shape, (2, 3, 4))
+        np.testing.assert_array_equal(spinband.energies,
+                                      [[[-10, -5,  0, 5.],
+                                        [ -7, -4, -1, 4.],
+                                        [ -6, -1, -3, 0.]],
+                                       [[-10.5, -5.5, -10., -5.],
+                                        [ -7.5, -4.5, -10., -5.],
+                                        [ -6.5, -1.5, -10., -5.]]])
 
-    def test_spinprocar_fermi_correction(self):
+    def test_spinband_fermi_correction(self):
         '''test for Band_with_projection.fermi_correction (SPIN)
         '''
-        self.spinband.fermi_correction(1.0)
-        np.testing.assert_array_equal(self.spinband.energies,
-                                      [[[-11, -6], [-8, -5], [-7, -2]],
-                                       [[-11.5, -6.5],
-                                        [-8.5, -5.5],
-                                        [-7.5, -2.5]]])
+        spinband = self.spinprocar.band()        
+        spinband.fermi_correction(1.0)
+        np.testing.assert_array_equal(spinband.energies,
+                                      np.array([[[-11., -6., -1., 4.],
+                                        [ -8., -5., -2., 3.],
+                                        [ -7., -2., -4., -1.]],
+                                       [[-11.5, -6.5, -11., -6.],
+                                        [ -8.5, -5.5, -11., -6.],
+                                        [ -7.5, -2.5, -11., -6.]]]))
 
     @with_setup(setup=setup)
     def test_spinprocar_band_orbitalread(self):
         '''test for Band_with_projection.orbitals setter (SPIN)'''
-        ok_(isinstance(self.spinband.orbitals, list))
-        eq_(self.spinband.orbitals[0].shape, (3, 2, 3, 10))
-        eq_(self.spinband.orbitals[1].shape, (3, 2, 3, 10))
+        spinband = self.spinprocar.band()
+        ok_(isinstance(spinband.orbitals, list))
+        eq_(spinband.orbitals[0].shape, (3, 4, 3, 10))
+        eq_(spinband.orbitals[1].shape, (3, 4, 3, 10))
         # for up spin, ik = 1, ib = 0, iatom = 2
         #            ->  (In PROCAR, k# =2, band# = 1, atom# = 3)
         #
         np.testing.assert_array_almost_equal(
-            self.spinband.orbitals[0][1][0][2],
+            spinband.orbitals[0][1][0][2],
             [0.0080, 0.0081, 0.0082, 0.0083,
              0.0084, 0.0085, 0.0086, 0.0087,
              0.0088, 0.0756])
 
     @with_setup(setup=setup)
-    def test_spinprocar_band_compose_orbital1(self):
-        '''test for Band_with_projection.compose_orbital (SOI)
+    def test_spinprocar_band_sum_orbital1(self):
+        '''test for Band_with_projection.sum_orbital (SOI)
 
         raise RuntimeError when no item in sitecomposed
         '''
-        self.spinband.compose_sites((0, 2))
-        self.spinband.compose_orbital(('p', 'pxpy', 'd'))
-        np.testing.assert_allclose(self.spinband.sitecomposed[0][0][0][0],
+        spinband = self.spinprocar.band()
+        spinband.sum_site((0, 2))
+        spinband.sum_orbital(('p', 'pxpy', 'd'))
+        np.testing.assert_allclose(spinband.sitecomposed[0][0][0][0],
                                    [0.0020, 0.0022, 0.0024,
                                     0.0026, 0.0028, 0.0030,
                                     0.0032, 0.0034, 0.0036, 0.0252,
                                     0.0072, 0.0048, 0.0160])
-        np.testing.assert_allclose(self.spinband.sitecomposed[1][0][0][0],
+        np.testing.assert_allclose(spinband.sitecomposed[1][0][0][0],
                                    [2.0020, 2.0022, 2.0024,
                                     2.0026, 2.0028, 2.0030,
                                     2.0032, 2.0034, 2.0036, 18.0252,
                                     6.0072, 4.0048, 10.0160])
-        eq_(self.spinband.orb_names,
+        eq_(spinband.orb_names,
             ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2',
              'dxz', 'dx2', 'tot', 'p', 'pxpy', 'd'])
 
@@ -296,25 +311,62 @@ class TestSpinPolarizedPROCAR(object):
     def test_spinprocar_setheader(self):
         '''test for Band_with_projection.set_header  (SPIN)
         '''
-        self.spinband.compose_sites((0, 2))
-        self.spinband.compose_orbital(('p', 'pxpy', 'd'))
-        eq_(self.spinband.set_header((('test'), ), (('p', 'pxpy', 'd'), )),
+        spinband = self.spinprocar.band()
+        spinband.sum_site((0, 2))
+        spinband.sum_orbital(('p', 'pxpy', 'd'))
+        eq_(spinband.set_header((('test'), ), (('p', 'pxpy', 'd'), )),
             ['#k', 'energy_up', 'test_p_up', 'test_pxpy_up', 'test_d_up',
              'energy_down', 'test_p_down', 'test_pxpy_down', 'test_d_down'])
 
     @with_setup(setup=setup)
-    def test_onlyband(self):
-        onlyband=self.spinprocar.onlyband()
+    def test_to_band_spin(self):
+        '''test for energies  (2:SPIN)'''
+        np.testing.assert_array_almost_equal(
+            np.array(
+            [[-10.0, -10.5],
+             [-5.0, -5.5],
+             [0.0, -10.0],
+             [5.0, -5.0],
+             [-7.0, -7.5],
+             [-4.0, -4.5],
+             [-1.0, -10.0],
+             [4.0, -5.0],
+             [-6.0, -6.5],
+             [-1.0, -1.5],
+             [-3.0, -10.0],
+             [0.0, -5.0]]),
+            self.spinprocar.energies)
+        band = self.spinprocar.band()
+        np.testing.assert_array_almost_equal(np.array(
+            [[[-10., -5., 0., 5.],
+              [ -7., -4., -1., 4.],
+              [ -6., -1., -3., 0.]],
+             [[-10.5, -5.5, -10., -5.],
+              [ -7.5, -4.5, -10., -5.],
+              [ -6.5, -1.5, -10., -5.]]]),
+            band.energies)
+
+    @with_setup(setup=setup)
+    def test_toband(self):
+        '''test for simple band data output (Spin polarized)'''
+        onlyband = self.spinprocar.to_band()
         eq_(onlyband.__str__(),
             '''#k	Energy_up	Energy_down
 0.000000000e+00	-1.000000000e+01	-1.050000000e+01
-3.535533906e-01	-5.000000000e+00	-5.500000000e+00
+3.535533906e-01	-7.000000000e+00	-7.500000000e+00
+7.071067812e-01	-6.000000000e+00	-6.500000000e+00
 
-0.000000000e+00	-7.000000000e+00	-7.500000000e+00
+0.000000000e+00	-5.000000000e+00	-5.500000000e+00
 3.535533906e-01	-4.000000000e+00	-4.500000000e+00
+7.071067812e-01	-1.000000000e+00	-1.500000000e+00
 
-0.000000000e+00	-6.000000000e+00	-6.500000000e+00
-3.535533906e-01	-1.000000000e+00	-1.500000000e+00
+0.000000000e+00	0.000000000e+00	-1.000000000e+01
+3.535533906e-01	-1.000000000e+00	-1.000000000e+01
+7.071067812e-01	-3.000000000e+00	-1.000000000e+01
+
+0.000000000e+00	5.000000000e+00	-5.000000000e+00
+3.535533906e-01	4.000000000e+00	-5.000000000e+00
+7.071067812e-01	0.000000000e+00	-5.000000000e+00
 
 ''')
 
@@ -413,9 +465,9 @@ class TestSOIPROCAR(object):
              3.0078, 3.0666])
 
     @with_setup(setup=setup)
-    def test_soiprocar_band_compose_sites(self):
-        '''test for Band_with_projection.compose_sites (SOI)'''
-        self.soiband.compose_sites((0, 2))
+    def test_soiprocar_band_sum_site(self):
+        '''test for Band_with_projection.sum_site (SOI)'''
+        self.soiband.sum_site((0, 2))
         np.testing.assert_allclose(self.soiband.sitecomposed[0][0][0][0],
                                    [0.0020, 0.0022, 0.0024,
                                     0.0026, 0.0028, 0.0030,
@@ -423,21 +475,21 @@ class TestSOIPROCAR(object):
 
     @raises(RuntimeError)
     @with_setup(setup=setup)
-    def test_soiprocar_band_compose_orbital0(self):
-        '''test for Band_with_projection.compose_orbital (0) (SOI)
+    def test_soiprocar_band_sum_orbital0(self):
+        '''test for Band_with_projection.sum_orbital (0) (SOI)
 
         raise RuntimeError when no item in sitecomposed
         '''
-        self.soiband.compose_orbital(('p', 'pxpy', 'd'))
+        self.soiband.sum_orbital(('p', 'pxpy', 'd'))
 
     @with_setup(setup=setup)
-    def test_soiprocar_band_compose_orbital1(self):
-        '''test for Band_with_projection.compose_orbital (SOI)
+    def test_soiprocar_band_sum_orbital1(self):
+        '''test for Band_with_projection.sum_orbital (SOI)
 
         raise RuntimeError when no item in sitecomposed
         '''
-        self.soiband.compose_sites((0, 2))
-        self.soiband.compose_orbital(('p', 'pxpy', 'd'))
+        self.soiband.sum_site((0, 2))
+        self.soiband.sum_orbital(('p', 'pxpy', 'd'))
         np.testing.assert_allclose(self.soiband.sitecomposed[0][0][0][0],  # mT
                                    [0.0020, 0.0022, 0.0024,
                                     0.0026, 0.0028, 0.0030,
@@ -455,8 +507,8 @@ class TestSOIPROCAR(object):
     def test_soiprocar_setheader(self):
         '''test for Band_with_projection.set_header  (SOI)
         '''
-        self.soiband.compose_sites((0, 2))
-        self.soiband.compose_orbital(('p', 'pxpy', 'd'))
+        self.soiband.sum_site((0, 2))
+        self.soiband.sum_orbital(('p', 'pxpy', 'd'))
         eq_(self.soiband.set_header((('test'), ), (('p', 'pxpy', 'd'), )),
             ['#k', 'energy',
              'test_p_mT', 'test_pxpy_mT', 'test_d_mT',
@@ -465,17 +517,29 @@ class TestSOIPROCAR(object):
              'test_p_mZ', 'test_pxpy_mZ', 'test_d_mZ'])
 
     @with_setup(setup=setup)
+    def test_to_band_soi(self):
+        '''test for soi energies (SOI)'''
+        np.testing.assert_array_almost_equal(
+            [-10.0, -5.0, -7.0, -4.0, -6.0, -1.0],
+            self.soiprocar.energies)
+        soiband = self.soiprocar.to_band()
+        np.testing.assert_array_almost_equal(
+            [[-10., -5.],
+             [ -7., -4.],
+             [ -6., -1.]],
+            soiband.energies)
+
+    @with_setup(setup=setup)
     def test_onlyband(self):
-        onlyband=self.soiprocar.onlyband()
+        onlyband = self.soiprocar.to_band()
         eq_(onlyband.__str__(),
             '''#k	Energy
 0.000000000e+00	-1.000000000e+01
-3.535533906e-01	-5.000000000e+00
+3.535533906e-01	-7.000000000e+00
+7.071067812e-01	-6.000000000e+00
 
-0.000000000e+00	-7.000000000e+00
+0.000000000e+00	-5.000000000e+00
 3.535533906e-01	-4.000000000e+00
-
-0.000000000e+00	-6.000000000e+00
-3.535533906e-01	-1.000000000e+00
+7.071067812e-01	-1.000000000e+00
 
 ''')

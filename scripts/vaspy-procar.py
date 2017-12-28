@@ -84,6 +84,6 @@ else:
     if fermi != 0.0:
         band.fermi_correction(fermi)
     for sites in siteindex:
-        band.compose_sites(sites)
-    band.compose_orbital(flat_orbitals)
-    print(band.get_sitecomposed_data(sitenames, args.orbital))
+        band.sum_site(sites)
+    band.sum_orbital(flat_orbitals)
+    print(band.str_sitecomposed_data(sitenames, args.orbital))

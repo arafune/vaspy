@@ -9,7 +9,7 @@ if sys.hexversion < 0x20700f0 or 0x30000f0 <= sys.hexversion < 0x30200f0:
     reqpkgs.append('argparse')
 
 setup(name='VASPy',
-      version='0.4.0',
+      version='0.4.1',
       author='Mao Kanno',
       author_email='mkanno.t.k@13.alumni.u-tokyo.ac.jp',
       maintainer='Ryuichi Arafune',
@@ -25,6 +25,7 @@ setup(name='VASPy',
           'vaspy.tools',
           'vaspy.mesh3d',
           'vaspy.eigenval',
+          'vaspy.wavecar',
       ],
       scripts=['scripts/vaspy-chgcar.py',
                'scripts/vaspy-doscar.py',

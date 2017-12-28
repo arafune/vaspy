@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''.. py:module doscar
-
+''' 
 This module provides DOSCAR and related classes.
 
 From VASP webpage::
@@ -55,25 +54,26 @@ import os
 
 
 class DOSCAR(object):  # Version safety
-    '''.. py:class:: DOSCAR(doscarfile)
-
+    ''' 
     Class for DOSCAR file
 
     A container of DOS object
 
-    .. py:attribute: natom
+    Attributes
+    ----------
+    natom: int
+        number of atoms
 
-    :py:attr:`natom` is number of atoms.
+    nenergypnts: int
+        number of energy points 
+        
+        Notes
+        -----
+        VASP defaults is 301
 
-    .. py:attribute: nenergypnts
-
-    :py:attr:`nenergypnts` is number of energy points.  (VASP defaults is 301.)
-
-    .. py:attribute: dos_container
-
-    :py:attr:`dos_container` is a python list object that
-    stores the DOS object. By default, the first item is the TDOS, and the
-    latter items are PDOS.
+    dos_container: list
+        stores the DOS object. By default, the first item is the TDOS, and the
+        latter items are PDOS.
     '''
 
     def __init__(self, arg=None):
@@ -85,8 +85,7 @@ class DOSCAR(object):  # Version safety
             self.load_doscar_file(arg)
 
     def load_doscar_file(self, doscarfile):
-        '''.. py:method load_dosca_file(doscarfile)
-
+        ''' 
         parse DOSCAR file and store it in memory
 
         Parameters
@@ -134,8 +133,7 @@ class DOSCAR(object):  # Version safety
 
 
 class DOS(object):  # Version safety
-    '''.. py:class:: DOS
-
+    ''' 
     Class for DOS
 
     List object consisting two elements.
@@ -145,10 +143,9 @@ class DOS(object):  # Version safety
 
     Attributes
     -----------
-    dos
-
-    `dos` is the python linst object for storing the dos data.
-    By default, the first column is the energy, the latter is the density.
+    dos: list
+         the dos data.
+         By default, the first column is the energy, the latter is the density.
     '''
 
     def __init__(self, array=None):
@@ -161,8 +158,7 @@ class DOS(object):  # Version safety
         return len(self.dos)
 
     def fermilevel_correction(self, fermi):
-        '''.. py:method:: fermilevel_correction(fermi)
-
+        ''' 
         Fermi level Correction
 
         Parameters
@@ -174,8 +170,7 @@ class DOS(object):  # Version safety
         self.dos[0] -= fermi
 
     def energies(self, i=None):
-        '''.. py:method:: energies(i)
-
+        ''' 
         Return the *i*-th energy of the object
 
         Parameters
@@ -196,8 +191,7 @@ class DOS(object):  # Version safety
             return self.dos[0][i]
 
     def export_csv(self, filename, header=None):
-        '''.. py:method:: export_csv(file[, header=header string])
-
+        ''' 
         Export data to file object (or file-like object) as csv format.
         '''
         transposed_dos = self.dos.transpose()
@@ -214,8 +208,7 @@ class DOS(object):  # Version safety
 
 
 class TDOS(DOS):
-    '''.. py:class:: TODS(array)
-
+    ''' 
     Class for total DOS
 
     Parameters
@@ -238,16 +231,14 @@ class TDOS(DOS):
             self.header = "Energy\tTDOS_up\tTDOS_down"
 
     def export_csv(self, filename):
-        '''.. py:method:: export_csv(filename)
-
+        ''' 
         Export data to file object (or file-like object) as csv format.
         '''
         header = self.header
         super(TDOS, self).export_csv(filename, header=header)
 
     def graphview(self):
-        ''' .. py:method:: graphview()
-
+        ''' 
         Show graphview by using matplotlib'''
         for density in self.dos[1:]:
             plt.plot(self.dos[0], density)
@@ -255,19 +246,18 @@ class TDOS(DOS):
 
 
 class PDOS(DOS):
-    '''.. py:class:: PDOS(array[, site])
-
+    ''' 
     Class for partial DOS
 
-    .. py:attribute: site
+    Attributes
+    ----------
+    site: str
+        name of the site.
 
-    :py:attr:`site` is the name of the site.
-
-    .. py:attribute: orbital_spin
-
-    :py:attr:`orbital_spin` is the name of the orbital with spin character.
-    (If non-spin calculated results, :py:attr:`orbital_spin` is
-    just orbital name)
+    orbital_spin: 
+        name of the orbital with spin character.
+        (If non-spin calculated results, :py:attr:`orbital_spin` is
+        just orbital name)
 
     Parameters
     -----------
@@ -306,8 +296,7 @@ class PDOS(DOS):
                 raise ValueError("Check the DOS data")
 
     def graphview(self, *orbitalnames):
-        '''.. py:method:: graphview(**orbitalnames)
-
+        ''' 
         Show DOS graph by using matplotlib.  For 'just seeing' use. '''
         try:
             alist = [self.orbital_spin.index(orbname)
@@ -322,8 +311,7 @@ class PDOS(DOS):
         plt.show()
 
     def export_csv(self, filename, site=None):
-        '''.. py:method:: export_csv(file[, site=site])
-
+        ''' 
         Export data to file object (or file-like object) as csv format.
         '''
         tmp = ["Energy"]
@@ -338,8 +326,7 @@ class PDOS(DOS):
         super(PDOS, self).export_csv(filename, header=header)
 
     def plot_dos(self, orbitals, fermi=0.0):  # Not implemented yet
-        '''.. py:method:: plot_dos(orbitals[, fermi=0.0])
-
+        '''
         Plot DOS spectra with matplotlib.pyplot
 
         Parameters
@@ -357,8 +344,7 @@ class PDOS(DOS):
         pass
 
     def __add__(self, other):
-        '''.. py:method:: __add__(other)
-
+        ''' 
         x.__add__(y) <-> x+y
 
         Parameters

@@ -1,7 +1,7 @@
 VASPy
 
 What is this?
-    This is VASP post-processing scripts for python.
+    This is VASP pre- and post-processing scripts by python.
     Translated from scRipt4VASP written by Ryuichi Arafune.
 
 Requirement

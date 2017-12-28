@@ -1,4 +1,4 @@
-''' .. py:module:: mesh3D
+'''
 mesh3D Module to provide class VASPGRID FFT-grid NG(X,Y,Z)F
 
 That is this is class VASPGRID is the parent class of CHGCAR,
@@ -17,10 +17,11 @@ _RE_BLANK = re.compile(r'^[\s]*$')
 _RE_AUG_OCC = re.compile(r'\baugmentation occupancies')
 
 
-class VASPGrid(poscar.POSCAR):
-    '''.. py:class::VaspGrid
-
-    class for VaspGrid used in CHGCAR, LOCPOT, ELFCAR...
+class VASPGrid(object):
+    # Todo: Use Composite pattern!!!
+    # VASPGrid should consists of POSCAR and Mesh3D object!!
+    '''
+    Class for VaspGrid used in CHGCAR, LOCPOT, ELFCAR...
 
     General format of the file uses VaspGrid format::
 
@@ -52,19 +53,17 @@ class VASPGrid(poscar.POSCAR):
     Attributes
     -----------------
 
-    mesh3d, additional, mesh_x, mesh_y, mesh_z
+    poscar, grid, additional
     '''
     def __init__(self, filename=None):
-        super(VASPGrid, self).__init__()
-        self.mesh_x, self.mesh_y, self.mesh_z = 0, 0, 0
-        self.mesh3d = []
+        self.poscar = poscar.POSCAR()
+        self.grid = Grid3D()
         self.additional = []
         if filename:
             self.load_from_file(filename)
 
     def load_from_file(self, filename):
-        '''.. py:method:: load_from_file(Parse)
-
+        ''' 
         filename file to construct the object
 
         Parameters
@@ -76,6 +75,7 @@ class VASPGrid(poscar.POSCAR):
         section = 'poscar'
         separator = None
         tmp = []
+        griddata = []
         if os.path.splitext(filename)[1] == '.bz2':
             try:
                 thefile = bz2.open(filename, mode='rt')
@@ -88,33 +88,35 @@ class VASPGrid(poscar.POSCAR):
                 line = line.rstrip('\n')
                 if section == 'poscar':
                     if re.search(_RE_BLANK, line):
-                        self.load_from_array(tmp)
+                        self.poscar.load_from_array(tmp)
                         section = 'define_separator'
                     else:
                         tmp.append(line)
                 elif section == 'define_separator':
                     separator = line if separator is None else separator
-                    if self.mesh_x == self.mesh_y == self.mesh_z == 0:
-                        self.mesh_x, self.mesh_y, self.mesh_z = \
-                                    [int(string) for string in line.split()]
-                    mesh_n = self.mesh_x * self.mesh_y * self.mesh_z
-                    self.mesh3d.extend([next(thefile).rstrip().replace(
-                        '***********', 'Nan').split()])
-                    if mesh_n % len(self.mesh3d[0]) == 0:
-                        lines_for_mesh = mesh_n // len(self.mesh3d[0])
+                    if self.grid.shape == (0, 0, 0):
+                        self.grid.shape = tuple([int(string) for string
+                                                 in line.split()])
+                    griddata.extend(
+                        [float(i) for i in next(thefile).rstrip().replace(
+                            '***********', 'Nan').split()])
+                    if self.grid.size % len(griddata) == 0:
+                        lines_for_mesh = self.grid.size // len(griddata)
                     else:
-                        lines_for_mesh = mesh_n // len(self.mesh3d[0]) + 1
-                    self.mesh3d.extend(
-                        [next(thefile).rstrip().replace('***********',
-                                                        'Nan').split()
-                         for i in range(lines_for_mesh-1)])
+                        lines_for_mesh = self.grid.size // len(griddata) + 1
+                    for _ in range(lines_for_mesh - 1):
+                        griddata.extend(
+                            [float(val) for val in
+                                 next(thefile).rstrip().replace('***********',
+                                                                'Nan').split()])
                     section = 'grid'
                 elif section == 'aug':
                     if separator in line:
-                        self.mesh3d.extend([
-                            next(thefile).rstrip().replace('***********',
-                                                           'Nan').split()
-                            for i in range(lines_for_mesh)])
+                        for _ in range(lines_for_mesh):
+                            griddata.extend(
+                                [float(val) for val in
+                                     next(thefile).rstrip().replace('***********',
+                                                                    'Nan').split()])
                         section = 'grid'
                     elif "augmentation occupancies " in line:
                         pass  # Used for CHGCAR, not LOCPOT. not implementd
@@ -124,116 +126,18 @@ class VASPGrid(poscar.POSCAR):
                     if "augmentation occupancies " in line:
                         section = 'aug'
                     elif separator in line:
-                        self.mesh3d.extend([
-                            next(thefile).rstrip().replace('***********',
-                                                           'Nan').split()
-                            for i in range(lines_for_mesh)])
+                        for _ in range(lines_for_mesh):
+                            griddata.extend(
+                                [float(val) for val in
+                                 next(thefile).rstrip().replace('***********',
+                                                            'Nan').split()])
                     else:
                         # for unused data stored in LOCPOT
                         self.additional.extend(line.split())
-            self.mesh3d = np.array([elem for sublist in self.mesh3d
-                                    for elem in sublist], dtype=np.float64)
-            self.n_frame = divmod(len(self.mesh3d),
-                                  self.mesh_x * self.mesh_y * self.mesh_z)[0]
-#            self.mesh3d = self.mesh3d.reshape(self.mesh3d.shape[0] *
-#                                              self.mesh3d.shape[1])
-
-    def get_mesh(self):
-        '''.. py:method:: get_mesh()
-
-        Return mesh_size
-
-        Returns
-        ------------
-        tuple
-           (mesh_x, mesh_y, mesh_z)
-        '''
-        return self.mesh_x, self.mesh_y, self.mesh_z
-
-    def __add__(self, other):
-        '''.. py:method:: __add__(other)
-
-        x.__add__(y) <=> x + y
-
-        Parameters
-        ---------------
-
-        other: VASPGrid
-            Addtion VaspGrid object
-
-        Returns
-        -----------
-
-        VASPGrid
-            Rusultant by summing two grid value
-
-        Notes
-        ----------
-
-        The Grid data is summed by this method, of course. And the
-        atom data (POSCAR part) is also summed.
-        '''
-        if not isinstance(other, VASPGrid):
-            return NotImplemented
-        add_vaspgrid = super(VASPGrid, self).__add__(other)
-        try:
-            add_vaspgrid.mesh3d = self.mesh3d + other.mesh3d
-        except ValueError:
-            raise RuntimeError('The mesh sizes are different each other')
-        return add_vaspgrid
-
-    def __sub__(self, other):
-        '''.. py:method:: __sub__(other)
-
-        x.__sub__(y) <=> x - y
-
-        Parameters
-        ---------------
-
-        other: VASPGrid
-            difference VASPGrid object
-
-        Returns
-        ----------
-
-        VASPGrid
-            Resultant by difference between two objects.
-
-        Notes
-        --------
-
-        The resultant grid data is the difference between two objects,
-        of course. On the other hand, the atom position information
-        unchange by this method.  Use the 'minuend' object.  The atom
-        information in subrtrahend object is totally ignored.
-        '''
-
-        if not isinstance(other, VASPGrid):
-            return NotImplemented
-        diff_vaspgrid = copy.deepcopy(self)
-        try:
-            diff_vaspgrid.mesh3d = self.mesh3d - other.mesh3d
-        except ValueError:
-            raise RuntimeError('The mesh sizes are different each other')
-        return diff_vaspgrid
-
-    def merge(self, other):
-        '''.. py:method:: merge(other)
-
-        x.merge(y) -> '3D mesh data of x' + '3D mesh data of y'
-        '''
-        if not isinstance(other, VASPGrid):
-            return NotImplemented
-        merged_vaspgrid = copy.deepcopy(self)
-        try:
-            merged_vaspgrid.mesh3d = self.mesh3d + other.mesh3d
-        except ValueError:
-            raise RuntimeError('The mesh sizes are different each other')
-        return merged_vaspgrid
+            self.grid.data = np.array(griddata, dtype=np.float64)
 
     def __str__(self):
-        '''.. py:method:: __str__()
-
+        ''' 
         x.__str__() <=> str(x)
 
         Returns
@@ -242,27 +146,12 @@ class VASPGrid(poscar.POSCAR):
         str
             a string representation of VASPGrid object
         '''
-        mesharray = self.mesh3d.reshape(self.mesh3d.size // (self.mesh_x *
-                                                             self.mesh_y *
-                                                             self.mesh_z),
-                                        self.mesh_x *
-                                        self.mesh_y *
-                                        self.mesh_z)
-        outputstr = self.str_short()
-        for tmp in mesharray:
-            output = []
-            outputstr += '\n  {0}  {1}  {2}\n'.format(self.mesh_x,
-                                                      self.mesh_y,
-                                                      self.mesh_z)
-            for array in tools.each_slice(tmp, 5):
-                output.append(''.join('  {0:18.11E}'.format(i)
-                                      for i in array if i is not None))
-            outputstr += '\n'.join(output)
-        return outputstr + '\n'
+        poscarstr = self.poscar.str_short()
+        meshstr = self.grid.__str__()
+        return poscarstr + meshstr + '\n'
 
     def save(self, filename):
-        '''.. py:method:: save(filename)
-
+        ''' 
         Save object as the same file-style
 
         Parameters
@@ -278,149 +167,105 @@ class VASPGrid(poscar.POSCAR):
         with thefile:
             thefile.write(str(self))
 
-    def average_along_axis(self, axis_name, mode=0):
-        '''.. py:method:: average_along_axis(axis_name, mode)
-
-        Calculate average value of potential along 'axis'
+    def frame(self, frame_i):
+        '''
+        Return VASPGrid object for only frame_i th frame
 
         Parameters
         ----------
 
-        axis_name: str
-             'X', 'Y', or 'Z'
-        mode: int
-             select meshdata by integer
-
-        Returns
-        -------
-        numpy.ndarray
-            average value along the axis
+        frame_i: int
+            frame index
         '''
-        axis_name = axis_name.capitalize()
-        meshdata = self.mesh3d.reshape(self.n_frame,
-                                       self.mesh_z,
-                                       self.mesh_y,
-                                       self.mesh_x)[mode]
-        if axis_name == 'X':
-            meshdata = np.average(np.average(
-                np.transpose(meshdata, (2, 0, 1)), axis=2), axis=1)
-        elif axis_name == 'Y':
-            meshdata = np.average(np.average(
-                np.transpose(meshdata, (1, 0, 2)), axis=2), axis=1)
-        elif axis_name == 'Z':
-            meshdata = np.average(np.average(meshdata, axis=2), axis=1)
-        else:
-            raise 'Wrong axis name set'
-        return meshdata
+        output_VASPGrid = VASPGrid()
+        output_VASPGrid.poscar = self.poscar
+        output_VASPGrid.grid = self.grid.frame(frame_i)
+        return output_VASPGrid
 
-    def min_along_axis(self, axis_name, mode=0):
-        '''.. py:method:: min_along_axis(axis_name, potmode)
-
-        Calculate minimum value of potential along 'axis'
+    def merge(self, other):
+        '''
+        x.__add__(y) <=> x + y
 
         Parameters
-        -----------
+        ---------------
 
-        axis_name: str
-             'X', 'Y', or 'Z'
-        mode: int
-             select meshdata by integer
+        other: VASPGrid
+            Addtion VaspGrid object
 
         Returns
-        -------
-        numpy.ndarray
-            minimum value along the axis
+        -----------
+
+        Grid3D
+            Rusultant by summing two grid values
+
         '''
-        axis_name = axis_name.capitalize()
-        meshdata = self.mesh3d.reshape(self.n_frame,
-                                       self.mesh_z,
-                                       self.mesh_y,
-                                       self.mesh_x)[mode]
-        if axis_name == 'X':
-            meshdata = np.min(np.min(
-                np.transpose(meshdata, (2, 0, 1)), axis=2), axis=1)
-        elif axis_name == 'Y':
-            meshdata = np.min(np.min(
-                np.transpose(meshdata, (1, 0, 2)), axis=2), axis=1)
-        elif axis_name == 'Z':
-            meshdata = np.min(np.min(meshdata, axis=2), axis=1)
-        else:
-            raise 'Wrong axis name set'
-        return meshdata
+        add_grid = copy.deepcopy(self)
+        try:
+            add_grid.grid.data = self.grid.data + other.grid.data
+        except ValueError:
+            raise RuntimeError('The mesh shapes are different each other')
+        return add_grid
 
-    def max_along_axis(self, axis_name, mode=0):
-        '''.. py:method:: man_along_axis(axis_name, potmode)
-
-        Calculate maximum value of potential along 'axis'
+    def __add__(self, other):
+        '''
+        x.__add__(y) <=> x + y
 
         Parameters
-        -----------
+        ---------------
 
-        axis_name: str
-             'X', 'Y', or 'Z'
-        mode: int
-             select meshdata by integer
+        other: VASPGrid
+            Addtion VaspGrid object
 
         Returns
-        -------
-        numpy.ndarray
-            maximum value along the axis
+        -----------
+
+        Grid3D
+            Rusultant by summing two grid values and poscar is also added.
+
         '''
-        axis_name = axis_name.capitalize()
-        meshdata = self.mesh3d.reshape(self.n_frame,
-                                       self.mesh_z,
-                                       self.mesh_y,
-                                       self.mesh_x)[mode]
-        if axis_name == 'X':
-            meshdata = np.max(np.max(
-                np.transpose(meshdata, (2, 0, 1)), axis=2), axis=1)
-        elif axis_name == 'Y':
-            meshdata = np.max(np.max(
-                np.transpose(meshdata, (1, 0, 2)), axis=2), axis=1)
-        elif axis_name == 'Z':
-            meshdata = np.max(np.max(meshdata, axis=2), axis=1)
-        else:
-            raise 'Wrong axis name set'
-        return meshdata
+        add_grid = copy.deepcopy(self)
+        add_grid.poscar = self.poscar + other.poscar
+        try:
+            add_grid.grid.data = self.grid.data + other.grid.data
+        except ValueError:
+            raise RuntimeError('The mesh shapes are different each other')
+        return add_grid
 
-    def median_along_axis(self, axis_name, mode=0):
-        '''.. py:method:: median_along_axis(axis_name, potmode)
-
-        Calculate median value of potential along 'axis'
+    def __sub__(self, other):
+        ''' 
+        x.__sub__(y) <=> x - y
 
         Parameters
-        -----------
+        ---------------
 
-        axis_name: str
-             'X', 'Y', or 'Z'
-        mode: int
-             select meshdata by integer
+        other: VASPGrid
+            difference VASPGrid object
 
         Returns
-        -------
-        numpy.ndarray
-            median value along the axis
+        ----------
+
+        Grid3D
+            Resultant by difference between two objects.
+
+        Note
+        --------
+
+        The resultant grid data is the difference between two objects,
+        of course. On the other hand, the atom position information
+        unchange by this method.  Use the 'minuend' object.  The atom
+        information in subrtrahend object is totally ignored.
         '''
-        axis_name = axis_name.capitalize()
-        meshdata = self.mesh3d.reshape(self.n_frame,
-                                       self.mesh_z,
-                                       self.mesh_y,
-                                       self.mesh_x)[mode]
-        if axis_name == 'X':
-            meshdata = np.median(np.median(
-                np.transpose(meshdata, (2, 0, 1)), axis=2), axis=1)
-        elif axis_name == 'Y':
-            meshdata = np.median(np.median(
-                np.transpose(meshdata, (1, 0, 2)), axis=2), axis=1)
-        elif axis_name == 'Z':
-            meshdata = np.median(np.median(meshdata, axis=2), axis=1)
-        else:
-            raise 'Wrong axis name set'
-        return meshdata
+
+        diff_grid = copy.deepcopy(self)
+        try:
+            diff_grid.grid.data = self.grid.data - other.grid.data
+        except ValueError:
+            raise RuntimeError('The mesh shapes are different each other')
+        return diff_grid
 
 
-class FFTGRID(object):
-    '''.. py:class:: FFTGRID(meshsize, meshdata)
+class Grid3D(object):
+    '''
     Class for NG(X,Y,Z)F in VASP
 
     This class is used chg_array in CHGCAR, Potential in LOCPOT,
@@ -429,24 +274,45 @@ class FFTGRID(object):
     Parameters
     ----------
 
-    meshsize: tuple
-        mesh_x, mesh_y, mesh_z
-    meshdata: list or numpy.array
-        1D-list or 1D-numpy array.  The length of grid is mesh_x *
-    mesh_y * mesh_z
+    shape: tuple
+        shape[0], shape[1], shape[2]
+    data: list or numpy.array
+        1D-list or 1D-numpy array.
+        The length of grid is shape[0] * shape[1] * shape[2]
     '''
-    def __init__(self, meshsize, meshdata):
-        if len(meshdata) == meshsize(0) * meshsize(1) * meshsize(2):
-            self.mesh_x = meshsize(0)
-            self.mesy_y = meshsize(1)
-            self.mesh_z = meshsize(2)
-            self.meshdata = np.array(meshdata)
+    def __init__(self, shape=(0, 0, 0), data=None):
+        self.shape = shape
+        if data is None:
+            self.data = []
         else:
-            raise RuntimeError
+            self.data = np.asarray(data)
+
+    @property
+    def size(self):
+        '''Return the number of meshes in the frame'''
+        return self.shape[0] * self.shape[1] * self.shape[2]
+
+    @property
+    def num_frame(self):
+        '''Return the number of grid frames'''
+        return divmod(self.data.size, self.size)[0]
+
+    def frame(self, frame_i):
+        '''
+        Return the i-th frame
+
+        Parameters
+        -----------
+        frame_i:int
+           frame index
+        '''
+        assert frame_i < self.num_frame
+        dest = copy.deepcopy(self)
+        dest.data = self.data.reshape(self.num_frame, self.size)[frame_i]
+        return dest
 
     def slice(self, axis, postition):
-        '''.. py:method:: slice(axis, position)
-
+        ''' 
         Parameters
         ----------
 
@@ -464,7 +330,7 @@ class FFTGRID(object):
         pass
 
     def integrate(self, axis, from_coor, to_coor):
-        '''.. py:method:: integrate(axis, from_coor, to_coor)
+        '''
         Return 2D data integrated occupacy along the 'axis'
         from_coor to to_coor.
 
@@ -490,12 +356,161 @@ class FFTGRID(object):
         pass
 
     def __str__(self):
-        ''' .. py:method:: __str__()
+        ''' 
+        x.__str__() <=> str(x)
 
         Returns
         -------
 
         str
-            a string representation of occupancy.
+            a string representation of VASPGrid object
         '''
-        pass
+        outputstr = ''
+        mesharray = self.data.reshape(self.num_frame,
+                                      self.size)
+        for tmp in mesharray:
+            output = []
+            outputstr += '\n  {0}  {1}  {2}\n'.format(self.shape[0],
+                                                      self.shape[1],
+                                                      self.shape[2])
+            for array in tools.each_slice(tmp, 5):
+                output.append(''.join('  {0:18.11E}'.format(i)
+                                      for i in array if i is not None))
+            outputstr += '\n'.join(output)
+        return outputstr + '\n'
+
+    def average_along_axis(self, axis_name, mode=0):
+        ''' 
+        Calculate average value of potential along 'axis'
+
+        Parameters
+        ----------
+
+        axis_name: str
+             'X', 'Y', or 'Z'
+        mode: int
+             select data by integer
+
+        Returns
+        -------
+        numpy.ndarray
+            average value along the axis
+        '''
+        axis_name = axis_name.capitalize()
+        data = self.data.reshape(self.num_frame,
+                                 self.shape[2],
+                                 self.shape[1],
+                                 self.shape[0])[mode]
+        if axis_name == 'X':
+            data = np.average(np.average(
+                np.transpose(data, (2, 0, 1)), axis=2), axis=1)
+        elif axis_name == 'Y':
+            data = np.average(np.average(
+                np.transpose(data, (1, 0, 2)), axis=2), axis=1)
+        elif axis_name == 'Z':
+            data = np.average(np.average(data, axis=2), axis=1)
+        else:
+            raise 'Wrong axis name set'
+        return data
+
+    def min_along_axis(self, axis_name, mode=0):
+        ''' 
+        Calculate minimum value of potential along 'axis'
+
+        Parameters
+        -----------
+
+        axis_name: str
+             'X', 'Y', or 'Z'
+        mode: int
+             select data by integer
+
+        Returns
+        -------
+        numpy.ndarray
+            minimum value along the axis
+        '''
+        axis_name = axis_name.capitalize()
+        data = self.data.reshape(self.num_frame,
+                                 self.shape[2],
+                                 self.shape[1],
+                                 self.shape[0])[mode]
+        if axis_name == 'X':
+            data = np.min(np.min(
+                np.transpose(data, (2, 0, 1)), axis=2), axis=1)
+        elif axis_name == 'Y':
+            data = np.min(np.min(
+                np.transpose(data, (1, 0, 2)), axis=2), axis=1)
+        elif axis_name == 'Z':
+            data = np.min(np.min(data, axis=2), axis=1)
+        else:
+            raise 'Wrong axis name set'
+        return data
+
+    def max_along_axis(self, axis_name, mode=0):
+        ''' 
+        Calculate maximum value of potential along 'axis'
+
+        Parameters
+        -----------
+
+        axis_name: str
+             'X', 'Y', or 'Z'
+        mode: int
+             select data by integer
+
+        Returns
+        -------
+        numpy.ndarray
+            maximum value along the axis
+        '''
+        axis_name = axis_name.capitalize()
+        data = self.data.reshape(self.num_frame,
+                                 self.shape[2],
+                                 self.shape[1],
+                                 self.shape[0])[mode]
+        if axis_name == 'X':
+            data = np.max(np.max(
+                np.transpose(data, (2, 0, 1)), axis=2), axis=1)
+        elif axis_name == 'Y':
+            data = np.max(np.max(
+                np.transpose(data, (1, 0, 2)), axis=2), axis=1)
+        elif axis_name == 'Z':
+            data = np.max(np.max(data, axis=2), axis=1)
+        else:
+            raise 'Wrong axis name set'
+        return data
+
+    def median_along_axis(self, axis_name, mode=0):
+        ''' 
+        Calculate median value of potential along 'axis'
+
+        Parameters
+        -----------
+
+        axis_name: str
+             'X', 'Y', or 'Z'
+        mode: int
+             select data by integer
+
+        Returns
+        -------
+        numpy.ndarray
+            median value along the axis
+        '''
+        axis_name = axis_name.capitalize()
+        data = self.data.reshape(self.num_frame,
+                                 self.shape[2],
+                                 self.shape[1],
+                                 self.shape[0])[mode]
+        if axis_name == 'X':
+            data = np.median(np.median(
+                np.transpose(data, (2, 0, 1)), axis=2), axis=1)
+        elif axis_name == 'Y':
+            data = np.median(np.median(
+                np.transpose(data, (1, 0, 2)), axis=2), axis=1)
+        elif axis_name == 'Z':
+            data = np.median(np.median(data, axis=2), axis=1)
+        else:
+            raise 'Wrong axis name set'
+        return data

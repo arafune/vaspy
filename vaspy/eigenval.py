@@ -1,5 +1,4 @@
-'''.. py:module:: eigenmval.py
-
+''' 
 This module provides EIGENVAL.
 '''
 
@@ -13,8 +12,7 @@ import matplotlib.pyplot as plt
 
 
 class EIGENVAL(object):
-    '''.. py:class:: EIGENVAL(EIGENVAL_file)
-
+    ''' 
     Class for storing the data of EIGENVAL file.
 
     Parameters
@@ -29,12 +27,14 @@ class EIGENVAL(object):
         Number of atoms
     numk: int
         Number of k vectors
+    n_bands: int
+        Number of bands
     spininfo: int
         No_spin or non-collinear:1 collinear spin: 2
-    kvectors: list
+    kvectors[ki]: list or numpy array
         List of kvalues, the length of kvectors must be equal to numk.
-    energies: list
-        Energy values
+    energies[bi+ki*n_bands]: list or numpy.array
+        Energy values (two-value array for spin-polarized eigenvalu)
     '''
 
     def __init__(self, arg=None):
@@ -49,8 +49,7 @@ class EIGENVAL(object):
             self.load_from_file(arg)
 
     def load_from_file(self, filename):
-        '''.. py:method:: load_from_file(filename)
-
+        ''' 
         A virtual parser of EIGENVAL
 
         parameters
@@ -76,7 +75,7 @@ class EIGENVAL(object):
             _, self.numk, self.n_bands = [int(i) for i in
                                           next(thefile).strip().split()]
             for ki in range(self.numk):
-                # the first line in the sigleset begin with the blank line
+                # the first line in the sigleset begins with the blank
                 next(thefile)
                 self.kvectors.append(np.array(
                     [float(i) for i in next(thefile).strip().split()[0:3]]))
@@ -93,9 +92,8 @@ class EIGENVAL(object):
     def to_band(self, recvec=[[1.0, 0.0, 0.0],
                               [0.0, 1.0, 0.0],
                               [0.0, 0.0, 1.0]]):
-        '''.. py:method:: to_band(recvec)
-
-        Return Band_with_projection object
+        ''' 
+        Return EnergyBand object
 
         Parameters
         -----------
@@ -113,9 +111,9 @@ class EIGENVAL(object):
         EnergyBand
 '''
         recvecarray = np.array(recvec).T
-        physical_kvector = [recvecarray.dot(kvector) for kvector in
+        kvector_physical = [recvecarray.dot(kvector) for kvector in
                             self.kvectors[0:self.numk]]
-        return EnergyBand(physical_kvector, self.energies, self.spininfo)
+        return EnergyBand(kvector_physical, self.energies, self.spininfo)
 
     def __str__(self):
         '''..py:method:: __str__()
@@ -133,8 +131,7 @@ class EIGENVAL(object):
 
 
 class EnergyBand(object):
-    '''.. py:class:: EnergyBand(kvectors, energies, spininfo)
-
+    ''' 
     Simple band structure object for analyzing by using ipython.
 
     Parameters
@@ -145,9 +142,9 @@ class EnergyBand(object):
     energies: numpy.ndarray
          1D array data of energies
     spininfo: int, tuple
-         Spin type.  1 or ("",) means No-spin.  2 or ('_up', '_down')
-         means collinear spin, 4 or ('_mT', '_mX', '_mY', '_mZ') means
-         collinear spin. This class does not distinguish  non-collinear spin
+         Spin type.  1 or ("",) mean No-spin.  2 or ('_up', '_down')
+         mean collinear spin, 4 or ('_mT', '_mX', '_mY', '_mZ') mean
+         collinear spin. This class does not distinguish non-collinear spin
          and No-spin.
 '''
 
@@ -175,8 +172,7 @@ class EnergyBand(object):
                 (self.numk, self.nbands))
 
     def fermi_correction(self, fermi):
-        '''.. py:method:: fermi_correction(fermi)
-
+        ''' 
         Correct the Fermi level
 
         Parameters
@@ -188,8 +184,7 @@ class EnergyBand(object):
         self.energies -= fermi
 
     def __str__(self):
-        '''.. py:method:: __str__()
-
+        ''' 
         Returns
         --------
 
@@ -213,9 +208,55 @@ class EnergyBand(object):
                 output += '\n'
         return output
 
-    def showband(self, yrange=None, spin=None):  # How to set default value?
-        '''.. py:method:: showband(yrange)
+    def figure(self, color='blue', spin=None):
+        '''
+        Return Axes object of the energy band.
 
+        Parameters
+        ----------
+
+        color: str
+            color of the band line
+
+        spin: str
+            up or down
+
+        Returns
+        --------
+        matplotlib.pyplot.Axes
+
+        Example
+        -------
+
+        Here is a typical code::
+
+           fig = plt.figure()
+           ax = band.figure(color='blue')
+           ax.set_ylabel('Energy  ( eV )')
+           ax.set_ylim(-5, 5)
+           ax.set_xlim(0, 4)
+           plt.show()
+
+'''
+        energies = np.swapaxes(self.energies, 1, 0)
+        draws = []
+        if self.spininfo == 2 or len(self.spininfo) == 2:
+            if spin == 'down':
+                for bi in range(0, self.nbands):
+                    draws.append(plt.plot(self.kdistances, energies[bi].T[1],
+                                          color=color))
+            else:
+                for bi in range(0, self.nbands):
+                    draws.append(plt.plot(self.kdistances, energies[bi].T[0],
+                                          color=color))
+        else:
+            for bi in range(0, self.nbands):
+                draws.append(plt.plot(self.kdistances, energies[bi],
+                                      color=color))
+        return plt.gca()
+
+    def show(self, yrange=None, spin=None):  # How to set default value?
+        ''' 
         Draw band structure by using maptlotlib.
         For 'just seeing' use.
 
@@ -227,7 +268,7 @@ class EnergyBand(object):
              If not specified, use the matplotlib default value.
 '''
         energies = np.swapaxes(self.energies, 1, 0)
-        if (self.spininfo == 2 or len(self.spininfo) == 2):
+        if self.spininfo == 2 or len(self.spininfo) == 2:
             if spin == 'down':
                 for bi in range(0, self.nbands):
                     plt.plot(self.kdistances, energies[bi].T[1],
