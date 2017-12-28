@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # translate from procar.rb of scRipt4VASP 2014/2/26 master branch
-""".. py:module:: procar.py
-
+""" 
 This module provides PROCAR, BandWithProjection, EnergyBand,
 Projection classes.
 
@@ -26,8 +25,7 @@ from vaspy import eigenval
 
 
 class PROCAR(eigenval.EIGENVAL):  # Version safety
-    '''.. py:class:: PROCAR(PROCAR_file[, phase_read])
-
+    ''' 
     Class for storing the data saved in PROCAR file.
 
     Parameters
@@ -69,18 +67,15 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
       :Example: 1 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000\
       0.000 0.000
 
-    .. py:attribute:: orbital
+    Attributes
+    ----------
+    orbital: list
+       Store orbital character
 
-      list object. Store orbital character
+    phase: list
+       list (Not used at present)
 
-    .. py:attribute:: phase
-
-      list (Not used at present)
-
-    .. py:attribute:: spininfo
-
-      tuple
-
+    spininfo: tuple
         * nospin: ('',)
         * spinresolved: ('_up', '_down')
         * soi: ('_mT', '_mX', '_mY', '_mZ')
@@ -99,8 +94,7 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
             raise RuntimeError("the arg of PROCAR() should be the filename")
 
     def load_from_file(self, filename, phase_read=False):
-        '''.. py:method::  load_from_file(filename, [phase_read=False])
-
+        ''' 
         A virtual parser of PROCAR
 
         Parameters
@@ -180,8 +174,7 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
             self.spininfo = ('_mT', '_mX', '_mY', '_mZ')
 
     def __str__(self):
-        '''.. py:method:: __str__()
-
+        ''' 
         __str__() <=> str(x)
 
         show the PROCAR character, not contents.
@@ -214,8 +207,7 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
     def band(self, recvec=[[1.0, 0.0, 0.0],
                            [0.0, 1.0, 0.0],
                            [0.0, 0.0, 1.0]]):
-        '''.. py:method:: band()
-
+        ''' 
         Return Band_with_projection object
 
         Parameters
@@ -249,8 +241,7 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
 
 
 class Projection(object):
-    '''.. py:class:: Projection(projections, natom, numk, nbands[, soi])
-
+    ''' 
     Orbital projection object for analyzing by using python.
 '''
 
@@ -281,8 +272,7 @@ class Projection(object):
                 raise ValueError("Argments are mismatched.")
 
     def sum_states(self, states, axis=None):
-        '''.. py:method:: sum_states(states[, axis=axis])
-
+        ''' 
         Return summantion of states
 
         Parameters
@@ -327,8 +317,7 @@ class Projection(object):
         return np.array([result])
 
     def add_output_states(self, name, state):
-        '''.. py: method:: add_output_states(name, state)
-
+        '''
         Construct states for output.
 
         Parameters
@@ -350,8 +339,7 @@ class Projection(object):
 
 
 class BandWithProjection(object):
-    '''.. py:class:: BandWithProjection()
-
+    ''' 
     The "Band structure" object deduced from PROCAR file.
 
     This class provides the way Band data with orbital projection. And
@@ -384,8 +372,7 @@ class BandWithProjection(object):
                           'tot']
 
     def isready(self):
-        '''.. py:method:: isready()
-
+        '''
         Return True if numk, n_bands, n_atoms, spininfo, and
         orb_names are set, otherwise raise ValueError.
 
@@ -534,7 +521,7 @@ class BandWithProjection(object):
                 self.__energies = energies
 
     def fermi_correction(self, fermi):
-        '''.. py:method:: fermi_correction(fermi)
+        '''
         Correct the Fermi level
 
         Parameters
@@ -646,8 +633,7 @@ class BandWithProjection(object):
                                      cmporbs_mx, cmporbs_my, cmporbs_mz]
 
     def get_orb_index(self, arg):
-        '''.. py:method::get_orb_index(arg)
-
+        ''' 
         Return the indexes corresponding orbitan name by tuple.
 
         This method returns the tuple of orbital number in self.orb_names.
@@ -704,8 +690,7 @@ class BandWithProjection(object):
         return orb_indexes
 
     def sum_orbital(self, arg):
-        '''.. py:method:compose_orbital(arg)
-
+        ''' 
         Add composed orbital contribution in
         each 'sites' stored in BandStructure.sitecomposed.
 
@@ -794,8 +779,7 @@ class BandWithProjection(object):
         return header
 
     def get_orbnums(self, orbnames):
-        '''.. py:method::get_orbnums(orbnames)
-
+        ''' 
         Return tuple whose size is same as that of arg, but
         the element is number determied from orb_names
 
@@ -814,8 +798,7 @@ class BandWithProjection(object):
                      for orbs in orbnames)
 
     def list_sitecomposed_data(self, orbnames):  # not checked
-        '''.. py:method::list_sitecomposed_data(orbnames)
-
+        ''' 
         Return list of sitecomposed attribute to 2D-list
 
         Parameters
@@ -882,8 +865,7 @@ class BandWithProjection(object):
 
 
 def check_orb_name(arg):
-    '''.. py:function::check_orb_name(arg)
-
+    ''' 
     Return arg without change if arg is a member of the 'orbital name'.
     i.e., if arg is an alias of the (more appropriate) orbital
     name, return it as is.  If arg is neither the appropriate

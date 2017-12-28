@@ -1,4 +1,4 @@
-''' .. py:module:: mesh3D
+'''
 mesh3D Module to provide class VASPGRID FFT-grid NG(X,Y,Z)F
 
 That is this is class VASPGRID is the parent class of CHGCAR,
@@ -20,9 +20,8 @@ _RE_AUG_OCC = re.compile(r'\baugmentation occupancies')
 class VASPGrid(object):
     # Todo: Use Composite pattern!!!
     # VASPGrid should consists of POSCAR and Mesh3D object!!
-    '''.. py:class::VaspGrid
-
-    class for VaspGrid used in CHGCAR, LOCPOT, ELFCAR...
+    '''
+    Class for VaspGrid used in CHGCAR, LOCPOT, ELFCAR...
 
     General format of the file uses VaspGrid format::
 
@@ -64,8 +63,7 @@ class VASPGrid(object):
             self.load_from_file(filename)
 
     def load_from_file(self, filename):
-        '''.. py:method:: load_from_file(filename)
-
+        ''' 
         filename file to construct the object
 
         Parameters
@@ -139,8 +137,7 @@ class VASPGrid(object):
             self.grid.data = np.array(griddata, dtype=np.float64)
 
     def __str__(self):
-        '''.. py:method:: __str__()
-
+        ''' 
         x.__str__() <=> str(x)
 
         Returns
@@ -154,8 +151,7 @@ class VASPGrid(object):
         return poscarstr + meshstr + '\n'
 
     def save(self, filename):
-        '''.. py:method:: save(filename)
-
+        ''' 
         Save object as the same file-style
 
         Parameters
@@ -172,7 +168,7 @@ class VASPGrid(object):
             thefile.write(str(self))
 
     def frame(self, frame_i):
-        '''.. py:method::  frame(frame_i)
+        '''
         Return VASPGrid object for only frame_i th frame
 
         Parameters
@@ -187,8 +183,7 @@ class VASPGrid(object):
         return output_VASPGrid
 
     def merge(self, other):
-        '''.. py:method:: __add__(other)
-
+        '''
         x.__add__(y) <=> x + y
 
         Parameters
@@ -201,7 +196,7 @@ class VASPGrid(object):
         -----------
 
         Grid3D
-            Rusultant by summing two grid value
+            Rusultant by summing two grid values
 
         '''
         add_grid = copy.deepcopy(self)
@@ -212,8 +207,7 @@ class VASPGrid(object):
         return add_grid
 
     def __add__(self, other):
-        '''.. py:method:: __add__(other)
-
+        '''
         x.__add__(y) <=> x + y
 
         Parameters
@@ -226,7 +220,7 @@ class VASPGrid(object):
         -----------
 
         Grid3D
-            Rusultant by summing two grid value
+            Rusultant by summing two grid values and poscar is also added.
 
         '''
         add_grid = copy.deepcopy(self)
@@ -238,8 +232,7 @@ class VASPGrid(object):
         return add_grid
 
     def __sub__(self, other):
-        '''.. py:method:: __sub__(other)
-
+        ''' 
         x.__sub__(y) <=> x - y
 
         Parameters
@@ -272,7 +265,7 @@ class VASPGrid(object):
 
 
 class Grid3D(object):
-    '''.. py:class:: Mesh3D(size, data)
+    '''
     Class for NG(X,Y,Z)F in VASP
 
     This class is used chg_array in CHGCAR, Potential in LOCPOT,
@@ -305,7 +298,7 @@ class Grid3D(object):
         return divmod(self.data.size, self.size)[0]
 
     def frame(self, frame_i):
-        '''.. py:method::  frame(frame_i)
+        '''
         Return the i-th frame
 
         Parameters
@@ -319,8 +312,7 @@ class Grid3D(object):
         return dest
 
     def slice(self, axis, postition):
-        '''.. py:method:: slice(axis, position)
-
+        ''' 
         Parameters
         ----------
 
@@ -338,7 +330,7 @@ class Grid3D(object):
         pass
 
     def integrate(self, axis, from_coor, to_coor):
-        '''.. py:method:: integrate(axis, from_coor, to_coor)
+        '''
         Return 2D data integrated occupacy along the 'axis'
         from_coor to to_coor.
 
@@ -364,8 +356,7 @@ class Grid3D(object):
         pass
 
     def __str__(self):
-        '''.. py:method:: __str__()
-
+        ''' 
         x.__str__() <=> str(x)
 
         Returns
@@ -389,8 +380,7 @@ class Grid3D(object):
         return outputstr + '\n'
 
     def average_along_axis(self, axis_name, mode=0):
-        '''.. py:method:: average_along_axis(axis_name, mode)
-
+        ''' 
         Calculate average value of potential along 'axis'
 
         Parameters
@@ -424,8 +414,7 @@ class Grid3D(object):
         return data
 
     def min_along_axis(self, axis_name, mode=0):
-        '''.. py:method:: min_along_axis(axis_name, potmode)
-
+        ''' 
         Calculate minimum value of potential along 'axis'
 
         Parameters
@@ -459,8 +448,7 @@ class Grid3D(object):
         return data
 
     def max_along_axis(self, axis_name, mode=0):
-        '''.. py:method:: man_along_axis(axis_name, potmode)
-
+        ''' 
         Calculate maximum value of potential along 'axis'
 
         Parameters
@@ -494,8 +482,7 @@ class Grid3D(object):
         return data
 
     def median_along_axis(self, axis_name, mode=0):
-        '''.. py:method:: median_along_axis(axis_name, potmode)
-
+        ''' 
         Calculate median value of potential along 'axis'
 
         Parameters

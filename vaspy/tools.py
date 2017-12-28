@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''.. py:module:: tools
-
+''' 
 Module for tools used in vaspy
 '''
 
@@ -19,8 +18,7 @@ else:
 
 
 def each_slice(iterable, n, fillvalue=None):
-    '''.. py:function:: each_slice(iterable, n, fillvalue)
-
+    '''
     each_slice(iterable, n[, fillvalue]) => iterator
 
     make new iterator object which get n item from [iterable] at once.
@@ -30,8 +28,7 @@ def each_slice(iterable, n, fillvalue=None):
 
 
 def removeall(L, value):
-    '''.. py:function:: removeall(L, value)
-
+    '''
     remove all *value* in [list] L
 
     Note
@@ -45,8 +42,7 @@ def removeall(L, value):
 
 
 def flatten(nested, target=Iterable, ignore=FLATTEN_IGNORE):
-    '''.. py:function:: flatten(nested, target, ignore)
-
+    '''
     flatten(iterable) => list
 
     flatten nested iterable.
@@ -80,8 +76,7 @@ _RESINGLE = re.compile(r'\d+')
 
 
 def parse_Atomselection(L):
-    '''.. py:function:: parse_Atomselection(L)
-
+    '''
     Return list of ordered "String" represents the number
 
     Parameters
@@ -115,8 +110,7 @@ def parse_Atomselection(L):
 
 
 def parse_AtomselectionNum(L):
-    '''.. py:function:: parse_AtomselectionNum(L)
-
+    ''' 
     Very similar with parse_Atomselection but returns the array of the
     number not array of the string.
 

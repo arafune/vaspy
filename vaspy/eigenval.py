@@ -1,5 +1,4 @@
-'''.. py:module:: eigenmval.py
-
+''' 
 This module provides EIGENVAL.
 '''
 
@@ -13,8 +12,7 @@ import matplotlib.pyplot as plt
 
 
 class EIGENVAL(object):
-    '''.. py:class:: EIGENVAL(EIGENVAL_file)
-
+    ''' 
     Class for storing the data of EIGENVAL file.
 
     Parameters
@@ -51,8 +49,7 @@ class EIGENVAL(object):
             self.load_from_file(arg)
 
     def load_from_file(self, filename):
-        '''.. py:method:: load_from_file(filename)
-
+        ''' 
         A virtual parser of EIGENVAL
 
         parameters
@@ -95,8 +92,7 @@ class EIGENVAL(object):
     def to_band(self, recvec=[[1.0, 0.0, 0.0],
                               [0.0, 1.0, 0.0],
                               [0.0, 0.0, 1.0]]):
-        '''.. py:method:: to_band(recvec)
-
+        ''' 
         Return EnergyBand object
 
         Parameters
@@ -135,8 +131,7 @@ class EIGENVAL(object):
 
 
 class EnergyBand(object):
-    '''.. py:class:: EnergyBand(kvectors, energies, spininfo)
-
+    ''' 
     Simple band structure object for analyzing by using ipython.
 
     Parameters
@@ -177,8 +172,7 @@ class EnergyBand(object):
                 (self.numk, self.nbands))
 
     def fermi_correction(self, fermi):
-        '''.. py:method:: fermi_correction(fermi)
-
+        ''' 
         Correct the Fermi level
 
         Parameters
@@ -190,8 +184,7 @@ class EnergyBand(object):
         self.energies -= fermi
 
     def __str__(self):
-        '''.. py:method:: __str__()
-
+        ''' 
         Returns
         --------
 
@@ -216,8 +209,7 @@ class EnergyBand(object):
         return output
 
     def figure(self, color='blue', spin=None):
-        '''.. py:method:: figure()
-
+        '''
         Return Axes object of the energy band.
 
         Parameters
@@ -264,8 +256,7 @@ class EnergyBand(object):
         return plt.gca()
 
     def show(self, yrange=None, spin=None):  # How to set default value?
-        '''.. py:method:: showband(yrange)
-
+        ''' 
         Draw band structure by using maptlotlib.
         For 'just seeing' use.
 

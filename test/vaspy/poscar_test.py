@@ -146,7 +146,7 @@ class TestPOSCAR(unittest.TestCase):
         global tmpstr_original
         global tmpstr_after_rotate
         self.assertEqual(tmpstr_original, self.testposcar.__str__())
-        self.testposcar.atom_rotate(0, "z", 90, (0, 0, 0))
+        self.testposcar.rotate_atom(0, "z", 90, (0, 0, 0))
         self.testposcar.to_direct()
 
     def test_poscar_supercell1(self):

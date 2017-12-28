@@ -18,7 +18,7 @@ class TestLOCPOT(unittest.TestCase):
     def test_locpot_poscar_part(self):
         '''test whether LOCPOT correctly treats POSCAR'''
         self.assertEqual('hBN-Cu', self.testlocpot1.poscar.system_name)
-        x, y, z = self.testlocpot2.poscar.get_axes_lengthes()
+        x, y, z = self.testlocpot2.poscar.axes_lengthes
         self.assertEqual((x, y, z),
                          (6.7395854049999997,
                           6.7395858129882784,
