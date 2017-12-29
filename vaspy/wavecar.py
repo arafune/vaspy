@@ -280,7 +280,7 @@ class WAVECAR(object):
             else:
                 vaspgrid = mesh3d.VASPGrid()
                 vaspgrid.poscar = poscar
-                vaspgrid.grid.shape = phi_k.shape
+                vaspgrid.grid.shape = ngrid
                 # checking consistency between POSCAR and WAVECAR
                 np.testing.assert_array_almost_equal(
                     poscar.scaling_factor * poscar.cell_vecs,
