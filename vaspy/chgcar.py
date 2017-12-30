@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''.. py:module:: chgcar
-
+''' 
 Module for CHGCAR class
 
 translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
@@ -25,11 +24,10 @@ _RE_AUG_OCC = re.compile(r'\baugmentation occupancies')
 
 
 class CHGCAR(mesh3d.VASPGrid):
-    '''.. py:class:: CHGCAR(chgcarfile)
-
+    '''
     Class for CHGCAR
 
-     An example of the first few lines of CHGCAR. ::
+    An example of the first few lines of CHGCAR. ::
 
            hBN-Cu                              # 1st line poscar.POSCAR[0]
            1.00000000000000                    # 2nd line poscar.POSCAR[1]
@@ -51,11 +49,11 @@ class CHGCAR(mesh3d.VASPGrid):
     Attributes
     ----------
 
-    spininfo
+    spininfo: int or list
+        Represents spin character
 
-    Note
+    Notes
     -----
-
     the current verstion ignores "augmentation occupacies".
     '''
 
@@ -66,7 +64,7 @@ class CHGCAR(mesh3d.VASPGrid):
             self.load_from_file(chgcar_file)
 
     def load_from_file(self, filename):
-        '''.. py:method:: load_from_file(chgcarfile)
+        '''
 
         Parse CHGCAR file to construct CHGCAR object
 
@@ -87,7 +85,7 @@ class CHGCAR(mesh3d.VASPGrid):
             raise RuntimeError("CHGCAR is correct?")
 
     def magnetization(self, direction=None):
-        '''.. py:method:: magnetization(direction)
+        '''
 
         Return CHGCAR for magnetization
 
@@ -142,7 +140,7 @@ class CHGCAR(mesh3d.VASPGrid):
         return dest
 
     def majorityspin(self):
-        '''.. py:method:: majorityspin()
+        '''
 
         Return CHGCAR for majority spin
 
@@ -164,7 +162,7 @@ class CHGCAR(mesh3d.VASPGrid):
         return dest
 
     def minorityspin(self):
-        '''.. py:method:: majorityspin()
+        '''
 
         Return CHGCAR for minority spin
 

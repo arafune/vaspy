@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''.. py:module:: wavecar
+'''
 Module for WAVECAR class
 '''
 
@@ -14,8 +14,7 @@ au_in_AA = 0.529177249
 
 
 class WAVECAR(object):
-    '''.. py:class:: WAVECAR(WAVECAR_file)
-
+    ''' 
     class for storing the data of WAVECAR file.
 
     Parameters
@@ -60,8 +59,7 @@ class WAVECAR(object):
         self.band()
 
     def header(self):
-        '''.. py:method:: header()
-
+        ''' 
         Read the information of the system stored in the first
         two record in WAVECAR file
 
@@ -101,8 +99,7 @@ class WAVECAR(object):
             raise ValueError('Invalid TAG value: {}'.format(self.rtag))
 
     def band(self):
-        '''.. py:method:: band()
-
+        ''' 
         Read the information about the band from WAVECAR file
 
         The infomation obtained by this method is as follows:
@@ -144,7 +141,7 @@ class WAVECAR(object):
         return self.kpath, self.bands
 
     def gvectors(self, k_i=0):
-        '''.. py::method gvectors(k_i)
+        '''
         G-vectors :math:`G` is determined by the following condition:
         :math:`(G+k)^2 / 2 < E_{cut}`
 
@@ -186,15 +183,14 @@ class WAVECAR(object):
         return np.asarray(g_vec, dtype=int)
 
     def bandcoeff(self, spin_i=0, k_i=0, band_i=0, norm=False):
-        ''' .. py:method:: bandcoeff(spin_i, k_i, band_i, norm)
-
+        ''' 
         Read the coefficient of the planewave of the KS
         states specified by the `spin_i`, `k_i` and `band_i`
 
         Parameters
         ----------
         spin_i: int, optional
-           spin index (0 or 1) :math:`s_i` (default value is 0)
+           spin index :math:`s_i` (0 or 1) (default value is 0)
         k_i: int, optioanl
            k index :math:`k_i`. Starts with 0 (default value is 0)
         band_i: int, optioanl
@@ -215,11 +211,10 @@ class WAVECAR(object):
     def realspace_wfc(self, spin_i=0, k_i=0, band_i=0,
                       gvec=None, ngrid=None, norm=False,
                       poscar=poscar.POSCAR()):
-        '''.. py:method:: realspace_wfc(spin_i, k_i, band_i, gvec, ngrid, norm)
-
+        r''' 
         Calculate the pseudo-wavefunction of the KS states in
         the real space by using FFT transformation of the reciprocal
-        space planewave coefficients.
+        space planewave coefficients. 
 
         The 3D FE grid size is detemined by ngrid, which defaults
         to self.ngrid if it is not provided.  GVectors of the KS
@@ -241,7 +236,7 @@ class WAVECAR(object):
         ngrid: numpy.array
             Ngrid for calculation. If not set, use self.ngrid.
         poscar: vaspy.poscar, optional
-            POSCAR object (defalut is no POSCAR object)
+            POSCAR object (defalut is blank POSCAR object)
 
         Returns
         -----------
@@ -258,7 +253,7 @@ class WAVECAR(object):
             phi_r_down corresponds to the 'down' spin spinor wavefunction.
 
         vaspgrid: VASPGrid
-            If poscar is specified, returns VASPGrid object.  The former frame
+            Returns VASPGrid object, if poscar is specified.  The former frame
             represents the real part of the wavefunction at :math:`k_i` and
             :math:`b_i` in the real space, the latter frame the imaginary
             part. On the other hand, the SOI-wavecar has 4 frames
@@ -285,13 +280,13 @@ class WAVECAR(object):
             else:
                 vaspgrid = mesh3d.VASPGrid()
                 vaspgrid.poscar = poscar
-                vaspgrid.grid.shape = phi_k.shape
+                vaspgrid.grid.shape = ngrid
                 # checking consistency between POSCAR and WAVECAR
                 np.testing.assert_array_almost_equal(
                     poscar.scaling_factor * poscar.cell_vecs,
                     self.realcell)
-                re = np.real(phi_r.T.flatten())
-                im = np.imag(phi_r.T.flatten())
+                re = np.real(phi_r.flatten('F'))
+                im = np.imag(phi_r.flatten('F'))
                 vaspgrid.grid.data = np.concatenate((re, im))
                 return vaspgrid
         except ValueError:   # SOI
@@ -314,17 +309,16 @@ class WAVECAR(object):
                 np.testing.assert_array_almost_equal(
                     poscar.scaling_factor * poscar.cell_vecs,
                     self.realcell)
-                up_re = np.real(phi_r.up.T.flatten())
-                up_im = np.imag(phi_r_up.T.flatten())
-                down_re = np.real(phi_r_down.T.flatten())
-                down_im = np.imag(phi_r_down.T.flatten())
+                up_re = np.real(phi_r.up.flatten('F'))
+                up_im = np.imag(phi_r_up.flatten('F'))
+                down_re = np.real(phi_r_down.flatten('F'))
+                down_im = np.imag(phi_r_down.flatten('F'))
                 vaspgrid.grid.data = np.concatenate((up_re, up_im,
                                                      down_re, down_im))
                 return vaspgrid
 
     def __str__(self):
-        ''' .. py:method:: __str__()
-
+        ''' 
         Print out the system parameters
         '''
         the1stline = "record length  =       {0}  "

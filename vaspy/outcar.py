@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-""".. py:module:: outcar
-
+""" 
 This module provides OUTCAR class
 """
 
@@ -12,8 +11,7 @@ import bz2
 
 
 class OUTCAR(object):  # Version safety
-    '''.. py:class:: OUTCAR(outcar_file)
-
+    ''' 
     Class for OUTCAR file that stores calculation details
     and/or calculation progress
 
@@ -52,8 +50,7 @@ class OUTCAR(object):  # Version safety
             self.load_from_file(arg)
 
     def set_atom_names(self):
-        '''.. py:method:: set_atom_names()
-
+        ''' 
         build atom_names (the list of atomname_with_index)
         '''
         self.atom_names = []
@@ -72,8 +69,7 @@ class OUTCAR(object):  # Version safety
         return self.atom_names
 
     def set_posforce_title(self):
-        """.. py:method:: set_posforce_title()
-
+        """ 
         build posforce_title
         """
         self.set_atom_names()
@@ -86,8 +82,7 @@ class OUTCAR(object):  # Version safety
                                for i in self.atom_names]
 
     def load_from_file(self, arg):
-        ''' .. py:method:: load_from_file(outcar_filename)
-
+        ''' 
         Effectively, this is a constructor of OUTCAR object.
 
         Parameters
@@ -182,7 +177,7 @@ class OUTCAR(object):  # Version safety
             self.weights.append(i[3])
 
     def select_posforce_header(self, posforce_flag, *sites):
-        '''.. py:method:: select_posforce_header(posforce_flag, *sites)
+        '''
         '''
         if sites == () or sites[0] == []:
             sites = range(1, self.nions + 1)
@@ -197,8 +192,7 @@ class OUTCAR(object):  # Version safety
 # correct?
 
     def select_posforce(self, posforce_flag, *sites):
-        '''.. py:method:: select_posforce(posforce_flag, *sites)
-
+        ''' 
         Return the posforce corresponding the posforce_flag
 
         Note

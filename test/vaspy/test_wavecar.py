@@ -8,6 +8,7 @@ from nose.tools import eq_, ok_
 from nose.tools import with_setup, raises, assert_almost_equal
 import numpy as np
 import vaspy.wavecar as wavecar
+import vaspy.poscar as poscar
 
 class TestCOWavecar(object):
     '''Class for Test WAVECAR module by using WAVECAR.CO.wavecar'''
@@ -53,6 +54,7 @@ class TestGrapheneWavecar(object):
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         data_file = datadir + 'Graphene.wavecar'
         self.gr = wavecar.WAVECAR(data_file)
+        self.gr_poscar = poscar.POSCAR(datadir + 'POSCAR.Graphene')
 
     def test_wavecar_header(self):
         '''Test for Graphene WAVECAR property'''
@@ -86,3 +88,17 @@ class TestGrapheneWavecar(object):
         np.testing.assert_array_almost_equal(
             [-22.516876, -10.623282, -6.106901, -6.094072, 0.245639, 1.006991],
             kbands[0, 0, 0:6])  # The value can be taken from EIGENVAL
+
+    @with_setup(setup=setup)
+    def test_realsapece_wfc(self):
+        '''Test for generation real space wfc (Graphene)'''
+        np.testing.assert_array_almost_equal(
+            [0.00013770+0.0001743j, 0.00014605+0.00018611j,
+             0.00017262+0.00022051j, 0.00021561+0.00027499j,
+             0.00026360+0.00033486j], 
+         self.gr.realspace_wfc()[0][0][:5])
+        vaspgrid = self.gr.realspace_wfc(poscar=self.gr_poscar)
+        np.testing.assert_array_almost_equal(
+            [0.00013770, 0.00014605, 0.00017262, 0.00021561,
+             0.00026360], vaspgrid.grid.data[:5])
+        eq_(2, vaspgrid.grid.num_frame)

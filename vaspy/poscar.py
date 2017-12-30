@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 # -*- conding: utf-8 -*-
-'''.. py:module:: poscar
-
+''' 
 This mudule provides POSCAR class
 
 translate from poscar.rb of 2014/2/26, master branch
@@ -56,8 +55,7 @@ import numpy as np
 
 
 class POSCAR_HEAD(object):
-    '''.. py:class:: POSCAR_HEAD()
-
+    ''' 
     One of the parent classes of POSCAR class
 
     Attributes
@@ -69,6 +67,8 @@ class POSCAR_HEAD(object):
        scaling factor
     iontypes : list
        list of ion name
+    ionnums : list
+       list of number of ions. Corresponding to `iontypes`
 '''
     def __init__(self):
         self.__cell_vecs = np.array([[0., 0., 0.],
@@ -83,6 +83,11 @@ class POSCAR_HEAD(object):
     @property
     def cell_vecs(self):
         '''Return the matrix of the unit cell'''
+        return self.__cell_vecs
+
+    @property
+    def realcell(self):
+        '''Alias of cell_vecs to keep consistency with wavecar.py'''
         return self.__cell_vecs
 
     @cell_vecs.setter
@@ -127,7 +132,8 @@ class POSCAR_HEAD(object):
 
 
 class POSCAR_POS(object):
-    '''.. py:class:: POSCAR_POS()
+    '''
+    POSCAR_DOS Class
 '''
     def __init__(self):
         self.coordinate_type = ""
@@ -136,7 +142,7 @@ class POSCAR_POS(object):
         self.selective = False
 
     def is_cartesian(self):
-        '''.. py:method:: is_cartesian()
+        '''
 
         Return True if Cartesian coordinate is set
 
@@ -149,8 +155,7 @@ class POSCAR_POS(object):
         return bool(re.search(r'^[ck]', self.coordinate_type, re.I))
 
     def is_direct(self):
-        '''.. py:method:: is_direct()
-
+        ''' 
         Return True if DIRECT coordinate is set
 
         Returns
@@ -163,7 +168,7 @@ class POSCAR_POS(object):
 
 
 class POSCAR(POSCAR_HEAD, POSCAR_POS):
-    '''.. py:class:: POSCAR(file or array)
+    '''
 
     Class for POSCAR (CONTCAR) format
 
@@ -246,8 +251,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             yield each
 
     def sort(self, from_site=0, to_site=None, axis='z'):
-        '''.. py:method:: sort(from_index, to_index, axis='z')
-
+        '''
         Sort positions attribute by coordinate
 
         Parameters
@@ -282,8 +286,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             key=lambda sortaxis: sortaxis[axis]) + self.positions[to_site:]
 
     def supercell(self, n_x, n_y, n_z):
-        '''.. py:method:: supercell(n_x, n_y, n_z)
-
+        ''' 
         Return the :math:`(n_x \\times n_y \\times n_z)` supercell
 
         Parameters
@@ -341,8 +344,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
     # class method? or independent function?
     def nearest(self, array, point):
-        '''.. py:method:: nearest(array, point)
-
+        ''' 
         Parameters
         -----------
 
@@ -359,7 +361,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
     # class method? or independent function?
     def make27candidate(self, position):
-        '''.. py:make27candidate(position)
+        '''
 
         Return 27 vectors set correspond the neiboring
 
@@ -392,8 +394,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                                     position)
         return candidates27
 
-    def atom_rotate(self, site, axis_name, theta_deg, center):
-        '''.. py:atom_rotate(site, axis_name, theta_deg, center)
+    def rotate_atom(self, site, axis_name, theta_deg, center):
+        '''
 
         Rotate the atom
 
@@ -409,10 +411,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         center: numpy.ndarray, list, tuple
             center position for rotation.
 
-        Todo
-        -----
-        check the center in the Braves lattice.
-        take into account the periodic boundary.
+
+        :Todo: check the center in the Braves lattice.
+               take into account the periodic boundary.
         '''
         center = _vectorize(center)
         if len(center) != 3:
@@ -420,7 +421,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if not point_in_box(center / self.scaling_factor, self.cell_vecs):
             raise ValueError('the center must be in the Braves lattice')
         if not isinstance(site, int):
-            raise ValueError('argument error in atom_rotate method')
+            raise ValueError('argument error in rotate_atom method')
         if not self.is_cartesian():
             self.to_cartesian()
         position = self.positions[site]
@@ -430,8 +431,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         position += center / self.scaling_factor
         self.positions[site] = position
 
-    def atoms_rotate(self, site_list, axis_name, theta_deg, center):
-        '''Rotate atoms
+    def rotate_atoms(self, site_list, axis_name, theta_deg, center):
+        '''
+        Rotate atoms
 
         Parameters
         ----------
@@ -446,11 +448,10 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
              Position of rotation center
         '''
         for site in site_list:
-            self.atom_rotate(site, axis_name, theta_deg, center)
+            self.rotate_atom(site, axis_name, theta_deg, center)
 
-    def cell_rotate(self, theta_deg, axis_name='Z'):
-        '''.. py:method:: cell_rotate(theta, axis_name)
-
+    def rotate_cell(self, theta_deg, axis_name='Z'):
+        ''' 
         Rotate unit-cell (rotation angle is set by degree.)
 
         Parameters
@@ -477,8 +478,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.to_cartesian()
 
     def repack_in_cell(self):
-        '''.. py:method:repack_in_cell()
-
+        '''
         Repack all atoms in the unit cell
 
         No negative values in DIRECT coordinate.
@@ -498,8 +498,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.to_cartesian()
 
     def __add__(self, other):
-        '''.. py:method:: __add__(other)
-
+        '''
         Parameters
         ----------
 
@@ -528,8 +527,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return dest_poscar
 
     def merge(self, other):
-        '''.. py:method:: merge(other)
-
+        '''
         lazy __add__: Return POSCAR generated from two POSCARs
 
         Even if the cell vectors and scaling factors are different,
@@ -568,8 +566,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return dest_poscar
 
     def to_list(self):
-        '''.. py:method:: to_list()
-
+        '''
         Return POSCAR object by list-style
 
         Returns
@@ -596,8 +593,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return out_list
 
     def __str__(self):
-        '''.. py:method:: __str__()
-
+        '''
         Returns
         --------
 
@@ -629,8 +625,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return '\n'.join(tmp) + '\n'
 
     def str_short(self):
-        '''.. py:method:: str_short()
-
+        '''
         Returns
         ---------
 
@@ -654,8 +649,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return '\n'.join(tmp) + '\n'
 
     def tune_scaling_factor(self, new_scaling_factor=1.0):
-        '''.. py:method:: tune_scaling_factor(new_scaling_factor=1.0)
-
+        ''' 
         Change scaling factor to new value
 
         Parameters
@@ -681,8 +675,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                               for i in self.positions]
 
     def to_cartesian(self):
-        '''.. py:method:: to_cartesian()
-
+        ''' 
         Change the coordinate to cartesian from direct
         '''
         if self.is_direct():
@@ -691,8 +684,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.positions = [mat.dot(v) for v in self.positions]
 
     def to_direct(self):
-        '''.. py:method:: to_direct()
-
+        ''' 
         Change the coordinate to direct from cartesian.
         '''
         if self.is_cartesian():
@@ -701,8 +693,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.positions = [mat.dot(v) for v in self.positions]
 
     def guess_molecule(self, site_list, center=None):
-        '''.. py:method:: guess_molecule(site_list, center)
-
+        '''
         Arrange atom position to form a molecule.
 
         This method is effective to rotate a molecule.
@@ -760,8 +751,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.positions[site] = pos
 
     def translate(self, vector, atomlist):
-        '''.. py:method:: translate(vector, atomlist)
-
+        ''' 
         Translate the selected atom(s) by vector
 
         Parameters
@@ -798,9 +788,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.to_direct()
         return self.positions
 
-    def get_axes_lengthes(self):
-        '''.. py:method:: get_axes_lengthes()
-
+    @property
+    def axes_lengthes(self):
+        ''' 
         Return cell axis lengthes
 
         Returns
@@ -815,8 +805,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return (cell_x, cell_y, cell_z)
 
     def translate_all(self, vector):
-        '''.. py:method::translate_all(vector)
-
+        ''' 
         Translate **all** atoms by vector
 
         Parameters
@@ -829,8 +818,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         self.translate(vector, atomrange)
 
     def save(self, filename):
-        '''.. py:method::samve(filename)
-
+        ''' 
         Save POSCAR contents to the file named "filename"
 
         Parameters
@@ -848,8 +836,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
 
 def point_in_box(point, cell_vecs):
-    '''.. py:function:: point_in_box(point, cell_vecs)
-
+    ''' 
     Return True if point is located in the box
 
     Parameters
@@ -875,8 +862,7 @@ def point_in_box(point, cell_vecs):
 
 
 def rotate_x(theta_deg):
-    ''' .. py:function:: rotate_x(theta_deg)
-
+    '''
     Rotation matrix around X-axis
 
     Parameters
@@ -907,8 +893,7 @@ def rotate_x(theta_deg):
 
 
 def rotate_y(theta_deg):
-    '''.. py:function:: rotate_y(theta_deg)
-
+    ''' 
     Rotation matrix around Y-axis
 
     Example
@@ -927,8 +912,7 @@ def rotate_y(theta_deg):
 
 
 def rotate_z(theta_deg):
-    '''.. py:function:: rotate_y(theta_deg)
-
+    ''' 
     Rotation matrix around Z-axis
 
     Example
@@ -947,8 +931,7 @@ def rotate_z(theta_deg):
 
 
 def three_by_three(vec):
-    '''.. py:function:three_by_three(vec)
-
+    ''' 
     Return True if vec can be converted into the 3x3 matrix
 
     Parameters

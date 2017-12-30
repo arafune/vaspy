@@ -121,29 +121,29 @@ class TestSinglePROCAR(object):
              'dxz', 'dx2', 'tot', 'p', 'pxpy', 'd'])
 
     @with_setup(setup=setup)
-    def test_singleprocar_band_get_orbnums(self):
+    def test_singleprocar_band_orbnums(self):
         '''test for Band_with_projection.get_orbnums
         '''
         self.singleband.sum_site((0, 2))
         self.singleband.sum_orbital(('p', 'pxpy', 'd'))
-        result = self.singleband.get_orbnums((('p', 'pxpy', 'd'),))
+        result = self.singleband.orbnums((('p', 'pxpy', 'd'),))
         eq_(((10, 11, 12), ), result)
-        result = self.singleband.get_orbnums((('d', 'pxpy', 'p'),))
+        result = self.singleband.orbnums((('d', 'pxpy', 'p'),))
         eq_(((12, 11, 10), ), result)
-        result = self.singleband.get_orbnums((['p', 'pxpy', 'd'],))
+        result = self.singleband.orbnums((['p', 'pxpy', 'd'],))
         eq_(((10, 11, 12), ), result)
-        result = self.singleband.get_orbnums([('d', 'pxpy', 'p')])
+        result = self.singleband.orbnums([('d', 'pxpy', 'p')])
         eq_(((12, 11, 10), ), result)
 
     @with_setup(setup=setup)
-    def test_singleprocar_band_get_orb_index(self):
+    def test_singleprocar_band_orb_index(self):
         '''test for Band_with_projection.get_orbnums
         '''
         self.singleband.sum_site((0, 2))
         self.singleband.sum_orbital(('p', 'pxpy', 'd'))
-        eq_(self.singleband.get_orb_index('p'), (3, 1, 2))
-        eq_(self.singleband.get_orb_index('d'), (4, 5, 8, 7, 6))
-        eq_(self.singleband.get_orb_index('pxpy'), (3, 1))
+        eq_(self.singleband.orb_index('p'), (3, 1, 2))
+        eq_(self.singleband.orb_index('d'), (4, 5, 8, 7, 6))
+        eq_(self.singleband.orb_index('pxpy'), (3, 1))
 
     @raises(ValueError)
     @with_setup(setup=setup)
