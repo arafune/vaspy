@@ -100,8 +100,9 @@ class VASPGrid(object):
                         self.grid.shape = tuple([int(string) for string
                                                  in line.split()])
                     griddata.extend(
-                        [float(i) for i in next(thefile).rstrip().replace(
-                            '***********', 'Nan').split()])
+                        [float(i) for i in
+                         next(thefile).rstrip().replace(
+                             '***********', 'Nan').split()])
                     if self.grid.size % len(griddata) == 0:
                         lines_for_mesh = self.grid.size // len(griddata)
                     else:
@@ -109,16 +110,16 @@ class VASPGrid(object):
                     for _ in range(lines_for_mesh - 1):
                         griddata.extend(
                             [float(val) for val in
-                                 next(thefile).rstrip().replace('***********',
-                                                                'Nan').split()])
+                             next(thefile).rstrip().replace('***********',
+                                                            'Nan').split()])
                     section = 'grid'
                 elif section == 'aug':
                     if separator in line:
                         for _ in range(lines_for_mesh):
                             griddata.extend(
                                 [float(val) for val in
-                                     next(thefile).rstrip().replace('***********',
-                                                                    'Nan').split()])
+                                 next(thefile).rstrip().replace('***********',
+                                                                'Nan').split()])
                         section = 'grid'
                     elif "augmentation occupancies " in line:
                         pass  # Used for CHGCAR, not LOCPOT. not implementd
@@ -132,7 +133,7 @@ class VASPGrid(object):
                             griddata.extend(
                                 [float(val) for val in
                                  next(thefile).rstrip().replace('***********',
-                                                            'Nan').split()])
+                                                                'Nan').split()])
                     else:
                         # for unused data stored in LOCPOT
                         self.additional.extend(line.split())
@@ -187,9 +188,9 @@ class VASPGrid(object):
         return output_VASPGrid
 
     def merge(self, other):
-        '''.. py:method:: __add__(other)
+        '''.. py:method:: merge(other)
 
-        x.__add__(y) <=> x + y
+        Add density data
 
         Parameters
         ---------------
@@ -200,7 +201,7 @@ class VASPGrid(object):
         Returns
         -----------
 
-        Grid3D
+        VASPGrid
             Rusultant by summing two grid value
 
         '''
@@ -225,8 +226,8 @@ class VASPGrid(object):
         Returns
         -----------
 
-        Grid3D
-            Rusultant by summing two grid value
+        VASPGrid
+            Rusultant by summing two VASPGrid
 
         '''
         add_grid = copy.deepcopy(self)
@@ -527,3 +528,4 @@ class Grid3D(object):
         else:
             raise 'Wrong axis name set'
         return data
+

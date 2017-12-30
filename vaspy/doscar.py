@@ -160,8 +160,8 @@ class DOS(object):  # Version safety
         """x.__len__() <=> len(x)"""
         return len(self.dos)
 
-    def fermilevel_correction(self, fermi):
-        '''.. py:method:: fermilevel_correction(fermi)
+    def fermi_correction(self, fermi):
+        '''.. py:method:: fermi_correction(fermi)
 
         Fermi level Correction
 
