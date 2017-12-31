@@ -31,6 +31,7 @@ class TestCOWavecar(object):
         eq_(1, self.co.numk)
         eq_(54, self.co.nbands)
         eq_(400, self.co.encut)
+        assert_almost_equal(-8.05748789, self.co.efermi)
         np.testing.assert_array_equal(
             [[17.,   0.,   0.],
              [  0.,  17.,   0.],
@@ -66,6 +67,7 @@ class TestGrapheneWavecar(object):
         eq_(240, self.gr.numk)
         eq_(27, self.gr.nbands)
         eq_(550, self.gr.encut)
+        assert_almost_equal(-2.9500542715, self.gr.efermi)
         np.testing.assert_array_almost_equal(
             [[2.139081750,   -1.235000000,   0.],
              [2.139081750,   1.235000000,   0.],

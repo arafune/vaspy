@@ -64,20 +64,23 @@ class WAVECAR(object):
         two record in WAVECAR file
 
         rec1: recl, nspin, rtag
-        rec2: numk, nbands ,encut ((cell(i, j) i=1, 3), j=1, 3)
+        rec2: numk, nbands ,encut, ((cell(i, j) i=1, 3), j=1, 3), efermi
         '''
         self.wfc.seek(0)
         self.recl, self.nspin, self.rtag = np.array(
             np.fromfile(self.wfc, dtype=np.float, count=3),
             dtype=int)
         self.wfc.seek(self.recl)
+        #        print(self.wfc.tell())
         #
-        dump = np.fromfile(self.wfc, dtype=np.float, count=12)
+        dump = np.fromfile(self.wfc, dtype=np.float, count=13)
         #
         self.numk = int(dump[0])
         self.nbands = int(dump[1])
         self.encut = dump[2]
-        self.realcell = dump[3:].reshape((3, 3))
+        self.realcell = dump[3:12].reshape((3, 3))
+        self.efermi = dump[12]
+        #        print(self.wfc.tell())
         self.volume = np.linalg.det(self.realcell)
         self.rcpcell = np.linalg.inv(self.realcell).T
         unit_cell_vector_magnitude = np.linalg.norm(self.realcell, axis=1)
@@ -121,6 +124,7 @@ class WAVECAR(object):
                 pos = 2 + spin_i * self.numk * (self.nbands + 1)
                 pos += k_i * (self.nbands + 1)
                 self.wfc.seek(pos * self.recl)
+#                print(self.wfc.tell())
                 dump = np.fromfile(self.wfc, dtype=np.float,
                                    count=4+3*self.nbands)
                 if spin_i == 0:
@@ -201,8 +205,10 @@ class WAVECAR(object):
         irec = 3 + spin_i * self.numk * (self.nbands + 1)
         irec += k_i * (self.nbands + 1) + band_i
         self.wfc.seek(irec * self.recl)
+#        print(self.wfc.tell())
         nplw = self.nplwvs[k_i]
         dump = np.fromfile(self.wfc, dtype=self.prec, count=nplw)
+        print(self.wfc.tell())        
         cg = np.array(dump, dtype=np.complex128)
         if norm:
             cg /= np.linalg.norm(cg)
