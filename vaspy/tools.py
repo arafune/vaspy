@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-''' 
+'''
 Module for tools used in vaspy
 '''
 
@@ -110,7 +110,7 @@ def parse_Atomselection(L):
 
 
 def parse_AtomselectionNum(L):
-    ''' 
+    '''
     Very similar with parse_Atomselection but returns the array of the
     number not array of the string.
 

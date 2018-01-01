@@ -15,14 +15,16 @@ __all__ = ['chgcar',
            'locpot',
            'eigenval',
            'wavecar',
+           'mesh3d',
            'tools',
            ]
 from vaspy import *
 
 
 def load(filename, mode=None):
-    ''' 
-    load file.  Guess the file type by the filename.  Use `mode` option to specify the file type.
+    '''
+    load file.  Guess the file type by the filename.
+    Use `mode` option to specify the file type.
 
     Parameters
     ----------

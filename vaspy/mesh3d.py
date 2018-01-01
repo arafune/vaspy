@@ -63,7 +63,7 @@ class VASPGrid(object):
             self.load_from_file(filename)
 
     def load_from_file(self, filename):
-        ''' 
+        '''
         filename file to construct the object
 
         Parameters
@@ -98,8 +98,9 @@ class VASPGrid(object):
                         self.grid.shape = tuple([int(string) for string
                                                  in line.split()])
                     griddata.extend(
-                        [float(i) for i in next(thefile).rstrip().replace(
-                            '***********', 'Nan').split()])
+                        [float(i) for i in
+                         next(thefile).rstrip().replace(
+                             '***********', 'Nan').split()])
                     if self.grid.size % len(griddata) == 0:
                         lines_for_mesh = self.grid.size // len(griddata)
                     else:
@@ -107,16 +108,17 @@ class VASPGrid(object):
                     for _ in range(lines_for_mesh - 1):
                         griddata.extend(
                             [float(val) for val in
-                                 next(thefile).rstrip().replace('***********',
-                                                                'Nan').split()])
+                             next(thefile).rstrip().replace('***********',
+                                                            'Nan').split()])
                     section = 'grid'
                 elif section == 'aug':
                     if separator in line:
                         for _ in range(lines_for_mesh):
                             griddata.extend(
                                 [float(val) for val in
-                                     next(thefile).rstrip().replace('***********',
-                                                                    'Nan').split()])
+                                 next(thefile).rstrip().replace(
+                                     '***********',
+                                     'Nan').split()])
                         section = 'grid'
                     elif "augmentation occupancies " in line:
                         pass  # Used for CHGCAR, not LOCPOT. not implementd
@@ -129,15 +131,16 @@ class VASPGrid(object):
                         for _ in range(lines_for_mesh):
                             griddata.extend(
                                 [float(val) for val in
-                                 next(thefile).rstrip().replace('***********',
-                                                            'Nan').split()])
+                                 next(thefile).rstrip().replace(
+                                     '***********',
+                                     'Nan').split()])
                     else:
                         # for unused data stored in LOCPOT
                         self.additional.extend(line.split())
             self.grid.data = np.array(griddata, dtype=np.float64)
 
     def __str__(self):
-        ''' 
+        '''
         x.__str__() <=> str(x)
 
         Returns
@@ -151,7 +154,7 @@ class VASPGrid(object):
         return poscarstr + meshstr + '\n'
 
     def save(self, filename):
-        ''' 
+        '''
         Save object as the same file-style
 
         Parameters
@@ -184,7 +187,7 @@ class VASPGrid(object):
 
     def merge(self, other):
         '''
-        x.__add__(y) <=> x + y
+        Add density data
 
         Parameters
         ---------------
@@ -195,7 +198,7 @@ class VASPGrid(object):
         Returns
         -----------
 
-        Grid3D
+        VASPGrid
             Rusultant by summing two grid values
 
         '''
@@ -232,7 +235,7 @@ class VASPGrid(object):
         return add_grid
 
     def __sub__(self, other):
-        ''' 
+        '''
         x.__sub__(y) <=> x - y
 
         Parameters
@@ -312,7 +315,7 @@ class Grid3D(object):
         return dest
 
     def slice(self, axis, postition):
-        ''' 
+        '''
         Parameters
         ----------
 
@@ -356,7 +359,7 @@ class Grid3D(object):
         pass
 
     def __str__(self):
-        ''' 
+        '''
         x.__str__() <=> str(x)
 
         Returns
@@ -380,7 +383,7 @@ class Grid3D(object):
         return outputstr + '\n'
 
     def average_along_axis(self, axis_name, mode=0):
-        ''' 
+        '''
         Calculate average value of potential along 'axis'
 
         Parameters
@@ -414,7 +417,7 @@ class Grid3D(object):
         return data
 
     def min_along_axis(self, axis_name, mode=0):
-        ''' 
+        '''
         Calculate minimum value of potential along 'axis'
 
         Parameters
@@ -448,7 +451,7 @@ class Grid3D(object):
         return data
 
     def max_along_axis(self, axis_name, mode=0):
-        ''' 
+        '''
         Calculate maximum value of potential along 'axis'
 
         Parameters
@@ -482,7 +485,7 @@ class Grid3D(object):
         return data
 
     def median_along_axis(self, axis_name, mode=0):
-        ''' 
+        '''
         Calculate median value of potential along 'axis'
 
         Parameters
