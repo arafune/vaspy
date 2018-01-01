@@ -180,10 +180,10 @@ class VASPGrid(object):
         frame_i: int
             frame index
         '''
-        output_VASPGrid = VASPGrid()
-        output_VASPGrid.poscar = self.poscar
-        output_VASPGrid.grid = self.grid.frame(frame_i)
-        return output_VASPGrid
+        output_vaspgrid = VASPGrid()
+        output_vaspgrid.poscar = self.poscar
+        output_vaspgrid.grid = self.grid.frame(frame_i)
+        return output_vaspgrid
 
     def merge(self, other):
         '''

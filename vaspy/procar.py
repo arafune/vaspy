@@ -729,7 +729,7 @@ class BandWithProjection(object):
                         axis=3)
                 self.orb_names.append(orb)
 
-    def del_band(self, band_indexes):  # not checked
+    def del_band(self, band_i):  # not checked
         '''not yet impremented'''
         if not self.sitecomposed:
             err = "This method operates with on sitecomposed attribute,"
@@ -755,7 +755,7 @@ class BandWithProjection(object):
         '''
         if len(sitenames) != len(orbnames):
             raise ValueError("Length of sitenames and orbnames is not same.")
-        numk, numband, numsite, norbs = self.sitecomposed[0].shape
+        numk, nband, numsite, norbs = self.sitecomposed[0].shape
         if numsite != len(sitenames):
             err = "Number of sitename is different with"
             err += "the size of sitecomposed."
@@ -812,17 +812,17 @@ class BandWithProjection(object):
         numk, numband, numsite, norbs = self.sitecomposed[0].shape
         table = list()
         if len(self.spininfo) == 1 or len(self.spininfo) == 4:
-            for b in range(numband):
-                for k in range(numk):
+            for band_i in range(numband):
+                for k_i in range(numk):
                     sitelist = list()
-                    sitelist.append(self.kdistance[k])
-                    sitelist.append(self.energies[k, b])
+                    sitelist.append(self.kdistance[k_i])
+                    sitelist.append(self.energies[k_i, band_i])
                     for sitecomposed in self.sitecomposed:
                         for site, norbs in zip(list(range(numsite)),
                                                orbnums):
-                            for o in norbs:
+                            for orbital in norbs:
                                 sitelist.append(
-                                    sitecomposed[k, b, site, o])
+                                    sitecomposed[k_i, band_i, site, orbital])
 
                     table.append(sitelist)
                 table.append([])

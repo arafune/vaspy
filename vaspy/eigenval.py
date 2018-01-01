@@ -74,12 +74,12 @@ class EIGENVAL(object):
             next(thefile)
             _, self.numk, self.n_bands = [int(i) for i in
                                           next(thefile).strip().split()]
-            for ki in range(self.numk):
+            for _ in range(self.numk):
                 # the first line in the sigleset begins with the blank
                 next(thefile)
                 self.kvectors.append(np.array(
                     [float(i) for i in next(thefile).strip().split()[0:3]]))
-                for bi in range(self.n_bands):
+                for _ in range(self.n_bands):
                     if self.spininfo == 1:
                         self.energies.append(float(
                             next(thefile).strip().split()[1]))
@@ -89,9 +89,9 @@ class EIGENVAL(object):
                                       next(thefile).strip().split()[1:3]]))
         self.energies = np.array(self.energies)
 
-    def to_band(self, recvec=[[1.0, 0.0, 0.0],
-                              [0.0, 1.0, 0.0],
-                              [0.0, 0.0, 1.0]]):
+    def to_band(self, recvec=((1.0, 0.0, 0.0),
+                              (0.0, 1.0, 0.0),
+                              (0.0, 0.0, 1.0))):
         '''
         Return EnergyBand object
 
@@ -194,17 +194,17 @@ class EnergyBand(object):
         energies = np.swapaxes(self.energies, 1, 0)
         if self.spininfo == 2 or len(self.spininfo) == 2:
             output = '#k\tEnergy_up\tEnergy_down\n'
-            for b_i in range(self.nbands):
-                for k, en in zip(self.kdistances, energies[b_i]):
-                    output += '{0:.9e}\t{1:.9e}\t{2:.9e}\n'.format(k,
-                                                                   en[0],
-                                                                   en[1])
+            for band_i in range(self.nbands):
+                for k_i, energy in zip(self.kdistances, energies[band_i]):
+                    output += '{0:.9e}\t{1:.9e}\t{2:.9e}\n'.format(k_i,
+                                                                   energy[0],
+                                                                   energy[1])
                 output += '\n'
         else:
             output = '#k\tEnergy\n'
-            for b_i in range(self.nbands):
-                for k, en in zip(self.kdistances, energies[b_i]):
-                    output += '{0:.9e}\t{1:.9e}\n'.format(k, en)
+            for band_i in range(self.nbands):
+                for k_i, enenergy in zip(self.kdistances, energies[band_i]):
+                    output += '{0:.9e}\t{1:.9e}\n'.format(k_i, enenergy)
                 output += '\n'
         return output
 
@@ -242,17 +242,20 @@ class EnergyBand(object):
         draws = []
         if self.spininfo == 2 or len(self.spininfo) == 2:
             if spin == 'down':
-                for bi in range(0, self.nbands):
-                    draws.append(plt.plot(self.kdistances, energies[bi].T[1],
-                                          color=color))
+                for band_i in range(0, self.nbands):
+                    draws.append(
+                        plt.plot(self.kdistances, energies[band_i].T[1],
+                                 color=color))
             else:
-                for bi in range(0, self.nbands):
-                    draws.append(plt.plot(self.kdistances, energies[bi].T[0],
-                                          color=color))
+                for band_i in range(0, self.nbands):
+                    draws.append(
+                        plt.plot(self.kdistances, energies[band_i].T[0],
+                                 color=color))
         else:
-            for bi in range(0, self.nbands):
-                draws.append(plt.plot(self.kdistances, energies[bi],
-                                      color=color))
+            for band_i in range(0, self.nbands):
+                draws.append(
+                    plt.plot(self.kdistances, energies[band_i],
+                             color=color))
         return plt.gca()
 
     def show(self, yrange=None, spin=None):  # How to set default value?
@@ -273,16 +276,16 @@ class EnergyBand(object):
         energies = np.swapaxes(self.energies, 1, 0)
         if self.spininfo == 2 or len(self.spininfo) == 2:
             if spin == 'down':
-                for bi in range(0, self.nbands):
-                    plt.plot(self.kdistances, energies[bi].T[1],
+                for band_i in range(0, self.nbands):
+                    plt.plot(self.kdistances, energies[band_i].T[1],
                              color='blue')
             else:
-                for bi in range(0, self.nbands):
-                    plt.plot(self.kdistances, energies[bi].T[0],
+                for band_i in range(0, self.nbands):
+                    plt.plot(self.kdistances, energies[band_i].T[0],
                              color='blue')
         else:
-            for bi in range(0, self.nbands):
-                plt.plot(self.kdistances, energies[bi],
+            for band_i in range(0, self.nbands):
+                plt.plot(self.kdistances, energies[band_i],
                          color='blue')
         if yrange is not None:
             plt.ylim([yrange[0], yrange[1]])
