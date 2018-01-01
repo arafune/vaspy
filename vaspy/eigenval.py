@@ -1,4 +1,4 @@
-''' 
+'''
 This module provides EIGENVAL.
 '''
 
@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 
 class EIGENVAL(object):
-    ''' 
+    '''
     Class for storing the data of EIGENVAL file.
 
     Parameters
@@ -49,7 +49,7 @@ class EIGENVAL(object):
             self.load_from_file(arg)
 
     def load_from_file(self, filename):
-        ''' 
+        '''
         A virtual parser of EIGENVAL
 
         parameters
@@ -92,7 +92,7 @@ class EIGENVAL(object):
     def to_band(self, recvec=[[1.0, 0.0, 0.0],
                               [0.0, 1.0, 0.0],
                               [0.0, 0.0, 1.0]]):
-        ''' 
+        '''
         Return EnergyBand object
 
         Parameters
@@ -131,7 +131,7 @@ class EIGENVAL(object):
 
 
 class EnergyBand(object):
-    ''' 
+    '''
     Simple band structure object for analyzing by using ipython.
 
     Parameters
@@ -172,7 +172,7 @@ class EnergyBand(object):
                 (self.numk, self.nbands))
 
     def fermi_correction(self, fermi):
-        ''' 
+        '''
         Correct the Fermi level
 
         Parameters
@@ -184,7 +184,7 @@ class EnergyBand(object):
         self.energies -= fermi
 
     def __str__(self):
-        ''' 
+        '''
         Returns
         --------
 
@@ -256,7 +256,7 @@ class EnergyBand(object):
         return plt.gca()
 
     def show(self, yrange=None, spin=None):  # How to set default value?
-        ''' 
+        '''
         Draw band structure by using maptlotlib.
         For 'just seeing' use.
 

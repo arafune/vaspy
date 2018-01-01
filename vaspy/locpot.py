@@ -19,7 +19,7 @@ except ImportError:
 
 
 class LOCPOT(mesh3d.VASPGrid):
-    ''' 
+    '''
     Class for LOCPOT
 
     LOCPOT format is essentially same as that of CHGCAR
@@ -32,7 +32,7 @@ class LOCPOT(mesh3d.VASPGrid):
             self.load_from_file(arg)
 
     def plot_potential_along_axis(self, axis_name, type=0):  # FIXME!!
-        ''' 
+        '''
         Plot potential curve along the axis
 
         Parameters

@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- conding: utf-8 -*-
-''' 
+'''
 This mudule provides POSCAR class
 
 translate from poscar.rb of 2014/2/26, master branch
@@ -55,7 +55,7 @@ import numpy as np
 
 
 class POSCAR_HEAD(object):
-    ''' 
+    '''
     One of the parent classes of POSCAR class
 
     Attributes
@@ -155,7 +155,7 @@ class POSCAR_POS(object):
         return bool(re.search(r'^[ck]', self.coordinate_type, re.I))
 
     def is_direct(self):
-        ''' 
+        '''
         Return True if DIRECT coordinate is set
 
         Returns
@@ -286,7 +286,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             key=lambda sortaxis: sortaxis[axis]) + self.positions[to_site:]
 
     def supercell(self, n_x, n_y, n_z):
-        ''' 
+        '''
         Return the :math:`(n_x \\times n_y \\times n_z)` supercell
 
         Parameters
@@ -344,7 +344,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
     # class method? or independent function?
     def nearest(self, array, point):
-        ''' 
+        '''
         Parameters
         -----------
 
@@ -451,7 +451,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.rotate_atom(site, axis_name, theta_deg, center)
 
     def rotate_cell(self, theta_deg, axis_name='Z'):
-        ''' 
+        '''
         Rotate unit-cell (rotation angle is set by degree.)
 
         Parameters
@@ -649,7 +649,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return '\n'.join(tmp) + '\n'
 
     def tune_scaling_factor(self, new_scaling_factor=1.0):
-        ''' 
+        '''
         Change scaling factor to new value
 
         Parameters
@@ -675,7 +675,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                               for i in self.positions]
 
     def to_cartesian(self):
-        ''' 
+        '''
         Change the coordinate to cartesian from direct
         '''
         if self.is_direct():
@@ -684,7 +684,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.positions = [mat.dot(v) for v in self.positions]
 
     def to_direct(self):
-        ''' 
+        '''
         Change the coordinate to direct from cartesian.
         '''
         if self.is_cartesian():
@@ -751,7 +751,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.positions[site] = pos
 
     def translate(self, vector, atomlist):
-        ''' 
+        '''
         Translate the selected atom(s) by vector
 
         Parameters
@@ -790,7 +790,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
     @property
     def axes_lengthes(self):
-        ''' 
+        '''
         Return cell axis lengthes
 
         Returns
@@ -805,7 +805,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return (cell_x, cell_y, cell_z)
 
     def translate_all(self, vector):
-        ''' 
+        '''
         Translate **all** atoms by vector
 
         Parameters
@@ -818,7 +818,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         self.translate(vector, atomrange)
 
     def save(self, filename):
-        ''' 
+        '''
         Save POSCAR contents to the file named "filename"
 
         Parameters
@@ -836,7 +836,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
 
 def point_in_box(point, cell_vecs):
-    ''' 
+    '''
     Return True if point is located in the box
 
     Parameters
@@ -893,7 +893,7 @@ def rotate_x(theta_deg):
 
 
 def rotate_y(theta_deg):
-    ''' 
+    '''
     Rotation matrix around Y-axis
 
     Example
@@ -912,7 +912,7 @@ def rotate_y(theta_deg):
 
 
 def rotate_z(theta_deg):
-    ''' 
+    '''
     Rotation matrix around Z-axis
 
     Example
@@ -931,7 +931,7 @@ def rotate_z(theta_deg):
 
 
 def three_by_three(vec):
-    ''' 
+    '''
     Return True if vec can be converted into the 3x3 matrix
 
     Parameters
