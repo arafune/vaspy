@@ -40,7 +40,7 @@ class LOCPOT(mesh3d.VASPGrid):
 
         axis_name: str
             the name of the axis (X, Y, or Z)
-        type: int
+        type: int, optional  (default is 0)
             'select potential type' (very optional)
         '''
         axis_name = axis_name.capitalize()

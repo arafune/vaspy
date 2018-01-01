@@ -175,7 +175,7 @@ class DOS(object):  # Version safety
 
         Parameters
         ----------
-        i : int
+        i : int, optional (default is all energy)
              index #
 
         Returns
@@ -313,6 +313,12 @@ class PDOS(DOS):
     def export_csv(self, filename, site=None):
         '''
         Export data to file object (or file-like object) as csv format.
+
+        Parameters
+        ----------
+
+        filename: str
+           filename for output
         '''
         tmp = ["Energy"]
         for i in self.orbital_spin:
@@ -334,6 +340,8 @@ class PDOS(DOS):
 
         orbitals: str
              orbital name
+
+        fermi: float, optional (default is 0.0)
 
         Warning
         --------
