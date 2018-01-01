@@ -29,7 +29,7 @@ class LOCPOT(mesh3d.VASPGrid):
     def __init__(self, arg=None):
         super(LOCPOT, self).__init__(None)
         if arg:
-            self.load_from_file(arg)
+            self.load_file(arg)
 
     def plot_potential_along_axis(self, axis_name, frame=0):  # FIXME!!
         '''

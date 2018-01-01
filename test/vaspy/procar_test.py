@@ -25,14 +25,14 @@ class TestSinglePROCAR(object):
     def test_sigleprocar_firstcheck(self):
         '''Load test for PROCAR_single'''
         eq_(('',), self.singleprocar.spininfo)
-        eq_(3, self.singleprocar.n_atoms)
-        eq_(1, self.singleprocar.n_bands)
+        eq_(3, self.singleprocar.natom)
+        eq_(1, self.singleprocar.nbands)
         eq_(1, self.singleprocar.numk)
         eq_([-15.0], self.singleprocar.energies)
         eq_(('s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot'),
             self.singleprocar.orb_names)
         np.testing.assert_array_equal([[0.0, 0.0, 0.0]],
-                                      self.singleprocar.kvectors)
+                                      self.singleprocar.kvecs)
         np.testing.assert_array_equal(3, len(self.singleprocar.orbital))
         np.testing.assert_array_equal([0.0000, 0.0001, 0.0002, 0.0003,
                                        0.0004, 0.0005, 0.0006, 0.0007,
@@ -50,9 +50,9 @@ class TestSinglePROCAR(object):
     @with_setup(setup=setup)
     def test_singleprocar_band(self):
         '''Band_with_projection object test generated from PROCAR_single'''
-        eq_(self.singleband.n_bands, self.singleprocar.n_bands)
-        np.testing.assert_array_equal(self.singleband.kvectors,
-                                      self.singleprocar.kvectors)
+        eq_(self.singleband.nbands, self.singleprocar.nbands)
+        np.testing.assert_array_equal(self.singleband.kvecs,
+                                      self.singleprocar.kvecs)
         eq_(self.singleband.spininfo, self.singleprocar.spininfo)
         ok_(self.singleband.isready())
         np.testing.assert_array_equal(self.singleband.kdistance,
@@ -190,8 +190,8 @@ class TestSpinPolarizedPROCAR(object):
     def test_spinprocar_firstcheck(self):
         '''Load test for PROCAR_spin_dummy'''
         eq_(('_up', '_down'), self.spinprocar.spininfo)
-        eq_(3, self.spinprocar.n_atoms)
-        eq_(4, self.spinprocar.n_bands)
+        eq_(3, self.spinprocar.natom)
+        eq_(4, self.spinprocar.nbands)
         eq_(3, self.spinprocar.numk)
         eq_([[-10.0, -10.5],
              [-5.0, -5.5],
@@ -214,7 +214,7 @@ class TestSpinPolarizedPROCAR(object):
                                        [0.0, 0.0, 0.0],
                                        [1.25, 1.25, 1.00],
                                        [1.50, 1.50, 1.00]],
-                                      self.spinprocar.kvectors)
+                                      self.spinprocar.kvecs)
         np.testing.assert_array_equal(72, len(self.spinprocar.orbital))
         np.testing.assert_array_equal([0.0000, 0.0001, 0.0002, 0.0003,
                                        0.0004, 0.0005, 0.0006, 0.0007,
@@ -232,10 +232,10 @@ class TestSpinPolarizedPROCAR(object):
     @with_setup(setup=setup)
     def test_spinprocar_band(self):
         '''Band_with_projection object test generated from PROCAR_spin_dummy'''
-        spinband = self.spinprocar.band()        
-        eq_(spinband.n_bands, self.spinprocar.n_bands)
-        np.testing.assert_array_almost_equal(spinband.kvectors,
-                                             self.spinprocar.kvectors[0:3])
+        spinband = self.spinprocar.band()
+        eq_(spinband.nbands, self.spinprocar.nbands)
+        np.testing.assert_array_almost_equal(spinband.kvecs,
+                                             self.spinprocar.kvecs[0:3])
         eq_(spinband.spininfo, self.spinprocar.spininfo)
         ok_(spinband.isready())
         np.testing.assert_array_almost_equal(spinband.kdistance,
@@ -245,7 +245,7 @@ class TestSpinPolarizedPROCAR(object):
     def test_spinband_band_energies(self):
         '''test for Band_with_projection.energies setter (SPIN)
         '''
-        spinband = self.spinprocar.band()                
+        spinband = self.spinprocar.band()
         eq_(spinband.energies.shape, (2, 3, 4))
         np.testing.assert_array_equal(spinband.energies,
                                       [[[-10, -5,  0, 5.],
@@ -258,15 +258,15 @@ class TestSpinPolarizedPROCAR(object):
     def test_spinband_fermi_correction(self):
         '''test for Band_with_projection.fermi_correction (SPIN)
         '''
-        spinband = self.spinprocar.band()        
+        spinband = self.spinprocar.band()
         spinband.fermi_correction(1.0)
         np.testing.assert_array_equal(spinband.energies,
                                       np.array([[[-11., -6., -1., 4.],
-                                        [ -8., -5., -2., 3.],
-                                        [ -7., -2., -4., -1.]],
-                                       [[-11.5, -6.5, -11., -6.],
-                                        [ -8.5, -5.5, -11., -6.],
-                                        [ -7.5, -2.5, -11., -6.]]]))
+                                                 [ -8., -5., -2., 3.],
+                                                 [ -7., -2., -4., -1.]],
+                                                [[-11.5, -6.5, -11., -6.],
+                                                 [ -8.5, -5.5, -11., -6.],
+                                                 [ -7.5, -2.5, -11., -6.]]]))
 
     @with_setup(setup=setup)
     def test_spinprocar_band_orbitalread(self):
@@ -323,18 +323,18 @@ class TestSpinPolarizedPROCAR(object):
         '''test for energies  (2:SPIN)'''
         np.testing.assert_array_almost_equal(
             np.array(
-            [[-10.0, -10.5],
-             [-5.0, -5.5],
-             [0.0, -10.0],
-             [5.0, -5.0],
-             [-7.0, -7.5],
-             [-4.0, -4.5],
-             [-1.0, -10.0],
-             [4.0, -5.0],
-             [-6.0, -6.5],
-             [-1.0, -1.5],
-             [-3.0, -10.0],
-             [0.0, -5.0]]),
+                [[-10.0, -10.5],
+                 [-5.0, -5.5],
+                 [0.0, -10.0],
+                 [5.0, -5.0],
+                 [-7.0, -7.5],
+                 [-4.0, -4.5],
+                 [-1.0, -10.0],
+                 [4.0, -5.0],
+                 [-6.0, -6.5],
+                 [-1.0, -1.5],
+                 [-3.0, -10.0],
+                 [0.0, -5.0]]),
             self.spinprocar.energies)
         band = self.spinprocar.band()
         np.testing.assert_array_almost_equal(np.array(
@@ -388,8 +388,8 @@ class TestSOIPROCAR(object):
     def test_soiprocar_firstcheck(self):
         '''Load test for PROCAR_SOI_dummy'''
         eq_(('_mT', '_mX', '_mY', '_mZ'), self.soiprocar.spininfo)
-        eq_(3, self.soiprocar.n_atoms)
-        eq_(2, self.soiprocar.n_bands)
+        eq_(3, self.soiprocar.natom)
+        eq_(2, self.soiprocar.nbands)
         eq_(3, self.soiprocar.numk)
         eq_([-10.0, -5.0, -7.0, -4.0, -6.0, -1.0],
             self.soiprocar.energies)
@@ -398,8 +398,8 @@ class TestSOIPROCAR(object):
         np.testing.assert_array_equal([[0.0, 0.0, 0.0],
                                        [0.25, 0.25, 0.00],
                                        [0.50, 0.50, 0.00]],
-                                      self.soiprocar.kvectors)
-        # 72 = n_atom * n_bands * numk * 4
+                                      self.soiprocar.kvecs)
+        # 72 = natom * nbands * numk * 4
         np.testing.assert_array_equal(72, len(self.soiprocar.orbital))
         np.testing.assert_array_equal([0.0000, 0.0001, 0.0002, 0.0003,
                                        0.0004, 0.0005, 0.0006, 0.0007,
@@ -417,9 +417,9 @@ class TestSOIPROCAR(object):
     @with_setup(setup=setup)
     def test_soiprocar_band(self):
         '''Band_with_projection object test generated from PROCAR_soi_dummy'''
-        eq_(self.soiband.n_bands, self.soiprocar.n_bands)
-        np.testing.assert_array_almost_equal(self.soiband.kvectors,
-                                             self.soiprocar.kvectors[0:3])
+        eq_(self.soiband.nbands, self.soiprocar.nbands)
+        np.testing.assert_array_almost_equal(self.soiband.kvecs,
+                                             self.soiprocar.kvecs[0:3])
         eq_(self.soiband.spininfo, self.soiprocar.spininfo)
         ok_(self.soiband.isready())
         np.testing.assert_array_almost_equal(self.soiband.kdistance,
@@ -429,7 +429,7 @@ class TestSOIPROCAR(object):
     def test_soiprocar_band_energies(self):
         '''test for Band_with_projection.energies setter (SOI)'''
         eq_(self.soiband.energies.shape, (self.soiband.numk,
-                                          self.soiband.n_bands))
+                                          self.soiband.nbands))
         np.testing.assert_array_equal(self.soiband.energies,
                                       [[-10, -5], [-7, -4], [-6, -1]])
 
@@ -444,13 +444,13 @@ class TestSOIPROCAR(object):
     def test_soiprocar_band_orbitalread(self):
         '''test for Band_with_projection.orbitals setter (SOI)'''
         eq_(self.soiband.orbitals.shape, (self.soiband.numk,
-                                          self.soiband.n_bands,
-                                          self.soiband.n_atoms * 4,
+                                          self.soiband.nbands,
+                                          self.soiband.natom * 4,
                                           10))
         # for ik = 0, ib = 1, atom=2, spin=mY,
         #                      (k#=1,  band#=2, atom#=3, spin=mY)
         np.testing.assert_array_equal(
-            self.soiband.orbitals[0][1][2 + 2 * self.soiband.n_atoms],
+            self.soiband.orbitals[0][1][2 + 2 * self.soiband.natom],
             #                               ^ This two means "mY"
             [2.0050, 2.0051, 2.0052, 2.0053,
              2.0054, 2.0055, 2.0056, 2.0057,
@@ -458,7 +458,7 @@ class TestSOIPROCAR(object):
         # for ik = 1, ib = 0, atom=1, spin=mZ,
         #                      (k#=2,  band#=1, atom#=2, spin=mZ)
         np.testing.assert_array_equal(
-            self.soiband.orbitals[1][0][1 + 3 * self.soiband.n_atoms],
+            self.soiband.orbitals[1][0][1 + 3 * self.soiband.natom],
             #                               ^ This three means "mZ"
             [3.0070, 3.0071, 3.0072, 3.0073,
              3.0074, 3.0075, 3.0076, 3.0077,

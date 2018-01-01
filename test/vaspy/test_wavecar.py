@@ -133,7 +133,7 @@ class TestGrapheneWavecar(object):
         np.testing.assert_array_almost_equal(
             [0.00013770, 0.00014605, 0.00017262, 0.00021561,
              0.00026360], vaspgrid.grid.data[:5])
-        eq_(2, vaspgrid.grid.num_frame)
+        eq_(2, vaspgrid.grid.nframe)
 
 
 class test_RestoreGammaGrid(object):
@@ -261,4 +261,4 @@ class TestCobaltWavecar(object):
              -7.92001487e-05, -7.92675956e-05,
              -7.90423140e-05],
         vaspgrid.grid.data[:5])
-        eq_(4, vaspgrid.grid.num_frame)
+        eq_(4, vaspgrid.grid.nframe)

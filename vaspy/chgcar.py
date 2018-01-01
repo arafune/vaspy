@@ -61,9 +61,9 @@ class CHGCAR(mesh3d.VASPGrid):
         super(CHGCAR, self).__init__(None)
         self.spininfo = 0
         if chgcar_file:
-            self.load_from_file(chgcar_file)
+            self.load_file(chgcar_file)
 
-    def load_from_file(self, filename):
+    def load_file(self, filename):
         '''
         Parse CHGCAR file to construct CHGCAR object
 
@@ -73,12 +73,12 @@ class CHGCAR(mesh3d.VASPGrid):
         chgcarfile: str
             CHGCAR file name
         '''
-        super(CHGCAR, self).load_from_file(filename)
-        if self.grid.num_frame == 1:
+        super(CHGCAR, self).load_file(filename)
+        if self.grid.nframe == 1:
             self.spininfo = [""]
-        elif self.grid.num_frame == 2:
+        elif self.grid.nframe == 2:
             self.spininfo = ["up+down", "up-down"]
-        elif self.grid.num_frame == 4:
+        elif self.grid.nframe == 4:
             self.spininfo = ["mT", "mX", "mY", "mZ"]
         else:
             raise RuntimeError("CHGCAR is correct?")

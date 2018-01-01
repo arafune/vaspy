@@ -64,8 +64,8 @@ class DOSCAR(object):  # Version safety
     natom: int
         number of atoms
 
-    nenergypnts: int
-        number of energy points
+    nbands: int
+        number of bands
 
         Notes
         -----
@@ -78,13 +78,13 @@ class DOSCAR(object):  # Version safety
 
     def __init__(self, arg=None):
         self.natom = 0
-        self.nenergypnts = 0
+        self.nbands = 0
         self.dos_container = list()
 
         if arg is not None:
-            self.load_doscar_file(arg)
+            self.load_file(arg)
 
-    def load_doscar_file(self, doscarfile):
+    def load_file(self, doscarfile):
         '''
         parse DOSCAR file and store it in memory
 
@@ -106,16 +106,16 @@ class DOSCAR(object):  # Version safety
             self.natom = int(firstline[0:4])
             [thefile.readline() for i in range(4)]
             header = thefile.readline()
-            self.nenergypnts = int(header[32:37])
+            self.nbands = int(header[32:37])
             tdos = np.array([next(thefile).rstrip().split()
-                             for i in range(self.nenergypnts)],
+                             for i in range(self.nbands)],
                             dtype=np.float64)
             if tdos.shape[1] == 3:
                 tdos = tdos[:, 0:2]
             elif tdos.shape[1] == 5:
                 tdos = tdos[:, 0:3]
             else:
-                raise (RuntimeError)
+                raise RuntimeError
             self.dos_container = [tdos]
             try:
                 nextheader = next(thefile)
@@ -124,7 +124,7 @@ class DOSCAR(object):  # Version safety
             while nextheader == header:
                 self.dos_container.append(
                     np.array([next(thefile).rstrip().split()
-                              for i in range(self.nenergypnts)],
+                              for i in range(self.nbands)],
                              dtype=np.float64))
                 try:
                     nextheader = next(thefile)
@@ -157,7 +157,7 @@ class DOS(object):  # Version safety
         """x.__len__() <=> len(x)"""
         return len(self.dos)
 
-    def fermilevel_correction(self, fermi):
+    def fermi_correction(self, fermi):
         '''
         Fermi level Correction
 

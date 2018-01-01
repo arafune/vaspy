@@ -18,20 +18,20 @@ class OUTCAR(object):  # Version safety
     Attributes
     -------------
 
-    nions: int
-        number of ions
+    ntom: int
+        number of atom
     iontypes: list
         list of ion name
     ionnums: list
         list of number of ions
     kvecs: list
-        kvector list
+        kvector
     weights: list
         weight list
     '''
 
     def __init__(self, arg=None):
-        self.nions = 0
+        self.natom = 0
         self.iontypes = []
         self.ionnums = []
         self.posforce = []
@@ -47,7 +47,7 @@ class OUTCAR(object):  # Version safety
         self.kvecs = []
         self.weights = []
         if arg is not None:
-            self.load_from_file(arg)
+            self.load_file(arg)
 
     def set_atom_names(self):
         '''
@@ -81,7 +81,7 @@ class OUTCAR(object):  # Version safety
                                 i + "_fz", ]
                                for i in self.atom_names]
 
-    def load_from_file(self, arg):
+    def load_file(self, arg):
         '''
         Effectively, this is a constructor of OUTCAR object.
 
@@ -135,7 +135,7 @@ class OUTCAR(object):  # Version safety
                     section.pop()
             else:
                 if "number of dos" in line:
-                    self.nions = int(line.split()[-1])
+                    self.natom = int(line.split()[-1])
                 elif "TITEL  =" in line:
                     self.iontypes.append(line.split()[3])
                 elif "ions per type " in line:
@@ -168,8 +168,8 @@ class OUTCAR(object):  # Version safety
                                     for (elm, n) in zip(self.iontypes,
                                                         self.ionnums)
                                     for j in range(1, int(n) + 1)])]
-        self.posforce = [posforce[i:i + self.nions]
-                         for i in range(0, len(posforce), self.nions)]
+        self.posforce = [posforce[i:i + self.natom]
+                         for i in range(0, len(posforce), self.natom)]
         self.set_atom_names()
         self.set_posforce_title()
         for i in kvec_weight:
@@ -180,7 +180,7 @@ class OUTCAR(object):  # Version safety
         '''
         '''
         if sites == () or sites[0] == []:
-            sites = range(1, self.nions + 1)
+            sites = range(1, self.natom + 1)
         if isinstance(sites[0], (list, tuple)):
             sites = [n for n in sites[0]]
         return [posforce for (index, site)
@@ -201,7 +201,7 @@ class OUTCAR(object):  # Version safety
                   the output (ex.) [True, True, False, True, True, False]
         '''
         if sites == () or sites[0] == []:
-            sites = range(1, self.nions + 1)
+            sites = range(1, self.natom + 1)
         if isinstance(sites[0], (list, tuple)):
             sites = [n for n in sites[0]]
         return [[posforce for (index, site) in enumerate(one_cycle)

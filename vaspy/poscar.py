@@ -105,7 +105,7 @@ class POSCAR_HEAD(object):
             raise TypeError
 
     @realcell.setter
-    def real(self, vec):
+    def realcell(self, vec):
         '''Alias of cell_vecs to keep consistency with wavecar.py
 
         Parameters
@@ -221,13 +221,12 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             else:
                 thefile = open(arg)
             poscar = thefile.readlines()
-            self.load_from_array(poscar)
+            self.load_array(poscar)
         if isinstance(arg, (list, tuple)):
-            self.load_from_array(arg)
+            self.load_array(arg)
 
-    def load_from_array(self, poscar):
-        '''.. :py:method:: load_from_array(poscar)
-
+    def load_array(self, poscar):
+        '''
         POSCAR parser
 
         Parameters

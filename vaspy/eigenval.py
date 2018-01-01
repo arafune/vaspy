@@ -23,32 +23,32 @@ class EIGENVAL(object):
 
     Attributes
     ----------
-    n_atom: int
+    natom: int
         Number of atoms
     numk: int
         Number of k vectors
-    n_bands: int
+    nbands: int
         Number of bands
     spininfo: int
         No_spin or non-collinear:1 collinear spin: 2
-    kvectors[ki]: list or numpy array
+    kvecs[ki]: list or numpy array
         List of kvalues, the length of kvectors must be equal to numk.
-    energies[bi+ki*n_bands]: list or numpy.array
+    energies[bi+ki*nbands]: list or numpy.array
         Energy values (two-value array for spin-polarized eigenvalu)
     '''
 
     def __init__(self, arg=None):
-        self.n_atoms = 0
+        self.natom = 0
         self.numk = 0
-        self.kvectors = list()
-        self.n_bands = 0
+        self.kvecs = list()
+        self.nbands = 0
         self.energies = list()
         self.spininfo = 0
         #
         if isinstance(arg, str):
-            self.load_from_file(arg)
+            self.load_file(arg)
 
-    def load_from_file(self, filename):
+    def load_file(self, filename):
         '''
         A virtual parser of EIGENVAL
 
@@ -66,20 +66,20 @@ class EIGENVAL(object):
         else:
             thefile = open(filename)
         with thefile:
-            self.n_atoms, _, _, self.spininfo = [int(i) for i in
+            self.natom, _, _, self.spininfo = [int(i) for i in
                                                  next(thefile).strip().split()]
             next(thefile)
             next(thefile)
             next(thefile)
             next(thefile)
-            _, self.numk, self.n_bands = [int(i) for i in
+            _, self.numk, self.nbands = [int(i) for i in
                                           next(thefile).strip().split()]
             for _ in range(self.numk):
                 # the first line in the sigleset begins with the blank
                 next(thefile)
-                self.kvectors.append(np.array(
+                self.kvecs.append(np.array(
                     [float(i) for i in next(thefile).strip().split()[0:3]]))
-                for _ in range(self.n_bands):
+                for _ in range(self.nbands):
                     if self.spininfo == 1:
                         self.energies.append(float(
                             next(thefile).strip().split()[1]))
@@ -112,7 +112,7 @@ class EIGENVAL(object):
 '''
         recvecarray = np.array(recvec).T
         kvector_physical = [recvecarray.dot(kvector) for kvector in
-                            self.kvectors[0:self.numk]]
+                            self.kvecs[0:self.numk]]
         return EnergyBand(kvector_physical, self.energies, self.spininfo)
 
     def __str__(self):
@@ -123,9 +123,9 @@ class EIGENVAL(object):
         Show the EIGENVAL character, not contents itself.
         '''
         template = '''The parameter of EIGENVALUE
-# of atoms: {0.n_atoms}
+# of atoms: {0.natom}
 # of kpoints: {0.numk}
-# of bands: {0.n_bands}
+# of bands: {0.nbands}
 '''
         return template.format(self)
 
@@ -137,7 +137,7 @@ class EnergyBand(object):
     Parameters
     -----------
 
-    kvectors: numpy.ndarray
+    kvecs: numpy.ndarray
          1D array data of k-vectors.
     energies: numpy.ndarray
          1D array data of energies
@@ -148,15 +148,15 @@ class EnergyBand(object):
          and No-spin.
 '''
 
-    def __init__(self, kvectors, energies, spininfo=1):
-        self.kvectors = np.array(kvectors)
+    def __init__(self, kvecs, energies, spininfo=1):
+        self.kvecs = np.array(kvecs)
         self.kdistances = np.cumsum(
             np.linalg.norm(
                 np.concatenate(
                     (np.array([[0, 0, 0]]),
-                     np.diff(kvectors, axis=0))), axis=1))
-        self.numk = len(self.kvectors)
-        self.nbands = len(energies) // len(kvectors)
+                     np.diff(kvecs, axis=0))), axis=1))
+        self.numk = len(self.kvecs)
+        self.nbands = len(energies) // len(kvecs)
         self.spininfo = spininfo
         if self.spininfo == 1:  # standard
             self.spininfo = ('',)
