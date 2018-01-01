@@ -18,7 +18,7 @@ au_in_AA = 0.529177249
 #   use parallel FFT for wavefunctions z direction half grid
 # ('z' direction is important),
 # set True.
-#   use serial FFT for wavefunctions  direction half grid
+#   use serial FFT for wavefunctions x direction half grid
 # set False
 PARALLEL = False
 

@@ -14,7 +14,7 @@ Installation
     In this directory type following command:
     - All users (require admin)
     $ python setup.py install
-    
+
     - Personal
     $ python setup.py install --user
 
@@ -24,12 +24,12 @@ Use scripts
     - Linux
     All user: /usr/local/bin
     Personal: ~/.local/bin
-    
+
     - Windows
     All user: [PythonDirectory]\Scripts
     Personal(Vista and later): C:\Users\[YourName]\AppData\Roaming\Python\Scripts
     Personal(XP): C:\Documents and Settings\[YourName]\Application Data\Python\[PythonXY]\Scripts
-    
+
     [PythonDirectory] is the directory of python.exe; Default is C:\[PythonXY]
     [PythonXY] varies with python version, e.g. Python27 for ver. 2.7
 
@@ -37,8 +37,16 @@ Uninstall
     With pip:
     If you have installed pip package to your python,
     $ pip uninstall vaspy
-    
+
     Without pip:
     Use rmvaspy.py and log file (install-vaspy.txt by default) in this directory.
     $ python rmvaspy.py install-vaspy.txt
-    
+
+Note
+	wavecar.py file use one global variable PARALLEL for treat
+	Gamma-only wavecar.
+	If you use parallel version VASP, switch this variable to True.
+	If you are not sure which version you use, check OUTCAR:
+	    'use serial FFT for wavefunctions x direction half grid'
+	If you find the above line in the OUTCAR ('x' is important),
+	your VASP is not paralell vasp. Set False.

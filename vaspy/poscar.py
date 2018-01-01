@@ -191,7 +191,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         arg: str
             POSCAR file name, or list of POSCAR text.
         '''
-        super().__init__()
+        super(POSCAR, self).__init__()
         POSCAR_POS.__init__(self)
         if isinstance(arg, str):
             if os.path.splitext(arg)[1] == '.bz2':
