@@ -92,7 +92,27 @@ class POSCAR_HEAD(object):
 
     @cell_vecs.setter
     def cell_vecs(self, vec):
-        '''Setter of cell matrix'''
+        '''Setter of cell matrix
+
+        Parameters
+        ----------
+        vec: numpy.array or list or tuple
+            3x3 matrix
+        '''
+        if three_by_three(vec):
+            self.__cell_vecs = np.array(vec)
+        else:
+            raise TypeError
+
+    @realcell.setter
+    def real(self, vec):
+        '''Alias of cell_vecs to keep consistency with wavecar.py
+
+        Parameters
+        ----------
+        vec: numpy.array or list or tuple
+            3x3 matrix
+        '''
         if three_by_three(vec):
             self.__cell_vecs = np.array(vec)
         else:
@@ -169,7 +189,6 @@ class POSCAR_POS(object):
 
 class POSCAR(POSCAR_HEAD, POSCAR_POS):
     '''
-
     Class for POSCAR (CONTCAR) format
 
     This script does *NOT* support for constructing POSCAR
@@ -257,14 +276,14 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         Parameters
         -----------
 
-        from_site: int
+        from_site: int, optional (default is 0)
             first index # for sort
 
-        to_site: int
+        to_site: int, optional (default is None)
             last index # for sort
 
-        axis: str
-            Axis used for sort (Default Z)
+        axis: str, optional  (default is `z`)
+            Axis used for sort
 
 
         Note

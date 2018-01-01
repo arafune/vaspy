@@ -98,7 +98,7 @@ class EIGENVAL(object):
         Parameters
         -----------
 
-        recvec: array, numpy.ndarray
+        recvec: array, numpy.ndarray, optional (default is the unit vector)
             reciprocal vector
 
             .. Note:: Don't forget that the reciprocal vector used
@@ -108,7 +108,7 @@ class EIGENVAL(object):
         Returns
         ---------
 
-        EnergyBand
+        vaspy.eigenval.EnergyBand
 '''
         recvecarray = np.array(recvec).T
         kvector_physical = [recvecarray.dot(kvector) for kvector in
@@ -215,7 +215,7 @@ class EnergyBand(object):
         Parameters
         ----------
 
-        color: str
+        color: str, optional (default is 'blue')
             color of the band line
 
         spin: str
@@ -263,9 +263,12 @@ class EnergyBand(object):
         Parameters
         ----------
 
-        yrange: tuple
+        yrange: tuple, optional  (default: all range)
              Minimum and maximum value of the y-axis.
              If not specified, use the matplotlib default value.
+
+        spin: str  (default is no spin or 'up' spin)
+             Spin direction for spin-polarized collinear band
 '''
         energies = np.swapaxes(self.energies, 1, 0)
         if self.spininfo == 2 or len(self.spininfo) == 2:
