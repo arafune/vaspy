@@ -65,7 +65,6 @@ class CHGCAR(mesh3d.VASPGrid):
 
     def load_from_file(self, filename):
         '''
-
         Parse CHGCAR file to construct CHGCAR object
 
         Parameters
@@ -86,7 +85,6 @@ class CHGCAR(mesh3d.VASPGrid):
 
     def magnetization(self, direction=None):
         '''
-
         Return CHGCAR for magnetization
 
         For collinear spin-polarized calculations
@@ -107,7 +105,7 @@ class CHGCAR(mesh3d.VASPGrid):
         Parameters
         ----------
 
-        direction: str
+        direction: str, optional
             specify x, y, z or t in noncollinear calculation.
             't' means the total.
 
@@ -141,7 +139,6 @@ class CHGCAR(mesh3d.VASPGrid):
 
     def majorityspin(self):
         '''
-
         Return CHGCAR for majority spin
 
         This method is for CHGCAR given by ``ISPIN=2`` but not-SOI
@@ -150,7 +147,7 @@ class CHGCAR(mesh3d.VASPGrid):
         Returns
         -------
 
-        CHGCAR
+        vaspy.chgcar.CHGCAR
             CHGCAR for the majority spin charge
         '''
         if len(self.spininfo) != 2:
@@ -163,7 +160,6 @@ class CHGCAR(mesh3d.VASPGrid):
 
     def minorityspin(self):
         '''
-
         Return CHGCAR for minority spin
 
         This method is for CHGCAR given by ``ISPIN=2`` but not-SOI
@@ -172,7 +168,7 @@ class CHGCAR(mesh3d.VASPGrid):
         Returns
         ---------
 
-        CHGCAR
+        vaspy.chgcar.CHGCAR
             CHGCAR for the minority  spin charge
         '''
         if len(self.spininfo) != 2:

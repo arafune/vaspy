@@ -51,6 +51,8 @@ class WAVECAR(object):
         Cut off energy in eV unit.
     realcell: numpy.array
         Vectors for the unit cell in real space
+    fermi: float
+        fermi level
     rcpcell: numpy.array
         Vectors for the unit cell in reciprocal space
     kvecs: numpy.array
@@ -210,11 +212,11 @@ class WAVECAR(object):
         ----------
         spin_i: int, optional
            spin index :math:`s_i` (0 or 1) (default value is 0)
-        k_i: int, optioanl
+        k_i: int, optional
            k index :math:`k_i`. Starts with 0 (default value is 0)
-        band_i: int, optioanl
+        band_i: int, optional
             band index :math:`b_i`. starts with 0 (default value is 0)
-        norm: bool, optioanl
+        norm: bool, optional
             If true the Band coeffients are normliazed (default is false)
         '''
         irec = 3 + spin_i * self.numk * (self.nbands + 1)
@@ -244,19 +246,19 @@ class WAVECAR(object):
 
         Parameters
         -----------
-        spin_i: int
-           spin index (0 or 1)
-        k_i: int
+        spin_i: int, optional
+           spin index (0 or 1). default is 0
+        k_i: int, optional
            k index :math:`k_i`. Starts with 0. default is 0
-        band_i: int
+        band_i: int, optional
             band index :math:`b_i`. starts with 0. default is 0.
-        norm: bool
+        norm: bool, optional
             If true the Band coeffients are normliazed
-        gvec: numpy.array
-            G-vector for calculation. If not set, use gvectors(k_i)
-        ngrid: numpy.array
-            Ngrid for calculation. If not set, use self.ngrid.
-        poscar: vaspy.poscar, optional
+        gvec: numpy.array, optional
+            G-vector for calculation. (default is self.gvectors(k_i))
+        ngrid: numpy.array, optional
+            Ngrid for calculation. (default is self.ngrid).
+        poscar: vaspy.poscar.POSCAR, optional
             POSCAR object (defalut is blank POSCAR object)
 
         Returns
@@ -273,7 +275,7 @@ class WAVECAR(object):
             the first item is for 'up' wavefunction in real space.
             the second item is for 'down' wavefunction in real space.
 
-        vaspgrid: VASPGrid
+        vaspy.mesh3d.VASPGrid
             Returns VASPGrid object, if poscar is specified.  The former frame
             represents the real part of the wavefunction at :math:`k_i` and
             :math:`b_i` in the real space, the latter frame the imaginary
@@ -401,6 +403,7 @@ def make_kgrid(ngrid, gamma=False, para=PARALLEL):
         Grid size
     gamma : boolean, optional (default is false)
         Set true if only gamma calculations (use vasp with -DwNGZHalf)
+    para  : boolean, optional (default is global variable `PARALLEL`)
 
     Returns
     --------
@@ -476,7 +479,15 @@ def check_symmetry(grid3d):
 
 
 def restore_gamma_grid(grid3d, para=PARALLEL):
-    '''Return Grid from the size-reduced matrix for gammareal Wavecar'''
+    '''Return Grid from the size-reduced matrix for gammareal Wavecar
+
+    Parameters
+    ----------
+    grid3d: numpy.array
+        3D grid data created with gamma-only version VASP
+
+    para  : boolean, optional (default is global variable `PARALLEL`)
+'''
     assert grid3d.ndim == 3, 'Must be 3D Grid'
     if para:
         #    ngrid = grid3d.shape

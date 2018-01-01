@@ -391,7 +391,7 @@ class Grid3D(object):
 
         axis_name: str
              'X', 'Y', or 'Z'
-        mode: int
+        mode: int, optional (default is 0)
              select data by integer
 
         Returns
@@ -425,7 +425,7 @@ class Grid3D(object):
 
         axis_name: str
              'X', 'Y', or 'Z'
-        mode: int
+        mode: int, optional (default is 0)
              select data by integer
 
         Returns
@@ -459,7 +459,7 @@ class Grid3D(object):
 
         axis_name: str
              'X', 'Y', or 'Z'
-        mode: int
+        mode: int, optional (default is 0)
              select data by integer
 
         Returns
@@ -493,7 +493,7 @@ class Grid3D(object):
 
         axis_name: str
              'X', 'Y', or 'Z'
-        mode: int
+        mode: int, optional (default is 0)
              select data by integer
 
         Returns
