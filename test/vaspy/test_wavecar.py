@@ -201,3 +201,64 @@ class test_RestoreGammaGrid(object):
         grid355[0, 4, 4] = np.conjugate(grid355[0, 1, 1])
         result = wavecar.restore_gamma_grid(grid355, para=False)
         ok_(wavecar.check_symmetry(result))
+
+class TestCobaltWavecar(object):
+    '''Class for Test WAVECAR module by using Co.wavecar (SOI)'''
+    def setup(self):
+        datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
+        data_file = datadir + 'Co.wavecar'
+        self.co = wavecar.WAVECAR(data_file)
+        self.co_poscar = poscar.POSCAR(datadir + 'Co.POSCAR')
+
+    @with_setup(setup=setup)
+    def test_wavecar_header(self):
+        '''Test for Cobalt property'''
+        eq_(7968, self.co.recl)  # record length
+        eq_(1, self.co.nspin)      # spin
+        eq_(45200, self.co.rtag)   # precision flag
+        eq_(np.complex64, self.co.prec)
+#
+        eq_(9, self.co.numk)
+        eq_(54, self.co.nbands)
+        eq_(400, self.co.encut)
+        assert_almost_equal(-0.84118407515959326, self.co.efermi)
+        np.testing.assert_array_almost_equal(
+            np.array([[1.0,   0.0,   0.],
+                      [0.5,   0.8660254,   0.],
+                      [0.,       0.,  2.0]])*2.501, self.co.realcell)
+        # volume of cell in OUTCAR is not enough
+        assert_almost_equal(27.095782694613046, self.co.volume)
+        # FIXME!!: Where these value come from ?
+        #  Maximum number of reciprocal cells 2x 2x 4 (in OUTCAR)
+        np.testing.assert_array_almost_equal([11, 11, 19], self.co.ngrid)
+
+    @with_setup(setup=setup)
+    def test_wavecar_band(self):
+        '''Test for Co wavecar band'''
+        kpath, kbands = self.co.band()
+        # from OUTCAR
+        eq_(996, self.co.nplwvs.max())
+        eq_(958, self.co.nplwvs.min())
+        eq_((self.co.numk,), kpath.shape)  # co.numk = 240
+        eq_((self.co.nspin, self.co.numk, self.co.nbands), kbands.shape)
+        np.testing.assert_array_almost_equal(
+            [-6.532492 , -5.858599, -4.037263, -3.418892, -3.265558, -2.642231],
+            kbands[0, 0, 0:6])  # The value can be taken from EIGENVAL
+
+    @with_setup(setup=setup)
+    def test_realsapece_wfc(self):
+        '''Test for generation real space wfc (Cobalt)'''
+        np.testing.assert_array_almost_equal(
+            [-7.84915157e-05 -5.61362047e-05j,
+             -7.88077954e-05 -5.63624713e-05j,
+             -7.92001487e-05 -5.66431905e-05j,
+             -7.92675956e-05 -5.66915450e-05j,
+             -7.90423140e-05 -5.65305135e-05j],
+            self.co.realspace_wfc()[0][0][0][:5])
+        vaspgrid = self.co.realspace_wfc(poscar=self.co_poscar)
+        np.testing.assert_array_almost_equal(
+            [-7.84915157e-05, -7.88077954e-05,
+             -7.92001487e-05, -7.92675956e-05,
+             -7.90423140e-05],
+        vaspgrid.grid.data[:5])
+        eq_(4, vaspgrid.grid.num_frame)

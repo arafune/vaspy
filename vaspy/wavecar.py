@@ -16,9 +16,9 @@ au_in_AA = 0.529177249
 # See OUTCAR file
 # If you find:
 #   use parallel FFT for wavefunctions z direction half grid
-# ('z' direction is important), 
+# ('z' direction is important),
 # set True.
-#   use serial FFT for wavefunctions  direction half grid
+#   use serial FFT for wavefunctions x direction half grid
 # set False
 PARALLEL = False
 
@@ -106,7 +106,8 @@ class WAVECAR(object):
         self.ngrid = np.array(2 * cutoff + 1, dtype=int)
 
     def check_DwNGZHalf(self):
-        r'''Set self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
+        r'''
+        Set self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
         about half of the number of gvectors equals number of plane waves'''
         if self.gamma:
             return True
@@ -261,24 +262,24 @@ class WAVECAR(object):
         Returns
         -----------
 
-        phi_r.T: numpy.array
+        numpy.array
             If poscar is not specified, for Collinear-wavecar file.
-            phi_r is mesh data for the wavefunction in the real space.
+            data for the wavefunction in the real space.
             .T is due to the original data is made by fortran program
             (i.e. 'VASP', of course.
 
-        phi_r_up.T, phi_r_down.T: tuple of numpy.array
+        tuple
             If poscar is not specified, for SOI-wavecar file.
-            phi_r_up corresponds to the 'up' spin spinor wavefunction.
-            phi_r_down corresponds to the 'down' spin spinor wavefunction.
+            the first item is for 'up' wavefunction in real space.
+            the second item is for 'down' wavefunction in real space.
 
         vaspgrid: VASPGrid
             Returns VASPGrid object, if poscar is specified.  The former frame
             represents the real part of the wavefunction at :math:`k_i` and
             :math:`b_i` in the real space, the latter frame the imaginary
-            part. On the other hand, the SOI-wavecar has 4 frames
-            The first and second are for the "up" spin, and the third
-            and fourth are "down" spin. (Judging SOI by
+            part. For the SOI wavecar, 4 frames.
+            The first and second are for the "up" wavefunction, and the third
+            and fourth are "down" wavefunction. (Judging SOI by
             gvectors(k_i).shape[0] :math:`\neq` bandcoeff(k_i).size)
         '''
         if ngrid is None:
@@ -333,19 +334,15 @@ class WAVECAR(object):
                         phi_k[0, iy, iz] = phi_k[0, -iy, -iz].conjugate()
             phi_k /= np.sqrt(2.0)
             phi_k[0, 0, 0] *= np.sqrt(2.)
-            self.phi_k = phi_k  # For debug
             phi_k = restore_gamma_grid(phi_k)
         #
-        try:
-            phi_r = ifftn(phi_k)
-        except TypeError:
-            phi_r = (ifftn(phi_k[0]), ifftn(phi_k[1]))
-        #
+        self.phi_k = phi_k  # For debug
+        phi_r = ifftn(phi_k)
         if poscar.scaling_factor == 0.:
-            try:
+            if phi_r.ndim == 3:
                 return phi_r.T
-            except TypeError:
-                return phi_r[0].T, phi_r[1].T
+            else:  # SOI
+                return (phi_r[0]+phi_r[1]).T, (phi_r[0]-phi_r[1]).T
         else:
             vaspgrid = mesh3d.VASPGrid()
             vaspgrid.poscar = poscar
@@ -354,17 +351,17 @@ class WAVECAR(object):
             np.testing.assert_array_almost_equal(
                 poscar.scaling_factor * poscar.cell_vecs,
                 self.realcell)
-            try:
-                re = np.real(phi_r.flatten('F'))
-                im = np.imag(phi_r.flatten('F'))
-                vaspgrid.grid.data = np.concatenate((re, im))
-            except TypeError:
-                up_re = np.real(phi_r[0].flatten('F'))
-                up_im = np.imag(phi_r[0].flatten('F'))
-                down_re = np.real(phi_r[1].flatten('F'))
-                down_im = np.imag(phi_r[1].flatten('F'))
-                vaspgrid.grid.data = np.concatenate((up_re, up_im,
-                                                     down_re, down_im))
+            re = np.real(phi_r)
+            im = np.imag(phi_r)
+            if phi_r.ndim == 3:
+                vaspgrid.grid.data = np.concatenate(
+                    (re.flatten('F'), im.flatten('F')))
+            else:  # SOI
+                vaspgrid.grid.data = np.concatenate(
+                    ((re[0]+re[1]).flatten('F'),
+                     (im[0]+im[1]).flatten('F'),
+                     (re[0]-re[1]).flatten('F'),
+                     (im[0]-im[1]).flatten('F')))
         return vaspgrid
 
     def __str__(self):
