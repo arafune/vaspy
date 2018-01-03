@@ -18,7 +18,7 @@ class OUTCAR(object):  # Version safety
     Attributes
     -------------
 
-    ntom: int
+    natom: int
         number of atom
     iontypes: list
         list of ion name
@@ -28,6 +28,23 @@ class OUTCAR(object):  # Version safety
         kvector
     weights: list
         weight list
+    fermi: float
+        fermi energy
+    numk: int
+        number of k points
+    nbands: int
+        number of bands
+    posforce : list
+        evolution of position and force
+    magnetization: list
+        evolution of magnetization
+    total_charge: list
+        evolution of total charge
+
+
+    Todo
+    ------
+      posforce should be devided to positions and forces
     '''
 
     def __init__(self, arg=None):
@@ -42,8 +59,8 @@ class OUTCAR(object):  # Version safety
         self.numk = 0
         self.nkdim = 0
         self.nbands = 0
-        self.magnetization = []
-        self.tot_chage = []
+        self.magnetizations = []
+        self.total_charges = []
         self.kvecs = []
         self.weights = []
         if arg is not None:
@@ -94,7 +111,8 @@ class OUTCAR(object):  # Version safety
         # local variables
         section = []
         posforce = []
-        magnetization = []
+        magnetizations = []
+        total_charges = []
         kvec_weight = []
         # parse
         if os.path.splitext(arg)[1] == '.bz2':
@@ -110,8 +128,6 @@ class OUTCAR(object):  # Version safety
                     section.pop()
                 elif "---------------" in line:
                     pass
-                elif "total drift:" in line:
-                    section.pop()
                 else:
                     posforce.append([float(x) for x in line.split()])
             elif section == ["magnetization"]:
@@ -120,12 +136,25 @@ class OUTCAR(object):  # Version safety
                 elif "# of ion" in line:
                     pass
                 elif "tot    " in line:
-                    self.magnetization.append(magnetization)
+                    self.magnetizations.append(magnetizations)
                     section.pop()
                 elif len(line) == 2:
                     pass
                 else:
-                    magnetization.append([
+                    magnetizations.append([
+                        float(x) for x in line.split()[1:4]])
+            elif section == ['total_charge']:
+                if "---------------------------------" in line:
+                    pass
+                elif "# of ion" in line:
+                    pass
+                elif "tot    " in line:
+                    self.total_charges.append(total_charges)
+                    section.pop()
+                elif len(line) == 2:
+                    pass
+                else:
+                    total_charges.append([
                         float(x) for x in line.split()[1:4]])
             elif section == ['kvec_weight']:
                 if len(line) > 3:
@@ -153,8 +182,11 @@ class OUTCAR(object):  # Version safety
                                     next(thefile).strip().split()[3:]]
                                    for i in range(3)]
                 elif " magnetization (x)" in line:
-                    magnetization = []
+                    magnetizations = []
                     section.append("magnetization")
+                elif " total charge     " in line:
+                    total_charges = []
+                    section.append("total_charge")
                 elif " Following reciprocal coordinates:" in line:
                     next(thefile)
                     kvec_weight = []
@@ -177,7 +209,7 @@ class OUTCAR(object):  # Version safety
             self.weights.append(i[3])
 
     def select_posforce_header(self, posforce_flag, *sites):
-        '''
+        '''Return the position and force header selected
         '''
         if sites == () or sites[0] == []:
             sites = range(1, self.natom + 1)
@@ -193,11 +225,11 @@ class OUTCAR(object):  # Version safety
 
     def select_posforce(self, posforce_flag, *sites):
         '''
-        Return the posforce corresponding the posforce_flag
+        Return the position and force selected by posforce_flag
 
         Note
         -------
-        posforce_flag: An 6-element True/False list that indicates \
+        posforce_flag: An 6-element True/False list that indicates
                   the output (ex.) [True, True, False, True, True, False]
         '''
         if sites == () or sites[0] == []:
