@@ -21,7 +21,7 @@ class EIGENVAL(object):
     Parameters
     -----------
 
-    EIGENVAL_file: str
+    filename: str
         File name of 'EIGENVAL'
 
     Attributes
@@ -40,7 +40,7 @@ class EIGENVAL(object):
         Energy values (two-value array for spin-polarized eigenvalu)
     '''
 
-    def __init__(self, arg=None):
+    def __init__(self, filename=None):
         self.natom = 0
         self.numk = 0
         self.kvecs = list()
@@ -48,49 +48,43 @@ class EIGENVAL(object):
         self.energies = list()
         self.spininfo = 0
         #
-        if isinstance(arg, str):
-            self.load_file(arg)
+        if filename:
+            if os.path.splitext(filename)[1] == '.bz2':
+                try:
+                    self.thefile = bz2.open(filename, mode='rt')
+                except AttributeError:
+                    self.thefile = bz2.BZ2File(filename, mode='r')
+            else:
+                self.thefile = open(filename)
+            self.load_file()
 
-    def load_file(self, filename):
+    def load_file(self):
         '''
         A virtual parser of EIGENVAL
-
-        parameters
-        -----------
-
-        filename: str
-           Filename of EIGENVAL file. bziped file is also readable.
         '''
-        if os.path.splitext(filename)[1] == '.bz2':
-            try:
-                thefile = bz2.open(filename, mode='rt')
-            except AttributeError:
-                thefile = bz2.BZ2File(filename, mode='r')
-        else:
-            thefile = open(filename)
-        with thefile:
-            self.natom, _, _, self.spininfo = [int(i) for i in
-                                                 next(thefile).split()]
-            next(thefile)
-            next(thefile)
-            next(thefile)
-            next(thefile)
-            _, self.numk, self.nbands = [int(i) for i in
-                                          next(thefile).split()]
-            for _ in range(self.numk):
-                # the first line in the sigleset begins with the blank
-                next(thefile)
-                self.kvecs.append(np.array(
-                    [float(i) for i in next(thefile).split()[0:3]]))
-                for _ in range(self.nbands):
-                    if self.spininfo == 1:
-                        self.energies.append(float(
-                            next(thefile).split()[1]))
-                    else:
-                        self.energies.append(
-                            np.array([float(i) for i in
-                                      next(thefile).split()[1:3]]))
+        self.natom, _, _, self.spininfo = [int(i) for i in
+                                           next(self.thefile).split()]
+        next(self.thefile)
+        next(self.thefile)
+        next(self.thefile)
+        next(self.thefile)
+        _, self.numk, self.nbands = [int(i) for i in
+                                     next(self.thefile).split()]
+        for _ in range(self.numk):
+            # the first line in the sigleset begins with the blank
+            next(self.thefile)
+            self.kvecs.append(np.array(
+                [float(i) for i in next(self.thefile).split()[0:3]]))
+            for _ in range(self.nbands):
+                if self.spininfo == 1:
+                    self.energies.append(float(
+                        next(self.thefile).split()[1]))
+                else:
+                    self.energies.append(
+                        np.array([float(i) for i in
+                                  next(self.thefile).split()[1:3]]))
         self.energies = np.array(self.energies)
+        self.thefile.close()
 
     def to_band(self, recvec=((1.0, 0.0, 0.0),
                               (0.0, 1.0, 0.0),
@@ -144,11 +138,11 @@ class EnergyBand(object):
          1D array data of k-vectors.
     energies: numpy.ndarray
          1D array data of energies
-    spininfo: int, tuple
+    spininfo: int, tuple, optional
          Spin type.  1 or ("",) mean No-spin.  2 or ('_up', '_down')
          mean collinear spin, 4 or ('_mT', '_mX', '_mY', '_mZ') mean
          collinear spin. This class does not distinguish non-collinear spin
-         and No-spin.
+         and No-spin.  (default is 1)
 '''
 
     def __init__(self, kvecs, energies, spininfo=1):
@@ -192,7 +186,8 @@ class EnergyBand(object):
         --------
 
         str
-            a string represntation of EnergyBand.  Useful for gnuplot and Igor.
+            a string represntation of EnergyBand.
+            Useful for gnuplot and Igor.
         '''
         energies = np.swapaxes(self.energies, 1, 0)
         if self.spininfo == 2 or len(self.spininfo) == 2:

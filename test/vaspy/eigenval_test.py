@@ -1,5 +1,5 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
+'''Test for EIGENVAL class'''
 import os
 from nose.tools import eq_
 from nose.tools import ok_
@@ -9,9 +9,9 @@ from nose.tools import raises
 import vaspy.eigenval as eigenval
 import numpy as np
 
+
 class TestEIGENVAL(object):
     '''Class for EIGENVAL class test'''
-
     def setup(self):
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         self.eigenval_spin = eigenval.EIGENVAL(datadir + 'EIGENVAL.spin')
@@ -27,10 +27,13 @@ class TestEIGENVAL(object):
         eq_((1890, 2), self.eigenval_spin.energies.shape)
         np.testing.assert_array_equal([0., 0., 0.],
                                       self.eigenval_spin.kvecs[0])
-        np.testing.assert_array_equal([-22.893072, -22.890912],
-                                      self.eigenval_spin.energies[0])
-        np.testing.assert_array_equal([  5.806516,   5.813531],
-                                      self.eigenval_spin.energies[-1])
+        np.testing.assert_array_almost_equal(
+            [[-22.893072, -22.890912], [-22.891405, -22.889365],
+             [-22.841659, -22.843597], [-22.832997, -22.830941],
+             [-22.761726, -22.760568], [-22.737184, -22.735949]],
+            self.eigenval_spin.energies[0:6])
+        np.testing.assert_array_equal(
+            [5.806516, 5.813531], self.eigenval_spin.energies[-1])
         #
         eq_(1, self.eigenval_soi.natom)
         eq_(1, self.eigenval_soi.spininfo)
@@ -39,7 +42,7 @@ class TestEIGENVAL(object):
         np.testing.assert_array_equal(-9.548122,
                                       self.eigenval_soi.energies[0])
         np.testing.assert_array_almost_equal(26.193038,
-                                      self.eigenval_soi.energies[-1])
+                                             self.eigenval_soi.energies[-1])
         eq_('''The parameter of EIGENVALUE
 # of atoms: 1
 # of kpoints: 625
