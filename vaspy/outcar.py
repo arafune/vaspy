@@ -174,12 +174,12 @@ class OUTCAR(object):  # Version safety
                 elif "E-fermi" in line:
                     self.fermi = float(line.split()[2])
                 elif "NBANDS" in line:
-                    self.numk = int(line.strip().split()[3])
-                    self.nkdim = int(line.strip().split()[9])
-                    self.nbands = int(line.strip().split()[14])
+                    self.numk = int(line.split()[3])
+                    self.nkdim = int(line.split()[9])
+                    self.nbands = int(line.split()[14])
                 elif "reciprocal lattice vectors" in line:
                     self.recvec = [[float(i) for i in
-                                    next(thefile).strip().split()[3:]]
+                                    next(thefile).split()[3:]]
                                    for i in range(3)]
                 elif " magnetization (x)" in line:
                     magnetizations = []

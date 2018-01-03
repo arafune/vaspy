@@ -99,8 +99,8 @@ class VASPGrid(object):
                                                  in line.split()])
                     griddata.extend(
                         [float(i) for i in
-                         next(thefile).rstrip().replace(
-                             '***********', 'Nan').split()])
+                         next(thefile).replace('***********',
+                                               'Nan').split()])
                     if self.grid.size % len(griddata) == 0:
                         lines_for_mesh = self.grid.size // len(griddata)
                     else:
@@ -108,15 +108,15 @@ class VASPGrid(object):
                     for _ in range(lines_for_mesh - 1):
                         griddata.extend(
                             [float(val) for val in
-                             next(thefile).rstrip().replace('***********',
-                                                            'Nan').split()])
+                             next(thefile).replace('***********',
+                                                   'Nan').split()])
                     section = 'grid'
                 elif section == 'aug':
                     if separator in line:
                         for _ in range(lines_for_mesh):
                             griddata.extend(
                                 [float(val) for val in
-                                 next(thefile).rstrip().replace(
+                                 next(thefile).replace(
                                      '***********',
                                      'Nan').split()])
                         section = 'grid'
@@ -131,7 +131,7 @@ class VASPGrid(object):
                         for _ in range(lines_for_mesh):
                             griddata.extend(
                                 [float(val) for val in
-                                 next(thefile).rstrip().replace(
+                                 next(thefile).replace(
                                      '***********',
                                      'Nan').split()])
                     else:

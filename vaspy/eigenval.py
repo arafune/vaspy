@@ -8,7 +8,10 @@ from __future__ import division
 import os
 import bz2
 import numpy as np
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    print('Install matplotlib, or you cannot use methods relating to draw')
 
 
 class EIGENVAL(object):
@@ -67,26 +70,26 @@ class EIGENVAL(object):
             thefile = open(filename)
         with thefile:
             self.natom, _, _, self.spininfo = [int(i) for i in
-                                                 next(thefile).strip().split()]
+                                                 next(thefile).split()]
             next(thefile)
             next(thefile)
             next(thefile)
             next(thefile)
             _, self.numk, self.nbands = [int(i) for i in
-                                          next(thefile).strip().split()]
+                                          next(thefile).split()]
             for _ in range(self.numk):
                 # the first line in the sigleset begins with the blank
                 next(thefile)
                 self.kvecs.append(np.array(
-                    [float(i) for i in next(thefile).strip().split()[0:3]]))
+                    [float(i) for i in next(thefile).split()[0:3]]))
                 for _ in range(self.nbands):
                     if self.spininfo == 1:
                         self.energies.append(float(
-                            next(thefile).strip().split()[1]))
+                            next(thefile).split()[1]))
                     else:
                         self.energies.append(
                             np.array([float(i) for i in
-                                      next(thefile).strip().split()[1:3]]))
+                                      next(thefile).split()[1:3]]))
         self.energies = np.array(self.energies)
 
     def to_band(self, recvec=((1.0, 0.0, 0.0),
@@ -135,7 +138,7 @@ class EnergyBand(object):
     Simple band structure object for analyzing by using ipython.
 
     Parameters
-    -----------
+    ----------
 
     kvecs: numpy.ndarray
          1D array data of k-vectors.
@@ -180,7 +183,7 @@ class EnergyBand(object):
 
         fermi: float
              value of the Fermi level.
-'''
+        '''
         self.energies -= fermi
 
     def __str__(self):
@@ -236,8 +239,7 @@ class EnergyBand(object):
            ax.set_ylim(-5, 5)
            ax.set_xlim(0, 4)
            plt.show()
-
-'''
+        '''
         energies = np.swapaxes(self.energies, 1, 0)
         draws = []
         if self.spininfo == 2 or len(self.spininfo) == 2:
@@ -272,7 +274,7 @@ class EnergyBand(object):
 
         spin: str  (default is no spin or 'up' spin)
              Spin direction for spin-polarized collinear band
-'''
+        '''
         energies = np.swapaxes(self.energies, 1, 0)
         if self.spininfo == 2 or len(self.spininfo) == 2:
             if spin == 'down':

@@ -42,11 +42,15 @@ From VASP webpage::
 
 from __future__ import print_function  # Version safety
 from __future__ import division  # Version safety
+import os
 import bz2
 import copy
 import numpy as np
-import matplotlib.pyplot as plt
-import os
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    print('Install matplotlib, or you cannot use methods relating to draw')
+
 # if _sys.version_info[0] >= 3:  # Version safety
 #     from io import StringIO as _StringIO
 # else:
@@ -107,7 +111,7 @@ class DOSCAR(object):  # Version safety
             [thefile.readline() for i in range(4)]
             header = thefile.readline()
             self.nbands = int(header[32:37])
-            tdos = np.array([next(thefile).rstrip().split()
+            tdos = np.array([next(thefile).split()
                              for i in range(self.nbands)],
                             dtype=np.float64)
             if tdos.shape[1] == 3:
@@ -123,7 +127,7 @@ class DOSCAR(object):  # Version safety
                 nextheader = ""
             while nextheader == header:
                 self.dos_container.append(
-                    np.array([next(thefile).rstrip().split()
+                    np.array([next(thefile).split()
                               for i in range(self.nbands)],
                              dtype=np.float64))
                 try:
