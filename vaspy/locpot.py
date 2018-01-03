@@ -9,7 +9,10 @@ from __future__ import print_function
 import os
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    print('Install matplotlib, or you cannot use methods relating to draw')
 try:
     from vaspy import mesh3d
 except ImportError:

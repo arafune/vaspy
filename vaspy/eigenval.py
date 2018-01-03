@@ -8,7 +8,10 @@ from __future__ import division
 import os
 import bz2
 import numpy as np
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    print('Install matplotlib, or you cannot use methods relating to draw')
 
 
 class EIGENVAL(object):
