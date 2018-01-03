@@ -51,40 +51,43 @@ class EIGENVAL(object):
         if filename:
             if os.path.splitext(filename)[1] == '.bz2':
                 try:
-                    self.thefile = bz2.open(filename, mode='rt')
+                    thefile = bz2.open(filename, mode='rt')
                 except AttributeError:
-                    self.thefile = bz2.BZ2File(filename, mode='r')
+                    thefile = bz2.BZ2File(filename, mode='r')
             else:
-                self.thefile = open(filename)
-            self.load_file()
+                thefile = open(filename)
+            self.load_file(thefile)
 
-    def load_file(self):
+    def load_file(self, thefile):
         '''
         A virtual parser of EIGENVAL
+
+        thefile: StringIO
+            'EIGENVAL' file
         '''
         self.natom, _, _, self.spininfo = [int(i) for i in
-                                           next(self.thefile).split()]
-        next(self.thefile)
-        next(self.thefile)
-        next(self.thefile)
-        next(self.thefile)
+                                           next(thefile).split()]
+        next(thefile)
+        next(thefile)
+        next(thefile)
+        next(thefile)
         _, self.numk, self.nbands = [int(i) for i in
-                                     next(self.thefile).split()]
+                                     next(thefile).split()]
         for _ in range(self.numk):
             # the first line in the sigleset begins with the blank
-            next(self.thefile)
+            next(thefile)
             self.kvecs.append(np.array(
-                [float(i) for i in next(self.thefile).split()[0:3]]))
+                [float(i) for i in next(thefile).split()[0:3]]))
             for _ in range(self.nbands):
                 if self.spininfo == 1:
                     self.energies.append(float(
-                        next(self.thefile).split()[1]))
+                        next(thefile).split()[1]))
                 else:
                     self.energies.append(
                         np.array([float(i) for i in
-                                  next(self.thefile).split()[1:3]]))
+                                  next(thefile).split()[1:3]]))
         self.energies = np.array(self.energies)
-        self.thefile.close()
+        thefile.close()
 
     def to_band(self, recvec=((1.0, 0.0, 0.0),
                               (0.0, 1.0, 0.0),
@@ -106,7 +109,7 @@ class EIGENVAL(object):
         ---------
 
         vaspy.eigenval.EnergyBand
-'''
+        '''
         recvecarray = np.array(recvec).T
         kvector_physical = [recvecarray.dot(kvector) for kvector in
                             self.kvecs[0:self.numk]]
@@ -143,7 +146,7 @@ class EnergyBand(object):
          mean collinear spin, 4 or ('_mT', '_mX', '_mY', '_mZ') mean
          collinear spin. This class does not distinguish non-collinear spin
          and No-spin.  (default is 1)
-'''
+    '''
 
     def __init__(self, kvecs, energies, spininfo=1):
         self.kvecs = np.array(kvecs)

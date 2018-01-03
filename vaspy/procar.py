@@ -98,30 +98,33 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
         if filename:
             if os.path.splitext(filename)[1] == ".bz2":
                 try:
-                    self.procar_file = bz2.open(filename, mode='rt')
+                    thefile = bz2.open(filename, mode='rt')
                 except AttributeError:
-                    self.procar_file = bz2.BZ2File(filename, mode='r')
+                    thefile = bz2.BZ2File(filename, mode='r')
             else:
-                self.procar_file = open(filename)
-            self.load_file(phase_read)
+                thefile = open(filename)
+            self.load_file(thefile, phase_read)
 
-    def load_file(self, phase_read=False):
+    def load_file(self, thefile, phase_read=False):
         '''
         A virtual parser of PROCAR
 
         Parameters
         ----------
 
+        thefile: StringIO
+            'PROCAR' file
+
         phase_read: boolean
-             Switch for loading phase characters
+            Switch for loading phase characters
         '''
-        first_line = next(self.procar_file)
+        first_line = next(thefile)
         if 'PROCAR lm decomposed + phase' not in first_line:
-            self.procar_file.close()
+            thefile.close()
             raise RuntimeError("This PROCAR is not a proper format\n \
                                 Check your INCAR the calculations.\n")
         section = list()
-        for line in self.procar_file:
+        for line in thefile:
             if line.isspace():
                 section = []
             elif "k-points: " in line:
@@ -156,7 +159,7 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
                 elif section == ['phase']:
                     if phase_read:
                         self.phase.append([float(i) for i in line.split()[1:]])
-#
+        #
         self.spininfo = (len(self.orbital) //
                          (self.numk * self.nbands * self.natom))
         if len(self.orbital) % (self.numk * self.nbands * self.natom) != 0:
@@ -171,7 +174,7 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
                 self.energies.append([up, down])
         elif self.spininfo == 4:  # non-collinear
             self.spininfo = ('_mT', '_mX', '_mY', '_mZ')
-        self.procar_file.close()
+        thefile.close()
 
     def __str__(self):
         '''
