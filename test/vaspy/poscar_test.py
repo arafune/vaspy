@@ -20,36 +20,17 @@ class TestPOSCAR(unittest.TestCase):
         self.blancposcar = vaspy.poscar.POSCAR()
         os.remove(filePOSCAR[1])
 
-    def test_system_name(self):
+    def test_fundamentals(self):
+        '''Test for POSCAR class: fundamental data read'''
         # a=os.getcwd()  # return the directory where nose execute.
         self.assertEqual('NiC4S4', self.testposcar.system_name)
-
-    def test_cell_vec1(self):
         np.testing.assert_allclose(np.array([0.866025404, -0.5, 0.]),
                                    self.testposcar.cell_vecs[0])
-
-    def test_cell_vec2(self):
         np.testing.assert_allclose(np.array([0.866025404, 0.5, 0.]),
                                    self.testposcar.cell_vecs[1])
-
-    def test_cell_vec3_setter(self):
         self.testposcar.cell_vecs[2] = (1, 0, 0)
         np.testing.assert_allclose(np.array([1, 0, 0]),
                                    self.testposcar.cell_vecs[2])
-
-    def test_cell_vec3(self):
-        np.testing.assert_allclose(np.array([0.0, 0.0, 1.02529049]),
-                                   self.testposcar.cell_vecs[2])
-
-    def test_point_in_box(self):
-        self.assertFalse(vaspy.poscar.point_in_box(
-            (0.5, 0.5, 0.2), self.testposcar.cell_vecs))
-        self.assertTrue(vaspy.poscar.point_in_box(
-            (0.5, 0.1, 0.2), self.testposcar.cell_vecs))
-        self.assertTrue(vaspy.poscar.point_in_box(
-            (0.5, 0.5, 0.2), ((1, 0, 0), (0, 1, 0), (0, 0, 1))))
-
-    def test_atom_identifer(self):
         self.assertEqual(['#0:Ni1', '#1:Ni2', '#2:Ni3',
                           '#3:C1', '#4:C2', '#5:C3', '#6:C4',
                           '#7:C5', '#8:C6', '#9:C7', '#10:C8',
@@ -58,6 +39,14 @@ class TestPOSCAR(unittest.TestCase):
                           '#19:S5', '#20:S6', '#21:S7', '#22:S8',
                           '#23:S9', '#24:S10', '#25:S11', '#26:S12'],
                          self.testposcar.atom_identifer)
+
+    def test_point_in_box(self):
+        self.assertFalse(vaspy.poscar.point_in_box(
+            (0.5, 0.5, 0.2), self.testposcar.cell_vecs))
+        self.assertTrue(vaspy.poscar.point_in_box(
+            (0.5, 0.1, 0.2), self.testposcar.cell_vecs))
+        self.assertTrue(vaspy.poscar.point_in_box(
+            (0.5, 0.5, 0.2), ((1, 0, 0), (0, 1, 0), (0, 0, 1))))
 
     def test_is_cartesian(self):
         self.assertFalse(self.testposcar.is_cartesian())
@@ -150,6 +139,7 @@ class TestPOSCAR(unittest.TestCase):
         self.testposcar.to_direct()
 
     def test_poscar_supercell1(self):
+        '''Tests for poscar supercell method'''
         supercell = self.testposcar.supercell(3, 2, 1)
         np.testing.assert_allclose(
             np.array([2.59807621, -1.5, 0.]),
@@ -160,20 +150,13 @@ class TestPOSCAR(unittest.TestCase):
         np.testing.assert_allclose(
             np.array([0.0, 0.0, 1.02529049]),
             supercell.cell_vecs[2])
-
-    def test_poscar_supercell2(self):
-        supercell = self.testposcar.supercell(3, 2, 1)
         self.assertEqual('NiC4S4', supercell.system_name)
         self.assertEqual(['Ni', 'C', 'S'], supercell.iontypes)
         self.assertEqual([18, 72, 72], supercell.ionnums)
-
-    def test_poscar_supercell3(self):
         supercell = self.testposcar.supercell(1, 1, 1)
         np.testing.assert_allclose(
             self.testposcar.positions[0],
             supercell.positions[0])
-
-    def test_poscar_supercell4(self):
         supercell = self.testposcar.supercell(3, 2, 1)
         np.testing.assert_allclose(
             supercell.positions[0],
@@ -185,8 +168,6 @@ class TestPOSCAR(unittest.TestCase):
             np.array([self.testposcar.positions[0][0] / 3 + 1 * (1 / 3),
                       self.testposcar.positions[0][1] / 2,
                       self.testposcar.positions[0][2] / 1]))
-
-    def test_poscar_supercell5(self):
         supercell = self.testposcar.supercell(3, 2, 1)
         self.assertEqual(6*len(self.testposcar.positions),
                          len(supercell.positions))

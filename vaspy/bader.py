@@ -2,8 +2,8 @@
 '''
 Module for bader class
 
-Bader charge anaslysis performed by bader
-http://theory.cm.utexas.edu/henkelman/code/bader/
+Bader charge anaslysis performed by bader.
+(http://theory.cm.utexas.edu/henkelman/code/bader/)
 
 This program is not a part of vasp but it deeply connects with the vasp.
 '''
@@ -18,16 +18,17 @@ import numpy as np
 class BaderACF(object):
     '''class for storing bader charge analysis (ACF.dat)
 
-    ACF.dat contains the coordinates of each atom, the charge
-    associated with it according to Bader partitioning, percentage of
-    the whole according to Bader partitioning and the minimum distance
-    to the surface. This distance should be compared to maximum
-    cut-off radius for the core region if pseudo potentials have been
-    used.
+          ACF.dat contains the coordinates of each atom, the charge
+          associated with it according to Bader partitioning, percentage of
+          the whole according to Bader partitioning and the minimum distance
+          to the surface. This distance should be compared to maximum
+          cut-off radius for the core region if pseudo potentials have been
+          used.
 
 
     Properties
     ----------
+
     natom: int
        Number of atoms
     positions: list
@@ -73,6 +74,7 @@ class BaderACF(object):
         # the first line is like:
         #     X     Y     Z     CHARGE      MIN DIST   ATOMIC VOL
         _ = next(thefile)
+        # the 2nd line is just "----------"
         separator = next(thefile)
         for line in thefile:
             if separator in line:
