@@ -136,6 +136,18 @@ class EnergyBand(object):
     '''
     Simple band structure object for analyzing by using ipython.
 
+    Attributes
+    ----------
+
+    kvecs: numpy array
+        kvectors
+    kdistances: nparray
+        kdisance
+    numk: int   # should be __numk ?
+        number of kpoints
+    nbands: int  # 
+        number of bands
+
     Parameters
     ----------
 

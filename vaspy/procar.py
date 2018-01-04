@@ -242,10 +242,37 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
         band.energies = self.energies
         return band
 
+    def projection(self):
+        '''Return Projection object
+
+        
+        '''
+        proj = Projection()
+        pass
+
 
 class Projection(object):
     '''
     Orbital projection object for analyzing by using python.
+
+    * 本質的にはこれは np.array 
+
+    このクラスで行いたいこと
+
+    * site をまとめた sum_by_site object を返す
+    * orbital を まとめる sum_by_orbital を返す。
+    * band_index を指定してそのバンドを消す。
+    * もしくはそのバンドだけ取り出す。
+    * Igor とかで見やすいstr フォーマットを返す。←ここで定義するmethod?
+
+
+    Attributes
+    ----------
+
+    numk: int
+       number of k-points
+    nbands: int
+       number of nbands
 '''
 
     def __init__(self, projection, natom=0, numk=0, nbands=0, soi=False):
@@ -351,7 +378,7 @@ class BandWithProjection(object):
     class is not so well sophisticated, the use is not easy.  Anyway,
     it works, however.
 
-    :class variables: kvecs, energies, states, spin, orb_names
+    :class variables: kvecs, energies, spin, orb_names
 
     Note
     -------
