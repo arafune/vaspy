@@ -98,12 +98,12 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
         if filename:
             if os.path.splitext(filename)[1] == ".bz2":
                 try:
-                    thefile = bz2.open(filename, mode='rt')
+                    procarfile = bz2.open(filename, mode='rt')
                 except AttributeError:
-                    thefile = bz2.BZ2File(filename, mode='r')
+                    procarfile = bz2.BZ2File(filename, mode='r')
             else:
-                thefile = open(filename)
-            self.load_file(thefile, phase_read)
+                procarfile = open(filename)
+            self.load_file(procarfile, phase_read)
 
     def load_file(self, thefile, phase_read=False):
         '''
@@ -112,11 +112,8 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
         Parameters
         ----------
 
-        thefile: StringIO
-            'PROCAR' file
-
         phase_read: boolean
-            Switch for loading phase characters
+             Switch for loading phase characters
         '''
         first_line = next(thefile)
         if 'PROCAR lm decomposed + phase' not in first_line:
