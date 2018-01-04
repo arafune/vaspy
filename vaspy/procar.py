@@ -228,10 +228,10 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
 
         BandWithProjection
         '''
-        recvecarray = np.array(recvec).T
+        recvecarray = np.array(recvec).T   # same as eigenval#to_band
         band = BandWithProjection()
         band.kvecs = [recvecarray.dot(kvector) for kvector in
-                      self.kvecs[0:self.numk]]
+                      self.kvecs[0:self.numk]]  # same as eigenval#to_band
         band.nbands = self.nbands
         band.natom = self.natom
         band.spininfo = self.spininfo
