@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-script to use (demonstrate) vaspy.procar (Ver.3) module.
+script to use (demonstrate) vaspy.procar module.
 """
 
 import re

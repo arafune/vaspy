@@ -8,7 +8,10 @@ from __future__ import division
 import os
 import bz2
 import numpy as np
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    print('Install matplotlib, or you cannot use methods relating to draw')
 
 
 class EIGENVAL(object):
@@ -23,32 +26,32 @@ class EIGENVAL(object):
 
     Attributes
     ----------
-    n_atom: int
+    natom: int
         Number of atoms
     numk: int
         Number of k vectors
-    n_bands: int
+    nbands: int
         Number of bands
     spininfo: int
         No_spin or non-collinear:1 collinear spin: 2
-    kvectors[ki]: list or numpy array
+    kvecs[ki]: list or numpy array
         List of kvalues, the length of kvectors must be equal to numk.
-    energies[bi+ki*n_bands]: list or numpy.array
+    energies[bi+ki*nbands]: list or numpy.array
         Energy values (two-value array for spin-polarized eigenvalu)
     '''
 
     def __init__(self, arg=None):
-        self.n_atoms = 0
+        self.natom = 0
         self.numk = 0
-        self.kvectors = list()
-        self.n_bands = 0
+        self.kvecs = list()
+        self.nbands = 0
         self.energies = list()
         self.spininfo = 0
         #
         if isinstance(arg, str):
-            self.load_from_file(arg)
+            self.load_file(arg)
 
-    def load_from_file(self, filename):
+    def load_file(self, filename):
         '''
         A virtual parser of EIGENVAL
 
@@ -66,32 +69,32 @@ class EIGENVAL(object):
         else:
             thefile = open(filename)
         with thefile:
-            self.n_atoms, _, _, self.spininfo = [int(i) for i in
-                                                 next(thefile).strip().split()]
+            self.natom, _, _, self.spininfo = [int(i) for i in
+                                                 next(thefile).split()]
             next(thefile)
             next(thefile)
             next(thefile)
             next(thefile)
-            _, self.numk, self.n_bands = [int(i) for i in
-                                          next(thefile).strip().split()]
-            for ki in range(self.numk):
+            _, self.numk, self.nbands = [int(i) for i in
+                                          next(thefile).split()]
+            for _ in range(self.numk):
                 # the first line in the sigleset begins with the blank
                 next(thefile)
-                self.kvectors.append(np.array(
-                    [float(i) for i in next(thefile).strip().split()[0:3]]))
-                for bi in range(self.n_bands):
+                self.kvecs.append(np.array(
+                    [float(i) for i in next(thefile).split()[0:3]]))
+                for _ in range(self.nbands):
                     if self.spininfo == 1:
                         self.energies.append(float(
-                            next(thefile).strip().split()[1]))
+                            next(thefile).split()[1]))
                     else:
                         self.energies.append(
                             np.array([float(i) for i in
-                                      next(thefile).strip().split()[1:3]]))
+                                      next(thefile).split()[1:3]]))
         self.energies = np.array(self.energies)
 
-    def to_band(self, recvec=[[1.0, 0.0, 0.0],
-                              [0.0, 1.0, 0.0],
-                              [0.0, 0.0, 1.0]]):
+    def to_band(self, recvec=((1.0, 0.0, 0.0),
+                              (0.0, 1.0, 0.0),
+                              (0.0, 0.0, 1.0))):
         '''
         Return EnergyBand object
 
@@ -112,7 +115,7 @@ class EIGENVAL(object):
 '''
         recvecarray = np.array(recvec).T
         kvector_physical = [recvecarray.dot(kvector) for kvector in
-                            self.kvectors[0:self.numk]]
+                            self.kvecs[0:self.numk]]
         return EnergyBand(kvector_physical, self.energies, self.spininfo)
 
     def __str__(self):
@@ -123,9 +126,9 @@ class EIGENVAL(object):
         Show the EIGENVAL character, not contents itself.
         '''
         template = '''The parameter of EIGENVALUE
-# of atoms: {0.n_atoms}
+# of atoms: {0.natom}
 # of kpoints: {0.numk}
-# of bands: {0.n_bands}
+# of bands: {0.nbands}
 '''
         return template.format(self)
 
@@ -135,9 +138,9 @@ class EnergyBand(object):
     Simple band structure object for analyzing by using ipython.
 
     Parameters
-    -----------
+    ----------
 
-    kvectors: numpy.ndarray
+    kvecs: numpy.ndarray
          1D array data of k-vectors.
     energies: numpy.ndarray
          1D array data of energies
@@ -148,15 +151,15 @@ class EnergyBand(object):
          and No-spin.
 '''
 
-    def __init__(self, kvectors, energies, spininfo=1):
-        self.kvectors = np.array(kvectors)
+    def __init__(self, kvecs, energies, spininfo=1):
+        self.kvecs = np.array(kvecs)
         self.kdistances = np.cumsum(
             np.linalg.norm(
                 np.concatenate(
                     (np.array([[0, 0, 0]]),
-                     np.diff(kvectors, axis=0))), axis=1))
-        self.numk = len(self.kvectors)
-        self.nbands = len(energies) // len(kvectors)
+                     np.diff(kvecs, axis=0))), axis=1))
+        self.numk = len(self.kvecs)
+        self.nbands = len(energies) // len(kvecs)
         self.spininfo = spininfo
         if self.spininfo == 1:  # standard
             self.spininfo = ('',)
@@ -180,7 +183,7 @@ class EnergyBand(object):
 
         fermi: float
              value of the Fermi level.
-'''
+        '''
         self.energies -= fermi
 
     def __str__(self):
@@ -194,17 +197,17 @@ class EnergyBand(object):
         energies = np.swapaxes(self.energies, 1, 0)
         if self.spininfo == 2 or len(self.spininfo) == 2:
             output = '#k\tEnergy_up\tEnergy_down\n'
-            for b_i in range(self.nbands):
-                for k, en in zip(self.kdistances, energies[b_i]):
-                    output += '{0:.9e}\t{1:.9e}\t{2:.9e}\n'.format(k,
-                                                                   en[0],
-                                                                   en[1])
+            for band_i in range(self.nbands):
+                for k_i, energy in zip(self.kdistances, energies[band_i]):
+                    output += '{0:.9e}\t{1:.9e}\t{2:.9e}\n'.format(k_i,
+                                                                   energy[0],
+                                                                   energy[1])
                 output += '\n'
         else:
             output = '#k\tEnergy\n'
-            for b_i in range(self.nbands):
-                for k, en in zip(self.kdistances, energies[b_i]):
-                    output += '{0:.9e}\t{1:.9e}\n'.format(k, en)
+            for band_i in range(self.nbands):
+                for k_i, enenergy in zip(self.kdistances, energies[band_i]):
+                    output += '{0:.9e}\t{1:.9e}\n'.format(k_i, enenergy)
                 output += '\n'
         return output
 
@@ -236,23 +239,25 @@ class EnergyBand(object):
            ax.set_ylim(-5, 5)
            ax.set_xlim(0, 4)
            plt.show()
-
-'''
+        '''
         energies = np.swapaxes(self.energies, 1, 0)
         draws = []
         if self.spininfo == 2 or len(self.spininfo) == 2:
             if spin == 'down':
-                for bi in range(0, self.nbands):
-                    draws.append(plt.plot(self.kdistances, energies[bi].T[1],
-                                          color=color))
+                for band_i in range(0, self.nbands):
+                    draws.append(
+                        plt.plot(self.kdistances, energies[band_i].T[1],
+                                 color=color))
             else:
-                for bi in range(0, self.nbands):
-                    draws.append(plt.plot(self.kdistances, energies[bi].T[0],
-                                          color=color))
+                for band_i in range(0, self.nbands):
+                    draws.append(
+                        plt.plot(self.kdistances, energies[band_i].T[0],
+                                 color=color))
         else:
-            for bi in range(0, self.nbands):
-                draws.append(plt.plot(self.kdistances, energies[bi],
-                                      color=color))
+            for band_i in range(0, self.nbands):
+                draws.append(
+                    plt.plot(self.kdistances, energies[band_i],
+                             color=color))
         return plt.gca()
 
     def show(self, yrange=None, spin=None):  # How to set default value?
@@ -269,20 +274,20 @@ class EnergyBand(object):
 
         spin: str  (default is no spin or 'up' spin)
              Spin direction for spin-polarized collinear band
-'''
+        '''
         energies = np.swapaxes(self.energies, 1, 0)
         if self.spininfo == 2 or len(self.spininfo) == 2:
             if spin == 'down':
-                for bi in range(0, self.nbands):
-                    plt.plot(self.kdistances, energies[bi].T[1],
+                for band_i in range(0, self.nbands):
+                    plt.plot(self.kdistances, energies[band_i].T[1],
                              color='blue')
             else:
-                for bi in range(0, self.nbands):
-                    plt.plot(self.kdistances, energies[bi].T[0],
+                for band_i in range(0, self.nbands):
+                    plt.plot(self.kdistances, energies[band_i].T[0],
                              color='blue')
         else:
-            for bi in range(0, self.nbands):
-                plt.plot(self.kdistances, energies[bi],
+            for band_i in range(0, self.nbands):
+                plt.plot(self.kdistances, energies[band_i],
                          color='blue')
         if yrange is not None:
             plt.ylim([yrange[0], yrange[1]])

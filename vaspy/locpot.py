@@ -9,7 +9,10 @@ from __future__ import print_function
 import os
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    print('Install matplotlib, or you cannot use methods relating to draw')
 try:
     from vaspy import mesh3d
 except ImportError:
@@ -29,9 +32,9 @@ class LOCPOT(mesh3d.VASPGrid):
     def __init__(self, arg=None):
         super(LOCPOT, self).__init__(None)
         if arg:
-            self.load_from_file(arg)
+            self.load_file(arg)
 
-    def plot_potential_along_axis(self, axis_name, type=0):  # FIXME!!
+    def plot_potential_along_axis(self, axis_name, frame=0):  # FIXME!!
         '''
         Plot potential curve along the axis
 
@@ -40,8 +43,8 @@ class LOCPOT(mesh3d.VASPGrid):
 
         axis_name: str
             the name of the axis (X, Y, or Z)
-        type: int, optional  (default is 0)
-            'select potential type' (very optional)
+        frame: int, optional  (default is 0)
+            'select frame potential' (very optional)
         '''
         axis_name = axis_name.capitalize()
         axes_length = self.poscar.get_axes_lengthes()
@@ -60,10 +63,10 @@ class LOCPOT(mesh3d.VASPGrid):
                 0, axes_length[2], self.grid.shape[2])
             plt.clf()
             plt.xlim(xmax=axes_length[2])
-        y_average = self.grid.average_along_axis(axis_name, type)
-        y_max = self.grid.max_along_axis(axis_name, type)
-        y_min = self.grid.min_along_axis(axis_name, type)
-        y_median = self.grid.median_along_axis(axis_name, type)
+        y_average = self.grid.average_along_axis(axis_name, frame)
+        y_max = self.grid.max_along_axis(axis_name, frame)
+        y_min = self.grid.min_along_axis(axis_name, frame)
+        y_median = self.grid.median_along_axis(axis_name, frame)
         plt.plot(horizontal_axis, y_average, label='average')
         plt.plot(horizontal_axis, y_max, label='max')
         plt.plot(horizontal_axis, y_min, label='min')

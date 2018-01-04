@@ -89,11 +89,11 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
         self.orb_names = tuple()
         #
         if isinstance(arg, str):
-            self.load_from_file(arg, phase_read)
+            self.load_file(arg, phase_read)
         else:
             raise RuntimeError("the arg of PROCAR() should be the filename")
 
-    def load_from_file(self, filename, phase_read=False):
+    def load_file(self, filename, phase_read=False):
         '''
         A virtual parser of PROCAR
 
@@ -123,16 +123,16 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
                 if line.isspace():
                     continue
                 elif "k-points: " in line:
-                    self.numk, self.n_bands, self.n_atoms = [
+                    self.numk, self.nbands, self.natom = [
                         int(i) for i in re.split(r'\s|:', line)
                         if i.isdigit()]
                 elif "k-point " in line:
                     try:
-                        self.kvectors.append(np.array(
+                        self.kvecs.append(np.array(
                             [float(i) for i in line.split()[3:6]]))
                         section = []
                     except ValueError:
-                        self.kvectors.append(np.array(
+                        self.kvecs.append(np.array(
                             [np.float_(line[18:29]),
                              np.float_(line[29:40]),
                              np.float_(line[40:51])]))
@@ -159,14 +159,14 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
                                            for i in line.split()[1:]])
 #
         self.spininfo = (len(self.orbital) //
-                         (self.numk * self.n_bands * self.n_atoms))
-        if len(self.orbital) % (self.numk * self.n_bands * self.n_atoms) != 0:
+                         (self.numk * self.nbands * self.natom))
+        if len(self.orbital) % (self.numk * self.nbands * self.natom) != 0:
             raise RuntimeError("PROCAR file may be broken")
         if self.spininfo == 1:  # standard
             self.spininfo = ('',)
         elif self.spininfo == 2:   # collinear
             self.spininfo = ('_up', '_down')
-            tmp = list(zip(*[iter(self.energies)]*self.numk*self.n_bands))
+            tmp = list(zip(*[iter(self.energies)]*self.numk*self.nbands))
             self.energies = []
             for up, down in zip(tmp[0], tmp[1]):
                 self.energies.append([up, down])
@@ -181,32 +181,32 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
         '''
         template = '''The properties of this procar:
   # of k-points: {0.numk}
-  # of bands: {0.n_bands}
-  # of ions: {0.n_atoms}
-  # of kvectors: {1}
+  # of bands: {0.nbands}
+  # of ions: {0.natom}
+  # of kvecs: {1}
   # of energies: {2}
-    ((# of k-points) * (# of bands) = {0.numk}*{0.n_bands}={3})
+    ((# of k-points) * (# of bands) = {0.numk}*{0.nbands}={3})
   # of orbital component: {4}
     ((# of k-points) * (# of bands) * (# of ions) =
-        {0.numk}*{0.n_bands}*{0.n_atoms}={5})
+        {0.numk}*{0.nbands}*{0.natom}={5})
   # of phase component: {6}
   Orbitals are: {0.orb_names}
   spininfo: {0.spininfo}
 '''
         return template.format(self,
-                               len(self.kvectors),
+                               len(self.kvecs),
                                len(self.energies),
-                               self.numk * self.n_bands,
+                               self.numk * self.nbands,
                                len(self.orbital),
-                               self.numk * self.n_bands * self.n_atoms,
+                               self.numk * self.nbands * self.natom,
                                len(self.phase))
 
     def __iter__(self):
         return iter(self.orbital)
 
-    def band(self, recvec=[[1.0, 0.0, 0.0],
-                           [0.0, 1.0, 0.0],
-                           [0.0, 0.0, 1.0]]):
+    def band(self, recvec=((1.0, 0.0, 0.0),
+                           (0.0, 1.0, 0.0),
+                           (0.0, 0.0, 1.0))):
         '''
         Return Band_with_projection object
 
@@ -227,10 +227,10 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
         '''
         recvecarray = np.array(recvec).T
         band = BandWithProjection()
-        band.kvectors = [recvecarray.dot(kvector) for kvector in
-                         self.kvectors[0:self.numk]]
-        band.n_bands = self.n_bands
-        band.n_atoms = self.n_atoms
+        band.kvecs = [recvecarray.dot(kvector) for kvector in
+                      self.kvecs[0:self.numk]]
+        band.nbands = self.nbands
+        band.natom = self.natom
         band.spininfo = self.spininfo
         band.orb_names = list(self.orb_names)
         # BandStructure.isready() must be True
@@ -348,7 +348,7 @@ class BandWithProjection(object):
     class is not so well sophisticated, the use is not easy.  Anyway,
     it works, however.
 
-    :class variables: kvectors, energies, states, spin, orb_names
+    :class variables: kvecs, energies, states, spin, orb_names
 
     Note
     -------
@@ -358,15 +358,15 @@ class BandWithProjection(object):
     '''
 
     def __init__(self):
-        self.__n_bands = 0
-        self.__kvectors = list()
+        self.__nbands = 0
+        self.__kvecs = list()
         self.kdistance = list()
         self.sitecomposed = []
         self.__orbitals = 0
         self.__phases = 0
         self.__energies = 0
         self.numk = 0
-        self.n_atoms = 0
+        self.natom = 0
         self.spininfo = tuple()
         self.orb_names = ['s', 'py', 'pz', 'px',
                           'dxy', 'dyz', 'dz2', 'dxz', 'dx2',
@@ -374,7 +374,7 @@ class BandWithProjection(object):
 
     def isready(self):
         '''
-        Return True if numk, n_bands, n_atoms, spininfo, and
+        Return True if numk, nbands, natom, spininfo, and
         orb_names are set, otherwise raise ValueError.
 
         Use for check before when orbitals, phases, energies
@@ -383,10 +383,10 @@ class BandWithProjection(object):
             raise ValueError("numk is not defined")
         if self.numk == 0:
             raise ValueError("numk is not defined")
-        if self.n_bands == 0:
-            raise ValueError("n_bands is not correctly set")
-        if not hasattr(self, "n_atoms"):
-            raise ValueError("n_atoms is not defined")
+        if self.nbands == 0:
+            raise ValueError("nbands is not correctly set")
+        if not hasattr(self, "natom"):
+            raise ValueError("natom is not defined")
         if not hasattr(self, "spininfo"):
             raise ValueError("spininfo is not defined")
         elif not isinstance(self.spininfo, tuple):
@@ -398,14 +398,14 @@ class BandWithProjection(object):
         return True
 
     @property
-    def n_bands(self):
+    def nbands(self):
         '''Number of bands'''
-        return self.__n_bands
+        return self.__nbands
 
-    @n_bands.setter
-    def n_bands(self, arg):
-        self.__n_bands = arg
-        self.available_band = list(range(self.n_bands))
+    @nbands.setter
+    def nbands(self, arg):
+        self.__nbands = arg
+        self.available_band = list(range(self.nbands))
 
     @property
     def orbitals(self):
@@ -430,14 +430,14 @@ class BandWithProjection(object):
             if len(self.spininfo) == 1 or len(self.spininfo) == 4:
                 self.__orbitals = \
                     np.array(arg).reshape(self.numk,
-                                          self.n_bands,
-                                          self.n_atoms * len(self.spininfo),
+                                          self.nbands,
+                                          self.natom * len(self.spininfo),
                                           len(self.orb_names))
             elif len(self.spininfo) == 2:
                 self.__orbitals = \
                     np.array(arg).reshape(2, self.numk,
-                                          self.n_bands,
-                                          self.n_atoms,
+                                          self.nbands,
+                                          self.natom,
                                           len(self.orb_names))
                 self.__orbitals = [self.__orbitals[0], self.__orbitals[1]]
 
@@ -473,35 +473,35 @@ class BandWithProjection(object):
             phases = phase_re + phase_im * (0.0 + 1.0J)
         if self.isready():
             if len(self.spininfo) == 1 or len(self.spininfo) == 4:
-                self.__phases = phases.reshape(self.numk, self.n_bands,
-                                               self.n_atoms,
+                self.__phases = phases.reshape(self.numk, self.nbands,
+                                               self.natom,
                                                len(self.orb_names) - 1)
             elif len(self.spininfo) == 2:
-                self.__phases = phases.reshape(2, self.numk, self.n_bands,
-                                               self.n_atoms,
+                self.__phases = phases.reshape(2, self.numk, self.nbands,
+                                               self.natom,
                                                len(self.orb_names) - 1)
                 self.__phases = (self.__phases[0], self.__phases[1])
 
     @property
-    def kvectors(self):
-        '''setter for kvector'''
-        return self.__kvectors
+    def kvecs(self):
+        '''setter for kvecs'''
+        return self.__kvecs
 
-    @kvectors.setter
-    def kvectors(self, kvectors):
-        if not isinstance(kvectors, list):
-            errmsg = 'kvectors must be an array of ndarray\n'
+    @kvecs.setter
+    def kvecs(self, kvecs):
+        if not isinstance(kvecs, list):
+            errmsg = 'kvecs must be an array of ndarray\n'
             raise TypeError(errmsg)
-        self.__kvectors = kvectors
-        self.numk = len(self.kvectors)
+        self.__kvecs = kvecs
+        self.numk = len(self.kvecs)
         self.kdistance = list()
-        for i, k in enumerate(self.kvectors):
+        for i, k in enumerate(self.kvecs):
             if i == 0:
                 self.kdistance.append(0.0)
             else:
                 self.kdistance.append(
                     self.kdistance[i - 1] +
-                    np.linalg.norm(self.kvectors[i - 1] - k))
+                    np.linalg.norm(self.kvecs[i - 1] - k))
 
     @property    # checked
     def energies(self):
@@ -515,9 +515,9 @@ class BandWithProjection(object):
         if self.isready():
             if len(self.spininfo) == 1 or len(self.spininfo) == 4:
                 self.__energies = np.array(arg).reshape(
-                    self.numk, self.n_bands)
+                    self.numk, self.nbands)
             elif len(self.spininfo) == 2:
-                energies = np.array(arg).T.reshape(2, self.numk, self.n_bands)
+                energies = np.array(arg).T.reshape(2, self.numk, self.nbands)
                 print(energies)
                 self.__energies = energies
 
@@ -587,13 +587,13 @@ class BandWithProjection(object):
             else:
                 self.sitecomposed = [cmporbs_up, cmporbs_down]
         if len(self.spininfo) == 4:
-            site_numbers_mtotal = tuple(x + self.n_atoms *
+            site_numbers_mtotal = tuple(x + self.natom *
                                         0 for x in site_numbers)
-            site_numbers_mx = tuple(x + self.n_atoms *
+            site_numbers_mx = tuple(x + self.natom *
                                     1 for x in site_numbers)
-            site_numbers_my = tuple(x + self.n_atoms *
+            site_numbers_my = tuple(x + self.natom *
                                     2 for x in site_numbers)
-            site_numbers_mz = tuple(x + self.n_atoms *
+            site_numbers_mz = tuple(x + self.natom *
                                     3 for x in site_numbers)
             #
             cmporbs_mtotal = np.array([[[np.sum(
@@ -729,7 +729,7 @@ class BandWithProjection(object):
                         axis=3)
                 self.orb_names.append(orb)
 
-    def del_band(self, band_indexes):  # not checked
+    def del_band(self, band_i):  # not checked
         '''not yet impremented'''
         if not self.sitecomposed:
             err = "This method operates with on sitecomposed attribute,"
@@ -755,7 +755,7 @@ class BandWithProjection(object):
         '''
         if len(sitenames) != len(orbnames):
             raise ValueError("Length of sitenames and orbnames is not same.")
-        numk, numband, numsite, norbs = self.sitecomposed[0].shape
+        numk, nband, numsite, norbs = self.sitecomposed[0].shape
         if numsite != len(sitenames):
             err = "Number of sitename is different with"
             err += "the size of sitecomposed."
@@ -812,17 +812,17 @@ class BandWithProjection(object):
         numk, numband, numsite, norbs = self.sitecomposed[0].shape
         table = list()
         if len(self.spininfo) == 1 or len(self.spininfo) == 4:
-            for b in range(numband):
-                for k in range(numk):
+            for band_i in range(numband):
+                for k_i in range(numk):
                     sitelist = list()
-                    sitelist.append(self.kdistance[k])
-                    sitelist.append(self.energies[k, b])
+                    sitelist.append(self.kdistance[k_i])
+                    sitelist.append(self.energies[k_i, band_i])
                     for sitecomposed in self.sitecomposed:
                         for site, norbs in zip(list(range(numsite)),
                                                orbnums):
-                            for o in norbs:
+                            for orbital in norbs:
                                 sitelist.append(
-                                    sitecomposed[k, b, site, o])
+                                    sitecomposed[k_i, band_i, site, orbital])
 
                     table.append(sitelist)
                 table.append([])

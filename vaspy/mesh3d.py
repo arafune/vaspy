@@ -60,11 +60,11 @@ class VASPGrid(object):
         self.grid = Grid3D()
         self.additional = []
         if filename:
-            self.load_from_file(filename)
+            self.load_file(filename)
 
-    def load_from_file(self, filename):
+    def load_file(self, filename):
         '''
-        filename file to construct the object
+        Construct the object from the file
 
         Parameters
         ---------------
@@ -88,7 +88,7 @@ class VASPGrid(object):
                 line = line.rstrip('\n')
                 if section == 'poscar':
                     if re.search(_RE_BLANK, line):
-                        self.poscar.load_from_array(tmp)
+                        self.poscar.load_array(tmp)
                         section = 'define_separator'
                     else:
                         tmp.append(line)
@@ -99,8 +99,8 @@ class VASPGrid(object):
                                                  in line.split()])
                     griddata.extend(
                         [float(i) for i in
-                         next(thefile).rstrip().replace(
-                             '***********', 'Nan').split()])
+                         next(thefile).replace('***********',
+                                               'Nan').split()])
                     if self.grid.size % len(griddata) == 0:
                         lines_for_mesh = self.grid.size // len(griddata)
                     else:
@@ -108,15 +108,15 @@ class VASPGrid(object):
                     for _ in range(lines_for_mesh - 1):
                         griddata.extend(
                             [float(val) for val in
-                             next(thefile).rstrip().replace('***********',
-                                                            'Nan').split()])
+                             next(thefile).replace('***********',
+                                                   'Nan').split()])
                     section = 'grid'
                 elif section == 'aug':
                     if separator in line:
                         for _ in range(lines_for_mesh):
                             griddata.extend(
                                 [float(val) for val in
-                                 next(thefile).rstrip().replace(
+                                 next(thefile).replace(
                                      '***********',
                                      'Nan').split()])
                         section = 'grid'
@@ -131,7 +131,7 @@ class VASPGrid(object):
                         for _ in range(lines_for_mesh):
                             griddata.extend(
                                 [float(val) for val in
-                                 next(thefile).rstrip().replace(
+                                 next(thefile).replace(
                                      '***********',
                                      'Nan').split()])
                     else:
@@ -180,10 +180,10 @@ class VASPGrid(object):
         frame_i: int
             frame index
         '''
-        output_VASPGrid = VASPGrid()
-        output_VASPGrid.poscar = self.poscar
-        output_VASPGrid.grid = self.grid.frame(frame_i)
-        return output_VASPGrid
+        output_vaspgrid = VASPGrid()
+        output_vaspgrid.poscar = self.poscar
+        output_vaspgrid.grid = self.grid.frame(frame_i)
+        return output_vaspgrid
 
     def merge(self, other):
         '''
@@ -274,9 +274,13 @@ class Grid3D(object):
     This class is used chg_array in CHGCAR, Potential in LOCPOT,
     electron localization function (ELF) in ELFCAR
 
-    Parameters
+    Attributes
     ----------
 
+    size: tuple
+        number of mesh in the single frame
+    nframe: int
+        number of frames
     shape: tuple
         shape[0], shape[1], shape[2]
     data: list or numpy.array
@@ -296,7 +300,7 @@ class Grid3D(object):
         return self.shape[0] * self.shape[1] * self.shape[2]
 
     @property
-    def num_frame(self):
+    def nframe(self):
         '''Return the number of grid frames'''
         return divmod(self.data.size, self.size)[0]
 
@@ -309,9 +313,9 @@ class Grid3D(object):
         frame_i:int
            frame index
         '''
-        assert frame_i < self.num_frame
+        assert frame_i < self.nframe
         dest = copy.deepcopy(self)
-        dest.data = self.data.reshape(self.num_frame, self.size)[frame_i]
+        dest.data = self.data.reshape(self.nframe, self.size)[frame_i]
         return dest
 
     def slice(self, axis, postition):
@@ -369,7 +373,7 @@ class Grid3D(object):
             a string representation of VASPGrid object
         '''
         outputstr = ''
-        mesharray = self.data.reshape(self.num_frame,
+        mesharray = self.data.reshape(self.nframe,
                                       self.size)
         for tmp in mesharray:
             output = []
@@ -400,7 +404,7 @@ class Grid3D(object):
             average value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data.reshape(self.num_frame,
+        data = self.data.reshape(self.nframe,
                                  self.shape[2],
                                  self.shape[1],
                                  self.shape[0])[mode]
@@ -434,7 +438,7 @@ class Grid3D(object):
             minimum value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data.reshape(self.num_frame,
+        data = self.data.reshape(self.nframe,
                                  self.shape[2],
                                  self.shape[1],
                                  self.shape[0])[mode]
@@ -468,7 +472,7 @@ class Grid3D(object):
             maximum value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data.reshape(self.num_frame,
+        data = self.data.reshape(self.nframe,
                                  self.shape[2],
                                  self.shape[1],
                                  self.shape[0])[mode]
@@ -502,7 +506,7 @@ class Grid3D(object):
             median value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data.reshape(self.num_frame,
+        data = self.data.reshape(self.nframe,
                                  self.shape[2],
                                  self.shape[1],
                                  self.shape[0])[mode]

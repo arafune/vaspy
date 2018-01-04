@@ -18,20 +18,37 @@ class OUTCAR(object):  # Version safety
     Attributes
     -------------
 
-    nions: int
-        number of ions
+    natom: int
+        number of atom
     iontypes: list
         list of ion name
     ionnums: list
         list of number of ions
     kvecs: list
-        kvector list
+        kvector
     weights: list
         weight list
+    fermi: float
+        fermi energy
+    numk: int
+        number of k points
+    nbands: int
+        number of bands
+    posforce : list
+        evolution of position and force
+    magnetization: list
+        evolution of magnetization
+    total_charge: list
+        evolution of total charge
+
+
+    Todo
+    ------
+      posforce should be devided to positions and forces
     '''
 
     def __init__(self, arg=None):
-        self.nions = 0
+        self.natom = 0
         self.iontypes = []
         self.ionnums = []
         self.posforce = []
@@ -42,12 +59,12 @@ class OUTCAR(object):  # Version safety
         self.numk = 0
         self.nkdim = 0
         self.nbands = 0
-        self.magnetization = []
-        self.tot_chage = []
+        self.magnetizations = []
+        self.total_charges = []
         self.kvecs = []
         self.weights = []
         if arg is not None:
-            self.load_from_file(arg)
+            self.load_file(arg)
 
     def set_atom_names(self):
         '''
@@ -81,7 +98,7 @@ class OUTCAR(object):  # Version safety
                                 i + "_fz", ]
                                for i in self.atom_names]
 
-    def load_from_file(self, arg):
+    def load_file(self, arg):
         '''
         Effectively, this is a constructor of OUTCAR object.
 
@@ -94,7 +111,8 @@ class OUTCAR(object):  # Version safety
         # local variables
         section = []
         posforce = []
-        magnetization = []
+        magnetizations = []
+        total_charges = []
         kvec_weight = []
         # parse
         if os.path.splitext(arg)[1] == '.bz2':
@@ -110,8 +128,6 @@ class OUTCAR(object):  # Version safety
                     section.pop()
                 elif "---------------" in line:
                     pass
-                elif "total drift:" in line:
-                    section.pop()
                 else:
                     posforce.append([float(x) for x in line.split()])
             elif section == ["magnetization"]:
@@ -120,12 +136,25 @@ class OUTCAR(object):  # Version safety
                 elif "# of ion" in line:
                     pass
                 elif "tot    " in line:
-                    self.magnetization.append(magnetization)
+                    self.magnetizations.append(magnetizations)
                     section.pop()
                 elif len(line) == 2:
                     pass
                 else:
-                    magnetization.append([
+                    magnetizations.append([
+                        float(x) for x in line.split()[1:4]])
+            elif section == ['total_charge']:
+                if "---------------------------------" in line:
+                    pass
+                elif "# of ion" in line:
+                    pass
+                elif "tot    " in line:
+                    self.total_charges.append(total_charges)
+                    section.pop()
+                elif len(line) == 2:
+                    pass
+                else:
+                    total_charges.append([
                         float(x) for x in line.split()[1:4]])
             elif section == ['kvec_weight']:
                 if len(line) > 3:
@@ -135,7 +164,7 @@ class OUTCAR(object):  # Version safety
                     section.pop()
             else:
                 if "number of dos" in line:
-                    self.nions = int(line.split()[-1])
+                    self.natom = int(line.split()[-1])
                 elif "TITEL  =" in line:
                     self.iontypes.append(line.split()[3])
                 elif "ions per type " in line:
@@ -145,16 +174,19 @@ class OUTCAR(object):  # Version safety
                 elif "E-fermi" in line:
                     self.fermi = float(line.split()[2])
                 elif "NBANDS" in line:
-                    self.numk = int(line.strip().split()[3])
-                    self.nkdim = int(line.strip().split()[9])
-                    self.nbands = int(line.strip().split()[14])
+                    self.numk = int(line.split()[3])
+                    self.nkdim = int(line.split()[9])
+                    self.nbands = int(line.split()[14])
                 elif "reciprocal lattice vectors" in line:
                     self.recvec = [[float(i) for i in
-                                    next(thefile).strip().split()[3:]]
+                                    next(thefile).split()[3:]]
                                    for i in range(3)]
                 elif " magnetization (x)" in line:
-                    magnetization = []
+                    magnetizations = []
                     section.append("magnetization")
+                elif " total charge     " in line:
+                    total_charges = []
+                    section.append("total_charge")
                 elif " Following reciprocal coordinates:" in line:
                     next(thefile)
                     kvec_weight = []
@@ -168,8 +200,8 @@ class OUTCAR(object):  # Version safety
                                     for (elm, n) in zip(self.iontypes,
                                                         self.ionnums)
                                     for j in range(1, int(n) + 1)])]
-        self.posforce = [posforce[i:i + self.nions]
-                         for i in range(0, len(posforce), self.nions)]
+        self.posforce = [posforce[i:i + self.natom]
+                         for i in range(0, len(posforce), self.natom)]
         self.set_atom_names()
         self.set_posforce_title()
         for i in kvec_weight:
@@ -177,10 +209,10 @@ class OUTCAR(object):  # Version safety
             self.weights.append(i[3])
 
     def select_posforce_header(self, posforce_flag, *sites):
-        '''
+        '''Return the position and force header selected
         '''
         if sites == () or sites[0] == []:
-            sites = range(1, self.nions + 1)
+            sites = range(1, self.natom + 1)
         if isinstance(sites[0], (list, tuple)):
             sites = [n for n in sites[0]]
         return [posforce for (index, site)
@@ -193,15 +225,15 @@ class OUTCAR(object):  # Version safety
 
     def select_posforce(self, posforce_flag, *sites):
         '''
-        Return the posforce corresponding the posforce_flag
+        Return the position and force selected by posforce_flag
 
         Note
         -------
-        posforce_flag: An 6-element True/False list that indicates \
+        posforce_flag: An 6-element True/False list that indicates
                   the output (ex.) [True, True, False, True, True, False]
         '''
         if sites == () or sites[0] == []:
-            sites = range(1, self.nions + 1)
+            sites = range(1, self.natom + 1)
         if isinstance(sites[0], (list, tuple)):
             sites = [n for n in sites[0]]
         return [[posforce for (index, site) in enumerate(one_cycle)

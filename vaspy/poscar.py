@@ -105,7 +105,7 @@ class POSCAR_HEAD(object):
             raise TypeError
 
     @realcell.setter
-    def real(self, vec):
+    def realcell(self, vec):
         '''Alias of cell_vecs to keep consistency with wavecar.py
 
         Parameters
@@ -221,13 +221,12 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             else:
                 thefile = open(arg)
             poscar = thefile.readlines()
-            self.load_from_array(poscar)
+            self.load_array(poscar)
         if isinstance(arg, (list, tuple)):
-            self.load_from_array(arg)
+            self.load_array(arg)
 
-    def load_from_array(self, poscar):
-        '''.. :py:method:: load_from_array(poscar)
-
+    def load_array(self, poscar):
+        '''
         POSCAR parser
 
         Parameters
@@ -258,7 +257,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.selective = False
             self.coordinate_type = line7
 
-        for line, elem in zip(poscar, self.atom_identifer):
+        for line, _ in zip(poscar, self.atom_identifer):
             # if not elem: break
             tmp = line.split()
             self.positions.append(np.float_(np.array(tmp[:3])))
@@ -746,24 +745,22 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         for index, site in enumerate(site_list):
             target_atom = self.positions[site]
             atoms27 = self.make27candidate(target_atom)
-
             def func(pos, center):
                 molecule[index] = pos
                 if center is not None:  # bool([np.ndarray]) => Error
                     center = _vectorize(center)
                     return np.linalg.norm(pos - center)
-                else:
-                    # fixme!! when the highest symmetry point
-                    # can be detemined from the position list,
-                    # guess_molecule method does not require
-                    # the "center" option.
-                    # (molecule.
-                    #     product(molecule)).inject(0.0) do | s, vectors |
-                    # s+ (vectors[0]-vectors[1]).magnitude
-                    s = 0.0
-                    for vectors in it.product(molecule, molecule):
-                        s += np.linalg.norm(vectors[0] - vectors[1])
-                    return s
+                # fixme!! when the highest symmetry point
+                # can be detemined from the position list,
+                # guess_molecule method does not require
+                # the "center" option.
+                # (molecule.
+                #     product(molecule)).inject(0.0) do | s, vectors |
+                # s+ (vectors[0]-vectors[1]).magnitude
+                s = 0.0
+                for vectors in it.product(molecule, molecule):
+                    s += np.linalg.norm(vectors[0] - vectors[1])
+                return s
             newpos = min(atoms27, key=(lambda x: func(x, center)))
             newposes.append(newpos)
         for site, pos in zip(site_list, newposes):
@@ -968,10 +965,7 @@ def three_by_three(vec):
         return False
     if len(vec) != 3:
         return False
-    if [3, 3, 3] == [len(i) for i in vec]:
-        return True
-    else:
-        return False
+    return [3, 3, 3] == [len(i) for i in vec]
 
 
 def _vectorize(vector):

@@ -76,6 +76,14 @@ vaspy.mesh3d module
     :undoc-members:
     :show-inheritance:
 
+vaspy.bader module
+-------------------
+
+.. automodule:: vaspy.bader
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 vaspy.tools module
 ------------------
 
