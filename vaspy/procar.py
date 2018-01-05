@@ -80,84 +80,86 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
         * spinresolved: ('_up', '_down')
         * soi: ('_mT', '_mX', '_mY', '_mZ')
 
+    Parameters
+    ----------
+
+    filename: str
+         Filename of *PROCAR* file
+    phase_read: boolean
+         True if read phase data (default is false)
     '''
 
-    def __init__(self, arg=None, phase_read=False):
+    def __init__(self, filename=None, phase_read=False):
         super(PROCAR, self).__init__(None)
         self.orbital = list()
         self.phase = list()
         self.orb_names = tuple()
         #
-        if isinstance(arg, str):
-            self.load_file(arg, phase_read)
-        else:
-            raise RuntimeError("the arg of PROCAR() should be the filename")
+        if filename:
+            if os.path.splitext(filename)[1] == ".bz2":
+                try:
+                    thefile = bz2.open(filename, mode='rt')
+                except AttributeError:
+                    thefile = bz2.BZ2File(filename, mode='r')
+            else:
+                thefile = open(filename)
+            self.load_file(thefile, phase_read)
 
-    def load_file(self, filename, phase_read=False):
+    def load_file(self, thefile, phase_read=False):
         '''
         A virtual parser of PROCAR
 
         Parameters
         ----------
 
-        filename: str
-             Filename of *PROCAR* file
+        thefile: StringIO
+            'PROCAR' file
+
         phase_read: boolean
-             Switch for loading phase characters
+            Switch for loading phase characters
         '''
-        if os.path.splitext(filename)[1] == ".bz2":
-            try:
-                procar_file = bz2.open(filename, mode='rt')
-            except AttributeError:
-                procar_file = bz2.BZ2File(filename, mode='r')
-        else:
-            procar_file = open(filename)
-        first_line = next(procar_file)
+        first_line = next(thefile)
         if 'PROCAR lm decomposed + phase' not in first_line:
-            procar_file.close()
+            thefile.close()
             raise RuntimeError("This PROCAR is not a proper format\n \
                                 Check your INCAR the calculations.\n")
         section = list()
-        with procar_file:
-            for line in procar_file:
-                if line.isspace():
-                    continue
-                elif "k-points: " in line:
-                    self.numk, self.nbands, self.natom = [
-                        int(i) for i in re.split(r'\s|:', line)
-                        if i.isdigit()]
-                elif "k-point " in line:
-                    try:
-                        self.kvecs.append(np.array(
-                            [float(i) for i in line.split()[3:6]]))
-                        section = []
-                    except ValueError:
-                        self.kvecs.append(np.array(
-                            [np.float_(line[18:29]),
-                             np.float_(line[29:40]),
-                             np.float_(line[40:51])]))
-                        section = []
-                elif "band " in line:
-                    self.energies.append(float(line.split()[4]))
+        for line in thefile:
+            if line.isspace():
+                section = []
+            elif "k-points: " in line:
+                self.numk, self.nbands, self.natom = [
+                    int(i) for i in re.split(r'\s|:', line)
+                    if i.isdigit()]
+            elif "k-point " in line:
+                try:
+                    self.kvecs.append(np.array(
+                        [float(i) for i in line.split()[3:6]]))
                     section = []
-                elif "ion" in line:
-                    if "tot" in line:
-                        section = ['orbital']
-                        self.orb_names = tuple(line.split()[1:])
-                    else:
-                        section = ['phase']
+                except ValueError:
+                    self.kvecs.append(np.array(
+                        [np.float_(line[18:29]),
+                         np.float_(line[29:40]),
+                         np.float_(line[40:51])]))
+                    section = []
+            elif "band " in line:
+                self.energies.append(float(line.split()[4]))
+                section = []
+            elif "ion" in line:
+                if "tot" in line:
+                    section = ['orbital']
+                    self.orb_names = tuple(line.split()[1:])
                 else:
-                    if section == ['orbital']:
-                        if "tot " in line[0:4]:
-                            continue
-                        self.orbital.append([float(i)
-                                             for i in line.split()[1:]])
-                    elif section == ['phase']:
-                        if not phase_read:
-                            continue
-                        self.phase.append([float(i)
-                                           for i in line.split()[1:]])
-#
+                    section = ['phase']
+            else:
+                if section == ['orbital']:
+                    if "tot " in line[0:4]:
+                        continue
+                    self.orbital.append([float(i) for i in line.split()[1:]])
+                elif section == ['phase']:
+                    if phase_read:
+                        self.phase.append([float(i) for i in line.split()[1:]])
+        #
         self.spininfo = (len(self.orbital) //
                          (self.numk * self.nbands * self.natom))
         if len(self.orbital) % (self.numk * self.nbands * self.natom) != 0:
@@ -172,6 +174,7 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
                 self.energies.append([up, down])
         elif self.spininfo == 4:  # non-collinear
             self.spininfo = ('_mT', '_mX', '_mY', '_mZ')
+        thefile.close()
 
     def __str__(self):
         '''
@@ -296,7 +299,7 @@ class Projection(object):
         ((1, "pz"), (43, "pz"))
         # to produce pz orbital projection
         for 'surface' atom (Here, the 43 atoms is included in the unit cell \
-        and 1st and 43the atoms are assumed to be identical.)
+        and 1st and 43th atoms are assumed to be identical.)
         '''
         result = 0
         orb_names = ['s', 'py', 'pz', 'px',

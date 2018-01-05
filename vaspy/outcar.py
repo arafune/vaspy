@@ -47,7 +47,7 @@ class OUTCAR(object):  # Version safety
       posforce should be devided to positions and forces
     '''
 
-    def __init__(self, arg=None):
+    def __init__(self, filename=None):
         self.natom = 0
         self.iontypes = []
         self.ionnums = []
@@ -63,8 +63,15 @@ class OUTCAR(object):  # Version safety
         self.total_charges = []
         self.kvecs = []
         self.weights = []
-        if arg is not None:
-            self.load_file(arg)
+        if filename:
+            if os.path.splitext(filename)[1] == '.bz2':
+                try:
+                    thefile = bz2.open(filename, mode='rt')
+                except AttributeError:
+                    thefile = bz2.BZ2File(filename, mode='r')
+            else:
+                thefile = open(filename)
+            self.load_file(thefile)
 
     def set_atom_names(self):
         '''
@@ -98,15 +105,15 @@ class OUTCAR(object):  # Version safety
                                 i + "_fz", ]
                                for i in self.atom_names]
 
-    def load_file(self, arg):
+    def load_file(self, thefile):
         '''
         Effectively, this is a constructor of OUTCAR object.
 
         Parameters
         ----------
 
-        arg: str
-            File name of "OUTCAR"
+        thefile: StringIO
+            "OUTCAR" file
         '''
         # local variables
         section = []
@@ -115,13 +122,6 @@ class OUTCAR(object):  # Version safety
         total_charges = []
         kvec_weight = []
         # parse
-        if os.path.splitext(arg)[1] == '.bz2':
-            try:
-                thefile = bz2.open(arg, mode='rt')
-            except AttributeError:
-                thefile = bz2.BZ2File(arg, mode='r')
-        else:
-            thefile = open(arg)
         for line in thefile:
             if section == ["force"]:
                 if "total drift" in line:
@@ -207,6 +207,7 @@ class OUTCAR(object):  # Version safety
         for i in kvec_weight:
             self.kvecs.append([i[0], i[1], i[2]])
             self.weights.append(i[3])
+        thefile.close()
 
     def select_posforce_header(self, posforce_flag, *sites):
         '''Return the position and force header selected

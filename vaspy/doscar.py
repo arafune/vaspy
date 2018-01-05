@@ -80,60 +80,59 @@ class DOSCAR(object):  # Version safety
         latter items are PDOS.
     '''
 
-    def __init__(self, arg=None):
+    def __init__(self, filename=None):
         self.natom = 0
         self.nbands = 0
         self.dos_container = list()
 
-        if arg is not None:
-            self.load_file(arg)
+        if filename:
+            if os.path.splitext(filename)[1] == '.bz2':
+                try:
+                    thefile = bz2.open(filename, mode='rt')
+                except AttributeError:
+                    thefile = bz2.BZ2File(filename, mode='r')
+            else:
+                thefile = open(filename)
+            self.load_file(thefile)
 
-    def load_file(self, doscarfile):
+    def load_file(self, thefile):
         '''
         parse DOSCAR file and store it in memory
 
         Parameters
         ------------
 
-        doscarfile: str
-            filename of "DOSCAR"
+        thefile: StringIO
+            "DOSCAR" file
         '''
-        if os.path.splitext(doscarfile)[1] == '.bz2':
-            try:
-                thefile = bz2.open(doscarfile, mode='rt')
-            except AttributeError:
-                thefile = bz2.BZ2File(doscarfile, mode='r')
+        firstline = thefile.readline()
+        self.natom = int(firstline[0:4])
+        [thefile.readline() for i in range(4)]
+        header = thefile.readline()
+        self.nbands = int(header[32:37])
+        tdos = np.array([next(thefile).split()
+                         for i in range(self.nbands)],
+                        dtype=np.float64)
+        if tdos.shape[1] == 3:
+            tdos = tdos[:, 0:2]
+        elif tdos.shape[1] == 5:
+            tdos = tdos[:, 0:3]
         else:
-            thefile = open(doscarfile)
-        with thefile:
-            firstline = thefile.readline()
-            self.natom = int(firstline[0:4])
-            [thefile.readline() for i in range(4)]
-            header = thefile.readline()
-            self.nbands = int(header[32:37])
-            tdos = np.array([next(thefile).split()
-                             for i in range(self.nbands)],
-                            dtype=np.float64)
-            if tdos.shape[1] == 3:
-                tdos = tdos[:, 0:2]
-            elif tdos.shape[1] == 5:
-                tdos = tdos[:, 0:3]
-            else:
-                raise RuntimeError
-            self.dos_container = [tdos]
+            raise RuntimeError
+        self.dos_container = [tdos]
+        try:
+            nextheader = next(thefile)
+        except StopIteration:
+            nextheader = ""
+        while nextheader == header:
+            self.dos_container.append(
+                np.array([next(thefile).split()
+                          for i in range(self.nbands)],
+                         dtype=np.float64))
             try:
                 nextheader = next(thefile)
             except StopIteration:
                 nextheader = ""
-            while nextheader == header:
-                self.dos_container.append(
-                    np.array([next(thefile).split()
-                              for i in range(self.nbands)],
-                             dtype=np.float64))
-                try:
-                    nextheader = next(thefile)
-                except StopIteration:
-                    nextheader = ""
 
 
 class DOS(object):  # Version safety

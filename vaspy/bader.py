@@ -18,12 +18,12 @@ import numpy as np
 class BaderACF(object):
     '''class for storing bader charge analysis (ACF.dat)
 
-      ACF.dat contains the coordinates of each atom, the charge
-      associated with it according to Bader partitioning, percentage of
-      the whole according to Bader partitioning and the minimum distance
-      to the surface. This distance should be compared to maximum
-      cut-off radius for the core region if pseudo potentials have been
-      used.
+          ACF.dat contains the coordinates of each atom, the charge
+          associated with it according to Bader partitioning, percentage of
+          the whole according to Bader partitioning and the minimum distance
+          to the surface. This distance should be compared to maximum
+          cut-off radius for the core region if pseudo potentials have been
+          used.
 
 
     Properties
@@ -56,20 +56,20 @@ class BaderACF(object):
         if filename:
             if os.path.splitext(filename)[1] == '.bz2':
                 try:
-                    baderfile = bz2.open(filename, mode='rt')
+                    thefile = bz2.open(filename, mode='rt')
                 except AttributeError:
-                    baderfile = bz2.BZ2File(filename, mode='r')
+                    thefile = bz2.BZ2File(filename, mode='r')
             else:
-                baderfile = open(filename)
-            self.parse(baderfile)
+                thefile = open(filename)
+            self.parse(thefile)
 
     def parse(self, thefile):
         '''Parse AFC.dat
 
-        Parameters
-        ----------
+        Parameter
+        ---------
         thefile: StringIO
-           'ACF.dat' file
+            'ACF.dat' file
         '''
         # the first line is like:
         #     X     Y     Z     CHARGE      MIN DIST   ATOMIC VOL
