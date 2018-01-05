@@ -43,13 +43,15 @@ From VASP webpage::
 from __future__ import print_function  # Version safety
 from __future__ import division  # Version safety
 import os
+import sys
 import bz2
 import copy
 import numpy as np
 try:
     import matplotlib.pyplot as plt
 except ImportError:
-    print('Install matplotlib, or you cannot use methods relating to draw')
+    sys.stderr.write(
+        'Install matplotlib, or you cannot use methods relating to draw')
 
 # if _sys.version_info[0] >= 3:  # Version safety
 #     from io import StringIO as _StringIO
