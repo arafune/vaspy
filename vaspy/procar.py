@@ -241,8 +241,6 @@ class PROCAR(eigenval.EIGENVAL):  # Version safety
 
     def projection(self):
         '''Return Projection object
-
-        
         '''
         proj = Projection()
         pass
@@ -925,3 +923,43 @@ def check_orb_name(arg):
     else:
         errmsg = arg + ": (composed) orbital name was not defined."
         raise ValueError(errmsg)
+
+
+def shortcheck(procar):
+    '''Return numk, nbands, nion, orbital_names and
+    True/False if collienar calculation'''
+    if 'PROCAR lm decomposed + phase' not in next(procar):
+        procar.close()
+        raise RuntimeError("This PROCAR is not a proper format\n \
+                            Check your INCAR the calculations.\n")
+    tmp = next(procar)
+    numk, nbands, natom = [int(i) for i in (tmp[14: 20],
+                                            tmp[39: 43],
+                                            tmp[62: -1])]
+    _ = [next(procar) for i in range(5)]
+    section = []
+    orbitals = []
+    phases = []
+    for line in procar:
+        if line.isspace():
+            break
+        elif 'ion' in line and 'tot' in line:
+            orbitalnames = line.split()[1:]
+            section = ['orbital']
+        elif 'ion' in line and 'tot' not in  line:
+            section.pop()
+            section = ['phase']
+        elif 'tot' in line and 'ion' not in line:
+            continue
+        elif section == ['orbital']:
+            orbitals.append([float(i) for i in line.split()[1:]])
+        elif section == ['phase']:
+            phases.append([float(i) for i in line.split()[1:]])
+    if len(orbitals) == natom:
+        collinear = True
+    elif len(orbitals) == natom * 4:
+        collinear = False
+    else:
+        raise RuntimeError('PROCAR is not proper format')
+    procar.seek(0)
+    return numk, nbands, natom, orbitalnames, collinear

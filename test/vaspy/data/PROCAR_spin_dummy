@@ -1,5 +1,5 @@
 PROCAR lm decomposed + phase
-# of k-points:    3         # of bands: 4         # of ions: 3
+# of k-points:    3         # of bands:   4         # of ions:   3
 
  k-point    1 :    0.00000000 0.00000000 0.00000000     weight = 0.33333333
 
@@ -187,7 +187,7 @@ ion       s      py      pz      px     dxy     dyz     dz2     dxz     dx2
   3  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000
   3  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000
 
-# of k-points:    3         # of bands: 4         # of ions: 3
+# of k-points:    3         # of bands:   4         # of ions:   3
 
  k-point    1 :    0.00000000 0.00000000 0.00000000     weight = 0.33333333
 

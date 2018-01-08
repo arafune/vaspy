@@ -6,6 +6,7 @@ import os
 # import tempfile
 from nose.tools import eq_, ok_
 from nose.tools import with_setup, assert_equal, raises
+from nose.tools import assert_false
 import numpy as np
 import vaspy.procar as procar
 
@@ -57,9 +58,6 @@ class TestSinglePROCAR(object):
         ok_(self.singleband.isready())
         np.testing.assert_array_equal(self.singleband.kdistance,
                                       [0.])
-
-    @with_setup(setup=setup)
-    def test_singleprocar_band_energies(self):
         '''test for Band_with_projection.energies setter'''
         np.testing.assert_array_equal(self.singleband.energies,
                                       [[-15.0]])
@@ -240,9 +238,6 @@ class TestSpinPolarizedPROCAR(object):
         ok_(spinband.isready())
         np.testing.assert_array_almost_equal(spinband.kdistance,
                                              [0., 0.353553, 0.707107])
-
-    @with_setup(setup=setup)
-    def test_spinband_band_energies(self):
         '''test for Band_with_projection.energies setter (SPIN)
         '''
         spinband = self.spinprocar.band()
@@ -424,16 +419,11 @@ class TestSOIPROCAR(object):
         ok_(self.soiband.isready())
         np.testing.assert_array_almost_equal(self.soiband.kdistance,
                                              [0., 0.353553, 0.707107])
-
-    @with_setup(setup=setup)
-    def test_soiprocar_band_energies(self):
         '''test for Band_with_projection.energies setter (SOI)'''
         eq_(self.soiband.energies.shape, (self.soiband.numk,
                                           self.soiband.nbands))
         np.testing.assert_array_equal(self.soiband.energies,
                                       [[-10, -5], [-7, -4], [-6, -1]])
-
-    def test_soiprocar_fermi_correction(self):
         '''test for Band_with_projection.fermi_correction
         '''
         self.soiband.fermi_correction(1.0)
@@ -543,3 +533,35 @@ class TestSOIPROCAR(object):
 7.071067812e-01	-1.000000000e+00
 
 ''')
+
+
+class test_functions_in_procarpy(object):
+    def test_shortcheck_function(self):
+        '''Test for shortfunction'''
+        datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
+        data_single = open(datadir + "PROCAR_single")
+        data_spin = open(datadir + "PROCAR_spin_dummy")
+
+        result_single = procar.shortcheck(data_single)
+        eq_(1, result_single[0])  #  numk
+        eq_(1, result_single[1])  #  nbands
+        eq_(3, result_single[2])  #  natom
+        eq_(['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot'],
+            result_single[3])
+        ok_(result_single[4])     #  collinear
+        result_spin = procar.shortcheck(data_spin)
+        eq_(3, result_spin[0])  #  numk
+        eq_(4, result_spin[1])  #  nbands
+        eq_(3, result_spin[2])  #  natom
+        eq_(['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot'],
+            result_spin[3])
+        ok_(result_spin[4])     #  collinear
+        data_soi = open(datadir + "PROCAR_SOI_dummy")
+        result_soi = procar.shortcheck(data_soi)
+        eq_(3, result_soi[0])  #  numk
+        eq_(2, result_soi[1])  #  nbands
+        eq_(3, result_soi[2])  #  natom
+        eq_(['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot'],
+            result_soi[3])
+        assert_false(result_soi[4])     #  collinear
+
