@@ -80,7 +80,8 @@ class EIGENVAL(object):
                     [float(i) for i in
                      next(self.thefile).split()[1:self.spininfo+1]])
         self.kvecs = np.array(self.kvecs)
-        self.energies = np.array(self.energies)
+        self.energies = np.array(
+            self.energies).T.reshape(self.spininfo, self.numk, self.nbands)
         self.thefile.close()
 
     def to_band(self, recvec=((1.0, 0.0, 0.0),
@@ -137,7 +138,7 @@ class EnergyBand(object):
         kdisance
     numk: int   # should be __numk ?
         number of kpoints
-    nbands: int  # 
+    nbands: int  #
         number of bands
 
     Parameters
