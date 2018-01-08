@@ -6,14 +6,12 @@ This module provides EIGENVAL.
 from __future__ import print_function
 from __future__ import division
 import os
-import sys
 import bz2
 import numpy as np
 try:
     import matplotlib.pyplot as plt
 except ImportError:
-    sys.stderr.write(
-        'Install matplotlib, or you cannot use methods relating to draw')
+    print('Install matplotlib, or you cannot use methods relating to draw')
 
 
 class EIGENVAL(object):
@@ -36,8 +34,8 @@ class EIGENVAL(object):
         Number of bands
     spininfo: int
         No_spin or non-collinear:1 collinear spin: 2
-    kvecs[ki]: list or numpy array
-        List of kvalues, the length of kvectors must be equal to numk.
+    kvecs[ki]: numpy.array
+        kvectors
     energies[bi+ki*nbands]: list or numpy.array
         Energy values (two-value array for spin-polarized eigenvalu)
     '''
@@ -53,43 +51,37 @@ class EIGENVAL(object):
         if filename:
             if os.path.splitext(filename)[1] == '.bz2':
                 try:
-                    thefile = bz2.open(filename, mode='rt')
+                    self.thefile = bz2.open(filename, mode='rt')
                 except AttributeError:
-                    thefile = bz2.BZ2File(filename, mode='r')
+                    self.thefile = bz2.BZ2File(filename, mode='r')
             else:
-                thefile = open(filename)
-            self.load_file(thefile)
+                self.thefile = open(filename)
+            self.load_file()
 
-    def load_file(self, thefile):
+    def load_file(self):
         '''
         A virtual parser of EIGENVAL
-
-        thefile: StringIO
-            'EIGENVAL' file
         '''
         self.natom, _, _, self.spininfo = [int(i) for i in
-                                           next(thefile).split()]
-        next(thefile)
-        next(thefile)
-        next(thefile)
-        next(thefile)
+                                           next(self.thefile).split()]
+        next(self.thefile)
+        next(self.thefile)
+        next(self.thefile)
+        next(self.thefile)
         _, self.numk, self.nbands = [int(i) for i in
-                                     next(thefile).split()]
+                                     next(self.thefile).split()]
         for _ in range(self.numk):
             # the first line in the sigleset begins with the blank
-            next(thefile)
-            self.kvecs.append(np.array(
-                [float(i) for i in next(thefile).split()[0:3]]))
+            next(self.thefile)
+            self.kvecs.append(
+                [float(i) for i in next(self.thefile).split()[0:3]])
             for _ in range(self.nbands):
-                if self.spininfo == 1:
-                    self.energies.append(float(
-                        next(thefile).split()[1]))
-                else:
-                    self.energies.append(
-                        np.array([float(i) for i in
-                                  next(thefile).split()[1:3]]))
+                self.energies.append(
+                    [float(i) for i in
+                     next(self.thefile).split()[1:self.spininfo+1]])
+        self.kvecs = np.array(self.kvecs)
         self.energies = np.array(self.energies)
-        thefile.close()
+        self.thefile.close()
 
     def to_band(self, recvec=((1.0, 0.0, 0.0),
                               (0.0, 1.0, 0.0),
@@ -111,7 +103,7 @@ class EIGENVAL(object):
         ---------
 
         vaspy.eigenval.EnergyBand
-        '''
+'''
         recvecarray = np.array(recvec).T
         kvector_physical = [recvecarray.dot(kvector) for kvector in
                             self.kvecs[0:self.numk]]
@@ -160,7 +152,7 @@ class EnergyBand(object):
          mean collinear spin, 4 or ('_mT', '_mX', '_mY', '_mZ') mean
          collinear spin. This class does not distinguish non-collinear spin
          and No-spin.  (default is 1)
-    '''
+'''
 
     def __init__(self, kvecs, energies, spininfo=1):
         self.kvecs = np.array(kvecs)
