@@ -318,7 +318,7 @@ class Grid3D(object):
         dest.data = self.data.reshape(self.nframe, self.size)[frame_i]
         return dest
 
-    def slice(self, axis, postition):
+    def slice(self, position, axis='z', frame_i=0):
         '''
         Parameters
         ----------
@@ -334,9 +334,17 @@ class Grid3D(object):
         numpy.array
             2D numpy array that sliced from 3D mesh data.
         '''
-        pass
+        data = self.frame(frame_i)
+        data.reshape(self.shape)
+        axis = axis.lower()
+        if axis == 'x':
+            return data[:, :, position]
+        elif axis == 'y':
+            return data[:, position, :]
+        elif axis == 'z':
+            return data[position, :, :]
 
-    def integrate(self, axis, from_coor, to_coor):
+    def integrate(self, from_coor, to_coor, axis, frame_i=0):
         '''
         Return 2D data integrated occupacy along the 'axis'
         from_coor to to_coor.
@@ -360,7 +368,18 @@ class Grid3D(object):
             2D numpy array that integrated from 3D mesh data
 
         '''
-        pass
+        data = self.frame(frame_i)
+        data.reshape(self.shape)
+        axis = axis.lower()
+        if axis == 'x':
+            return np.sum(data[:, :, from_coor:to_coor], axis=0)
+        elif axis == 'y':
+            return np.sum(data[:, from_coor:to_coor, :], axis=0)
+        elif axis == 'z':
+            return np.sum(data[from_coor:to_coor, :, :], axis=0)
+        else:
+            raise ValueError('incorrect axis')
+
 
     def __str__(self):
         '''
