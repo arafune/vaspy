@@ -60,9 +60,16 @@ class VASPGrid(object):
         self.grid = Grid3D()
         self.additional = []
         if filename:
-            self.load_file(filename)
+            if os.path.splitext(filename)[1] == '.bz2':
+                try:
+                    thefile = bz2.open(filename, mode='rt')
+                except AttributeError:
+                    thefile = bz2.BZ2File(filename, mode='r')
+            else:
+                thefile = open(filename)
+            self.load_file(thefile)
 
-    def load_file(self, filename):
+    def load_file(self, thefile):
         '''
         Construct the object from the file
 
@@ -76,68 +83,61 @@ class VASPGrid(object):
         separator = None
         tmp = []
         griddata = []
-        if os.path.splitext(filename)[1] == '.bz2':
-            try:
-                thefile = bz2.open(filename, mode='rt')
-            except AttributeError:
-                thefile = bz2.BZ2File(filename, mode='r')
-        else:
-            thefile = open(filename)
-        with thefile:
-            for line in thefile:
-                line = line.rstrip('\n')
-                if section == 'poscar':
-                    if re.search(_RE_BLANK, line):
-                        self.poscar.load_array(tmp)
-                        section = 'define_separator'
-                    else:
-                        tmp.append(line)
-                elif section == 'define_separator':
-                    separator = line if separator is None else separator
-                    if self.grid.shape == (0, 0, 0):
-                        self.grid.shape = tuple([int(string) for string
-                                                 in line.split()])
+        for line in thefile:
+            line = line.rstrip('\n')
+            if section == 'poscar':
+                if re.search(_RE_BLANK, line):
+                    self.poscar.load_array(tmp)
+                    section = 'define_separator'
+                else:
+                    tmp.append(line)
+            elif section == 'define_separator':
+                separator = line if separator is None else separator
+                if self.grid.shape == (0, 0, 0):
+                    self.grid.shape = tuple([int(string) for string
+                                             in line.split()])
+                griddata.extend(
+                    [float(i) for i in
+                     next(thefile).replace('***********',
+                                           'Nan').split()])
+                if self.grid.size % len(griddata) == 0:
+                    lines_for_mesh = self.grid.size // len(griddata)
+                else:
+                    lines_for_mesh = self.grid.size // len(griddata) + 1
+                for _ in range(lines_for_mesh - 1):
                     griddata.extend(
-                        [float(i) for i in
+                        [float(val) for val in
                          next(thefile).replace('***********',
                                                'Nan').split()])
-                    if self.grid.size % len(griddata) == 0:
-                        lines_for_mesh = self.grid.size // len(griddata)
-                    else:
-                        lines_for_mesh = self.grid.size // len(griddata) + 1
-                    for _ in range(lines_for_mesh - 1):
+                section = 'grid'
+            elif section == 'aug':
+                if separator in line:
+                    for _ in range(lines_for_mesh):
                         griddata.extend(
                             [float(val) for val in
-                             next(thefile).replace('***********',
-                                                   'Nan').split()])
+                             next(thefile).replace(
+                                 '***********',
+                                 'Nan').split()])
                     section = 'grid'
-                elif section == 'aug':
-                    if separator in line:
-                        for _ in range(lines_for_mesh):
-                            griddata.extend(
-                                [float(val) for val in
-                                 next(thefile).replace(
-                                     '***********',
-                                     'Nan').split()])
-                        section = 'grid'
-                    elif "augmentation occupancies " in line:
-                        pass  # Used for CHGCAR, not LOCPOT. not implementd
-                    else:
-                        pass  # Used for CHGCAR, not LOCPOT. not implementd
-                elif section == 'grid':
-                    if "augmentation occupancies " in line:
-                        section = 'aug'
-                    elif separator in line:
-                        for _ in range(lines_for_mesh):
-                            griddata.extend(
-                                [float(val) for val in
-                                 next(thefile).replace(
-                                     '***********',
-                                     'Nan').split()])
-                    else:
-                        # for unused data stored in LOCPOT
-                        self.additional.extend(line.split())
-            self.grid.data = np.array(griddata, dtype=np.float64)
+                elif "augmentation occupancies " in line:
+                    pass  # Used for CHGCAR, not LOCPOT. not implementd
+                else:
+                    pass  # Used for CHGCAR, not LOCPOT. not implementd
+            elif section == 'grid':
+                if "augmentation occupancies " in line:
+                    section = 'aug'
+                elif separator in line:
+                    for _ in range(lines_for_mesh):
+                        griddata.extend(
+                            [float(val) for val in
+                             next(thefile).replace(
+                                 '***********',
+                                 'Nan').split()])
+                else:
+                    # for unused data stored in LOCPOT
+                    self.additional.extend(line.split())
+        self.grid.data = np.array(griddata, dtype=np.float64)
+        thefile.close()
 
     def __str__(self):
         '''
