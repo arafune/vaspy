@@ -47,8 +47,3 @@ class TestEIGENVAL(object):
         np.testing.assert_array_almost_equal(
             26.193038,
             self.eigenval_soi.energies[0,:,-1][-1])
-        eq_('''The parameter of EIGENVALUE
-# of atoms: 1
-# of kpoints: 625
-# of bands: 54
-''', self.eigenval_soi.__str__())
