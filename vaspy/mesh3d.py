@@ -51,7 +51,7 @@ class VASPGrid(object):
 
     poscar, grid, additional
     '''
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, pickleddata=None):
         self.poscar = poscar.POSCAR()
         self.grid = Grid3D()
         self.additional = []
@@ -63,9 +63,9 @@ class VASPGrid(object):
                     thefile = bz2.BZ2File(filename, mode='r')
             else:
                 thefile = open(filename)
-            self.load_file(thefile)
+            self.load_file(thefile, pickleddata)
 
-    def load_file(self, thefile):
+    def load_file(self, thefile, pickleddata=None):
         '''
         Construct the object from the file
 
@@ -74,6 +74,9 @@ class VASPGrid(object):
 
         thefile: StringIO
             file
+
+        pickleddata: str
+            griddata stored by np.save or np.savez
         '''
         separator = None
         tmp = []
@@ -89,6 +92,15 @@ class VASPGrid(object):
         self.grid.shape = tuple([int(string) for string
                                  in separator.split()])
         # Volumetric data
+        if pickleddata:
+            if os.path.splitext(pickleddata)[1] == '.npy':
+                self.grid.data = np.load(pickleddata)
+            elif os.path.splitext(pickleddata)[1] == '.npz':
+                self.grid.data = np.load(pickleddata)['arr_0']
+            else:
+                raise TypeError('Check the volmetric data type')
+            thefile.close()
+            return None
         griddata += next(thefile).replace('***********', 'Nan')
         if self.grid.size % len(griddata.split()) == 0:
             lines_for_mesh = self.grid.size // len(griddata.split())
@@ -314,15 +326,20 @@ class Grid3D(object):
         numpy.array
             2D numpy array that sliced from 3D mesh data.
         '''
-        data = self.frame(frame_i)
-        data.reshape(self.shape)
+        griddata = self.data[frame_i * self.size: (frame_i+1) * self.size]
         axis = axis.lower()
         if axis == 'x':
-            return data[:, :, position]
+            return griddata.reshape(self.shape[2],
+                                    self.shape[1],
+                                    self.shape[0])[position, :, :]
         elif axis == 'y':
-            return data[:, position, :]
+            return griddata.reshape(self.shape[2],
+                                    self.shape[1],
+                                    self.shape[0])[:, position, :]
         elif axis == 'z':
-            return data[position, :, :]
+            return griddata.reshape(self.shape[2],
+                                    self.shape[1],
+                                    self.shape[0])[position, :, :]
 
     def integrate(self, from_coor, to_coor, axis, frame_i=0):
         '''
@@ -348,18 +365,28 @@ class Grid3D(object):
             2D numpy array that integrated from 3D mesh data
 
         '''
-        data = self.frame(frame_i)
-        data.reshape(self.shape)
+        griddata = self.data[frame_i * self.size: (frame_i+1) * self.size]
         axis = axis.lower()
         if axis == 'x':
-            return np.sum(data[:, :, from_coor:to_coor], axis=0)
+            return np.sum(
+                griddata.reshape(self.shape[2],
+                                 self.shape[1],
+                                 self.shape[0])[:, :, from_coor:to_coor],
+                axis=0)
         elif axis == 'y':
-            return np.sum(data[:, from_coor:to_coor, :], axis=0)
+            return np.sum(
+                griddata.reshape(self.shape[2],
+                                 self.shape[1],
+                                 self.shape[0])[:, from_coor:to_coor, :],
+                axis=0)
         elif axis == 'z':
-            return np.sum(data[from_coor:to_coor, :, :], axis=0)
+            return np.sum(
+                griddata.reshape(self.shape[2],
+                                 self.shape[1],
+                                 self.shape[0])[from_coor:to_coor, :, :],
+                axis=0)
         else:
             raise ValueError('incorrect axis')
-
 
     def __str__(self):
         '''

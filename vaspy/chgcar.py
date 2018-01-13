@@ -53,7 +53,7 @@ class CHGCAR(mesh3d.VASPGrid):
     the current verstion ignores "augmentation occupacies".
     '''
 
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, pickleddata=None):
         super(CHGCAR, self).__init__(None)
         self.spininfo = 0
         if filename:
@@ -64,10 +64,10 @@ class CHGCAR(mesh3d.VASPGrid):
                     thefile = bz2.BZ2File(filename, mode='r')
             else:
                 thefile = open(filename)
-            self.load_file(thefile)
+            self.load_file(thefile, pickleddata)
 
 
-    def load_file(self, thefile):
+    def load_file(self, thefile, pickleddata=None):
         '''
         Parse CHGCAR file to construct CHGCAR object
 
@@ -77,7 +77,7 @@ class CHGCAR(mesh3d.VASPGrid):
         thefile: StringIO
             CHGCAR file 
         '''
-        super(CHGCAR, self).load_file(thefile)
+        super(CHGCAR, self).load_file(thefile, pickleddata)
         if self.grid.nframe == 1:
             self.spininfo = [""]
         elif self.grid.nframe == 2:
