@@ -76,8 +76,8 @@ class VASPGrid(object):
         Parameters
         ---------------
 
-        filename: str
-            file name
+        thefile: StringIO
+            file
         '''
         section = 'poscar'
         separator = None

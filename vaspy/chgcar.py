@@ -9,6 +9,7 @@ from __future__ import division, print_function  # Version safety
 import re
 import copy
 import os
+import bz2
 import sys
 
 try:
@@ -57,23 +58,31 @@ class CHGCAR(mesh3d.VASPGrid):
     the current verstion ignores "augmentation occupacies".
     '''
 
-    def __init__(self, chgcar_file=None):
+    def __init__(self, filename=None):
         super(CHGCAR, self).__init__(None)
         self.spininfo = 0
-        if chgcar_file:
-            self.load_file(chgcar_file)
+        if filename:
+            if os.path.splitext(filename)[1] == '.bz2':
+                try:
+                    thefile = bz2.open(filename, mode='rt')
+                except AttributeError:
+                    thefile = bz2.BZ2File(filename, mode='r')
+            else:
+                thefile = open(filename)
+            self.load_file(thefile)
 
-    def load_file(self, filename):
+
+    def load_file(self, thefile):
         '''
         Parse CHGCAR file to construct CHGCAR object
 
         Parameters
         ----------
 
-        chgcarfile: str
-            CHGCAR file name
+        thefile: StringIO
+            CHGCAR file 
         '''
-        super(CHGCAR, self).load_file(filename)
+        super(CHGCAR, self).load_file(thefile)
         if self.grid.nframe == 1:
             self.spininfo = [""]
         elif self.grid.nframe == 2:
