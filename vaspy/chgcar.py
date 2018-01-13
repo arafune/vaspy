@@ -6,7 +6,6 @@ Module for CHGCAR class
 translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 '''
 from __future__ import division, print_function  # Version safety
-import re
 import copy
 import os
 import bz2
@@ -18,10 +17,6 @@ except ImportError:
     MYPATH = os.readlink(__file__) if os.path.islink(__file__) else __file__
     sys.path.append(os.path.dirname(os.path.abspath(MYPATH)))
     import mesh3d
-
-
-_RE_BLANK = re.compile(r'^[\s]*$')   # << should use other than regexp
-_RE_AUG_OCC = re.compile(r'\baugmentation occupancies')
 
 
 class CHGCAR(mesh3d.VASPGrid):

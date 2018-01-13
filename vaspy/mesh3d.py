@@ -9,12 +9,8 @@ from __future__ import division, print_function
 import bz2
 import copy
 import os
-import re
 import numpy as np
 from vaspy import poscar, tools
-
-_RE_BLANK = re.compile(r'^[\s]*$')
-_RE_AUG_OCC = re.compile(r'\baugmentation occupancies')
 
 
 class VASPGrid(object):
@@ -79,45 +75,33 @@ class VASPGrid(object):
         thefile: StringIO
             file
         '''
-        section = 'poscar'
         separator = None
         tmp = []
-        griddata = []
+        griddata = ''
+        # read POSCAR part
+        line = thefile.readline()
+        while not line.isspace():
+            tmp.append(line.strip('\n'))
+            line = thefile.readline()
+        self.poscar.load_array(tmp)
+        # read grid size and use it as separator
+        separator = thefile.readline()
+        self.grid.shape = tuple([int(string) for string
+                                 in separator.split()])
+        # Volumetric data
+        griddata += next(thefile).replace('***********', 'Nan')
+        if self.grid.size % len(griddata.split()) == 0:
+            lines_for_mesh = self.grid.size // len(griddata.split())
+        else:
+            lines_for_mesh = self.grid.size // len(griddata.split()) + 1
+        for _ in range(lines_for_mesh - 1):  # read the first frame
+            griddata += next(thefile).replace('***********', 'Nan')
+        section = 'grid'
         for line in thefile:
-            line = line.rstrip('\n')
-            if section == 'poscar':
-                if re.search(_RE_BLANK, line):
-                    self.poscar.load_array(tmp)
-                    section = 'define_separator'
-                else:
-                    tmp.append(line)
-            elif section == 'define_separator':
-                separator = line if separator is None else separator
-                if self.grid.shape == (0, 0, 0):
-                    self.grid.shape = tuple([int(string) for string
-                                             in line.split()])
-                griddata.extend(
-                    [float(i) for i in
-                     next(thefile).replace('***********',
-                                           'Nan').split()])
-                if self.grid.size % len(griddata) == 0:
-                    lines_for_mesh = self.grid.size // len(griddata)
-                else:
-                    lines_for_mesh = self.grid.size // len(griddata) + 1
-                for _ in range(lines_for_mesh - 1):
-                    griddata.extend(
-                        [float(val) for val in
-                         next(thefile).replace('***********',
-                                               'Nan').split()])
-                section = 'grid'
-            elif section == 'aug':
+            if section == 'aug':
                 if separator in line:
                     for _ in range(lines_for_mesh):
-                        griddata.extend(
-                            [float(val) for val in
-                             next(thefile).replace(
-                                 '***********',
-                                 'Nan').split()])
+                        griddata += next(thefile).replace('***********', 'Nan')
                     section = 'grid'
                 elif "augmentation occupancies " in line:
                     pass  # Used for CHGCAR, not LOCPOT. not implementd
@@ -128,15 +112,11 @@ class VASPGrid(object):
                     section = 'aug'
                 elif separator in line:
                     for _ in range(lines_for_mesh):
-                        griddata.extend(
-                            [float(val) for val in
-                             next(thefile).replace(
-                                 '***********',
-                                 'Nan').split()])
+                        griddata += next(thefile).replace('***********', 'Nan')
                 else:
                     # for unused data stored in LOCPOT
                     self.additional.extend(line.split())
-        self.grid.data = np.array(griddata, dtype=np.float64)
+        self.grid.data = np.fromstring(griddata, dtype=float, sep=' ')
         thefile.close()
 
     def __str__(self):
