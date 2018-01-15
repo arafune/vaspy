@@ -21,7 +21,7 @@ class TestEIGENVAL(object):
     def test_check_basic_parameters(self):
         '''Checking the basic parameters stored'''
         eq_(344, self.eigenval_spin.natom)
-        eq_(2, self.eigenval_spin.spininfo)
+        eq_(2, self.eigenval_spin.nspin)
         eq_(1890, self.eigenval_spin.nbands)
         eq_(1, self.eigenval_spin.numk)
         eq_((2, 1, 1890), self.eigenval_spin.energies.shape)
@@ -37,7 +37,7 @@ class TestEIGENVAL(object):
             [5.813531], self.eigenval_spin.energies[1,:,-1])
         #
         eq_(1, self.eigenval_soi.natom)
-        eq_(1, self.eigenval_soi.spininfo)
+        eq_(1, self.eigenval_soi.nspin)
         eq_(54, self.eigenval_soi.nbands)
         eq_(625, self.eigenval_soi.numk)
         np.testing.assert_array_equal(
@@ -47,3 +47,16 @@ class TestEIGENVAL(object):
         np.testing.assert_array_almost_equal(
             26.193038,
             self.eigenval_soi.energies[0,:,-1][-1])
+
+    @with_setup(setup=setup)
+    def test_make_label(self):
+        '''test for make_label function'''
+        labels_soi = self.eigenval_soi.make_label('k', 'energy')
+        eq_('#k', labels_soi[0])
+        eq_('Energy', labels_soi[1])
+        labels_spin = self.eigenval_spin.make_label('k', 'energy')
+        eq_('#k', labels_spin[0])
+        eq_('Energy_up', labels_spin[1])
+        eq_('Energy_down', labels_spin[2])        
+
+        

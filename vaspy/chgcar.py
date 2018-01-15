@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
 Module for CHGCAR class
@@ -45,7 +44,7 @@ class CHGCAR(mesh3d.VASPGrid):
     Attributes
     ----------
 
-    spininfo: int or list
+    spin: int or list
         Represents spin character
 
     Notes
@@ -55,7 +54,7 @@ class CHGCAR(mesh3d.VASPGrid):
 
     def __init__(self, filename=None, pickleddata=None):
         super(CHGCAR, self).__init__(None)
-        self.spininfo = 0
+        self.spin = 1
         if filename:
             if os.path.splitext(filename)[1] == '.bz2':
                 try:
@@ -79,11 +78,11 @@ class CHGCAR(mesh3d.VASPGrid):
         '''
         super(CHGCAR, self).load_file(thefile, pickleddata)
         if self.grid.nframe == 1:
-            self.spininfo = [""]
+            self.spin = [""]
         elif self.grid.nframe == 2:
-            self.spininfo = ["up+down", "up-down"]
+            self.spin = ["up+down", "up-down"]
         elif self.grid.nframe == 4:
-            self.spininfo = ["mT", "mX", "mY", "mZ"]
+            self.spin = ["mT", "mX", "mY", "mZ"]
         else:
             raise RuntimeError("CHGCAR is correct?")
 
@@ -119,25 +118,25 @@ class CHGCAR(mesh3d.VASPGrid):
         CHGCAR
              CHGCAR of the spin-distribution
         '''
-        if len(self.spininfo) == 1:
+        if len(self.spin) == 1:
             raise RuntimeError("This CHGCAR is not spinresolved version")
         dest = copy.deepcopy(self)
-        if len(self.spininfo) == 2:
+        if len(self.spin) == 2:
             dest.grid = dest.grid.frame(1)
-            dest.spininfo = ["up-down"]
-        elif len(self.spininfo) == 4:
+            dest.spin = ["up-down"]
+        elif len(self.spin) == 4:
             if direction is None or direction == 't':
                 dest.grid = dest.grid.frame(0)
-                dest.spininfo = ["mT"]
+                dest.spin = ["mT"]
             if direction == 'x':
                 dest.grid = dest.grid.frame(1)
-                dest.spininfo = ["mX"]
+                dest.spin = ["mX"]
             elif direction == 'y':
                 dest.grid = dest.grid.frame(2)
-                dest.spininfo = ["mY"]
+                dest.spin = ["mY"]
             elif direction == 'z':
                 dest.grid = dest.grid.frame(3)
-                dest.spininfo = ["mZ"]
+                dest.spin = ["mZ"]
         dest.grid.data = dest.grid.data.flatten()
         return dest
 
@@ -154,12 +153,12 @@ class CHGCAR(mesh3d.VASPGrid):
         vaspy.chgcar.CHGCAR
             CHGCAR for the majority spin charge
         '''
-        if len(self.spininfo) != 2:
+        if len(self.spin) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         dest = copy.deepcopy(self)
         tmp = dest.grid.data.reshape(2, self.grid.size)
         dest.grid.data = ((tmp[0] + tmp[1]) / 2)
-        dest.spininfo = ["up"]
+        dest.spin = ["up"]
         return dest
 
     def minorityspin(self):
@@ -175,10 +174,10 @@ class CHGCAR(mesh3d.VASPGrid):
         vaspy.chgcar.CHGCAR
             CHGCAR for the minority  spin charge
         '''
-        if len(self.spininfo) != 2:
+        if len(self.spin) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         dest = copy.deepcopy(self)
         tmp = dest.grid.data.reshape(2, self.grid.size)
         dest.grid.data = ((tmp[0] - tmp[1]) / 2)
-        dest.spininfo = ["down"]
+        dest.spin = ["down"]
         return dest

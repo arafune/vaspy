@@ -6,33 +6,35 @@ This module provides EIGENVAL.
 from __future__ import print_function
 from __future__ import division
 import os
+import csv
+import sys
 import bz2
 import numpy as np
 try:
     import matplotlib.pyplot as plt
 except ImportError:
-    print('Install matplotlib, or you cannot use methods relating to draw\n')
+    sys.stderr.write(
+        'Install matplotlib, or you cannot use methods relating to draw')
 
 
 class EnergyBand(object):
-    '''
-    Simple band structure object for analyzing by using ipython.
+    '''Simple band structure object for analyzing by using ipython.
 
     Attributes
     ----------
 
-    kvecs: numpy.array
+    kvecs: numpy.ndarray
         kvectors
-    kdistances: numpy.array
+    kdistances: numpy.ndarray
         kdisance
     numk: int
         number of kpoints
     nbands: int
         number of bands
-    energies: numpy.array
+    energies: numpy.ndarray
         energies[spin_i, k_i, band_i], where spin_i, k_i, and band_i are spin-,
         k- and band-index, respectively.
-    label: list of str
+    label: dict
         used as a label (data 'title' such as '#k', 'Energy') in str format
 
 
@@ -43,29 +45,32 @@ class EnergyBand(object):
          1D array data of k-vectors.
     energies: numpy.ndarray
          1D array data of energies
-    spininfo: int, tuple, optional
-         Spin type.  1 or ("",) mean No-spin.  2 or ('_up', '_down')
-         mean collinear spin, 4 or ('_mT', '_mX', '_mY', '_mZ') mean
-         collinear spin. This class does not distinguish non-collinear spin
+    nspin: int
+         number of spin: '1' means No-spin.  '2' means collinear spin,
+         '4' means noncollinear spin.
+         In this class does not distinguish non-collinear spin
          and No-spin.  (default is 1)
     '''
-
-    def __init__(self, kvecs=(), energies=(), spininfo=1):
+    def __init__(self, kvecs=(), energies=(), nspin=1):
         self.kvecs = np.array(kvecs)
         self.numk = len(self.kvecs)
+        self.label = {}
         try:
             self.nbands = len(energies) // len(kvecs)
         except ZeroDivisionError:
             self.nbands = 0
         self.energies = energies
-        self.spininfo = spininfo
-        if self.spininfo == 1:  # standard
-            self.spininfo = ('',)
-        elif self.spininfo == 2 or len(self.spininfo) == 2:   # collinear
-            self.spininfo = ('_up', '_down')
-        elif self.spininfo == 4:  # non-collinear
-            self.spininfo = ('_mT', '_mX', '_mY', '_mZ')
-        self.label = ['#k']
+        self.nspin = nspin
+        if self.nspin == 1:  # standard
+            self.label['spin'] = ['']
+            self.label['energy'] = ['Energy']
+        elif self.nspin == 2:  # spin-polarized
+            self.label['energy'] = ['Energy_up', 'Energy_down']
+            self.label['spin'] = ['_up', '_down']
+        elif self.nspin == 4:  # non-collinear
+            self.label['energy'] = ['Energy']
+            self.label['spin'] = ['_mT', '_mX', '_mY', '_mZ']
+        self.label['k'] = ['#k']
 
     @property
     def kdistances(self):
@@ -74,23 +79,106 @@ class EnergyBand(object):
             np.concatenate((np.array([[0, 0, 0]]),
                             np.diff(self.kvecs, axis=0))), axis=1))
 
-    def __str__(self):  # << FIXME
+    def fermi_correction(self, fermi):
+        '''Correct the Fermi level
+
+        Parameters
+        ----------
+
+        fermi: float
+             value of the Fermi level.
+        '''
+        self.energies -= fermi
+
+    def make_label(self, *keys):
+        '''Return array the used for label for CSV-like data
+
+        Parameters
+        ----------
+
+        keys: tuple
+          key tuple used for label
+        '''
+        label_list = []
+        for key in keys:
+            for tmp in self.label[key]:
+                label_list.append(tmp)
+        return label_list
+
+    def make_label_text(self, *keys):
+        '''Return str the used for label for CSV-like data
+
+        Parameters
+        ----------
+
+        keys: tuple
+          key tuple used for label
+        '''
+        label_list = self.make_label(*keys)
+        output = label_list[0]
+        for label in label_list[1:]:
+            output += '\t'+label
+        output += '\n'
+        return output
+
+    def to_3dlist(self):
+        '''Return 3D mentional list
+
+        list[band_i, [k_i, energy, (energy_down)]]
+
+        This list format would be useful for str output
+        '''
+        bandstructure = []
+        for energies in self.energies.T.tolist():
+            band = []
+            for k, energy in zip(self.kdistances[:, np.newaxis].tolist(),
+                                 energies):
+                k.extend(energy)
+                band.append(k)
+            bandstructure.append(band)
+        return bandstructure
+
+    def to_csv(self, csv_file, label_str='', blankline=True):
+        '''Write data to csv file
+
+        Parameters
+        ------------
+        csv_file: str
+           filename for output
+        label_str: str
+           string for label (put it on the first line)
+        blankline: boolean
+           It True (default), the blank line is inserted between band data
+        '''
+        if not label_str:
+            label_str = self.make_label_text('k', 'energy')
+        with open(csv_file, 'w') as fhandle:
+            fhandle.writelines(label_str)
+            writer = csv.writer(fhandle, delimiter='\t')
+            for band_i in self.to_3dlist():
+                writer.writerows(band_i)
+                if blankline:
+                    fhandle.writelines('\n')
+
+    def __str__(self):
         '''
         Returns
         --------
 
         str
             a string represntation of EnergyBand.
-            Useful for gnuplot and Igor.
+            **Useful for gnuplot and Igor**.
         '''
-        output = self.label[0]
-        for label in self.label[1]:
+        labels = self.make_label('k', 'energy')
+        output = labels[0]
+        for label in labels[1:]:
             output += '\t'+label
         output += '\n'
-        for band_i in range(self.energies.shape[2]):
-            for k, energies in zip(self.kdistances, self.energies[:, :, band_i].T):
-                output += str(k)
-                for energy in energies:
+        list3d = self.to_3dlist()
+        for band_i in list3d:
+            for line in band_i:
+                output += "{0:.8e}".format(line[0])
+                for energy in line[1:]:
                     output += "\t{0:.8e}".format(energy)
                 output += "\n"
             output += "\n"
@@ -152,9 +240,8 @@ class EnergyBand(object):
             plt.ylim([yrange[0], yrange[1]])
         plt.xlim([self.kdistances[0],
                   self.kdistances[-1]])
-        plt.ylabel(self.label[spin_i+1] + ' (eV)')
+        plt.ylabel(self.label['energy'][spin_i] + ' (eV)')
         plt.show()
-
 
     def to_physical_kvector(self, recvec=((1.0, 0.0, 0.0),
                                           (0.0, 1.0, 0.0),
@@ -209,12 +296,12 @@ class EIGENVAL(EnergyBand):
         '''
         A virtual parser of EIGENVAL
         '''
-        self.natom, _, _, self.spininfo = [int(i) for i in
-                                           next(self.thefile).split()]
-        if self.spininfo == 2:
-            self.label.extend(['Energy_up', 'Energy_down'])
+        self.natom, _, _, self.nspin = [int(i) for i in
+                                        next(self.thefile).split()]
+        if self.nspin == 2:
+            self.label['energy'] = ['Energy_up', 'Energy_down']
         else:
-            self.label.append('Energy')
+            self.label['energy'] = ['Energy']
         next(self.thefile)
         next(self.thefile)
         next(self.thefile)
@@ -231,8 +318,8 @@ class EIGENVAL(EnergyBand):
             for _ in range(self.nbands):
                 self.energies.append(
                     [float(i) for i in
-                     next(self.thefile).split()[1:self.spininfo+1]])
+                     next(self.thefile).split()[1:self.nspin+1]])
         self.kvecs = np.array(self.kvecs)
         self.energies = np.array(
-            self.energies).T.reshape(self.spininfo, self.numk, self.nbands)
+            self.energies).T.reshape(self.nspin, self.numk, self.nbands)
         self.thefile.close()
