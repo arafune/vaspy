@@ -12,7 +12,6 @@ This module provides PROCAR, ProjectionBand classes.
 
 from __future__ import print_function  # Version safety
 from __future__ import division        # Version safety
-import copy
 import re
 import os
 import bz2
@@ -22,7 +21,7 @@ import numpy as np
 from vaspy import eigenval
 logging.basicConfig(level=logging.DEBUG,
                     format=' %(asctime)s - %(levelname)s -%(message)s')
-#logging.disable(logging.DEBUG)
+logging.disable(logging.DEBUG)
 
 
 class ProjectionBand(eigenval.EnergyBand):
@@ -383,7 +382,7 @@ class PROCAR(ProjectionBand):  # Version safety
         section = list()
         kvecs = []
         energies = []
-        orbitals = []
+        orbitals = ''
         orbital_names = []
         for line in thefile:
             if line.isspace():
@@ -414,15 +413,16 @@ class PROCAR(ProjectionBand):  # Version safety
                 if section == ['orbital']:
                     if "tot " in line[0:4]:
                         continue
-                    orbitals.append([float(i) for i in line.split()[1:]])
+                    orbitals += line[3:]
                 elif section == ['phase']:
                     if phase_read:
                         self.phase.append([float(i) for i in line.split()[1:]])
         #
         self.kvecs = np.asarray(kvecs[:self.numk])
         del kvecs
-        self.nspin = len(orbitals) // (self.numk * self.nbands * self.natom)
-        if len(orbitals) % (self.numk * self.nbands * self.natom) != 0:
+        self.proj = np.fromstring(orbitals, dtype=float) 
+        self.nspin = self.proj.size // (self.numk * self.nbands * self.natom)
+        if self.proj.size % (self.numk * self.nbands * self.natom):
             raise RuntimeError("PROCAR file may be broken")
         if self.nspin == 1:  # standard
             self.label['spin'] = ['']
@@ -446,14 +446,12 @@ class PROCAR(ProjectionBand):  # Version safety
         self.label['orbital'] = orbital_names
         self.label['site'] = list(range(self.natom))
         if self.nspin == 4:
-            self.proj = np.asarray(
-                orbitals).reshape(self.numk, self.nbands,
+            self.proj = self.proj.reshape(self.numk, self.nbands,
                                   self.nspin, self.natom,
                                   len(self.label['orbital'])).transpose(
                                       (2, 0, 1, 3, 4))
         elif self.nspin == 1 or self.nspin == 2:
-            self.proj = np.asarray(
-                orbitals).reshape((self.nspin, self.numk,
+            self.proj = self.proj.reshape((self.nspin, self.numk,
                                    self.nbands, self.natom,
                                    len(self.label['orbital'])))
         thefile.close()
