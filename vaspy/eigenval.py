@@ -105,23 +105,7 @@ class EnergyBand(object):
                 label_list.append(tmp)
         return label_list
 
-    def make_label_text(self, *keys):
-        '''Return str the used for label for CSV-like data
-
-        Parameters
-        ----------
-
-        keys: tuple
-          key tuple used for label
-        '''
-        label_list = self.make_label(*keys)
-        output = label_list[0]
-        for label in label_list[1:]:
-            output += '\t'+label
-        output += '\n'
-        return output
-
-    def to_3dlist(self):
+    def to_3dlist(self, **kwargs):
         '''Return 3D mentional list
 
         list[band_i, [k_i, energy, (energy_down)]]
@@ -138,7 +122,7 @@ class EnergyBand(object):
             bandstructure.append(band)
         return bandstructure
 
-    def to_csv(self, csv_file, label_str='', blankline=True):
+    def to_csv(self, csv_file, blankline=True):
         '''Write data to csv file
 
         Parameters
@@ -150,8 +134,7 @@ class EnergyBand(object):
         blankline: boolean
            It True (default), the blank line is inserted between band data
         '''
-        if not label_str:
-            label_str = self.make_label_text('k', 'energy')
+        label_str = '\t'.join(self.make_label('k', 'energy')) + '\n'
         with open(csv_file, 'w') as fhandle:
             fhandle.writelines(label_str)
             writer = csv.writer(fhandle, delimiter='\t')
@@ -159,7 +142,7 @@ class EnergyBand(object):
                 writer.writerows(band_i)
                 if blankline:
                     fhandle.writelines('\n')
-
+                    
     def __str__(self):
         '''
         Returns
