@@ -416,11 +416,14 @@ class PROCAR(ProjectionBand):  # Version safety
         #
         self.kvecs = np.asarray(kvecs[:self.numk])
         del kvecs
-        self.proj = np.fromstring(orbitals, dtype=float)
+        self.proj = np.fromstring(orbitals, dtype=float, sep=' ')
         del orbitals
         self.label['orbital'] = orbital_names
-        norbital = len(orbital_names)
+        norbital = len(self.label['orbital'])
+        logging.debug(
+            'nspin:  {0}'.format(self.nspin))
         self.label['site'] = list(range(self.natom))
+
         self.nspin = self.proj.size // (self.numk * self.nbands *
                                         self.natom * norbital)        
         #
