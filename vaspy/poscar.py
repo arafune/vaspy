@@ -745,6 +745,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         for index, site in enumerate(site_list):
             target_atom = self.positions[site]
             atoms27 = self.make27candidate(target_atom)
+
             def func(pos, center):
                 molecule[index] = pos
                 if center is not None:  # bool([np.ndarray]) => Error
@@ -972,6 +973,7 @@ def _vectorize(vector):
     if not isinstance(vector, (np.ndarray, np.matrix, list, tuple)):
         raise TypeError('Cannot convert into vector.')
     return np.array(vector).flatten()
+
 
 # --------------------------
 

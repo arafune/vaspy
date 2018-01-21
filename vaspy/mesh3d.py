@@ -1,5 +1,4 @@
-'''
-mesh3D Module to provide class VASPGRID FFT-grid NG(X,Y,Z)F
+'''mesh3D Module to provide class VASPGRID FFT-grid NG(X,Y,Z)F
 
 That is this is class VASPGRID is the parent class of CHGCAR,
  LOCPOT, and ELFCAR.  The ELFCAR class has not yet implemented yet, though.
@@ -275,7 +274,7 @@ class Grid3D(object):
         number of frames
     shape: tuple
         shape[0], shape[1], shape[2]
-    data: list or numpy.array
+    data: list or numpy.ndarray
         1D-list or 1D-numpy array.
         The length of grid is shape[0] * shape[1] * shape[2]
     '''
@@ -323,7 +322,7 @@ class Grid3D(object):
         Return
         ------
 
-        numpy.array
+        numpy.ndarray
             2D numpy array that sliced from 3D mesh data.
         '''
         griddata = self.data[frame_i * self.size: (frame_i+1) * self.size]
@@ -361,7 +360,7 @@ class Grid3D(object):
         Return
         ------
 
-        numpy.array
+        numpy.ndarray
             2D numpy array that integrated from 3D mesh data
 
         '''
@@ -412,7 +411,7 @@ class Grid3D(object):
             outputstr += '\n'.join(output)
         return outputstr + '\n'
 
-    def average_along_axis(self, axis_name, mode=0):
+    def average_along_axis(self, axis_name, frame_i=0):
         '''
         Calculate average value of potential along 'axis'
 
@@ -430,10 +429,10 @@ class Grid3D(object):
             average value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data.reshape(self.nframe,
-                                 self.shape[2],
-                                 self.shape[1],
-                                 self.shape[0])[mode]
+        data = self.data[frame_i * self.size:
+                         (frame_i+1) * self.size].reshape((self.shape[2],
+                                                           self.shape[1],
+                                                           self.shape[0]))
         if axis_name == 'X':
             data = np.average(np.average(
                 np.transpose(data, (2, 0, 1)), axis=2), axis=1)
@@ -446,7 +445,7 @@ class Grid3D(object):
             raise 'Wrong axis name set'
         return data
 
-    def min_along_axis(self, axis_name, mode=0):
+    def min_along_axis(self, axis_name, frame_i=0):
         '''
         Calculate minimum value of potential along 'axis'
 
@@ -464,10 +463,10 @@ class Grid3D(object):
             minimum value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data.reshape(self.nframe,
-                                 self.shape[2],
-                                 self.shape[1],
-                                 self.shape[0])[mode]
+        data = self.data[frame_i * self.size:
+                         (frame_i+1) * self.size].reshape((self.shape[2],
+                                                           self.shape[1],
+                                                           self.shape[0]))
         if axis_name == 'X':
             data = np.min(np.min(
                 np.transpose(data, (2, 0, 1)), axis=2), axis=1)
@@ -480,7 +479,7 @@ class Grid3D(object):
             raise 'Wrong axis name set'
         return data
 
-    def max_along_axis(self, axis_name, mode=0):
+    def max_along_axis(self, axis_name, frame_i=0):
         '''
         Calculate maximum value of potential along 'axis'
 
@@ -498,10 +497,10 @@ class Grid3D(object):
             maximum value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data.reshape(self.nframe,
-                                 self.shape[2],
-                                 self.shape[1],
-                                 self.shape[0])[mode]
+        data = self.data[frame_i * self.size:
+                         (frame_i+1) * self.size].reshape((self.shape[2],
+                                                           self.shape[1],
+                                                           self.shape[0]))
         if axis_name == 'X':
             data = np.max(np.max(
                 np.transpose(data, (2, 0, 1)), axis=2), axis=1)
@@ -514,7 +513,7 @@ class Grid3D(object):
             raise 'Wrong axis name set'
         return data
 
-    def median_along_axis(self, axis_name, mode=0):
+    def median_along_axis(self, axis_name, frame_i=0):
         '''
         Calculate median value of potential along 'axis'
 
@@ -532,10 +531,10 @@ class Grid3D(object):
             median value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data.reshape(self.nframe,
-                                 self.shape[2],
-                                 self.shape[1],
-                                 self.shape[0])[mode]
+        data = self.data[frame_i * self.size:
+                         (frame_i+1) * self.size].reshape((self.shape[2],
+                                                           self.shape[1],
+                                                           self.shape[0]))
         if axis_name == 'X':
             data = np.median(np.median(
                 np.transpose(data, (2, 0, 1)), axis=2), axis=1)
