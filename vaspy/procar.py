@@ -420,12 +420,9 @@ class PROCAR(ProjectionBand):  # Version safety
         del orbitals
         self.label['orbital'] = orbital_names
         norbital = len(self.label['orbital'])
-        logging.debug(
-            'nspin:  {0}'.format(self.nspin))
         self.label['site'] = list(range(self.natom))
-
         self.nspin = self.proj.size // (self.numk * self.nbands *
-                                        self.natom * norbital)        
+                                        self.natom * norbital)
         #
         if self.nspin == 1:  # standard
             self.label['spin'] = ['']
@@ -478,9 +475,9 @@ class PROCAR(ProjectionBand):  # Version safety
     ((# of k-points) * (# of bands) * (# of ions) =
         {0.numk}*{0.nbands}*{0.natom}={5})
   # of phase component: {6}'''
-        str = ""
+        string = ""
         for orb in self.label['orbital']:
-            str += '{0}  '.format(orb)
+            string += '{0}  '.format(orb)
         template2 = '''
   # Orbitals are: {0}
         '''.format(str)
