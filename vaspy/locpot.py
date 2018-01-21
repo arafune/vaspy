@@ -13,7 +13,7 @@ try:
     import matplotlib.pyplot as plt
 except ImportError:
     sys.stderr.write(
-        'Install matplotlib, or you cannot use methods relating to draw')
+        'Install matplotlib, or you cannot use methods relating to draw\n')
 try:
     from vaspy import mesh3d
 except ImportError:

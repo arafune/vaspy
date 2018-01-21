@@ -25,7 +25,7 @@ parser.add_argument('--band', '-b', metavar='band_index',
 parser.add_argument('--output', metavar='output_filename',
                     type=str,
                     help='''filename for output.
-the actural filename is 'output_s_(spin_index)_k_(k_index)_b_(bandindex).vasp'
+filename is 'output_s_(spin_index)_k_(k_index)_b_(bandindex).vasp'
 If notspecified, standard output is used.
 ''')
 parser.add_argument('wavecar', metavar='WAVECAR_file',
