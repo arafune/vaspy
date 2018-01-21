@@ -65,7 +65,6 @@ class CHGCAR(mesh3d.VASPGrid):
                 thefile = open(filename)
             self.load_file(thefile, pickleddata)
 
-
     def load_file(self, thefile, pickleddata=None):
         '''
         Parse CHGCAR file to construct CHGCAR object
@@ -74,7 +73,7 @@ class CHGCAR(mesh3d.VASPGrid):
         ----------
 
         thefile: StringIO
-            CHGCAR file 
+            CHGCAR file
         '''
         super(CHGCAR, self).load_file(thefile, pickleddata)
         if self.grid.nframe == 1:

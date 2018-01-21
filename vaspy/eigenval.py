@@ -142,7 +142,7 @@ class EnergyBand(object):
                 writer.writerows(band_i)
                 if blankline:
                     fhandle.writelines('\n')
-                    
+
     def __str__(self):
         '''
         Returns

@@ -172,10 +172,10 @@ class ProjectionBand(eigenval.EnergyBand):
                 for spin_i in self.label['spin']:
                     try:
                         label = str(self.label['site'][site_i]) + \
-                                spin_i+'_'+ self.label['orbital'][orbital_i]
+                                spin_i + '_' + self.label['orbital'][orbital_i]
                     except TypeError:
                         label = str(self.label['site'][site_i]) + \
-                                spin_i+'_'+ \
+                                spin_i + '_' + \
                                 self.label['orbital'][orbital_i[0]]
                     label_list.append(label)
         return label_list
@@ -250,7 +250,6 @@ class ProjectionBand(eigenval.EnergyBand):
                 if blankline:
                     fhandle.writelines('\n')
 
-
     def text_sheet(self, site_indexes=(), orbital_indexes_sets=()):
         '''Return csv-like text data
 
@@ -284,6 +283,7 @@ class ProjectionBand(eigenval.EnergyBand):
                 output += '\n'
             output += '\n'
         return output
+
 
 class PROCAR(ProjectionBand):  # Version safety
     '''
@@ -375,14 +375,15 @@ class PROCAR(ProjectionBand):  # Version safety
             thefile.close()
             raise RuntimeError("This PROCAR is not a proper format\n \
                                 Check your INCAR the calculations.\n")
-        section = list()
         kvecs = []
         energies = []
         orbitals = ''
+        phase_r = ''
+        phase_i = ''
         orbital_names = []
         for line in thefile:
             if line.isspace():
-                section = []
+                continue
             elif "k-points: " in line:
                 self.numk, self.nbands, self.natom = [
                     int(i) for i in re.split(r'\s|:', line)
@@ -390,29 +391,30 @@ class PROCAR(ProjectionBand):  # Version safety
             elif "k-point " in line:
                 try:
                     kvecs.append([float(i) for i in line.split()[3:6]])
-                    section = []
                 except ValueError:
                     kvecs.append(
                         [np.float_(line[18:29]),
                          np.float_(line[29:40]), np.float_(line[40:51])])
-                    section = []
             elif "band " in line:
                 energies.append(float(line.split()[4]))
-                section = []
             elif "ion" in line:
-                if "tot" in line:
-                    section = ['orbital']
+                if "tot" in line and not orbital_names:
                     orbital_names = line.split()[1:]
-                else:
-                    section = ['phase']
-            else:
-                if section == ['orbital']:
-                    if "tot " in line[0:4]:
-                        continue
-                    orbitals += line[3:]
-                elif section == ['phase']:
-                    if phase_read:
-                        self.phase.append([float(i) for i in line.split()[1:]])
+                line = next(thefile)
+                while 'ion ' not in line:
+                    if 'tot ' not in line:
+                        orbitals += line[3:]
+                    line = next(thefile)
+                if phase_read:
+                    line = next(thefile)
+                    for _ in range(self.natom):
+                        try:
+                            phase_r += line[3:]
+                            line = next(thefile)
+                            phase_i += line[3:]
+                            line = next(thefile)
+                        except StopIteration:
+                            continue
         #
         self.kvecs = np.asarray(kvecs[:self.numk])
         del kvecs
@@ -423,6 +425,9 @@ class PROCAR(ProjectionBand):  # Version safety
         self.label['site'] = list(range(self.natom))
         self.nspin = self.proj.size // (self.numk * self.nbands *
                                         self.natom * norbital)
+        if phase_read:
+            self.phase = np.fromstring(phase_r, dtype=float, sep=' ') + \
+                (0 + 1.0J) * np.fromstring(phase_i, dtype=float, sep=' ')
         #
         if self.nspin == 1:  # standard
             self.label['spin'] = ['']
@@ -432,7 +437,11 @@ class PROCAR(ProjectionBand):  # Version safety
                                                          self.nbands)
             self.proj = self.proj.reshape((self.nspin, self.numk,
                                            self.nbands, self.natom,
-                                           len(self.label['orbital'])))
+                                           norbital))
+            if phase_read:
+                self.phase = self.phase.reshape((self.nspin, self.numk,
+                                                 self.nbands, self.natom,
+                                                 norbital-1))
         elif self.nspin == 2:   # collinear
             self.label['spin'] = ['_up', '_down']
             self.label['energy'] = ['Energy_up', 'Energy_down']
@@ -441,7 +450,11 @@ class PROCAR(ProjectionBand):  # Version safety
                                                          self.nbands)
             self.proj = self.proj.reshape((self.nspin, self.numk,
                                            self.nbands, self.natom,
-                                           len(self.label['orbital'])))
+                                           norbital))
+            if phase_read:
+                self.phase = self.phase.reshape((self.nspin, self.numk,
+                                                 self.nbands, self.natom,
+                                                 norbital-1))
         elif self.nspin == 4:  # non-collinear
             self.label['spin'] = ['_mT', '_mX', '_mY', '_mZ']
             self.label['energy'] = ['Energy']
@@ -450,8 +463,12 @@ class PROCAR(ProjectionBand):  # Version safety
                                                          self.nbands)
             self.proj = self.proj.reshape(self.numk, self.nbands,
                                           self.nspin, self.natom,
-                                          len(self.label['orbital'])).transpose(
+                                          norbital).transpose(
                                               (2, 0, 1, 3, 4))
+            if phase_read:
+                self.phase = self.phase.reshape((1, self.numk,
+                                                 self.nbands, self.natom,
+                                                 norbital-1))
         else:
             raise ValueError
         del energies
@@ -466,7 +483,7 @@ class PROCAR(ProjectionBand):  # Version safety
         template1 = '''The properties of this procar:
   # of k-points: {0.numk}
   # of bands: {0.nbands}
-  # of ions: {0.natom}
+  # of atoms: {0.natom}
   # of spin: {0.nspin}
   # of kvecs: {1}
   # of energies: {2}
@@ -546,7 +563,7 @@ def shortcheck(procar):
         elif 'ion' in line and 'tot' in line:
             orbitalnames = line.split()[1:]
             section = ['orbital']
-        elif 'ion' in line and 'tot' not in  line:
+        elif 'ion' in line and 'tot' not in line:
             section.pop()
             section = ['phase']
         elif 'tot' in line and 'ion' not in line:
