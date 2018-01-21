@@ -152,10 +152,6 @@ class ProjectionBand(eigenval.EnergyBand):
             err = str(orbname) + " is not a proper (composed) orbital name."
             raise RuntimeError(err)
 
-    def find_index_from_label(self, key, item):
-        '''Return the index corresponds 'item'''
-        return self.label[key].index[item]
-
     def make_label(self, site_indexes=None, orbital_indexes_sets=None):
         '''Return array the used for **label** for CSV-like data
 
