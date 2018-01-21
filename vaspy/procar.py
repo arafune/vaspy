@@ -62,8 +62,11 @@ class ProjectionBand(eigenval.EnergyBand):
         site_name: str
             label name for summed site, such as 'silicene', and 'SurfaceAu'
         '''
+        # As the original label['site'] is just a number beginnig from zero
+        if len(sites) == 1 and sites[0] in self.label[sites][:self.natom]:
+            self.label['site'][sites[0]] = site_name
         if site_name in self.label['site']:
-            return
+            return None
         self.label['site'].append(site_name)
         #    spin, k, band, atom
         sumsite = self.proj[:, :, :, sites, :].sum(axis=-2, keepdims=True)
@@ -87,7 +90,7 @@ class ProjectionBand(eigenval.EnergyBand):
            label name for summed orbital, such as 'p' and 'sp'
         '''
         if orbital_name in self.label['orbital']:
-            return
+            return None
         self.label['orbital'].append(orbital_name)
         #    spin, k, band, atom
         sumorbital = self.proj[:, :, :, :,
@@ -428,6 +431,7 @@ class PROCAR(ProjectionBand):  # Version safety
         if phase_read:
             self.phase = np.fromstring(phase_r, dtype=float, sep=' ') + \
                 (0 + 1.0J) * np.fromstring(phase_i, dtype=float, sep=' ')
+            del phase_r, phase_i
         #
         if self.nspin == 1:  # standard
             self.label['spin'] = ['']
