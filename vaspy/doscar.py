@@ -123,18 +123,18 @@ class DOSCAR(object):  # Version safety
             raise RuntimeError
         self.dos_container = [tdos]
         try:
-            nextheader = next(thefile)
+            line = next(thefile)
         except StopIteration:
-            nextheader = ""
-        while nextheader == header:
+            line = ""
+        while line == header:
             self.dos_container.append(
                 np.array([next(thefile).split()
                           for i in range(self.nbands)],
                          dtype=np.float64))
             try:
-                nextheader = next(thefile)
+                line = next(thefile)
             except StopIteration:
-                nextheader = ""
+                line = ""
 
 
 class DOS(object):  # Version safety
