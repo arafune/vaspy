@@ -235,7 +235,7 @@ class ProjectionBand(eigenval.EnergyBand):
         '''Write data to csv file
 
         Parameters
-        ------------- 
+        ----------
         csv_file: str
            filename for output
         label_str: str
@@ -420,40 +420,45 @@ class PROCAR(ProjectionBand):  # Version safety
         #
         self.kvecs = np.asarray(kvecs[:self.numk])
         del kvecs
-        self.proj = np.fromstring(orbitals, dtype=float) 
-        self.nspin = self.proj.size // (self.numk * self.nbands * self.natom)
-        if self.proj.size % (self.numk * self.nbands * self.natom):
-            raise RuntimeError("PROCAR file may be broken")
+        self.proj = np.fromstring(orbitals, dtype=float)
+        del orbitals
+        self.label['orbital'] = orbital_names
+        norbital = len(orbital_names)
+        self.label['site'] = list(range(self.natom))
+        self.nspin = self.proj.size // (self.numk * self.nbands *
+                                        self.natom * norbital)        
+        #
         if self.nspin == 1:  # standard
             self.label['spin'] = ['']
             self.label['energy'] = ['Energy']
             self.energies = np.asarray(energies).reshape(1,
                                                          self.numk,
                                                          self.nbands)
+            self.proj = self.proj.reshape((self.nspin, self.numk,
+                                           self.nbands, self.natom,
+                                           len(self.label['orbital'])))
         elif self.nspin == 2:   # collinear
             self.label['spin'] = ['_up', '_down']
             self.label['energy'] = ['Energy_up', 'Energy_down']
             self.energies = np.asarray(energies).reshape(2,
                                                          self.numk,
                                                          self.nbands)
+            self.proj = self.proj.reshape((self.nspin, self.numk,
+                                           self.nbands, self.natom,
+                                           len(self.label['orbital'])))
         elif self.nspin == 4:  # non-collinear
             self.label['spin'] = ['_mT', '_mX', '_mY', '_mZ']
             self.label['energy'] = ['Energy']
             self.energies = np.asarray(energies).reshape(1,
                                                          self.numk,
                                                          self.nbands)
-        del energies
-        self.label['orbital'] = orbital_names
-        self.label['site'] = list(range(self.natom))
-        if self.nspin == 4:
             self.proj = self.proj.reshape(self.numk, self.nbands,
-                                  self.nspin, self.natom,
-                                  len(self.label['orbital'])).transpose(
-                                      (2, 0, 1, 3, 4))
-        elif self.nspin == 1 or self.nspin == 2:
-            self.proj = self.proj.reshape((self.nspin, self.numk,
-                                   self.nbands, self.natom,
-                                   len(self.label['orbital'])))
+                                          self.nspin, self.natom,
+                                          len(self.label['orbital'])).transpose(
+                                              (2, 0, 1, 3, 4))
+        else:
+            raise ValueError
+        del energies
         thefile.close()
 
     def __repr__(self):
