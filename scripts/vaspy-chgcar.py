@@ -43,7 +43,7 @@ magZ : show the magnetization density in
 majority : extract the part for the
            majority spin (for spin resolved calc.)
 minority : extract the part for the
-           inority spin (for spin resolved calc.)""")
+           minority spin (for spin resolved calc.)""")
 
 parser.add_argument('--output', metavar='file_name',
                     help="""output file name
