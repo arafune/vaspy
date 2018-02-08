@@ -66,7 +66,7 @@ doses.extend(PDOS(*each) for each in zip(doscar.dos_container,
 #
 # Fermi level correction
 #
-[thedos.fermilevel_correction(args.fermi) for thedos in doses]
+[thedos.fermi_correction(args.fermi) for thedos in doses]
 #
 if args.atomset is not None:  # atomset and atomsetname are given by
                               # the command line argument.
