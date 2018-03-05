@@ -61,7 +61,7 @@ class TestCHGCAR(object):
             [2.57589571650E+00, 2.09247290400E+00, 1.03267062280E+00,
              1.74930752210E-01, -2.99056784380E-02],
             magCHG.grid.data[0:5])
-        eq_(["up-down"], magCHG.spininfo)
+        eq_(["up-down"], magCHG.spin)
 
     @with_setup(setup=setup)
     def test_mag_majority(self):

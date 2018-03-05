@@ -13,7 +13,7 @@ try:
     import matplotlib.pyplot as plt
 except ImportError:
     sys.stderr.write(
-        'Install matplotlib, or you cannot use methods relating to draw')
+        'Install matplotlib, or you cannot use methods relating to draw\n')
 try:
     from vaspy import mesh3d
 except ImportError:
@@ -30,8 +30,8 @@ class LOCPOT(mesh3d.VASPGrid):
 
 '''
 
-    def __init__(self, filename=None):
-        super(LOCPOT, self).__init__(filename)
+    def __init__(self, filename=None, pickleddata=None):
+        super(LOCPOT, self).__init__(filename, pickleddata)
 
     def plot_potential_along_axis(self, axis_name, frame=0):  # FIXME!!
         '''

@@ -11,6 +11,10 @@ from itertools import chain
 from vaspy import tools
 from vaspy.outcar import OUTCAR
 import vaspy.procar as procar
+import logging
+logging.basicConfig(level=logging.DEBUG,
+                    format=' %(asctime)s - %(levelname)s -%(message)s')
+logging.disable(logging.DEBUG)
 
 parser = argparse.ArgumentParser(
     formatter_class=argparse.RawTextHelpFormatter)
@@ -55,35 +59,56 @@ elif args.fermi is not None:
 else:
     fermi = 0.0
 procar = procar.PROCAR(args.procar)
-
-if args.atomindex is None and args.orbital is None and args.atomsetname is None:
-    if recvec:
-        band = procar.onlyband(recvec)
-    else:
-        band = procar.onlyband()
-    del procar
-    if fermi != 0.0:
-        band.fermi_correction(fermi)
-    print(band)
-else:
-    if not len(args.atomindex) == len(args.orbital) == len(args.atomsetname):
-        raise parser.error("--atom, --as and --orbital are mismatched.")
-    #
-    sitenames = tuple(chain.from_iterable(args.atomsetname))
-    flat_orbitals = tuple(chain.from_iterable(args.orbital))
-    #
-    # As atomindex used here begins with "1", but siteindex used in procar.py
-    # internaly begins with "0".  (This is because VASP is fortran program !)
-    siteindex = [[i-1 for i in internal] for internal in args.atomindex]
-    #
-    if recvec:
-        band = procar.band(recvec)
-    else:
-        band = procar.band()
-    del procar  # for memory saving
-    if fermi != 0.0:
-        band.fermi_correction(fermi)
-    for sites in siteindex:
-        band.sum_site(sites)
-    band.sum_orbital(flat_orbitals)
-    print(band.str_sitecomposed_data(sitenames, args.orbital))
+procar.fermi_correction(fermi)
+if recvec:
+    procar.to_physical_kvector(recvec)
+#
+assert len(args.atomindex) == len(args.orbital) == len(args.atomsetname), \
+    "--atom, --as and --orbital are mismatched."
+#
+sitenames = tuple(chain.from_iterable(args.atomsetname))
+flat_orbitals = tuple(chain.from_iterable(args.orbital))
+#
+# As atomindex used here begins with "1", but siteindex used in procar.py
+# internaly begins with "0".  (This is because VASP is fortran program !)
+siteindex = [[i-1 for i in internal] for internal in args.atomindex]
+#
+logging.debug('siteindex are:')
+logging.debug(siteindex)
+logging.debug('sitenames are:')
+logging.debug(sitenames)
+logging.debug('orbitals are:')
+logging.debug(args.orbital)
+logging.debug('orbitals flat:')
+logging.debug(flat_orbitals)
+#
+for sites, name in zip(siteindex, sitenames):
+    procar.append_sumsite(tuple(sites), name)
+for orb in tuple(set(flat_orbitals)):
+    procar.append_sumorbital(procar.orb_index(orb), orb)
+#
+logging.debug("label['site'] is")
+logging.debug(procar.label['site'])
+logging.debug("label['orbital'] is")
+logging.debug(procar.label['oribital'])
+#
+site_indexes = []
+orbtal_indexes_sets = []
+for site in sitenames:
+    site_indexes.append(procar.label['site'].index(site))
+for orbitals in args.orbital:
+    tmp = []
+    for orb_in_site in orbitals:
+        tmp.append(procar.label['orbital'].index(orb_in_site))
+    tmp = tuple(tmp)
+    orbtal_indexes_sets(tmp)
+site_indexes = tuple(site_indexes)
+orbital_indexes_sets = tuple(orbtal_indexes_sets)
+#
+logging.debug('site_indexes:')
+logging.debug(site_indexes)
+logging.debug('orbital_indexes_sets:')
+logging.debug(orbital_indexes_sets)
+#
+print(procar.text_sheet(site_indexes=site_indexes,
+                        orbital_indexes_sets=orbital_indexes_sets))

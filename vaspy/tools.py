@@ -135,6 +135,7 @@ def parse_AtomselectionNum(L):
     '''
     return sorted(int(i) for i in parse_Atomselection(L))
 
+
 if __name__ == '__main__':
     import argparse
     EACH_SLICE_DEMO = lambda L, n: list(each_slice(L, n))

@@ -1,5 +1,4 @@
-'''
-mesh3D Module to provide class VASPGRID FFT-grid NG(X,Y,Z)F
+'''mesh3D Module to provide class VASPGRID FFT-grid NG(X,Y,Z)F
 
 That is this is class VASPGRID is the parent class of CHGCAR,
  LOCPOT, and ELFCAR.  The ELFCAR class has not yet implemented yet, though.
@@ -9,12 +8,8 @@ from __future__ import division, print_function
 import bz2
 import copy
 import os
-import re
 import numpy as np
 from vaspy import poscar, tools
-
-_RE_BLANK = re.compile(r'^[\s]*$')
-_RE_AUG_OCC = re.compile(r'\baugmentation occupancies')
 
 
 class VASPGrid(object):
@@ -55,7 +50,7 @@ class VASPGrid(object):
 
     poscar, grid, additional
     '''
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, pickleddata=None):
         self.poscar = poscar.POSCAR()
         self.grid = Grid3D()
         self.additional = []
@@ -67,9 +62,9 @@ class VASPGrid(object):
                     thefile = bz2.BZ2File(filename, mode='r')
             else:
                 thefile = open(filename)
-            self.load_file(thefile)
+            self.load_file(thefile, pickleddata)
 
-    def load_file(self, thefile):
+    def load_file(self, thefile, pickleddata=None):
         '''
         Construct the object from the file
 
@@ -78,46 +73,46 @@ class VASPGrid(object):
 
         thefile: StringIO
             file
+
+        pickleddata: str
+            griddata stored by np.save or np.savez
         '''
-        section = 'poscar'
         separator = None
         tmp = []
-        griddata = []
+        griddata = ''
+        # read POSCAR part
+        line = thefile.readline()
+        while not line.isspace():
+            tmp.append(line.strip('\n'))
+            line = thefile.readline()
+        self.poscar.load_array(tmp)
+        # read grid size and use it as separator
+        separator = thefile.readline()
+        self.grid.shape = tuple([int(string) for string
+                                 in separator.split()])
+        # Volumetric data
+        if pickleddata:
+            if os.path.splitext(pickleddata)[1] == '.npy':
+                self.grid.data = np.load(pickleddata)
+            elif os.path.splitext(pickleddata)[1] == '.npz':
+                self.grid.data = np.load(pickleddata)['arr_0']
+            else:
+                raise TypeError('Check the volmetric data type')
+            thefile.close()
+            return None
+        griddata += next(thefile).replace('***********', 'Nan')
+        if self.grid.size % len(griddata.split()) == 0:
+            lines_for_mesh = self.grid.size // len(griddata.split())
+        else:
+            lines_for_mesh = self.grid.size // len(griddata.split()) + 1
+        for _ in range(lines_for_mesh - 1):  # read the first frame
+            griddata += next(thefile).replace('***********', 'Nan')
+        section = 'grid'
         for line in thefile:
-            line = line.rstrip('\n')
-            if section == 'poscar':
-                if re.search(_RE_BLANK, line):
-                    self.poscar.load_array(tmp)
-                    section = 'define_separator'
-                else:
-                    tmp.append(line)
-            elif section == 'define_separator':
-                separator = line if separator is None else separator
-                if self.grid.shape == (0, 0, 0):
-                    self.grid.shape = tuple([int(string) for string
-                                             in line.split()])
-                griddata.extend(
-                    [float(i) for i in
-                     next(thefile).replace('***********',
-                                           'Nan').split()])
-                if self.grid.size % len(griddata) == 0:
-                    lines_for_mesh = self.grid.size // len(griddata)
-                else:
-                    lines_for_mesh = self.grid.size // len(griddata) + 1
-                for _ in range(lines_for_mesh - 1):
-                    griddata.extend(
-                        [float(val) for val in
-                         next(thefile).replace('***********',
-                                               'Nan').split()])
-                section = 'grid'
-            elif section == 'aug':
+            if section == 'aug':
                 if separator in line:
                     for _ in range(lines_for_mesh):
-                        griddata.extend(
-                            [float(val) for val in
-                             next(thefile).replace(
-                                 '***********',
-                                 'Nan').split()])
+                        griddata += next(thefile).replace('***********', 'Nan')
                     section = 'grid'
                 elif "augmentation occupancies " in line:
                     pass  # Used for CHGCAR, not LOCPOT. not implementd
@@ -128,15 +123,11 @@ class VASPGrid(object):
                     section = 'aug'
                 elif separator in line:
                     for _ in range(lines_for_mesh):
-                        griddata.extend(
-                            [float(val) for val in
-                             next(thefile).replace(
-                                 '***********',
-                                 'Nan').split()])
+                        griddata += next(thefile).replace('***********', 'Nan')
                 else:
                     # for unused data stored in LOCPOT
                     self.additional.extend(line.split())
-        self.grid.data = np.array(griddata, dtype=np.float64)
+        self.grid.data = np.fromstring(griddata, dtype=float, sep=' ')
         thefile.close()
 
     def __str__(self):
@@ -283,7 +274,7 @@ class Grid3D(object):
         number of frames
     shape: tuple
         shape[0], shape[1], shape[2]
-    data: list or numpy.array
+    data: list or numpy.ndarray
         1D-list or 1D-numpy array.
         The length of grid is shape[0] * shape[1] * shape[2]
     '''
@@ -318,7 +309,7 @@ class Grid3D(object):
         dest.data = self.data.reshape(self.nframe, self.size)[frame_i]
         return dest
 
-    def slice(self, axis, postition):
+    def slice(self, position, axis='z', frame_i=0):
         '''
         Parameters
         ----------
@@ -331,12 +322,25 @@ class Grid3D(object):
         Return
         ------
 
-        numpy.array
+        numpy.ndarray
             2D numpy array that sliced from 3D mesh data.
         '''
-        pass
+        griddata = self.data[frame_i * self.size: (frame_i+1) * self.size]
+        axis = axis.lower()
+        if axis == 'x':
+            return griddata.reshape(self.shape[2],
+                                    self.shape[1],
+                                    self.shape[0])[position, :, :]
+        elif axis == 'y':
+            return griddata.reshape(self.shape[2],
+                                    self.shape[1],
+                                    self.shape[0])[:, position, :]
+        elif axis == 'z':
+            return griddata.reshape(self.shape[2],
+                                    self.shape[1],
+                                    self.shape[0])[position, :, :]
 
-    def integrate(self, axis, from_coor, to_coor):
+    def integrate(self, from_coor, to_coor, axis, frame_i=0):
         '''
         Return 2D data integrated occupacy along the 'axis'
         from_coor to to_coor.
@@ -356,11 +360,32 @@ class Grid3D(object):
         Return
         ------
 
-        numpy.array
+        numpy.ndarray
             2D numpy array that integrated from 3D mesh data
 
         '''
-        pass
+        griddata = self.data[frame_i * self.size: (frame_i+1) * self.size]
+        axis = axis.lower()
+        if axis == 'x':
+            return np.sum(
+                griddata.reshape(self.shape[2],
+                                 self.shape[1],
+                                 self.shape[0])[:, :, from_coor:to_coor],
+                axis=0)
+        elif axis == 'y':
+            return np.sum(
+                griddata.reshape(self.shape[2],
+                                 self.shape[1],
+                                 self.shape[0])[:, from_coor:to_coor, :],
+                axis=0)
+        elif axis == 'z':
+            return np.sum(
+                griddata.reshape(self.shape[2],
+                                 self.shape[1],
+                                 self.shape[0])[from_coor:to_coor, :, :],
+                axis=0)
+        else:
+            raise ValueError('incorrect axis')
 
     def __str__(self):
         '''
@@ -386,7 +411,7 @@ class Grid3D(object):
             outputstr += '\n'.join(output)
         return outputstr + '\n'
 
-    def average_along_axis(self, axis_name, mode=0):
+    def average_along_axis(self, axis_name, frame_i=0):
         '''
         Calculate average value of potential along 'axis'
 
@@ -404,10 +429,10 @@ class Grid3D(object):
             average value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data.reshape(self.nframe,
-                                 self.shape[2],
-                                 self.shape[1],
-                                 self.shape[0])[mode]
+        data = self.data[frame_i * self.size:
+                         (frame_i+1) * self.size].reshape((self.shape[2],
+                                                           self.shape[1],
+                                                           self.shape[0]))
         if axis_name == 'X':
             data = np.average(np.average(
                 np.transpose(data, (2, 0, 1)), axis=2), axis=1)
@@ -420,7 +445,7 @@ class Grid3D(object):
             raise 'Wrong axis name set'
         return data
 
-    def min_along_axis(self, axis_name, mode=0):
+    def min_along_axis(self, axis_name, frame_i=0):
         '''
         Calculate minimum value of potential along 'axis'
 
@@ -438,10 +463,10 @@ class Grid3D(object):
             minimum value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data.reshape(self.nframe,
-                                 self.shape[2],
-                                 self.shape[1],
-                                 self.shape[0])[mode]
+        data = self.data[frame_i * self.size:
+                         (frame_i+1) * self.size].reshape((self.shape[2],
+                                                           self.shape[1],
+                                                           self.shape[0]))
         if axis_name == 'X':
             data = np.min(np.min(
                 np.transpose(data, (2, 0, 1)), axis=2), axis=1)
@@ -454,7 +479,7 @@ class Grid3D(object):
             raise 'Wrong axis name set'
         return data
 
-    def max_along_axis(self, axis_name, mode=0):
+    def max_along_axis(self, axis_name, frame_i=0):
         '''
         Calculate maximum value of potential along 'axis'
 
@@ -472,10 +497,10 @@ class Grid3D(object):
             maximum value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data.reshape(self.nframe,
-                                 self.shape[2],
-                                 self.shape[1],
-                                 self.shape[0])[mode]
+        data = self.data[frame_i * self.size:
+                         (frame_i+1) * self.size].reshape((self.shape[2],
+                                                           self.shape[1],
+                                                           self.shape[0]))
         if axis_name == 'X':
             data = np.max(np.max(
                 np.transpose(data, (2, 0, 1)), axis=2), axis=1)
@@ -488,7 +513,7 @@ class Grid3D(object):
             raise 'Wrong axis name set'
         return data
 
-    def median_along_axis(self, axis_name, mode=0):
+    def median_along_axis(self, axis_name, frame_i=0):
         '''
         Calculate median value of potential along 'axis'
 
@@ -506,10 +531,10 @@ class Grid3D(object):
             median value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data.reshape(self.nframe,
-                                 self.shape[2],
-                                 self.shape[1],
-                                 self.shape[0])[mode]
+        data = self.data[frame_i * self.size:
+                         (frame_i+1) * self.size].reshape((self.shape[2],
+                                                           self.shape[1],
+                                                           self.shape[0]))
         if axis_name == 'X':
             data = np.median(np.median(
                 np.transpose(data, (2, 0, 1)), axis=2), axis=1)

@@ -20,7 +20,7 @@ __all__ = ['chgcar',
 from vaspy import *
 
 
-def load(filename, mode=None):
+def load(filename, mode=None, additional=None):
     '''
     load file.  Guess the file type by the filename.
     Use `mode` option to specify the file type.
@@ -51,11 +51,11 @@ def load(filename, mode=None):
     elif re.search(r'outcar', filenamebase) or mode == 'outcar':
         return outcar.OUTCAR(filename)
     elif re.search(r'chgcar|parchg', filenamebase) or mode == 'chgcar':
-        return chgcar.CHGCAR(filename)
+        return chgcar.CHGCAR(filename, pickleddata=additional)
     elif re.search(r'procar', filenamebase) or mode == 'procar':
         return procar.PROCAR(filename)
     elif re.search(r'locpot', filenamebase) or mode == 'locpot':
-        return locpot.LOCPOT(filename)
+        return locpot.LOCPOT(filename, pickleddata=additional)
     elif re.search(r'doscar', filenamebase) or mode == 'doscar':
         return doscar.DOSCAR(filename)
     elif re.search(r'vasp', filenamebase):
