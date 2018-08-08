@@ -46,7 +46,7 @@ class LOCPOT(mesh3d.VASPGrid):
             'select frame potential' (very optional)
         '''
         axis_name = axis_name.capitalize()
-        axes_length = self.poscar.get_axes_lengthes()
+        axes_length = self.poscar.axes_lengthes
         if axis_name == 'X':
             horizontal_axis = np.linspace(
                 0, axes_length[0], self.grid.shape[0])
