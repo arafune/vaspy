@@ -15,7 +15,6 @@ The first is absolutely required.
  '''
 
 import os.path
-import re
 import bz2
 import numpy as np
 
@@ -56,8 +55,8 @@ class VSIM_ASC(object):
         # the 3rd line represents dzx, dzy, dzz
         dzx, dzy, dzz = [float(x) for x in next(thefile).split()]
         self.lattice_vector = np.array([[dxx, 0, 0],
-                                       [dyx, dyy, 0],
-                                       [dzx, dzy, dzz]])
+                                        [dyx, dyy, 0],
+                                        [dzx, dzy, dzz]])
         ions = []
         positions = []
         for line in thefile:
@@ -87,8 +86,8 @@ class VSIM_ASC(object):
             else:  # displacement vector
                 vectors = [float(x) for x in line[1:-1].split(';')]
                 dis_vectors.append([vectors[0] + vectors[3]*1j,
-                                   vectors[1] + vectors[4]*1j,
-                                   vectors[2] + vectors[5]*1j])
+                                    vectors[1] + vectors[4]*1j,
+                                    vectors[2] + vectors[5]*1j])
         n_phonons = len(self.freqs)
         self.d_vectors = np.array(dis_vectors).reshape(n_phonons,
                                                        sum(self.ionnums),
@@ -128,6 +127,7 @@ def ions_to_iontypes_ionnums(ions):
             iontypes.append(ion)
         thelast = ion
     return ionnums, iontypes
+
 
 if __name__ == '__main__':
     import doctest
