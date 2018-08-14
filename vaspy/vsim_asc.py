@@ -95,6 +95,51 @@ class VSIM_ASC(object):
         self.freqs = np.array(self.freqs)
 
 
+def animate_atom_phonon(position, qpt_cart, d_vector, mass=1.0,
+                        n_frames=30, s_frame=0, e_frame=None,
+                        magnitude=1):
+    '''Return atom position series determined by d_vector and q
+
+    Parameters
+    ------------
+    position: list, tuple, np.array
+       position of atom in cartesian coordinate
+    qpt_cart: np.array
+       wavevector in cartesian coordinate
+    d_vector: np.array
+       displacement (complex) vecror
+    mass: float
+       mass of atom
+    n_frames: int
+       total number of animationn frames
+    s_frame: int
+       start number of frame
+    e_frame: int or None
+       end number of frame
+    magnitude: float
+        Scale factor for atom moving
+
+    Returns
+    ---------
+
+    positions
+       list
+'''
+
+    position = np.array(position)  # for safe
+    positions = [position]
+    if not e_frame:
+        e_frame = s_frame + n_frames - 1
+    for frame in range(s_frame, e_frame+1):
+        exponent = np.exp(1.0j * np.dot(position, qpt_cart) -
+                          2 * np.pi * frame/n_frames)
+        normal_displ = np.array(list(map((lambda y: (y.real)),
+                                         [x * exponent for x in d_vector])))
+        pos = position + magnitude * normal_displ / np.sqrt(mass)
+        positions.append(pos)
+    return positions
+
+
 def ions_to_iontypes_ionnums(ions):
     '''Return ionnums and iontypes list
 
