@@ -127,7 +127,7 @@ def animate_atom_phonon(position, qpt_cart, d_vector, mass=1.0,
 '''
 
     position = np.array(position)  # for safe
-    positions = [position]
+    positions = []
     if not e_frame:
         e_frame = s_frame + n_frames - 1
     for frame in range(s_frame, e_frame+1):
