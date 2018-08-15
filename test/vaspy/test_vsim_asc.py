@@ -28,10 +28,7 @@ class TestVsimASCII(object):
                                    self.hBN.lattice_vector[1])
         np.testing.assert_allclose([0, 0, 24.85], 
                                    self.hBN.lattice_vector[2])
-        eq_(1, self.hBN.ionnums[0])
-        eq_(1, self.hBN.ionnums[1])
-        eq_('B', self.hBN.iontypes[0])
-        eq_('N', self.hBN.iontypes[1])
+        eq_(['B', 'N'], self.hBN.ions)
         #
         #
         np.testing.assert_allclose([9.354567, 17.815346, 26.162733,

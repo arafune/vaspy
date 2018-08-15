@@ -30,10 +30,10 @@ class VSIM_ASC(object):
 
     system_name: str
         System name
-    ionnums: list
-        Number of each ions (The total number of ions is sum(ionnums)
-    iontypes: list
-        List of ion names
+    ions: list
+        Atoms used
+    positions: list
+        List of ion positionn in static
     qpts: list
         List of qvectors
     freqs: list
@@ -44,8 +44,7 @@ class VSIM_ASC(object):
 '''
     def __init__(self, filename=None):
         self.system_name = ""
-        self.ionnums = []
-        self.iontypes = []
+        self.ions = []
         #
         self.qpts = []
         self.freqs = []
@@ -79,19 +78,19 @@ class VSIM_ASC(object):
         self.lattice_vector = np.array([[dxx, 0, 0],
                                         [dyx, dyy, 0],
                                         [dzx, dzy, dzz]])
-        ions = []
-        positions = []
+        self.ions = []
+        self.positions = []
+        self.d_vectors = []
         for line in thefile:
             line = line.strip()
             if line[0] == "#" or line[0] == "!":
                 phonon_lines.append(line[1:].strip())
             else:
                 x, y, z, ion = line.split()
-                ions.append(ion)
-                positions.append(np.array([float(x), float(y), float(z)]))
-        self.ionnums, self.iontypes = ions_to_iontypes_ionnums(ions)
-        #
-        dis_vectors = []
+                self.ions.append(ion)
+                self.positions.append(np.array(
+                    [float(x), float(y), float(z)]))
+        # self.ionnums, self.iontypes = ions_to_iontypes_ionnums(self.ions)
         #
         for line in phonon_lines:
             if 'metaData' in line:
@@ -107,13 +106,13 @@ class VSIM_ASC(object):
                 pass
             else:  # displacement vector
                 vectors = [float(x) for x in line[1:-1].split(';')]
-                dis_vectors.append([vectors[0] + vectors[3]*1j,
-                                    vectors[1] + vectors[4]*1j,
-                                    vectors[2] + vectors[5]*1j])
+                self.d_vectors.append([vectors[0] + vectors[3]*1j,
+                                       vectors[1] + vectors[4]*1j,
+                                       vectors[2] + vectors[5]*1j])
         n_phonons = len(self.freqs)
-        self.d_vectors = np.array(dis_vectors).reshape(n_phonons,
-                                                       sum(self.ionnums),
-                                                       3)
+        self.d_vectors = np.array(self.d_vectors).reshape(n_phonons,
+                                                          len(self.ions),
+                                                          3)
         self.freqs = np.array(self.freqs)
 
     def build_animation_frame(self, mode=0, supercell=(2, 2, 1), n_frames=30):
