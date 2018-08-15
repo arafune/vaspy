@@ -14,6 +14,7 @@ This module generates
 The first is absolutely required.
  '''
 
+import itertools
 import os.path
 import bz2
 import numpy as np
@@ -128,7 +129,20 @@ class VSIM_ASC(object):
         n_frames: int
            total number of animation frmaes
 '''
-        pass
+        # カーテシアンのk をつくる
+        #
+        # 以下各原子についてsupercell の位置を求めそれぞれ
+        # phonon mode に対応した原子位置変化を計算する
+        for atom_index, position in enumerate(self.positions):
+            #  変位ベクトルをもとめる
+            #  mass
+            #
+            for cell_id in itertools.product(range(supercell[0]),
+                                             range(supercell[1]),
+                                             range(supercell[2])):
+                # 原子位置を求める。
+                # animate_atom_phononの実行
+                pass
 
 
 def animate_atom_phonon(position, qpt_cart, d_vector, mass=1.0,
