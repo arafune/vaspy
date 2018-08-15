@@ -37,11 +37,11 @@ class TestVsimASCII(object):
         np.testing.assert_allclose([9.354567, 17.815346, 26.162733,
                                    32.356041, 35.832499, 39.191721],
                                    self.hBN.freqs)
-        #
+        #  mode is '3', second atom
         np.testing.assert_allclose([0.000000 + -0.188937j,
                                     -0.188937 + 0.000000j,
                                     -0.000000 + 0.000000],
-                                   self.hBN.d_vectors[3][1])  #  mode is '3', second atom
+                                   self.hBN.d_vectors[3][1])
         np.testing.assert_allclose([-0.112619 -0.065020j,
                                     0.065021 - 0.112619j,
                                     0.0 -0.0j],

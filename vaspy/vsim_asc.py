@@ -20,10 +20,32 @@ import numpy as np
 
 
 class VSIM_ASC(object):
+    '''VSIM_ASC
+
+    Collection of phonon mode data from v_scim ascii file
+
+
+    Attributes
+    -----------
+
+    system_name: str
+        System name
+    ionnums: list
+        Number of each ions (The total number of ions is sum(ionnums)
+    iontypes: list
+        List of ion names
+    qpts: list
+        List of qvectors
+    freqs: list
+        List of phonon frequencies
+    d_vectors: np.array
+        d_vectors[mode#][atom#] returns the displacement (complex) vector
+    lattice.vectors: np.array
+'''
     def __init__(self, filename=None):
+        self.system_name = ""
         self.ionnums = []
         self.iontypes = []
-        self.system_name = ""
         #
         self.qpts = []
         self.freqs = []
@@ -94,6 +116,21 @@ class VSIM_ASC(object):
                                                        3)
         self.freqs = np.array(self.freqs)
 
+    def build_animation_frame(self, mode=0, supercell=(2, 2, 1), n_frames=30):
+        '''Build data for creating POSCAR etc.,
+
+        Parameters
+        ----------
+
+        mode: int
+           mode number
+        supercell: tuple
+           supercell dimensions
+        n_frames: int
+           total number of animation frmaes
+'''
+        pass
+
 
 def animate_atom_phonon(position, qpt_cart, d_vector, mass=1.0,
                         n_frames=30, s_frame=0, e_frame=None,
@@ -102,6 +139,7 @@ def animate_atom_phonon(position, qpt_cart, d_vector, mass=1.0,
 
     Parameters
     ------------
+
     position: list, tuple, np.array
        position of atom in cartesian coordinate
     qpt_cart: np.array
@@ -122,8 +160,8 @@ def animate_atom_phonon(position, qpt_cart, d_vector, mass=1.0,
     Returns
     ---------
 
-    positions
-       list
+    positions: list
+        List of atom position representing animation
 '''
 
     position = np.array(position)  # for safe
