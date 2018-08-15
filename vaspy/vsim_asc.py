@@ -76,7 +76,7 @@ class VSIM_ASC(object):
         dxx, dyx, dyy = [float(x) for x in next(thefile).split()]
         # the 3rd line represents dzx, dzy, dzz
         dzx, dzy, dzz = [float(x) for x in next(thefile).split()]
-        self.lattice_vector = np.array([[dxx, 0, 0],
+        self.lattice_vectors = np.array([[dxx, 0, 0],
                                         [dyx, dyy, 0],
                                         [dzx, dzy, dzz]])
         self.ions = []
@@ -129,10 +129,12 @@ class VSIM_ASC(object):
         n_frames: int
            total number of animation frmaes
 '''
-        # カーテシアンのk をつくる
-        #
+        qpt = self.qpts[mode]
+        bmatrix = 2 * np.pi * np.linalg.inv(self.lattice_vectors).transpose()
+        qpt_cartesian = bmatrix.dot(qpt)
         # 以下各原子についてsupercell の位置を求めそれぞれ
         # phonon mode に対応した原子位置変化を計算する
+        
         for atom_index, position in enumerate(self.positions):
             #  変位ベクトルをもとめる
             #  mass
@@ -143,6 +145,20 @@ class VSIM_ASC(object):
                 # 原子位置を求める。
                 # animate_atom_phononの実行
                 pass
+
+    def abs_position(self, position):
+        '''Return absolute position in supercell
+
+        Parameters
+        -----------
+        position: np.array
+           position
+        
+
+        Returns
+        ---------
+        position: np.array
+'''
 
 
 def animate_atom_phonon(position, qpt_cart, d_vector, mass=1.0,
