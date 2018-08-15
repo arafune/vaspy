@@ -44,3 +44,11 @@ class TestVsimASCII(object):
                                     0.0 -0.0j],
                                    self.hBN.d_vectors[5][1])
 
+
+
+class Test_animate_atom_phonon(object):
+    '''上手く動くようになったらテストルーチンを書いておこう）'''
+    '''animate_atom_phonon(position, qpt_cart, d_vector, mass=1.0,
+                        n_frames=30, s_frame=0, e_frame=None,
+                        magnitude=1):'''
+    pass

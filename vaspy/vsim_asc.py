@@ -20,6 +20,7 @@ import bz2
 import numpy as np
 import vaspy.const as const
 
+
 class VSIM_ASC(object):
     '''VSIM_ASC
 
@@ -116,7 +117,26 @@ class VSIM_ASC(object):
                                                           3)
         self.freqs = np.array(self.freqs)
 
-    def build_animation_frame(self, mode=0, supercell=(2, 2, 1), n_frames=30):
+    def abs_position(self, position, cell_id):
+        '''Return absolute position in supercell
+
+        Parameters
+        -----------
+        position: np.array
+           position
+
+
+        Returns
+        ---------
+        np.array
+'''
+        cart_pos = position
+        for cell_dim, vector in zip(cell_id, self.lattice_vectors):
+            cart_pos += cell_dim * vector
+        return cart_pos
+
+    def build_phono_motion(self, mode=0, supercell=(2, 2, 1),
+                           n_frames=30, magnitude=1):
         '''Build data for creating POSCAR etc.,
 
         Parameters
@@ -131,34 +151,23 @@ class VSIM_ASC(object):
 '''
         qpt = self.qpts[mode]
         bmatrix = 2 * np.pi * np.linalg.inv(self.lattice_vectors).transpose()
-        qpt_cartesian = bmatrix.dot(qpt)
-        # 以下各原子についてsupercell の位置を求めそれぞれ
-        # phonon mode に対応した原子位置変化を計算する
-        
-        for atom_index, position in enumerate(self.positions):
-            #  変位ベクトルをもとめる
-            #  mass
-            #
+        qpt_cart = bmatrix.dot(qpt)
+        #
+        animation_positions = []
+        for atom_i, position in enumerate(self.positions):
             for cell_id in itertools.product(range(supercell[0]),
                                              range(supercell[1]),
                                              range(supercell[2])):
-                # 原子位置を求める。
+                position = self.abs_position(position, cell_id)
                 # animate_atom_phononの実行
-                pass
-
-    def abs_position(self, position):
-        '''Return absolute position in supercell
-
-        Parameters
-        -----------
-        position: np.array
-           position
-        
-
-        Returns
-        ---------
-        position: np.array
-'''
+                positions = animate_atom_phonon(position, qpt_cart,
+                                                self.d_vectors[mode][atom_i],
+                                                mass=const.masses[
+                                                    self.ions[atom_i]],
+                                                n_frames=n_frames,
+                                                magnitude=magnitude)
+                animation_positions.append(positions)
+        return animation_positions
 
 
 def animate_atom_phonon(position, qpt_cart, d_vector, mass=1.0,
