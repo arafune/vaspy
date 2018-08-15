@@ -26,7 +26,7 @@ class TestVsimASCII(object):
                                    self.hBN.lattice_vector[0])
         np.testing.assert_allclose([1.242498697, 2.152072878, 0],
                                    self.hBN.lattice_vector[1])
-        np.testing.assert_allclose([0, 0, 24.85], 
+        np.testing.assert_allclose([0, 0, 24.85],
                                    self.hBN.lattice_vector[2])
         eq_(['B', 'N'], self.hBN.ions)
         #
@@ -39,11 +39,10 @@ class TestVsimASCII(object):
                                     -0.188937 + 0.000000j,
                                     -0.000000 + 0.000000],
                                    self.hBN.d_vectors[3][1])
-        np.testing.assert_allclose([-0.112619 -0.065020j,
+        np.testing.assert_allclose([-0.112619 - 0.065020j,
                                     0.065021 - 0.112619j,
-                                    0.0 -0.0j],
+                                    0.0 - 0.0j],
                                    self.hBN.d_vectors[5][1])
-
 
 
 class Test_animate_atom_phonon(object):
