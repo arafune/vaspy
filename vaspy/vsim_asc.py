@@ -18,7 +18,7 @@ import itertools
 import os.path
 import bz2
 import numpy as np
-
+import vaspy.const as const
 
 class VSIM_ASC(object):
     '''VSIM_ASC
