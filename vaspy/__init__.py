@@ -16,6 +16,8 @@ __all__ = ['chgcar',
            'eigenval',
            'wavecar',
            'mesh3d',
+           'const',
+           'vsim_asc',
            'tools']
 from vaspy import *
 
