@@ -13,9 +13,8 @@ This module generates
 
 The first is absolutely required.
  '''
-
 import logging
-logging.basicConfig(level=logging.CRITICAL,
+logging.basicConfig(level=logging.DEBUG,
                     format=' %(asctime)s - %(levelname)s - %(message)s')
 
 import itertools
@@ -121,23 +120,6 @@ class VSIM_ASC(object):
                                                           3)
         self.freqs = np.array(self.freqs)
 
-    def abs_position(self, position, cell_id):
-        '''Return absolute position in supercell
-
-        Parameters
-        -----------
-        position: np.array
-           position
-
-
-        Returns
-        ---------
-        np.array
-'''
-        cart_pos = position
-        for cell_dim, vector in zip(cell_id, self.lattice_vectors):
-            cart_pos += cell_dim * vector
-        return cart_pos
 
     def build_phono_motion(self, mode=0, supercell=(2, 2, 1),
                            n_frames=30, magnitude=1):
@@ -155,19 +137,23 @@ class VSIM_ASC(object):
 '''
         qpt = self.qpts[mode]
         bmatrix = 2 * np.pi * np.linalg.inv(self.lattice_vectors).transpose()
-        qpt_cart = bmatrix.dot(qpt)
+        #print('bmatrix is :{}'.format(bmatrix))
+        qpt_cart = qpt.dot(bmatrix)
+        #print('qpt_cart :{}'.format(qpt_cart))
         logging.debug('qpt_cart[x] = {}, qpt_cart[y] = {}, qpt_cart[z] ={}'.format(qpt_cart[0],
                                                                                    qpt_cart[1],
                                                                                    qpt_cart[2]))
         #
         animation_positions = []
         for atom_i, position in enumerate(self.positions):
+
             for cell_id in itertools.product(range(supercell[0]),
                                              range(supercell[1]),
                                              range(supercell[2])):
-                abs_position = self.abs_position(position, cell_id)
-                # animate_atom_phononの実行
-                positions = animate_atom_phonon(abs_position, qpt_cart,
+                abs_pos =  position + (self.lattice_vectors[0] * cell_id[0] +
+                                       self.lattice_vectors[1] * cell_id[1] +
+                                       self.lattice_vectors[2] * cell_id[2])
+                positions = animate_atom_phonon(abs_pos, qpt_cart,
                                                 self.d_vectors[mode][atom_i],
                                                 mass=const.masses[
                                                     self.ions[atom_i]],
@@ -200,7 +186,7 @@ def supercell_lattice_vectors(lattice_vectors, cell_id):
 
 def animate_atom_phonon(position, qpt_cart, d_vector, mass=1.0,
                         n_frames=30, s_frame=0, e_frame=None,
-                        magnitude=1):
+                        magnitude=1.0):
     '''Return atom position series determined by d_vector and q
 
     Parameters
@@ -237,10 +223,15 @@ def animate_atom_phonon(position, qpt_cart, d_vector, mass=1.0,
     for frame in range(s_frame, e_frame+1):
         exponent = np.exp(1.0j * np.dot(position, qpt_cart) -
                           2 * np.pi * frame/n_frames)
+        print('position:{}, qpt_cart;{}, frame:{}, n_frames:{}'.format(position, qpt_cart, frame, n_frames))
+        print('exponent:{}'.format(exponent))
+        logging.debug('exponent:{}'.format(exponent))
         normal_displ = np.array(list(map((lambda y: (y.real)),
                                          [x * exponent for x in d_vector])))
-        pos = position + magnitude * normal_displ / np.sqrt(mass)
-        positions.append(pos)
+        logging.debug('normal_displ:{}'.format(normal_displ))
+        print('normal_displ:{}'.format(normal_displ))
+        position = position + magnitude * normal_displ / np.sqrt(mass)
+        positions.append(position)
     return positions
 
 
