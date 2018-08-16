@@ -14,6 +14,10 @@ This module generates
 The first is absolutely required.
  '''
 
+import logging
+logging.basicConfig(level=logging.CRITICAL,
+                    format=' %(asctime)s - %(levelname)s - %(message)s')
+
 import itertools
 import os.path
 import bz2
@@ -152,15 +156,18 @@ class VSIM_ASC(object):
         qpt = self.qpts[mode]
         bmatrix = 2 * np.pi * np.linalg.inv(self.lattice_vectors).transpose()
         qpt_cart = bmatrix.dot(qpt)
+        logging.debug('qpt_cart[x] = {}, qpt_cart[y] = {}, qpt_cart[z] ={}'.format(qpt_cart[0],
+                                                                                   qpt_cart[1],
+                                                                                   qpt_cart[2]))
         #
         animation_positions = []
         for atom_i, position in enumerate(self.positions):
             for cell_id in itertools.product(range(supercell[0]),
                                              range(supercell[1]),
                                              range(supercell[2])):
-                position = self.abs_position(position, cell_id)
+                abs_position = self.abs_position(position, cell_id)
                 # animate_atom_phononの実行
-                positions = animate_atom_phonon(position, qpt_cart,
+                positions = animate_atom_phonon(abs_position, qpt_cart,
                                                 self.d_vectors[mode][atom_i],
                                                 mass=const.masses[
                                                     self.ions[atom_i]],
@@ -168,6 +175,27 @@ class VSIM_ASC(object):
                                                 magnitude=magnitude)
                 animation_positions.append(positions)
         return animation_positions
+
+
+def supercell_lattice_vectors(lattice_vectors, cell_id):
+    '''Return lattice vectors of supercell
+
+    Parameters
+    ----------
+
+    lattice_vectors: np.array
+        3x3 matrix for original lattice vectors
+    cell_id: tuple, list
+
+    Returns
+    -------
+
+    np.array
+'''
+    supercell_vectors = []
+    for x, x_i in zip(lattice_vectors, cell_id):
+        supercell_vectors.append(x * x_i)
+    return np.array(supercell_vectors)
 
 
 def animate_atom_phonon(position, qpt_cart, d_vector, mass=1.0,
