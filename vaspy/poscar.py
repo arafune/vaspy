@@ -154,6 +154,15 @@ class POSCAR_HEAD(object):
 class POSCAR_POS(object):
     '''
     POSCAR_DOS Class
+
+    Attributes
+    ------------
+
+    coordinate_type: str
+        "Direct" or "Cartesian"
+    positions: list
+        list of positions (np.array)
+    
 '''
     def __init__(self):
         self.coordinate_type = ""
