@@ -14,7 +14,7 @@ import vaspy.procar as procar
 import logging
 logging.basicConfig(level=logging.DEBUG,
                     format=' %(asctime)s - %(levelname)s -%(message)s')
-logging.disable(logging.DEBUG)
+#logging.disable(logging.DEBUG)
 
 parser = argparse.ArgumentParser(
     formatter_class=argparse.RawTextHelpFormatter)

@@ -7,6 +7,8 @@ modules for VASP pre/post-process
 """
 import os.path
 import re
+import logging
+logging.disable(logging.DEBUG)
 __all__ = ['chgcar',
            'doscar',
            'outcar',

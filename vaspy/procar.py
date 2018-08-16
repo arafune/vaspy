@@ -21,7 +21,6 @@ import numpy as np
 from vaspy import eigenval
 logging.basicConfig(level=logging.DEBUG,
                     format=' %(asctime)s - %(levelname)s -%(message)s')
-logging.disable(logging.DEBUG)
 
 
 class ProjectionBand(eigenval.EnergyBand):

@@ -1,14 +1,9 @@
-#! /usr/binenv python3
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 '''
 Script to convert V_Sim ascii file to POSCAR
 '''
 
-import logging
-logging.basicConfig(level=logging.DEBUG,
-                    format=' %(asctime)s - %(levelname)s -%(message)s')
-#logging.disable(logging.DEBUG)
-#
 import vaspy.poscar as poscar
 import vaspy.vsim_asc as vsim_asc
 import argparse
