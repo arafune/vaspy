@@ -53,7 +53,6 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
         self.cell_vecs[2] = np.array([float(x) for x in next(thefile).split()])
         self.iontypes = next(thefile).split()
         self.ionnums = [int(x) for x in next(thefile).split()]
-        n_ions = sum(self.ionnums)
         positions = []
         for line in thefile:
             if 'Direct configuration=' in line:
