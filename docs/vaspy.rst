@@ -21,7 +21,7 @@ vaspy.doscar module
     :show-inheritance:
 
 vaspy.eigenval module
----------------------
+----------------------
 
 .. automodule:: vaspy.eigenval
     :members:
@@ -60,26 +60,35 @@ vaspy.procar module
     :undoc-members:
     :show-inheritance:
 
+vaspy.vsim_asc module
+----------------------
+
+.. automodule:: vaspy.vsim_asc
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vaspy.xdatcar module
+----------------------
+
+.. automodule:: vaspy.xdatcar
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 vaspy.wavecar module
----------------------
+----------------------
 
 .. automodule:: vaspy.wavecar
     :members:
     :undoc-members:
     :show-inheritance:
 
+
 vaspy.mesh3d module
--------------------
+---------------------
 
 .. automodule:: vaspy.mesh3d
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-vaspy.bader module
--------------------
-
-.. automodule:: vaspy.bader
     :members:
     :undoc-members:
     :show-inheritance:
