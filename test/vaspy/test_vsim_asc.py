@@ -23,11 +23,11 @@ class TestVsimASCII(object):
     def test_(self):
         eq_('Phonopy generated file for v_sim 3.6', self.hBN.system_name)
         np.testing.assert_allclose([2.484999131, 0, 0],
-                                   self.hBN.lattice_vector[0])
+                                   self.hBN.lattice_vectors[0])
         np.testing.assert_allclose([1.242498697, 2.152072878, 0],
-                                   self.hBN.lattice_vector[1])
+                                   self.hBN.lattice_vectors[1])
         np.testing.assert_allclose([0, 0, 24.85],
-                                   self.hBN.lattice_vector[2])
+                                   self.hBN.lattice_vectors[2])
         eq_(['B', 'N'], self.hBN.ions)
         #
         #
