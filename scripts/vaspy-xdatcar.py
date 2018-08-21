@@ -41,14 +41,29 @@ if args.merge:
     output_xdatcar.configurations = configurations
     print(output_xdatcar)
 if args.split:
-    pass
+    assert len(args.files)==1, '--split option takes the single XDATCAR file'
+    xdatcar = XDATCAR(args.files[0])
+    scaling_factor = xdatcar.scaling_factor
+    cell_vecs = xdatcar.cell_vecs
+    iontypes = xdatcar.iontypes
+    ionnums =  xdatcar.ionnums
+    for frame, configuration in enumerate(xdatcar.configurations):
+        poscar = POSCAR()
+        poscar.system_name = xdatcar.system_name + '_frame_' + str(frame+1)
+        poscar.scaling_factor =  scaling_factor
+        poscar.cell_vecs = cell_vecs
+        poscar.iontypes = iontypes
+        poscar.ionnums = ionnums
+        poscar.coordinate_type = 'Direct'
+        poscar.positions = configuration
+        poscar.save(args.split + '_' + str(frame+1) + '.vasp')
 if args.poscar:
     poscars = []
     for poscar_file in args.files:
         poscars.append(POSCAR(poscar_file))
     output_xdatcar = XDATCAR()
+    output_xdatcar.system_name = poscars[0].system_name        
     output_xdatcar.scaling_factor = poscars[0].scaling_factor
-    output_xdatcar.system_name = poscars[0].system_name
     output_xdatcar.cell_vecs = poscars[0].cell_vecs
     output_xdatcar.iontypes = poscars[0].iontypes
     output_xdatcar.ionnums = poscars[0].ionnums
