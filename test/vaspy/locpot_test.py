@@ -37,5 +37,6 @@ class TestLOCPOT(unittest.TestCase):
         np.testing.assert_equal(np.array([31., 34., 37., 40.]),
                                 self.testlocpot2.grid.average_along_axis('Y'))
 
+
 if __name__ == '__main__':
     unittest.main()

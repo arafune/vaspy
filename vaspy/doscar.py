@@ -272,6 +272,7 @@ class PDOS(DOS):
     site: str
         site name
     '''
+
     def __init__(self, array=None, site=None):
         super(PDOS, self).__init__(array)
         self.site = "" if site is None else site

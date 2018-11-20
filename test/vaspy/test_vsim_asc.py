@@ -13,6 +13,7 @@ class TestVsimASCII(object):
     '''Class for Test of Vsim_asc
 
 '''
+
     def setup(self):
         '''VSIM'''
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
@@ -32,7 +33,7 @@ class TestVsimASCII(object):
         #
         #
         np.testing.assert_allclose([9.354567, 17.815346, 26.162733,
-                                   32.356041, 35.832499, 39.191721],
+                                    32.356041, 35.832499, 39.191721],
                                    self.hBN.freqs)
         #  mode is '3', second atom
         np.testing.assert_allclose([0.000000 + -0.188937j,

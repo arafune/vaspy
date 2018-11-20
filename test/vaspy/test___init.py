@@ -8,11 +8,13 @@ from nose.tools import with_setup
 
 import vaspy
 
+
 class TestInitModule(object):
     '''Class for Test of vaspy.module
 
     The functions should be tested are in __init__.py
     '''
+
     def setup(self):
         self.datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
 

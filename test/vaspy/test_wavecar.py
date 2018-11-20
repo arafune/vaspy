@@ -13,6 +13,7 @@ import vaspy.poscar as poscar
 
 class TestHatomWavecar(object):
     '''Class for Test WAVECAR module by using H_gamma.wavecar'''
+
     def setup(self):
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         data_file = datadir + 'H_gamma.wavecar'
@@ -29,8 +30,8 @@ class TestHatomWavecar(object):
         eq_(600, self.h.encut)
         np.testing.assert_array_equal(
             [[25.,   0.,   0.],
-             [ 0.,  25.,   0.],
-             [ 0.,   0.,  25.]], self.h.realcell)
+             [0.,   25.,   0.],
+             [0.,    0.,  25.]], self.h.realcell)
         assert_almost_equal(25**3, self.h.volume)
         np.testing.assert_array_almost_equal([101, 101, 101], self.h.ngrid)
         #
@@ -40,6 +41,7 @@ class TestHatomWavecar(object):
 
 class TestCOWavecar(object):
     '''Class for Test WAVECAR module by using WAVECAR.CO.wavecar'''
+
     def setup(self):
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         data_file = datadir + 'WAVECAR.CO.wavecar'
@@ -62,8 +64,8 @@ class TestCOWavecar(object):
         assert_almost_equal(-8.05748789, self.co.efermi)
         np.testing.assert_array_equal(
             [[17.,   0.,   0.],
-             [ 0.,  17.,   0.],
-             [ 0.,   0.,  17.]], self.co.realcell)
+             [0.,   17.,   0.],
+             [0.,    0.,  17.]], self.co.realcell)
         assert_almost_equal(4913, self.co.volume)
         np.testing.assert_array_almost_equal([57, 57, 57], self.co.ngrid)
 
@@ -81,6 +83,7 @@ class TestCOWavecar(object):
 
 class TestGrapheneWavecar(object):
     '''Class for Test WAVECAR module by using Graphene.wavecar'''
+
     def setup(self):
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         data_file = datadir + 'Graphene.wavecar'
@@ -202,8 +205,10 @@ class test_RestoreGammaGrid(object):
         result = wavecar.restore_gamma_grid(grid355, para=False)
         ok_(wavecar.check_symmetry(result))
 
+
 class TestCobaltWavecar(object):
     '''Class for Test WAVECAR module by using Co.wavecar (SOI)'''
+
     def setup(self):
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         data_file = datadir + 'Co.wavecar'
@@ -242,23 +247,23 @@ class TestCobaltWavecar(object):
         eq_((self.co.numk,), kpath.shape)  # co.numk = 240
         eq_((self.co.nspin, self.co.numk, self.co.nbands), kbands.shape)
         np.testing.assert_array_almost_equal(
-            [-6.532492 , -5.858599, -4.037263, -3.418892, -3.265558, -2.642231],
+            [-6.532492, -5.858599, -4.037263, -3.418892, -3.265558, -2.642231],
             kbands[0, 0, 0:6])  # The value can be taken from EIGENVAL
 
     @with_setup(setup=setup)
     def test_realsapece_wfc(self):
         '''Test for generation real space wfc (Cobalt)'''
         np.testing.assert_array_almost_equal(
-            [-7.84915157e-05 -5.61362047e-05j,
-             -7.88077954e-05 -5.63624713e-05j,
-             -7.92001487e-05 -5.66431905e-05j,
-             -7.92675956e-05 -5.66915450e-05j,
-             -7.90423140e-05 -5.65305135e-05j],
+            [-7.84915157e-05 - 5.61362047e-05j,
+             -7.88077954e-05 - 5.63624713e-05j,
+             -7.92001487e-05 - 5.66431905e-05j,
+             -7.92675956e-05 - 5.66915450e-05j,
+             -7.90423140e-05 - 5.65305135e-05j],
             self.co.realspace_wfc()[0][0][0][:5])
         vaspgrid = self.co.realspace_wfc(poscar=self.co_poscar)
         np.testing.assert_array_almost_equal(
             [-7.84915157e-05, -7.88077954e-05,
              -7.92001487e-05, -7.92675956e-05,
              -7.90423140e-05],
-        vaspgrid.grid.data[:5])
+            vaspgrid.grid.data[:5])
         eq_(4, vaspgrid.grid.nframe)

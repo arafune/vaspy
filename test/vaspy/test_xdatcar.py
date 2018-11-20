@@ -13,6 +13,7 @@ class TestXDATCAR(object):
     '''Class for Test of Vsim_asc
 
 '''
+
     def setup(self):
         '''XDATCAR'''
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
@@ -36,12 +37,12 @@ class TestXDATCAR(object):
         np.testing.assert_allclose([[0.33333333,  0.33333333,  0.24999815],
                                     [0.66666667,  0.66666667,  0.29113380],
                                     [0.66666667,  0.66666667,  0.20886348]],
-                                    self.xdatcar_test.configurations[0])
-        np.testing.assert_allclose([[   0.33333333,  0.33333333,  0.24999815],
-                                    [   0.66666667,  0.66666667,  0.29113854],
+                                   self.xdatcar_test.configurations[0])
+        np.testing.assert_allclose([[0.33333333,  0.33333333,  0.24999815],
+                                    [0.66666667,  0.66666667,  0.29113854],
                                     [0.66666667,  0.66666667,  0.20885874]],
-                                    self.xdatcar_test.configurations[4])
-        
+                                   self.xdatcar_test.configurations[4])
+
         # #  mode is '3', second atom
         # np.testing.assert_allclose([0.000000 + -0.188937j,
         #                             -0.188937 + 0.000000j,
@@ -51,7 +52,3 @@ class TestXDATCAR(object):
         #                             0.065021 - 0.112619j,
         #                             0.0 - 0.0j],
         #                            self.xdatcar_testy.d_vectors[5][1])
-
-
-
-   

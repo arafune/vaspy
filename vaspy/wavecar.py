@@ -113,9 +113,9 @@ class WAVECAR(object):
         about half of the number of gvectors equals number of plane waves'''
         if self.gamma:
             return True
-        if (self.gvectors(0).shape[0]//2 == self.nplwvs[0] or
-                self.gvectors(0).shape[0]//2+1 == self.nplwvs[0] or
-                self.gvectors(0).shape[0]//2-1 == self.nplwvs[0]):
+        if (self.gvectors(0).shape[0] // 2 == self.nplwvs[0]
+                or self.gvectors(0).shape[0] // 2 + 1 == self.nplwvs[0]
+                or self.gvectors(0).shape[0] // 2 - 1 == self.nplwvs[0]):
             self.gamma = True
 
     @property
@@ -424,20 +424,19 @@ def make_kgrid(ngrid, gamma=False, para=PARALLEL):
                           for iz in range(ngrid[2])
                           for iy in range(ngrid[1])
                           for ix in range(ngrid[0])
-                          if ((fz[iz] > 0) or
-                              (fz[iz] == 0 and fy[iy] > 0) or
-                              (fz[iz] == 0 and fy[iy] == 0 and
-                               fx[ix] >= 0))],
-                         dtype=float)
+                          if ((fz[iz] > 0)
+                              or (fz[iz] == 0 and fy[iy] > 0)
+                              or (fz[iz] == 0 and fy[iy] == 0 and fx[ix] >= 0)
+                              )], dtype=float)
     elif gamma and not para:
         kgrid = np.array([(fx[ix], fy[iy], fz[iz])
                           for iz in range(ngrid[2])
                           for iy in range(ngrid[1])
                           for ix in range(ngrid[0])
-                          if ((fz[ix] > 0) or
-                              (fz[ix] == 0 and fy[iy] > 0) or
-                              (fz[ix] == 0 and fy[iy] == 0 and
-                               fx[iz] >= 0))],
+                          if ((fz[ix] > 0)
+                              or (fz[ix] == 0 and fy[iy] > 0)
+                              or (fz[ix] == 0 and fy[iy] == 0
+                                  and fx[iz] >= 0))],
                          dtype=float)
 
     else:

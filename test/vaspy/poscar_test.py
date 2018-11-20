@@ -188,6 +188,7 @@ class TestPOSCAR(unittest.TestCase):
     def test_plus(self):
         pass
 
+
 test_poscar_string = """NiC4S4
 14.63
 0.866025404	-0.5	0

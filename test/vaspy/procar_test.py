@@ -15,6 +15,7 @@ class TestSinglePROCAR(object):
     '''Class for Test of PROCAR module
 
     Use PROCAR_single for test data (dummy PROCAR)'''
+
     def setup(self):
         '''PROCAR object by using file of "PROCAR_single" in data directory'''
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
@@ -97,11 +98,10 @@ class TestSinglePROCAR(object):
             ['#k', 'Energy',
              '0_s', '0_px', '0_py', '2_dxy', '2_dxz'])
 
-
     @with_setup(setup=setup)
     def test_singleprocar_sum_site_orbital(self):
         '''testing: sum by site and then sum by orbital (PROCAR_single)
-        
+
         Also test for orb_index
          '''
         self.singleprocar.append_sumsite((0, 2), site_name='zero_two')
@@ -109,9 +109,9 @@ class TestSinglePROCAR(object):
         self.singleprocar.append_sumorbital(p, 'p')
         pxpy = self.singleprocar.orb_index('pxpy')
         self.singleprocar.append_sumorbital(pxpy, 'pxpy')
-        d =  self.singleprocar.orb_index('d')
+        d = self.singleprocar.orb_index('d')
         self.singleprocar.append_sumorbital(d, 'd')
-        np.testing.assert_allclose(self.singleprocar.proj[0,0,0,3],
+        np.testing.assert_allclose(self.singleprocar.proj[0, 0, 0, 3],
                                    [0.0020, 0.0022, 0.0024, 0.0026, 0.0028,
                                     0.0030, 0.0032, 0.0034, 0.0036, 0.0252,
                                     0.0072, 0.0048, 0.0160])
@@ -121,14 +121,14 @@ class TestSinglePROCAR(object):
         eq_(self.singleprocar.label['site'][-1], 'zero_two')
         eq_(4, len(self.singleprocar.label['site']))
 
-
     @with_setup(setup=setup)
     def test_singleprocar_setheader(self):
         '''test for Band_with_projection.set_header
          '''
         self.singleprocar.append_sumsite((0, 2), 'zero_two')
         for orb in ('p', 'pxpy', 'd'):
-            self.singleprocar.append_sumorbital(self.singleprocar.orb_index(orb), orb)
+            self.singleprocar.append_sumorbital(
+                self.singleprocar.orb_index(orb), orb)
         eq_(self.singleprocar.make_label((3, ), ((10, 11, 12),)),
             ['#k', 'Energy', 'zero_two_p', 'zero_two_pxpy', 'zero_two_d'])
         # same as above
@@ -136,7 +136,6 @@ class TestSinglePROCAR(object):
                                          ((self.singleprocar.orb_index(o)
                                            for o in ('p', 'pxpy', 'd')),)),
             ['#k', 'Energy', 'zero_two_p', 'zero_two_pxpy', 'zero_two_d'])
-
 
     @with_setup(setup=setup)
     def test_text_sheet(self):
@@ -148,7 +147,8 @@ class TestSinglePROCAR(object):
 ''')
         self.singleprocar.append_sumsite((0, 2), 'zero_two')
         for orb in ('p', 'pxpy', 'd'):
-            self.singleprocar.append_sumorbital(self.singleprocar.orb_index(orb), orb)
+            self.singleprocar.append_sumorbital(
+                self.singleprocar.orb_index(orb), orb)
         eq_(self.singleprocar.make_label((3, ), ((10, 11, 12),)),
             ['#k', 'Energy', 'zero_two_p', 'zero_two_pxpy', 'zero_two_d'])
         eq_(self.singleprocar.text_sheet((3, ), ((10, 11, 12),)),
@@ -164,6 +164,7 @@ class TestSpinPolarizedPROCAR(object):
     '''Class for Test of PROCAR module
 
     Use PROCAR_spin_dummy for test data (dummy PROCAR)'''
+
     def setup(self):
         '''PROCAR object by using file of "PROCAR_single" in data directory'''
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
@@ -179,11 +180,11 @@ class TestSpinPolarizedPROCAR(object):
         eq_(3, self.spinprocar.numk)
         np.testing.assert_array_almost_equal(
             np.array([[[-10.,  -5.,   0.,   5.],
-                       [ -7.,  -4.,  -1.,   4.],
-                       [ -6.,  -1.,  -3.,   0.]],
+                       [-7.,   -4.,  -1.,   4.],
+                       [-6.,   -1.,  -3.,   0.]],
                       [[-10.5, -5.5, -0.5, -5.5],
-                       [ -7.5, -4.5, -1.5, -4.5],
-                       [ -6.5, -1.5, -3.5, -0.5]]]),
+                       [-7.5,  -4.5, -1.5, -4.5],
+                       [-6.5,  -1.5, -3.5, -0.5]]]),
             self.spinprocar.energies)
         np.testing.assert_array_equal(
             ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot'],
@@ -212,14 +213,12 @@ class TestSpinPolarizedPROCAR(object):
         '''
         label = self.spinprocar.make_label((0, 2), ((0, 3, 1), (4, 7)))
         eq_(label,
-            ['#k', 'Energy_up','Energy_down',
+            ['#k', 'Energy_up', 'Energy_down',
              '0_up_s', '0_down_s',
              '0_up_px', '0_down_px',
-             '0_up_py','0_down_py',
+             '0_up_py', '0_down_py',
              '2_up_dxy', '2_down_dxy',
              '2_up_dxz', '2_down_dxz'])
-
-        
 
     @with_setup(setup=setup)
     def test_spinprocar_band(self):
@@ -236,18 +235,19 @@ class TestSpinPolarizedPROCAR(object):
                                                 [[-10.5, -5.5, -0.5, -5.5],
                                                  [-7.5, -4.5, -1.5, -4.5],
                                                  [-6.5, -1.5, -3.5, -0.5]]]))
-        
+
     def test_spinprocar_fermi_correction(self):
         '''test for fermi_correction (SPIN)
         '''
         self.spinprocar.fermi_correction(1.0)
         np.testing.assert_array_equal(self.spinprocar.energies,
-                                      np.array([[[-11.,  -6., -1., 4.],
-                                                 [ -8.,  -5., -2., 3.],
-                                                 [ -7.,  -2., -4., -1.]],
+                                      np.array([[[-11., -6., -1., 4.],
+                                                 [-8., -5., -2., 3.],
+                                                 [-7., -2., -4., -1.]],
                                                 [[-11.5, -6.5, -1.5, -6.5],
-                                                 [ -8.5, -5.5, -2.5, -5.5],
-                                                 [ -7.5, -2.5, -4.5, -1.5]]]))
+                                                 [-8.5, -5.5, -2.5, -5.5],
+                                                 [-7.5, -2.5, -4.5, -1.5]]]))
+
     @with_setup(setup=setup)
     def test_spinprocar_band_orbitalread(self):
         '''test for Band_with_projection.orbitals setter (SPIN)'''
@@ -269,7 +269,8 @@ class TestSpinPolarizedPROCAR(object):
         '''
         self.spinprocar.append_sumsite((0, 2), 'zero_two')
         for orb in ('p', 'pxpy', 'd'):
-            self.spinprocar.append_sumorbital(self.spinprocar.orb_index(orb), orb)
+            self.spinprocar.append_sumorbital(
+                self.spinprocar.orb_index(orb), orb)
         np.testing.assert_allclose(self.spinprocar.proj[0][0][0][3],
                                    [0.0020, 0.0022, 0.0024,
                                     0.0026, 0.0028, 0.0030,
@@ -290,7 +291,8 @@ class TestSpinPolarizedPROCAR(object):
         '''
         self.spinprocar.append_sumsite((0, 2), 'test')
         for orb in ('p', 'pxpy', 'd'):
-            self.spinprocar.append_sumorbital(self.spinprocar.orb_index(orb), orb)
+            self.spinprocar.append_sumorbital(
+                self.spinprocar.orb_index(orb), orb)
         eq_(self.spinprocar.make_label((3, ), (((10,), (11,), (12,)), )),
             ['#k', 'Energy_up', 'Energy_down', 'test_up_p', 'test_down_p',
              'test_up_pxpy', 'test_down_pxpy', 'test_up_d', 'test_down_d'])
@@ -325,6 +327,7 @@ class TestSOIPROCAR(object):
     '''Class for Test of PROCAR module
 
     Use PROCAR_SOI_dummy for test data (dummy PROCAR)'''
+
     def setup(self):
         '''PROCAR object by using file of "PROCAR_single" in data directory'''
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
@@ -371,9 +374,9 @@ class TestSOIPROCAR(object):
         label = self.soiprocar.make_label((0, 2), ((0, 3, 1), (4, 7)))
         eq_(label,
             ['#k', 'Energy',
-             '0_mT_s', '0_mX_s','0_mY_s', '0_mZ_s',
+             '0_mT_s', '0_mX_s', '0_mY_s', '0_mZ_s',
              '0_mT_px', '0_mX_px', '0_mY_px', '0_mZ_px',
-             '0_mT_py','0_mX_py','0_mY_py','0_mZ_py',
+             '0_mT_py', '0_mX_py', '0_mY_py', '0_mZ_py',
              '2_mT_dxy', '2_mX_dxy', '2_mY_dxy', '2_mZ_dxy',
              '2_mT_dxz', '2_mX_dxz', '2_mY_dxz', '2_mZ_dxz'])
 #            ['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot'],
@@ -385,7 +388,7 @@ class TestSOIPROCAR(object):
                                              [0., 0.353553, 0.707107])
         '''test for Band_with_projection.energies setter (SOI)'''
         eq_(self.soiprocar.energies.shape, (1, self.soiprocar.numk,
-                                          self.soiprocar.nbands))
+                                            self.soiprocar.nbands))
         np.testing.assert_array_equal(self.soiprocar.energies,
                                       [[[-10, -5], [-7, -4], [-6, -1]]])
         '''test for Band_with_projection.fermi_correction
@@ -398,8 +401,8 @@ class TestSOIPROCAR(object):
     def test_soiprocar_band_orbitalread(self):
         '''test for Band_with_projection.orbitals setter (SOI)'''
         eq_(self.soiprocar.proj.shape, (4, self.soiprocar.numk,
-                                          self.soiprocar.nbands,
-                                          self.soiprocar.natom, 10))
+                                        self.soiprocar.nbands,
+                                        self.soiprocar.natom, 10))
         # for ik = 0, ib = 1, atom=2, spin=mY,
         #                      (k#=1,  band#=2, atom#=3, spin=mY)
         np.testing.assert_array_equal(
@@ -423,7 +426,8 @@ class TestSOIPROCAR(object):
         self.soiprocar.append_sumsite((0, 2), 'test')
         eq_(self.soiprocar.label['site'].index('test'), 3)
         np.testing.assert_allclose(
-            self.soiprocar.proj[0][0][0][self.soiprocar.label['site'].index('test')],
+            self.soiprocar.proj[0][0][0][
+                self.soiprocar.label['site'].index('test')],
             [0.0020, 0.0022, 0.0024, 0.0026, 0.0028, 0.0030,
              0.0032, 0.0034, 0.0036, 0.0252])
 
@@ -435,7 +439,8 @@ class TestSOIPROCAR(object):
         '''
         self.soiprocar.append_sumsite((0, 2), 'test')
         for orb in ('p', 'pxpy', 'd'):
-            self.soiprocar.append_sumorbital(self.soiprocar.orb_index(orb), orb)
+            self.soiprocar.append_sumorbital(
+                self.soiprocar.orb_index(orb), orb)
         np.testing.assert_allclose(self.soiprocar.proj[0][0][0][3],  # mT
                                    [0.0020, 0.0022, 0.0024,
                                     0.0026, 0.0028, 0.0030,
@@ -455,15 +460,16 @@ class TestSOIPROCAR(object):
         '''
         self.soiprocar.append_sumsite((0, 2), 'test')
         for orb in ('p', 'pxpy', 'd'):
-            self.soiprocar.append_sumorbital(self.soiprocar.orb_index(orb), orb)
-        for orb  in ('p', 'pxpy', 'd'):
+            self.soiprocar.append_sumorbital(
+                self.soiprocar.orb_index(orb), orb)
+        for orb in ('p', 'pxpy', 'd'):
             self.soiprocar.append_sumorbital(
                 self.soiprocar.label['orbital'].index(orb), orb)
         eq_(self.soiprocar.make_label((3, ), ((10, 11, 12),)),
             ['#k', 'Energy',
              'test_mT_p', 'test_mX_p', 'test_mY_p', 'test_mZ_p',
              'test_mT_pxpy', 'test_mX_pxpy', 'test_mY_pxpy', 'test_mZ_pxpy',
-             'test_mT_d','test_mX_d', 'test_mY_d', 'test_mZ_d'])
+             'test_mT_d', 'test_mX_d', 'test_mY_d', 'test_mZ_d'])
 
     def test_text_sheet(self):
         '''test for simple band data output (SOI)'''
@@ -480,7 +486,6 @@ class TestSOIPROCAR(object):
 ''')
 
 
-
 class test_functions_in_procarpy(object):
     def test_shortcheck_function(self):
         '''Test for shortfunction'''
@@ -489,25 +494,24 @@ class test_functions_in_procarpy(object):
         data_spin = open(datadir + "PROCAR_spin_dummy")
 
         result_single = procar.shortcheck(data_single)
-        eq_(1, result_single[0])  #  numk
-        eq_(1, result_single[1])  #  nbands
-        eq_(3, result_single[2])  #  natom
+        eq_(1, result_single[0])  # numk
+        eq_(1, result_single[1])  # nbands
+        eq_(3, result_single[2])  # natom
         eq_(['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot'],
             result_single[3])
-        ok_(result_single[4])     #  collinear
+        ok_(result_single[4])     # collinear
         result_spin = procar.shortcheck(data_spin)
-        eq_(3, result_spin[0])  #  numk
-        eq_(4, result_spin[1])  #  nbands
-        eq_(3, result_spin[2])  #  natom
+        eq_(3, result_spin[0])  # numk
+        eq_(4, result_spin[1])  # nbands
+        eq_(3, result_spin[2])  # natom
         eq_(['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot'],
             result_spin[3])
-        ok_(result_spin[4])     #  collinear
+        ok_(result_spin[4])     # collinear
         data_soi = open(datadir + "PROCAR_SOI_dummy")
         result_soi = procar.shortcheck(data_soi)
-        eq_(3, result_soi[0])  #  numk
-        eq_(2, result_soi[1])  #  nbands
-        eq_(3, result_soi[2])  #  natom
+        eq_(3, result_soi[0])  # numk
+        eq_(2, result_soi[1])  # nbands
+        eq_(3, result_soi[2])  # natom
         eq_(['s', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot'],
             result_soi[3])
-        assert_false(result_soi[4])     #  collinear
-
+        assert_false(result_soi[4])     # collinear

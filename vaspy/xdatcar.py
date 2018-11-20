@@ -58,12 +58,11 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
             if 'Direct configuration=' in line:
                 if positions:
                     self.configurations.append(positions)
-                    positions = []                    
+                    positions = []
             else:
                 position = np.array([float(x) for x in line.strip().split()])
                 positions.append(position)
         self.configurations.append(positions)
-
 
     def __str__(self):
         '''

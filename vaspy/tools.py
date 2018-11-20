@@ -55,13 +55,13 @@ def flatten(nested, target=Iterable, ignore=FLATTEN_IGNORE):
     >>> flatten((1, [range(2), 3, set([4, 5]), [6]], frozenset([7, 8])))
     [1, 0, 1, 3, 4, 5, 6, 8, 7]
 '''
-    if (isinstance(nested, target) and
-            not isinstance(nested, ignore)):
+    if (isinstance(nested, target)
+            and not isinstance(nested, ignore)):
         nested = list(nested)
     i = 0
     while i < len(nested):
-        while (isinstance(nested[i], target) and
-               not isinstance(nested[i], ignore)):
+        while (isinstance(nested[i], target)
+               and not isinstance(nested[i], ignore)):
             if not nested[i]:
                 nested.pop(i)
                 i -= 1
@@ -70,6 +70,7 @@ def flatten(nested, target=Iterable, ignore=FLATTEN_IGNORE):
                 nested[i:i + 1] = nested[i]
         i += 1
     return nested
+
 
 _RERANGE = re.compile(r'(\d+)-(\d+)')
 _RESINGLE = re.compile(r'\d+')

@@ -70,6 +70,7 @@ class POSCAR_HEAD(object):
     ionnums : list
        list of number of ions. Corresponding to `iontypes`
 '''
+
     def __init__(self):
         self.__cell_vecs = np.array([[0., 0., 0.],
                                      [0., 0., 0.],
@@ -162,8 +163,9 @@ class POSCAR_POS(object):
         "Direct" or "Cartesian"
     positions: list
         list of positions (np.array)
-    
+
 '''
+
     def __init__(self):
         self.coordinate_type = ""
         self.positions = []
@@ -409,16 +411,16 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         candidates27 = []
         if self.is_cartesian():
             for i, j, k in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
-                candidates27.append(i * self.cell_vecs[0] +
-                                    j * self.cell_vecs[1] +
-                                    k * self.cell_vecs[2] +
-                                    position)
+                candidates27.append(i * self.cell_vecs[0]
+                                    + j * self.cell_vecs[1]
+                                    + k * self.cell_vecs[2]
+                                    + position)
         else:
             for i, j, k in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
-                candidates27.append(i * np.array([1., 0., 0.]) +
-                                    j * np.array([0., 1., 0.]) +
-                                    k * np.array([0., 0., 1.]) +
-                                    position)
+                candidates27.append(i * np.array([1., 0., 0.])
+                                    + j * np.array([0., 1., 0.])
+                                    + k * np.array([0., 0., 1.])
+                                    + position)
         return candidates27
 
     def rotate_atom(self, site, axis_name, theta_deg, center):
@@ -453,8 +455,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.to_cartesian()
         position = self.positions[site]
         position -= center / self.scaling_factor
-        position = globals()["rotate_" +
-                             axis_name.lower()](theta_deg).dot(position)
+        position = globals()["rotate_"
+                             + axis_name.lower()](theta_deg).dot(position)
         position += center / self.scaling_factor
         self.positions[site] = position
 
@@ -646,9 +648,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                                                self.coordinate_changeflags,
                                                self.atom_identifer,
                                                fillvalue=''):
-            tmp.append(' '.join('  {0:20.17f}'.format(i) for i in pos) +
-                       ' ' + t_or_f +
-                       ' ' + atom)
+            tmp.append(' '.join('  {0:20.17f}'.format(i) for i in pos)
+                       + ' ' + t_or_f
+                       + ' ' + atom)
         return '\n'.join(tmp) + '\n'
 
     def str_short(self):
@@ -667,8 +669,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             tmp.append(''.join('{0:12.6f}'.format(i) for i in
                                self.cell_vecs[k]))
         if not self.iontypes[0].isdigit():
-            tmp.append(' ' +
-                       "".join(['{0:>5}'.format(i) for i in self.iontypes]))
+            tmp.append(' '
+                       + "".join(['{0:>5}'.format(i) for i in self.iontypes]))
         tmp.append(''.join(['{0:>6}'.format(i) for i in self.ionnums]))
         tmp.append(self.coordinate_type)
         for pos in self.positions:
@@ -803,14 +805,14 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if self.is_cartesian():
             vector = _vectorize(vector)
             for i in atomlist:
-                self.positions[i] = (self.positions[i] +
-                                     vector / self.scaling_factor)
+                self.positions[i] = (self.positions[i]
+                                     + vector / self.scaling_factor)
         else:
             vector = _vectorize(vector)
             self.to_cartesian()
             for i in atomlist:
-                self.positions[i] = (self.positions[i] +
-                                     vector / self.scaling_factor)
+                self.positions[i] = (self.positions[i]
+                                     + vector / self.scaling_factor)
             self.to_direct()
         return self.positions
 

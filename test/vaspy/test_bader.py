@@ -11,6 +11,7 @@ import vaspy.bader
 class TestBader(object):
     '''class for test of vaspy.outcar module
     '''
+
     def setup(self):
         '''Reading ACF.chg.dat for test'''
         datadir = os.path.abspath(os.path.dirname(__file__)) + '/data/'
@@ -35,4 +36,3 @@ class TestBader(object):
         eq_(3.526327, self.acf.charges[0])
         eq_(0.423581, self.acf.mindists[0])
         eq_(17.540723, self.acf.vols[0])
-            

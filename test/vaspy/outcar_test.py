@@ -11,6 +11,7 @@ import vaspy.outcar
 class TestOUTCAR(object):
     '''class for test of vaspy.outcar module
     '''
+
     def setup(self):
         '''Reading OUTCAR file for test'''
         datadir = os.path.abspath(os.path.dirname(__file__)) + '/data/'
@@ -64,4 +65,3 @@ class TestOUTCAR(object):
         eq_(11, len(self.outcar.total_charges))
         eq_(7, len(self.outcar.total_charges[0]))
         eq_(3, len(self.outcar.total_charges[0][0]))
-        

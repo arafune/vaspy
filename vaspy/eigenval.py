@@ -51,6 +51,7 @@ class EnergyBand(object):
          In this class does not distinguish non-collinear spin
          and No-spin.  (default is 1)
     '''
+
     def __init__(self, kvecs=(), energies=(), nspin=1):
         self.kvecs = np.array(kvecs)
         self.numk = len(self.kvecs)

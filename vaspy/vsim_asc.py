@@ -15,17 +15,16 @@ The first is absolutely required.
  '''
 import logging
 from logging import getLogger, StreamHandler, Formatter
-logger = getLogger("LogTest")
-logger.setLevel(logging.DEBUG)
-stream_handler = StreamHandler()
-handler_format = Formatter(' %(asctime)s - %(levelname)s - %(message)s ')
-stream_handler.setFormatter(handler_format)
-
 import itertools
 import os.path
 import bz2
 import numpy as np
 import vaspy.const as const
+logger = getLogger("LogTest")
+logger.setLevel(logging.DEBUG)
+stream_handler = StreamHandler()
+handler_format = Formatter(' %(asctime)s - %(levelname)s - %(message)s ')
+stream_handler.setFormatter(handler_format)
 
 
 class VSIM_ASC(object):
@@ -51,6 +50,7 @@ class VSIM_ASC(object):
         d_vectors[mode#][atom#] returns the displacement (complex) vector
     lattice.vectors: np.array
 '''
+
     def __init__(self, filename=None):
         self.system_name = ""
         self.ions = []
@@ -85,8 +85,8 @@ class VSIM_ASC(object):
         # the 3rd line represents dzx, dzy, dzz
         dzx, dzy, dzz = [float(x) for x in next(thefile).split()]
         self.lattice_vectors = np.array([[dxx, 0, 0],
-                                        [dyx, dyy, 0],
-                                        [dzx, dzy, dzz]])
+                                         [dyx, dyy, 0],
+                                         [dzx, dzy, dzz]])
         self.ions = []
         self.positions = []
         self.d_vectors = []
@@ -124,7 +124,6 @@ class VSIM_ASC(object):
                                                           3)
         self.freqs = np.array(self.freqs)
 
-
     def build_phono_motion(self, mode=0, supercell=(2, 2, 1),
                            n_frames=30, magnitude=1):
         '''Build data for creating POSCAR etc.,
@@ -143,9 +142,9 @@ class VSIM_ASC(object):
         qpt = self.qpts[mode]
         bmatrix = 2 * np.pi * np.linalg.inv(self.lattice_vectors).transpose()
         qpt_cart = qpt.dot(bmatrix)
-        logger.debug('qpt_cart[x] = {}, qpt_cart[y] = {}, qpt_cart[z] ={}'.format(qpt_cart[0],
-                                                                                   qpt_cart[1],
-                                                                                   qpt_cart[2]))
+        logger.debug(
+            'qpt_cart[x] = {}, qpt_cart[y] = {}, qpt_cart[z] ={}'.format(
+                qpt_cart[0], qpt_cart[1], qpt_cart[2]))
         #
         animation_positions = []
         for atom_i, position in enumerate(self.positions):
@@ -154,9 +153,9 @@ class VSIM_ASC(object):
                                              range(supercell[1]),
                                              range(supercell[2])):
                 logger.debug(' cell_id:{}'.format(cell_id))
-                abs_pos =  position + (self.lattice_vectors[0] * cell_id[0] +
-                                       self.lattice_vectors[1] * cell_id[1] +
-                                       self.lattice_vectors[2] * cell_id[2])
+                abs_pos = position + (self.lattice_vectors[0] * cell_id[0]
+                                      + self.lattice_vectors[1] * cell_id[1]
+                                      + self.lattice_vectors[2] * cell_id[2])
                 positions = animate_atom_phonon(abs_pos, qpt_cart,
                                                 self.d_vectors[mode][atom_i],
                                                 n_frames=n_frames,
@@ -221,21 +220,24 @@ def animate_atom_phonon(position, qpt_cart, d_vector,
     if not e_frame:
         e_frame = s_frame + n_frames - 1
     for frame in range(s_frame, e_frame+1):
-        exponent = np.exp(1.0j * (np.dot(position0, qpt_cart) -
-                                  2 * np.pi * frame/n_frames))
-        logger.debug('r:{}, qpt_cart;{}, frame:{}, n_frames:{}'.format(position0,
-                                                                       qpt_cart,
-                                                                       frame,
-                                                                       n_frames))
-        logger.debug('arg_exponent:{}'.format(1.0j * (np.dot(position0, qpt_cart) -
-                                  2 * np.pi * frame/n_frames)))
+        exponent = np.exp(1.0j * (np.dot(position0, qpt_cart)
+                                  - 2 * np.pi * frame/n_frames))
+        logger.debug(
+            'r:{}, qpt_cart;{}, frame:{}, n_frames:{}'.format(
+                position0, qpt_cart, frame, n_frames))
+        logger.debug(
+            'arg_exponent:{}'.format(
+                1.0j * (np.dot(position0, qpt_cart)
+                        - 2 * np.pi * frame / n_frames)))
         logger.debug('exponent:{}'.format(exponent))
         normal_displ = np.array(list(map((lambda y: (y.real)),
                                          [x * exponent for x in d_vector])))
         logger.debug('normal_displ:{}'.format(normal_displ))
-        # The displacement vector calculated by (at least) phonopy is 
-        # taken into account the mass of the atom.  If the calculated displacement vector 
-        # does not contain the mass effect, the normal_displ should be devided by sqrt(mass)
+        # The displacement vector calculated by (at least) phonopy is
+        # taken into account the mass of the atom.
+        # If the calculated displacement vector
+        # does not contain the mass effect,
+        # the normal_displ should be devided by sqrt(mass)
         positions.append(position0 + magnitude * normal_displ)
         logger.debug('position.after_move:{}'.format(positions[-1]))
     return positions

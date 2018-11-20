@@ -14,6 +14,7 @@ class TestCHGCAR(object):
     '''Class for test of CHGCAR module
 
     Use CHGCAR for test data'''
+
     def setup(self):
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         data_file_spin = datadir + 'CHGCAR_spin'

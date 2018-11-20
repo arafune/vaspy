@@ -44,6 +44,7 @@ class BaderACF(object):
     nelectron: float
        number of electron
     '''
+
     def __init__(self, filename=None):
         self.natom = 0
         self.positions = []
@@ -73,7 +74,7 @@ class BaderACF(object):
         '''
         # the first line is like:
         #     X     Y     Z     CHARGE      MIN DIST   ATOMIC VOL
-        _ = next(thefile)
+        next(thefile)
         # the 2nd line is just "----------"
         separator = next(thefile)
         for line in thefile:
