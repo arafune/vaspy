@@ -86,7 +86,7 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
             tmp += '    {}'.format(ionnum)
         tmp += '\n'
         for frame_index, positions in enumerate(self.configurations):
-            tmp += 'Direct configuration=    {}\n'.format(frame_index+1)
+            tmp += 'Direct configuration=    {}\n'.format(frame_index + 1)
             for position in positions:
                 tmp += '    {:#.6f}    {:#.6f}    {:6f}\n'.format(
                     position[0], position[1], position[2])

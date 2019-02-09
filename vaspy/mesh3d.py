@@ -50,6 +50,7 @@ class VASPGrid(object):
 
     poscar, grid, additional
     '''
+
     def __init__(self, filename=None, pickleddata=None):
         self.poscar = poscar.POSCAR()
         self.grid = Grid3D()
@@ -278,6 +279,7 @@ class Grid3D(object):
         1D-list or 1D-numpy array.
         The length of grid is shape[0] * shape[1] * shape[2]
     '''
+
     def __init__(self, shape=(0, 0, 0), data=None):
         self.shape = shape
         if data is None:
@@ -325,7 +327,7 @@ class Grid3D(object):
         numpy.ndarray
             2D numpy array that sliced from 3D mesh data.
         '''
-        griddata = self.data[frame_i * self.size: (frame_i+1) * self.size]
+        griddata = self.data[frame_i * self.size: (frame_i + 1) * self.size]
         axis = axis.lower()
         if axis == 'x':
             return griddata.reshape(self.shape[2],
@@ -364,7 +366,7 @@ class Grid3D(object):
             2D numpy array that integrated from 3D mesh data
 
         '''
-        griddata = self.data[frame_i * self.size: (frame_i+1) * self.size]
+        griddata = self.data[frame_i * self.size: (frame_i + 1) * self.size]
         axis = axis.lower()
         if axis == 'x':
             return np.sum(
@@ -430,9 +432,9 @@ class Grid3D(object):
         '''
         axis_name = axis_name.capitalize()
         data = self.data[frame_i * self.size:
-                         (frame_i+1) * self.size].reshape((self.shape[2],
-                                                           self.shape[1],
-                                                           self.shape[0]))
+                         (frame_i + 1) * self.size].reshape((self.shape[2],
+                                                             self.shape[1],
+                                                             self.shape[0]))
         if axis_name == 'X':
             data = np.average(np.average(
                 np.transpose(data, (2, 0, 1)), axis=2), axis=1)
@@ -464,9 +466,9 @@ class Grid3D(object):
         '''
         axis_name = axis_name.capitalize()
         data = self.data[frame_i * self.size:
-                         (frame_i+1) * self.size].reshape((self.shape[2],
-                                                           self.shape[1],
-                                                           self.shape[0]))
+                         (frame_i + 1) * self.size].reshape((self.shape[2],
+                                                             self.shape[1],
+                                                             self.shape[0]))
         if axis_name == 'X':
             data = np.min(np.min(
                 np.transpose(data, (2, 0, 1)), axis=2), axis=1)
@@ -498,9 +500,9 @@ class Grid3D(object):
         '''
         axis_name = axis_name.capitalize()
         data = self.data[frame_i * self.size:
-                         (frame_i+1) * self.size].reshape((self.shape[2],
-                                                           self.shape[1],
-                                                           self.shape[0]))
+                         (frame_i + 1) * self.size].reshape((self.shape[2],
+                                                             self.shape[1],
+                                                             self.shape[0]))
         if axis_name == 'X':
             data = np.max(np.max(
                 np.transpose(data, (2, 0, 1)), axis=2), axis=1)
@@ -532,9 +534,9 @@ class Grid3D(object):
         '''
         axis_name = axis_name.capitalize()
         data = self.data[frame_i * self.size:
-                         (frame_i+1) * self.size].reshape((self.shape[2],
-                                                           self.shape[1],
-                                                           self.shape[0]))
+                         (frame_i + 1) * self.size].reshape((self.shape[2],
+                                                             self.shape[1],
+                                                             self.shape[0]))
         if axis_name == 'X':
             data = np.median(np.median(
                 np.transpose(data, (2, 0, 1)), axis=2), axis=1)

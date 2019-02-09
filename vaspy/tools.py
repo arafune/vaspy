@@ -55,13 +55,13 @@ def flatten(nested, target=Iterable, ignore=FLATTEN_IGNORE):
     >>> flatten((1, [range(2), 3, set([4, 5]), [6]], frozenset([7, 8])))
     [1, 0, 1, 3, 4, 5, 6, 8, 7]
 '''
-    if (isinstance(nested, target)
-            and not isinstance(nested, ignore)):
+    if (isinstance(nested, target) and
+            not isinstance(nested, ignore)):
         nested = list(nested)
     i = 0
     while i < len(nested):
-        while (isinstance(nested[i], target)
-               and not isinstance(nested[i], ignore)):
+        while (isinstance(nested[i], target) and
+               not isinstance(nested[i], ignore)):
             if not nested[i]:
                 nested.pop(i)
                 i -= 1
@@ -139,7 +139,7 @@ def parse_AtomselectionNum(L):
 
 if __name__ == '__main__':
     import argparse
-    EACH_SLICE_DEMO = lambda L, n: list(each_slice(L, n))
+    def EACH_SLICE_DEMO(L, n): return list(each_slice(L, n))
     demo = {'EACH_SLICE_DEMO': (range(10), 3),
             'removeall': ([1, 0, 0, 1, 0, 1, 0, 0], 0),
             'flatten': ((1, [range(2), 3, set([4, 5]), [6]],  # Version safety

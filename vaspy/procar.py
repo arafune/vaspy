@@ -36,6 +36,7 @@ class ProjectionBand(eigenval.EnergyBand):
     phase: numpy.ndarray
        Phase data.  phase[spin_i, k_i, band_i, site_i, orbital_i]
     '''
+
     def __init__(self,
                  kvecs=(), energies=(),
                  proj=(), phase=(),
@@ -174,11 +175,11 @@ class ProjectionBand(eigenval.EnergyBand):
                 for spin_i in self.label['spin']:
                     try:
                         label = str(self.label['site'][site_i]) + \
-                                spin_i + '_' + self.label['orbital'][orbital_i]
+                            spin_i + '_' + self.label['orbital'][orbital_i]
                     except TypeError:
                         label = str(self.label['site'][site_i]) + \
-                                spin_i + '_' + \
-                                self.label['orbital'][orbital_i[0]]
+                            spin_i + '_' + \
+                            self.label['orbital'][orbital_i[0]]
                     label_list.append(label)
         return label_list
 
@@ -242,7 +243,7 @@ class ProjectionBand(eigenval.EnergyBand):
            It True (default), the blank line is inserted between band data
         '''
         label_str = '\t'.join(self.make_label(site_indexes,
-                                              orbital_indexes_sets))+'\n'
+                                              orbital_indexes_sets)) + '\n'
         with open(csv_file, 'w') as fhandle:
             fhandle.writelines(label_str)
             writer = csv.writer(fhandle, delimiter='\t')
@@ -444,7 +445,7 @@ class PROCAR(ProjectionBand):  # Version safety
             if phase_read:
                 self.phase = self.phase.reshape((self.nspin, self.numk,
                                                  self.nbands, self.natom,
-                                                 norbital-1))
+                                                 norbital - 1))
         elif self.nspin == 2:   # collinear
             self.label['spin'] = ['_up', '_down']
             self.label['energy'] = ['Energy_up', 'Energy_down']
@@ -457,7 +458,7 @@ class PROCAR(ProjectionBand):  # Version safety
             if phase_read:
                 self.phase = self.phase.reshape((self.nspin, self.numk,
                                                  self.nbands, self.natom,
-                                                 norbital-1))
+                                                 norbital - 1))
         elif self.nspin == 4:  # non-collinear
             self.label['spin'] = ['_mT', '_mX', '_mY', '_mZ']
             self.label['energy'] = ['Energy']
@@ -471,7 +472,7 @@ class PROCAR(ProjectionBand):  # Version safety
             if phase_read:
                 self.phase = self.phase.reshape((1, self.numk,
                                                  self.nbands, self.natom,
-                                                 norbital-1))
+                                                 norbital - 1))
         else:
             raise ValueError
         del energies

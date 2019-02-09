@@ -102,7 +102,7 @@ class WAVECAR(object):
         self.rcpcell = np.linalg.inv(self.realcell).T
         unit_cell_vector_magnitude = np.linalg.norm(self.realcell, axis=1)
         cutoff = np.ceil(
-            np.sqrt(self.encut / Ry_in_eV) / (2*np.pi / (
+            np.sqrt(self.encut / Ry_in_eV) / (2 * np.pi / (
                 unit_cell_vector_magnitude / au_in_AA)))
         # FFT Minimum grid size. Always odd!!
         self.ngrid = np.array(2 * cutoff + 1, dtype=int)
@@ -153,7 +153,7 @@ class WAVECAR(object):
                 self.wfc.seek(pos * self.recl)
 #                print(self.wfc.tell())
                 dump = np.fromfile(self.wfc, dtype=np.float,
-                                   count=4+3*self.nbands)
+                                   count=4 + 3 * self.nbands)
                 if spin_i == 0:
                     self.nplwvs[k_i] = int(dump[0])
                     self.kvecs[k_i] = dump[1:4]
@@ -198,7 +198,7 @@ class WAVECAR(object):
         kgrid = make_kgrid(self.ngrid, self.gamma, para=PARALLEL)
         hbar2over2m = 13.605826 * 0.529177249 * 0.529177249
         energy_k = hbar2over2m * np.linalg.norm(
-            np.dot(kgrid + kvec[np.newaxis, :], 2*np.pi*self.rcpcell),
+            np.dot(kgrid + kvec[np.newaxis, :], 2 * np.pi * self.rcpcell),
             axis=1)**2
         g_vec = kgrid[np.where(energy_k < self.encut)[0]]
         return np.asarray(g_vec, dtype=int)
@@ -294,9 +294,9 @@ class WAVECAR(object):
         if self.gamma and PARALLEL:
             phi_k = np.zeros((ngrid[0],
                               ngrid[1],
-                              ngrid[2]//2+1), dtype=np.complex128)
+                              ngrid[2] // 2 + 1), dtype=np.complex128)
         elif self.gamma and not PARALLEL:
-            phi_k = np.zeros((ngrid[0]//2+1,
+            phi_k = np.zeros((ngrid[0] // 2 + 1,
                               ngrid[1],
                               ngrid[2]), dtype=np.complex128)
         else:
@@ -312,10 +312,10 @@ class WAVECAR(object):
                              dtype=np.complex128)
             phi_k[0][gvec[:, 0],
                      gvec[:, 1],
-                     gvec[:, 2]] = bandcoeff[:bandcoeff.size//2]
+                     gvec[:, 2]] = bandcoeff[:bandcoeff.size // 2]
             phi_k[1][gvec[:, 0],
                      gvec[:, 1],
-                     gvec[:, 2]] = bandcoeff[bandcoeff.size//2:]
+                     gvec[:, 2]] = bandcoeff[bandcoeff.size // 2:]
         #
         if self.gamma:
             if PARALLEL:
@@ -344,7 +344,7 @@ class WAVECAR(object):
             if phi_r.ndim == 3:
                 return phi_r.T
             else:  # SOI
-                return (phi_r[0]+phi_r[1]).T, (phi_r[0]-phi_r[1]).T
+                return (phi_r[0] + phi_r[1]).T, (phi_r[0] - phi_r[1]).T
         else:
             vaspgrid = mesh3d.VASPGrid()
             vaspgrid.poscar = poscar
@@ -360,10 +360,10 @@ class WAVECAR(object):
                     (re.flatten('F'), im.flatten('F')))
             else:  # SOI
                 vaspgrid.grid.data = np.concatenate(
-                    ((re[0]+re[1]).flatten('F'),
-                     (im[0]+im[1]).flatten('F'),
-                     (re[0]-re[1]).flatten('F'),
-                     (im[0]-im[1]).flatten('F')))
+                    ((re[0] + re[1]).flatten('F'),
+                     (im[0] + im[1]).flatten('F'),
+                     (re[0] - re[1]).flatten('F'),
+                     (im[0] - im[1]).flatten('F')))
         return vaspgrid
 
     def __str__(self):
@@ -378,7 +378,7 @@ class WAVECAR(object):
         string += "\nno. bands =          {0}".format(self.nbands)
         string += "\nreal space lattice vectors:"
         for i in range(3):
-            string += "\na"+str(i+1)
+            string += "\na" + str(i + 1)
             string += " = {0}    {1}    {2}".format(self.realcell[i][0],
                                                     self.realcell[i][1],
                                                     self.realcell[i][2])
@@ -386,7 +386,7 @@ class WAVECAR(object):
         string += "\nvolume unit cell =   {0}".format(self.volume)
         string += "\nReciprocal lattice vectors:"
         for i in range(3):
-            string += "\nb" + str(i+1)
+            string += "\nb" + str(i + 1)
             string += " = {0}    {1}    {2}".format(self.rcpcell[i][0],
                                                     self.rcpcell[i][1],
                                                     self.rcpcell[i][2])
@@ -424,8 +424,8 @@ def make_kgrid(ngrid, gamma=False, para=PARALLEL):
                           for iz in range(ngrid[2])
                           for iy in range(ngrid[1])
                           for ix in range(ngrid[0])
-                          if ((fz[iz] > 0)
-                              or (fz[iz] == 0 and fy[iy] > 0)
+                          if ((fz[iz] > 0) or
+                              (fz[iz] == 0 and fy[iy] > 0)
                               or (fz[iz] == 0 and fy[iy] == 0 and fx[ix] >= 0)
                               )], dtype=float)
     elif gamma and not para:
@@ -433,10 +433,10 @@ def make_kgrid(ngrid, gamma=False, para=PARALLEL):
                           for iz in range(ngrid[2])
                           for iy in range(ngrid[1])
                           for ix in range(ngrid[0])
-                          if ((fz[ix] > 0)
-                              or (fz[ix] == 0 and fy[iy] > 0)
-                              or (fz[ix] == 0 and fy[iy] == 0
-                                  and fx[iz] >= 0))],
+                          if ((fz[ix] > 0) or
+                              (fz[ix] == 0 and fy[iy] > 0)
+                              or (fz[ix] == 0 and fy[iy] == 0 and
+                                  fx[iz] >= 0))],
                          dtype=float)
 
     else:

@@ -156,7 +156,7 @@ class EnergyBand(object):
         labels = self.make_label('k', 'energy')
         output = labels[0]
         for label in labels[1:]:
-            output += '\t'+label
+            output += '\t' + label
         output += '\n'
         list3d = self.to_3dlist()
         for band_i in list3d:
@@ -302,7 +302,7 @@ class EIGENVAL(EnergyBand):
             for _ in range(self.nbands):
                 self.energies.append(
                     [float(i) for i in
-                     next(self.thefile).split()[1:self.nspin+1]])
+                     next(self.thefile).split()[1:self.nspin + 1]])
         self.kvecs = np.array(self.kvecs)
         self.energies = np.array(
             self.energies).T.reshape(self.nspin, self.numk, self.nbands)
