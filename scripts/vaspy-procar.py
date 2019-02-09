@@ -14,7 +14,7 @@ import vaspy.procar as procar
 import logging
 logging.basicConfig(level=logging.DEBUG,
                     format=' %(asctime)s - %(levelname)s -%(message)s')
-#logging.disable(logging.DEBUG)
+# logging.disable(logging.DEBUG)
 
 parser = argparse.ArgumentParser(
     formatter_class=argparse.RawTextHelpFormatter)
@@ -71,7 +71,7 @@ flat_orbitals = tuple(chain.from_iterable(args.orbital))
 #
 # As atomindex used here begins with "1", but siteindex used in procar.py
 # internaly begins with "0".  (This is because VASP is fortran program !)
-siteindex = [[i-1 for i in internal] for internal in args.atomindex]
+siteindex = [[i - 1 for i in internal] for internal in args.atomindex]
 #
 logging.debug('siteindex are:')
 logging.debug(siteindex)

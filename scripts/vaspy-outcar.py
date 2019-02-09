@@ -55,7 +55,7 @@ if args.plot:
     for name, data in zip(headers, zip(*posforce)):
         plt.plot(data, label=name)
     plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left',
-               ncol=len(headers)//18+1)
+               ncol=len(headers) // 18 + 1)
     plt.show()
 else:
     print("\t".join(headers))

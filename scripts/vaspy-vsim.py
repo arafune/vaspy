@@ -28,7 +28,7 @@ parser.add_argument('vsim', metavar='VSIM_file',
 #
 args = parser.parse_args()
 assert (args.poscar and args.xdatcar), \
-  '--poscar xor --xdatcar should be specified'
+    '--poscar xor --xdatcar should be specified'
 #
 dim = [int(x) for x in args.dim.split(',')]
 vsim_data = vsim_asc.VSIM_ASC(args.vsim)
@@ -48,7 +48,7 @@ if args.poscar:
     for frame in range(args.frames):
         vasp_poscar = poscar.POSCAR()
         vasp_poscar.system_name = vsim_data.system_name
-        vasp_poscar += '_mode_'+str(args.mode) + '_frame_' + str(frame)
+        vasp_poscar += '_mode_' + str(args.mode) + '_frame_' + str(frame)
         vasp_poscar.scaling_factor = 1.0
         vasp_poscar.cell_vecs = supercell
         vasp_poscar.iontypes = iontypes
@@ -58,7 +58,7 @@ if args.poscar:
         vasp_poscar.save('POSCAR_mode_' + str(args.mode) +
                          '_frame_' + str(frame) + '.vasp')
 else:
-    xdatcar_str = vsim_data.system_name + '_mode_'+str(args.mode)+'\n'
+    xdatcar_str = vsim_data.system_name + '_mode_' + str(args.mode) + '\n'
     xdatcar_str += '       1.00\n'
     for i in range(3):
         xdatcar_str += '      {:#.6f}   {:#.6f}    {:6f}\n'.format(
@@ -70,9 +70,9 @@ else:
         xdatcar_str += '    {}'.format(ionnum)
     xdatcar_str += '\n'
     mat = np.linalg.inv(np.transpose(supercell))
-    for frame in range(1, args.frames+1):
+    for frame in range(1, args.frames + 1):
         xdatcar_str += 'Direct configuration=    {}\n'.format(frame)
-        positions = [mat.dot(v) for v in motion_frames[frame-1]]
+        positions = [mat.dot(v) for v in motion_frames[frame - 1]]
         for position in positions:
             xdatcar_str += '    {:#.6f}    {:#.6f}    {:6f}\n'.format(
                 position[0], position[1], position[2])
