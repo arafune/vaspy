@@ -38,12 +38,15 @@ The below is an example of POSCAR file::
 '''
 
 from __future__ import division, print_function  # Version safety
+
 import bz2
-import itertools as it
 import copy
-import re
+import itertools as it
 import os
+import re
 import sys
+
+import numpy as np
 
 try:
     from vaspy import tools
@@ -51,7 +54,6 @@ except ImportError:
     mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
     sys.path.append(os.path.dirname(os.path.abspath(mypath)))
     import tools
-import numpy as np
 
 
 class POSCAR_HEAD(object):
@@ -72,9 +74,7 @@ class POSCAR_HEAD(object):
 '''
 
     def __init__(self):
-        self.__cell_vecs = np.array([[0., 0., 0.],
-                                     [0., 0., 0.],
-                                     [0., 0., 0.]])
+        self.__cell_vecs = np.array([[0., 0., 0.], [0., 0., 0.], [0., 0., 0.]])
         self.system_name = ""
         self.scaling_factor = 0.
         self.iontypes = []
@@ -143,8 +143,9 @@ class POSCAR_HEAD(object):
                     else:
                         atomnames.append(elem_num)
         self.__atom_identifer = [
-            "#" + str(s) + ":" + a for s, a in
-            zip(range(0, len(atomnames)), atomnames)]
+            "#" + str(s) + ":" + a
+            for s, a in zip(range(0, len(atomnames)), atomnames)
+        ]
         return self.__atom_identifer
 
     @atom_identifer.setter
@@ -352,16 +353,18 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         sposcar.ionnums = [i * n_x * n_y * n_z for i in sposcar.ionnums]
         spositions = sposcar.positions
         sposcar.positions = []
-        spositions = [np.array([x[0] / n_x, x[1] / n_y, x[2] / n_z])
-                      for x in spositions]
+        spositions = [
+            np.array([x[0] / n_x, x[1] / n_y, x[2] / n_z]) for x in spositions
+        ]
         for spos in spositions:
             for i_z in range(0, n_z):
                 for i_y in range(0, n_y):
                     for i_x in range(0, n_x):
-                        sposcar.positions.append(np.array(
-                            [spos[0] + i_x / n_x,
-                             spos[1] + i_y / n_y,
-                             spos[2] + i_z / n_z]))
+                        sposcar.positions.append(
+                            np.array([
+                                spos[0] + i_x / n_x, spos[1] + i_y / n_y,
+                                spos[2] + i_z / n_z
+                            ]))
         sposcar.coordinate_changeflags = []
         for flags in self.coordinate_changeflags:
             for _ in range(n_x * n_y * n_z):
@@ -411,16 +414,14 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         candidates27 = []
         if self.is_cartesian():
             for i, j, k in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
-                candidates27.append(i * self.cell_vecs[0]
-                                    + j * self.cell_vecs[1]
-                                    + k * self.cell_vecs[2]
-                                    + position)
+                candidates27.append(i * self.cell_vecs[0] +
+                                    j * self.cell_vecs[1] +
+                                    k * self.cell_vecs[2] + position)
         else:
             for i, j, k in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
-                candidates27.append(i * np.array([1., 0., 0.])
-                                    + j * np.array([0., 1., 0.])
-                                    + k * np.array([0., 0., 1.])
-                                    + position)
+                candidates27.append(i * np.array([1., 0., 0.]) +
+                                    j * np.array([0., 1., 0.]) +
+                                    k * np.array([0., 0., 1.]) + position)
         return candidates27
 
     def rotate_atom(self, site, axis_name, theta_deg, center):
@@ -455,8 +456,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.to_cartesian()
         position = self.positions[site]
         position -= center / self.scaling_factor
-        position = globals()["rotate_"
-                             + axis_name.lower()](theta_deg).dot(position)
+        position = globals()["rotate_" +
+                             axis_name.lower()](theta_deg).dot(position)
         position += center / self.scaling_factor
         self.positions[site] = position
 
@@ -632,25 +633,25 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         tmp = []
         tmp.append(self.system_name)
         tmp.append(str(self.scaling_factor))
-        tmp.append(''.join('   {0:20.17f}'.format(i) for i in
-                           self.cell_vecs[0]))
-        tmp.append(''.join('   {0:20.17f}'.format(i) for i in
-                           self.cell_vecs[1]))
-        tmp.append(''.join('   {0:20.17f}'.format(i) for i in
-                           self.cell_vecs[2]))
+        tmp.append(''.join(
+            '   {0:20.17f}'.format(i) for i in self.cell_vecs[0]))
+        tmp.append(''.join(
+            '   {0:20.17f}'.format(i) for i in self.cell_vecs[1]))
+        tmp.append(''.join(
+            '   {0:20.17f}'.format(i) for i in self.cell_vecs[2]))
         if not self.iontypes[0].isdigit():
             tmp.append(' ' + ' '.join(self.iontypes))
         tmp.append(' ' + ' '.join(str(i) for i in self.ionnums))
         if self.selective:
             tmp.append('Selective Dynamics')
         tmp.append(self.coordinate_type)
-        for pos, t_or_f, atom in tools.ZIPLONG(self.positions,
-                                               self.coordinate_changeflags,
-                                               self.atom_identifer,
-                                               fillvalue=''):
-            tmp.append(' '.join('  {0:20.17f}'.format(i) for i in pos)
-                       + ' ' + t_or_f
-                       + ' ' + atom)
+        for pos, t_or_f, atom in tools.ZIPLONG(
+                self.positions,
+                self.coordinate_changeflags,
+                self.atom_identifer,
+                fillvalue=''):
+            tmp.append(' '.join('  {0:20.17f}'.format(i)
+                                for i in pos) + ' ' + t_or_f + ' ' + atom)
         return '\n'.join(tmp) + '\n'
 
     def str_short(self):
@@ -666,11 +667,11 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         tmp.append(self.system_name)
         tmp.append('  {0:.14f}'.format(self.scaling_factor))
         for k in range(3):
-            tmp.append(''.join('{0:12.6f}'.format(i) for i in
-                               self.cell_vecs[k]))
+            tmp.append(''.join(
+                '{0:12.6f}'.format(i) for i in self.cell_vecs[k]))
         if not self.iontypes[0].isdigit():
-            tmp.append(' '
-                       + "".join(['{0:>5}'.format(i) for i in self.iontypes]))
+            tmp.append(' ' +
+                       "".join(['{0:>5}'.format(i) for i in self.iontypes]))
         tmp.append(''.join(['{0:>6}'.format(i) for i in self.ionnums]))
         tmp.append(self.coordinate_type)
         for pos in self.positions:
@@ -700,8 +701,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         self.cell_vecs *= (old / new_scaling_factor)
         self.scaling_factor = new_scaling_factor
         if self.is_cartesian():
-            self.positions = [i * old / new_scaling_factor
-                              for i in self.positions]
+            self.positions = [
+                i * old / new_scaling_factor for i in self.positions
+            ]
 
     def to_cartesian(self):
         '''
@@ -773,6 +775,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                 for vectors in it.product(molecule, molecule):
                     s += np.linalg.norm(vectors[0] - vectors[1])
                 return s
+
             newpos = min(atoms27, key=(lambda x: func(x, center)))
             newposes.append(newpos)
         for site, pos in zip(site_list, newposes):
@@ -805,14 +808,14 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if self.is_cartesian():
             vector = _vectorize(vector)
             for i in atomlist:
-                self.positions[i] = (self.positions[i]
-                                     + vector / self.scaling_factor)
+                self.positions[i] = (
+                    self.positions[i] + vector / self.scaling_factor)
         else:
             vector = _vectorize(vector)
             self.to_cartesian()
             for i in atomlist:
-                self.positions[i] = (self.positions[i]
-                                     + vector / self.scaling_factor)
+                self.positions[i] = (
+                    self.positions[i] + vector / self.scaling_factor)
             self.to_direct()
         return self.positions
 
@@ -917,7 +920,8 @@ def rotate_x(theta_deg):
     return np.array(
         [[1.0, 0.0, 0.0],
          [0.0, np.cos(theta_deg * degree), -np.sin(theta_deg * degree)],
-         [0.0, np.sin(theta_deg * degree), np.cos(theta_deg * degree)]])
+         [0.0, np.sin(theta_deg * degree),
+          np.cos(theta_deg * degree)]])
 
 
 def rotate_y(theta_deg):
@@ -934,9 +938,10 @@ def rotate_y(theta_deg):
     '''
     degree = np.pi / 180.0
     return np.array(
-        [[np.cos(theta_deg * degree), 0.0, np.sin(theta_deg * degree)],
-         [0.0, 1.0, 0.0],
-         [-np.sin(theta_deg * degree), 0.0, np.cos(theta_deg * degree)]])
+        [[np.cos(theta_deg * degree), 0.0,
+          np.sin(theta_deg * degree)], [0.0, 1.0, 0.0],
+         [-np.sin(theta_deg * degree), 0.0,
+          np.cos(theta_deg * degree)]])
 
 
 def rotate_z(theta_deg):
@@ -954,8 +959,8 @@ def rotate_z(theta_deg):
     degree = np.pi / 180.0
     return np.array(
         [[np.cos(theta_deg * degree), -np.sin(theta_deg * degree), 0.0],
-         [np.sin(theta_deg * degree), np.cos(theta_deg * degree), 0.0],
-         [0.0, 0.0, 1.0]])
+         [np.sin(theta_deg * degree),
+          np.cos(theta_deg * degree), 0.0], [0.0, 0.0, 1.0]])
 
 
 def three_by_three(vec):

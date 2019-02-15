@@ -2,9 +2,11 @@
 '''This module provide XDATCAR class
 '''
 
-import os
 import bz2
+import os
+
 import numpy as np
+
 import vaspy.poscar
 
 
@@ -76,8 +78,7 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
         tmp += '        {}\n'.format(self.scaling_factor)
         for i in range(3):
             tmp += '      {:#.6f}   {:#.6f}    {:6f}\n'.format(
-                self.cell_vecs[i][0],
-                self.cell_vecs[i][1],
+                self.cell_vecs[i][0], self.cell_vecs[i][1],
                 self.cell_vecs[i][2])
         for element in self.iontypes:
             tmp += '    {}'.format(element)

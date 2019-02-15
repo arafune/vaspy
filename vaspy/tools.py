@@ -4,10 +4,12 @@
 Module for tools used in vaspy
 '''
 
-from __future__ import print_function, division  # Version safety
-import re
+from __future__ import division, print_function  # Version safety
+
 import itertools as it
+import re
 from collections import Iterable
+
 # Version safety
 ZIPLONG = it.izip_longest if hasattr(it, 'izip_longest') else it.zip_longest
 
@@ -55,13 +57,12 @@ def flatten(nested, target=Iterable, ignore=FLATTEN_IGNORE):
     >>> flatten((1, [range(2), 3, set([4, 5]), [6]], frozenset([7, 8])))
     [1, 0, 1, 3, 4, 5, 6, 8, 7]
 '''
-    if (isinstance(nested, target) and
-            not isinstance(nested, ignore)):
+    if (isinstance(nested, target) and not isinstance(nested, ignore)):
         nested = list(nested)
     i = 0
     while i < len(nested):
-        while (isinstance(nested[i], target) and
-               not isinstance(nested[i], ignore)):
+        while (isinstance(nested[i], target)
+               and not isinstance(nested[i], ignore)):
             if not nested[i]:
                 nested.pop(i)
                 i -= 1
@@ -139,16 +140,26 @@ def parse_AtomselectionNum(L):
 
 if __name__ == '__main__':
     import argparse
-    def EACH_SLICE_DEMO(L, n): return list(each_slice(L, n))
-    demo = {'EACH_SLICE_DEMO': (range(10), 3),
-            'removeall': ([1, 0, 0, 1, 0, 1, 0, 0], 0),
-            'flatten': ((1, [range(2), 3, set([4, 5]), [6]],  # Version safety
-                         frozenset([7, 8])),),
-            'parse_Atomselection': ('1-5,8,9,11-15',), }
-    argcounts = {'EACH_SLICE_DEMO': 2,
-                 'removeall': 2,
-                 'flatten': 1,
-                 'parse_Atomselection': 1}
+
+    def EACH_SLICE_DEMO(L, n):
+        return list(each_slice(L, n))
+
+    demo = {
+        'EACH_SLICE_DEMO': (range(10), 3),
+        'removeall': ([1, 0, 0, 1, 0, 1, 0, 0], 0),
+        'flatten': (
+            (
+                1,
+                [range(2), 3, set([4, 5]), [6]],  # Version safety
+                frozenset([7, 8])), ),
+        'parse_Atomselection': ('1-5,8,9,11-15', ),
+    }
+    argcounts = {
+        'EACH_SLICE_DEMO': 2,
+        'removeall': 2,
+        'flatten': 1,
+        'parse_Atomselection': 1
+    }
     available = ['all'] + list(demo.keys())
     parser = argparse.ArgumentParser(
         description='''collection of tools used in this package.''',
@@ -158,15 +169,23 @@ so strings must be given with quotations("" or '').
 Because command line regards spaces as break,
 list argument must be written without any space.
 (i.e. [1,2,3,4,5] is valid, while [1, 2, 3, 4, 5] is invalid.)''')
-    parser.add_argument('choice', metavar='funcname', nargs='+',
-                        choices=available,
-                        help='''Demonstrate choosen function.
+    parser.add_argument(
+        'choice',
+        metavar='funcname',
+        nargs='+',
+        choices=available,
+        help='''Demonstrate choosen function.
 *all* shows all function in the choice.
 If -a/--args option is given, get argument(s) from command line.
 Otherwise use prepared argument(s).''')
-    parser.add_argument('-a', '--args', metavar='values', nargs='+',
-                        action='append', dest='values',
-                        help='''Use given argument(s) for demonstration.
+    parser.add_argument(
+        '-a',
+        '--args',
+        metavar='values',
+        nargs='+',
+        action='append',
+        dest='values',
+        help='''Use given argument(s) for demonstration.
 You have to use this option for each function.
 See epilog for notices for argument notation.''')
     args = parser.parse_args()

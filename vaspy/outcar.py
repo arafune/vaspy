@@ -4,10 +4,11 @@
 This module provides OUTCAR class
 """
 
-from __future__ import unicode_literals  # Version safety
 from __future__ import print_function  # Version safety
-import os.path
+from __future__ import unicode_literals  # Version safety
+
 import bz2
+import os.path
 
 
 class OUTCAR(object):  # Version safety
@@ -97,13 +98,14 @@ class OUTCAR(object):  # Version safety
         build posforce_title
         """
         self.set_atom_names()
-        self.posforce_title = [[i + "_x",
-                                i + "_y",
-                                i + "_z",
-                                i + "_fx",
-                                i + "_fy",
-                                i + "_fz", ]
-                               for i in self.atom_names]
+        self.posforce_title = [[
+            i + "_x",
+            i + "_y",
+            i + "_z",
+            i + "_fx",
+            i + "_fy",
+            i + "_fz",
+        ] for i in self.atom_names]
 
     def load_file(self, thefile):
         '''
@@ -141,8 +143,8 @@ class OUTCAR(object):  # Version safety
                 elif len(line) == 2:
                     pass
                 else:
-                    magnetizations.append([
-                        float(x) for x in line.split()[1:4]])
+                    magnetizations.append(
+                        [float(x) for x in line.split()[1:4]])
             elif section == ['total_charge']:
                 if "---------------------------------" in line:
                     pass
@@ -154,12 +156,10 @@ class OUTCAR(object):  # Version safety
                 elif len(line) == 2:
                     pass
                 else:
-                    total_charges.append([
-                        float(x) for x in line.split()[1:4]])
+                    total_charges.append([float(x) for x in line.split()[1:4]])
             elif section == ['kvec_weight']:
                 if len(line) > 3:
-                    kvec_weight.append(
-                        [float(x) for x in line.split()])
+                    kvec_weight.append([float(x) for x in line.split()])
                 else:
                     section.pop()
             else:
@@ -178,9 +178,9 @@ class OUTCAR(object):  # Version safety
                     self.nkdim = int(line.split()[9])
                     self.nbands = int(line.split()[14])
                 elif "reciprocal lattice vectors" in line:
-                    self.recvec = [[float(i) for i in
-                                    next(thefile).split()[3:]]
-                                   for i in range(3)]
+                    self.recvec = [[
+                        float(i) for i in next(thefile).split()[3:]
+                    ] for i in range(3)]
                 elif " magnetization (x)" in line:
                     magnetizations = []
                     section.append("magnetization")
@@ -193,15 +193,17 @@ class OUTCAR(object):  # Version safety
                     section.append('kvec_weight')
                 else:
                     pass
-        self.atom_identifer = [name + ":#" + str(index + 1)
-                               for (index, name)
-                               in enumerate(
-                                   [elm + str(j)
-                                    for (elm, n) in zip(self.iontypes,
-                                                        self.ionnums)
-                                    for j in range(1, int(n) + 1)])]
-        self.posforce = [posforce[i:i + self.natom]
-                         for i in range(0, len(posforce), self.natom)]
+        self.atom_identifer = [
+            name + ":#" + str(index + 1) for (index, name) in enumerate([
+                elm + str(j) for (elm, n) in zip(self.iontypes, self.ionnums)
+                for j in range(1,
+                               int(n) + 1)
+            ])
+        ]
+        self.posforce = [
+            posforce[i:i + self.natom]
+            for i in range(0, len(posforce), self.natom)
+        ]
         self.set_atom_names()
         self.set_posforce_title()
         for i in kvec_weight:
@@ -216,10 +218,13 @@ class OUTCAR(object):  # Version safety
             sites = range(1, self.natom + 1)
         if isinstance(sites[0], (list, tuple)):
             sites = [n for n in sites[0]]
-        return [posforce for (index, site)
-                in enumerate(self.posforce_title)
-                for (posforce, boolian) in zip(site, posforce_flag)
-                if boolian and (index + 1 in sites)]
+        return [
+            posforce for (index, site) in enumerate(self.posforce_title)
+            for (posforce, boolian) in zip(site, posforce_flag)
+            if boolian and (index + 1 in sites)
+        ]
+
+
 # return [posforce for (posforce, boolian) in zip(ithAtom, poforce_flag)
 # if boolian==True for ithAtom in self.posforce_title  ] #which is
 # correct?
@@ -237,8 +242,8 @@ class OUTCAR(object):  # Version safety
             sites = range(1, self.natom + 1)
         if isinstance(sites[0], (list, tuple)):
             sites = [n for n in sites[0]]
-        return [[posforce for (index, site) in enumerate(one_cycle)
-                 for (posforce, boolian) in zip(site, posforce_flag)
-                 if boolian
-                 if index + 1 in sites]
-                for one_cycle in self.posforce]
+        return [[
+            posforce for (index, site) in enumerate(one_cycle)
+            for (posforce, boolian) in zip(site, posforce_flag) if boolian
+            if index + 1 in sites
+        ] for one_cycle in self.posforce]

@@ -40,13 +40,16 @@ From VASP webpage::
   calculation.
 '''
 
-from __future__ import print_function  # Version safety
 from __future__ import division  # Version safety
-import os
-import sys
+from __future__ import print_function  # Version safety
+
 import bz2
 import copy
+import os
+import sys
+
 import numpy as np
+
 try:
     import matplotlib.pyplot as plt
 except ImportError:
@@ -112,8 +115,7 @@ class DOSCAR(object):  # Version safety
         [thefile.readline() for i in range(4)]
         header = thefile.readline()
         self.nbands = int(header[32:37])
-        tdos = np.array([next(thefile).split()
-                         for i in range(self.nbands)],
+        tdos = np.array([next(thefile).split() for i in range(self.nbands)],
                         dtype=np.float64)
         if tdos.shape[1] == 3:
             tdos = tdos[:, 0:2]
@@ -128,8 +130,7 @@ class DOSCAR(object):  # Version safety
             line = ""
         while line == header:
             self.dos_container.append(
-                np.array([next(thefile).split()
-                          for i in range(self.nbands)],
+                np.array([next(thefile).split() for i in range(self.nbands)],
                          dtype=np.float64))
             try:
                 line = next(thefile)
@@ -202,14 +203,16 @@ class DOS(object):  # Version safety
         transposed_dos = self.dos.transpose()
         if header is None:
             with open(filename, mode='wb') as fhandle:
-                np.savetxt(fhandle,
-                           transposed_dos,
-                           delimiter='\t', newline='\n')
+                np.savetxt(
+                    fhandle, transposed_dos, delimiter='\t', newline='\n')
         else:
             with open(filename, mode='wb') as fhandle:
-                np.savetxt(fhandle,
-                           transposed_dos, header=header,
-                           delimiter='\t', newline='\n')
+                np.savetxt(
+                    fhandle,
+                    transposed_dos,
+                    header=header,
+                    delimiter='\t',
+                    newline='\n')
 
 
 class TDOS(DOS):
@@ -277,8 +280,9 @@ class PDOS(DOS):
         super(PDOS, self).__init__(array)
         self.site = "" if site is None else site
         self.orbital_spin = list()
-        orbitalnames = ["s", "py", "pz", "px", "dxy", "dyz", "dz2",
-                        "dxz", "dx2"]
+        orbitalnames = [
+            "s", "py", "pz", "px", "dxy", "dyz", "dz2", "dxz", "dx2"
+        ]
         # The above order is refered from sphpro.F of vasp source
         spins_soi = ("mT", "mX", "mY", "mZ")
         spins = ("up", "down")
@@ -288,8 +292,8 @@ class PDOS(DOS):
                 self.orbital_spin = orbitalnames
             elif flag == 19:  # Spin resolved
                 self.orbital_spin = [
-                    orb + "_" + spin for orb in orbitalnames
-                    for spin in spins]
+                    orb + "_" + spin for orb in orbitalnames for spin in spins
+                ]
                 # In collinear spin calculation, DOS of down-spin is
                 # set by negative value.
                 for i in range(2, 19, 2):
@@ -297,7 +301,8 @@ class PDOS(DOS):
             elif flag == 37:  # SOI
                 self.orbital_spin = [
                     orb + "_" + spin for orb in orbitalnames
-                    for spin in spins_soi]
+                    for spin in spins_soi
+                ]
             else:
                 raise ValueError("Check the DOS data")
 
@@ -305,15 +310,16 @@ class PDOS(DOS):
         '''
         Show DOS graph by using matplotlib.  For 'just seeing' use. '''
         try:
-            alist = [self.orbital_spin.index(orbname)
-                     for orbname in orbitalnames]
+            alist = [
+                self.orbital_spin.index(orbname) for orbname in orbitalnames
+            ]
         except ValueError:
             err = "Check argment of this function\n"
             err += "The following name(s) are accpted:\n"
             err += ", ".join(self.orbital_spin)
             raise ValueError(err)
         for orbital in alist:
-            plt.plot(self.dos[0], self.dos[orbital+1])
+            plt.plot(self.dos[0], self.dos[orbital + 1])
         plt.show()
 
     def export_csv(self, filename, site=None):

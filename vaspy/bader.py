@@ -10,8 +10,10 @@ This program is not a part of vasp but it deeply connects with the vasp.
 
 from __future__ import division  # Version safety
 from __future__ import print_function
-import os.path
+
 import bz2
+import os.path
+
 import numpy as np
 
 

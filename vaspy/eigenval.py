@@ -2,14 +2,15 @@
 This module provides EIGENVAL.
 '''
 
+from __future__ import division, print_function
 
-from __future__ import print_function
-from __future__ import division
-import os
-import csv
-import sys
 import bz2
+import csv
+import os
+import sys
+
 import numpy as np
+
 try:
     import matplotlib.pyplot as plt
 except ImportError:
@@ -76,9 +77,11 @@ class EnergyBand(object):
     @property
     def kdistances(self):
         '''Return kdistances'''
-        return np.cumsum(np.linalg.norm(
-            np.concatenate((np.array([[0, 0, 0]]),
-                            np.diff(self.kvecs, axis=0))), axis=1))
+        return np.cumsum(
+            np.linalg.norm(
+                np.concatenate((np.array([[0, 0, 0]]),
+                                np.diff(self.kvecs, axis=0))),
+                axis=1))
 
     def fermi_correction(self, fermi):
         '''Correct the Fermi level
@@ -197,9 +200,11 @@ class EnergyBand(object):
            ax.set_xlim(0, 4)
            plt.show()
         '''
-        _ = [plt.plot(self.kdistances, self.energies[spin_i, :, band_i],
-                      color=color)
-             for band_i in range(self.energies.shape[2])]
+        _ = [
+            plt.plot(
+                self.kdistances, self.energies[spin_i, :, band_i], color=color)
+            for band_i in range(self.energies.shape[2])
+        ]
         return plt.gca()
 
     def show(self, yrange=None, spin_i=0):  # How to set default value?
@@ -218,18 +223,19 @@ class EnergyBand(object):
              Spin index. For spin-polarized collinear band
         '''
         for band_i in range(self.energies.shape[2]):
-            plt.plot(self.kdistances, self.energies[spin_i, :, band_i],
-                     color='blue')
+            plt.plot(
+                self.kdistances,
+                self.energies[spin_i, :, band_i],
+                color='blue')
         if yrange is not None:
             plt.ylim([yrange[0], yrange[1]])
-        plt.xlim([self.kdistances[0],
-                  self.kdistances[-1]])
+        plt.xlim([self.kdistances[0], self.kdistances[-1]])
         plt.ylabel(self.label['energy'][spin_i] + ' (eV)')
         plt.show()
 
-    def to_physical_kvector(self, recvec=((1.0, 0.0, 0.0),
-                                          (0.0, 1.0, 0.0),
-                                          (0.0, 0.0, 1.0))):
+    def to_physical_kvector(self,
+                            recvec=((1.0, 0.0, 0.0), (0.0, 1.0, 0.0),
+                                    (0.0, 0.0, 1.0))):
         '''Change kvec unit to inverse AA
 
         Parameters
@@ -242,8 +248,7 @@ class EnergyBand(object):
                       unit of the wavevector.
         '''
         recvec = np.array(recvec)
-        self.kvecs = np.array(
-            [recvec.dot(kvecs) for kvecs in self.kvecs])
+        self.kvecs = np.array([recvec.dot(kvecs) for kvecs in self.kvecs])
 
 
 class EIGENVAL(EnergyBand):
@@ -280,8 +285,9 @@ class EIGENVAL(EnergyBand):
         '''
         A virtual parser of EIGENVAL
         '''
-        self.natom, _, _, self.nspin = [int(i) for i in
-                                        next(self.thefile).split()]
+        self.natom, _, _, self.nspin = [
+            int(i) for i in next(self.thefile).split()
+        ]
         if self.nspin == 2:
             self.label['energy'] = ['Energy_up', 'Energy_down']
         else:
@@ -290,8 +296,9 @@ class EIGENVAL(EnergyBand):
         next(self.thefile)
         next(self.thefile)
         next(self.thefile)
-        _, self.numk, self.nbands = [int(i) for i in
-                                     next(self.thefile).split()]
+        _, self.numk, self.nbands = [
+            int(i) for i in next(self.thefile).split()
+        ]
         self.kvecs = []
         self.energies = []
         for _ in range(self.numk):
@@ -300,10 +307,11 @@ class EIGENVAL(EnergyBand):
             self.kvecs.append(
                 [float(i) for i in next(self.thefile).split()[0:3]])
             for _ in range(self.nbands):
-                self.energies.append(
-                    [float(i) for i in
-                     next(self.thefile).split()[1:self.nspin + 1]])
+                self.energies.append([
+                    float(i)
+                    for i in next(self.thefile).split()[1:self.nspin + 1]
+                ])
         self.kvecs = np.array(self.kvecs)
-        self.energies = np.array(
-            self.energies).T.reshape(self.nspin, self.numk, self.nbands)
+        self.energies = np.array(self.energies).T.reshape(
+            self.nspin, self.numk, self.nbands)
         self.thefile.close()

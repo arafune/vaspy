@@ -4,8 +4,10 @@ Module for WAVECAR class
 '''
 
 from __future__ import division, print_function  # Version safety
+
 import numpy as np
 from scipy.fftpack import ifftn
+
 import vaspy.mesh3d as mesh3d
 import vaspy.poscar as poscar
 
@@ -85,8 +87,7 @@ class WAVECAR(object):
         '''
         self.wfc.seek(0)
         self.recl, self.nspin, self.rtag = np.array(
-            np.fromfile(self.wfc, dtype=np.float, count=3),
-            dtype=int)
+            np.fromfile(self.wfc, dtype=np.float, count=3), dtype=int)
         self.wfc.seek(self.recl)
         #        print(self.wfc.tell())
         #
@@ -102,8 +103,8 @@ class WAVECAR(object):
         self.rcpcell = np.linalg.inv(self.realcell).T
         unit_cell_vector_magnitude = np.linalg.norm(self.realcell, axis=1)
         cutoff = np.ceil(
-            np.sqrt(self.encut / Ry_in_eV) / (2 * np.pi / (
-                unit_cell_vector_magnitude / au_in_AA)))
+            np.sqrt(self.encut / Ry_in_eV) /
+            (2 * np.pi / (unit_cell_vector_magnitude / au_in_AA)))
         # FFT Minimum grid size. Always odd!!
         self.ngrid = np.array(2 * cutoff + 1, dtype=int)
 
@@ -144,16 +145,15 @@ class WAVECAR(object):
         self.bands = np.zeros((self.nspin, self.numk, self.nbands),
                               dtype=float)
         self.nplwvs = np.zeros(self.numk, dtype=int)
-        self.occs = np.zeros((self.nspin, self.numk, self.nbands),
-                             dtype=float)
+        self.occs = np.zeros((self.nspin, self.numk, self.nbands), dtype=float)
         for spin_i in range(self.nspin):
             for k_i in range(self.numk):
                 pos = 2 + spin_i * self.numk * (self.nbands + 1)
                 pos += k_i * (self.nbands + 1)
                 self.wfc.seek(pos * self.recl)
-#                print(self.wfc.tell())
-                dump = np.fromfile(self.wfc, dtype=np.float,
-                                   count=4 + 3 * self.nbands)
+                #                print(self.wfc.tell())
+                dump = np.fromfile(
+                    self.wfc, dtype=np.float, count=4 + 3 * self.nbands)
                 if spin_i == 0:
                     self.nplwvs[k_i] = int(dump[0])
                     self.kvecs[k_i] = dump[1:4]
@@ -164,11 +164,12 @@ class WAVECAR(object):
             self.kpath = None
         else:
             self.kpath = np.concatenate(
-                ([0, ],
+                ([
+                    0,
+                ],
                  np.cumsum(
                      np.linalg.norm(
-                         np.dot(np.diff(self.kvecs, axis=0),
-                                self.rcpcell),
+                         np.dot(np.diff(self.kvecs, axis=0), self.rcpcell),
                          axis=1))))
         return self.kpath, self.bands
 
@@ -231,8 +232,13 @@ class WAVECAR(object):
             cg /= np.linalg.norm(cg)
         return cg
 
-    def realspace_wfc(self, spin_i=0, k_i=0, band_i=0,
-                      gvec=None, ngrid=None, norm=False,
+    def realspace_wfc(self,
+                      spin_i=0,
+                      k_i=0,
+                      band_i=0,
+                      gvec=None,
+                      ngrid=None,
+                      norm=False,
                       poscar=poscar.POSCAR()):
         r'''
         Calculate the pseudo-wavefunction of the KS states in
@@ -292,30 +298,24 @@ class WAVECAR(object):
             gvec = self.gvectors(k_i)
         gvec %= ngrid[np.newaxis, :]
         if self.gamma and PARALLEL:
-            phi_k = np.zeros((ngrid[0],
-                              ngrid[1],
-                              ngrid[2] // 2 + 1), dtype=np.complex128)
+            phi_k = np.zeros((ngrid[0], ngrid[1], ngrid[2] // 2 + 1),
+                             dtype=np.complex128)
         elif self.gamma and not PARALLEL:
-            phi_k = np.zeros((ngrid[0] // 2 + 1,
-                              ngrid[1],
-                              ngrid[2]), dtype=np.complex128)
+            phi_k = np.zeros((ngrid[0] // 2 + 1, ngrid[1], ngrid[2]),
+                             dtype=np.complex128)
         else:
             phi_k = np.zeros(ngrid, dtype=np.complex128)
         try:  # Collininear
-            phi_k[gvec[:, 0], gvec[:, 1], gvec[:, 2]] = self.bandcoeff(spin_i,
-                                                                       k_i,
-                                                                       band_i,
-                                                                       norm)
-        except ValueError:   # SOI:
+            phi_k[gvec[:, 0], gvec[:, 1], gvec[:, 2]] = self.bandcoeff(
+                spin_i, k_i, band_i, norm)
+        except ValueError:  # SOI:
             bandcoeff = self.bandcoeff(spin_i, k_i, band_i, norm)
             phi_k = np.zeros((2, ngrid[0], ngrid[1], ngrid[2]),
                              dtype=np.complex128)
-            phi_k[0][gvec[:, 0],
-                     gvec[:, 1],
+            phi_k[0][gvec[:, 0], gvec[:, 1],
                      gvec[:, 2]] = bandcoeff[:bandcoeff.size // 2]
-            phi_k[1][gvec[:, 0],
-                     gvec[:, 1],
-                     gvec[:, 2]] = bandcoeff[bandcoeff.size // 2:]
+            phi_k[1][gvec[:, 0], gvec[:, 1], gvec[:, 2]] = bandcoeff[
+                bandcoeff.size // 2:]
         #
         if self.gamma:
             if PARALLEL:
@@ -351,13 +351,12 @@ class WAVECAR(object):
             vaspgrid.grid.shape = ngrid
             # checking consistency between POSCAR and WAVECAR
             np.testing.assert_array_almost_equal(
-                poscar.scaling_factor * poscar.cell_vecs,
-                self.realcell)
+                poscar.scaling_factor * poscar.cell_vecs, self.realcell)
             re = np.real(phi_r)
             im = np.imag(phi_r)
             if phi_r.ndim == 3:
-                vaspgrid.grid.data = np.concatenate(
-                    (re.flatten('F'), im.flatten('F')))
+                vaspgrid.grid.data = np.concatenate((re.flatten('F'),
+                                                     im.flatten('F')))
             else:  # SOI
                 vaspgrid.grid.data = np.concatenate(
                     ((re[0] + re[1]).flatten('F'),
@@ -379,17 +378,15 @@ class WAVECAR(object):
         string += "\nreal space lattice vectors:"
         for i in range(3):
             string += "\na" + str(i + 1)
-            string += " = {0}    {1}    {2}".format(self.realcell[i][0],
-                                                    self.realcell[i][1],
-                                                    self.realcell[i][2])
+            string += " = {0}    {1}    {2}".format(
+                self.realcell[i][0], self.realcell[i][1], self.realcell[i][2])
         string += "\n"
         string += "\nvolume unit cell =   {0}".format(self.volume)
         string += "\nReciprocal lattice vectors:"
         for i in range(3):
             string += "\nb" + str(i + 1)
-            string += " = {0}    {1}    {2}".format(self.rcpcell[i][0],
-                                                    self.rcpcell[i][1],
-                                                    self.rcpcell[i][2])
+            string += " = {0}    {1}    {2}".format(
+                self.rcpcell[i][0], self.rcpcell[i][1], self.rcpcell[i][2])
         # string +="\nreciprocal lattice vector magnitudes:"
         return string
 
@@ -410,40 +407,35 @@ def make_kgrid(ngrid, gamma=False, para=PARALLEL):
     numpy.array
 
 '''
-    fx = [ii if ii < ngrid[0] // 2 + 1  # <<< // or / (?)
-          else ii - ngrid[0]
-          for ii in range(ngrid[0])]
-    fy = [ii if ii < ngrid[1] // 2 + 1
-          else ii - ngrid[1]
-          for ii in range(ngrid[1])]
-    fz = [ii if ii < ngrid[2] // 2 + 1
-          else ii - ngrid[2]
-          for ii in range(ngrid[2])]
+    fx = [
+        ii if ii < ngrid[0] // 2 + 1  # <<< // or / (?)
+        else ii - ngrid[0] for ii in range(ngrid[0])
+    ]
+    fy = [
+        ii if ii < ngrid[1] // 2 + 1 else ii - ngrid[1]
+        for ii in range(ngrid[1])
+    ]
+    fz = [
+        ii if ii < ngrid[2] // 2 + 1 else ii - ngrid[2]
+        for ii in range(ngrid[2])
+    ]
     if gamma and para:
-        kgrid = np.array([(fx[ix], fy[iy], fz[iz])
-                          for iz in range(ngrid[2])
-                          for iy in range(ngrid[1])
-                          for ix in range(ngrid[0])
-                          if ((fz[iz] > 0) or
-                              (fz[iz] == 0 and fy[iy] > 0)
-                              or (fz[iz] == 0 and fy[iy] == 0 and fx[ix] >= 0)
-                              )], dtype=float)
+        kgrid = np.array([(fx[ix], fy[iy], fz[iz]) for iz in range(ngrid[2])
+                          for iy in range(ngrid[1]) for ix in range(ngrid[0])
+                          if ((fz[iz] > 0) or (fz[iz] == 0 and fy[iy] > 0) or (
+                              fz[iz] == 0 and fy[iy] == 0 and fx[ix] >= 0))],
+                         dtype=float)
     elif gamma and not para:
-        kgrid = np.array([(fx[ix], fy[iy], fz[iz])
-                          for iz in range(ngrid[2])
-                          for iy in range(ngrid[1])
-                          for ix in range(ngrid[0])
-                          if ((fz[ix] > 0) or
-                              (fz[ix] == 0 and fy[iy] > 0)
-                              or (fz[ix] == 0 and fy[iy] == 0 and
-                                  fx[iz] >= 0))],
+        kgrid = np.array([(fx[ix], fy[iy], fz[iz]) for iz in range(ngrid[2])
+                          for iy in range(ngrid[1]) for ix in range(ngrid[0])
+                          if ((fz[ix] > 0) or (fz[ix] == 0 and fy[iy] > 0) or (
+                              fz[ix] == 0 and fy[iy] == 0 and fx[iz] >= 0))],
                          dtype=float)
 
     else:
-        kgrid = np.array([(fx[ix], fy[iy], fz[iz])
-                          for iz in range(ngrid[2])
-                          for iy in range(ngrid[1])
-                          for ix in range(ngrid[0])], dtype=float)
+        kgrid = np.array([(fx[ix], fy[iy], fz[iz]) for iz in range(ngrid[2])
+                          for iy in range(ngrid[1]) for ix in range(ngrid[0])],
+                         dtype=float)
     return kgrid
 
 
@@ -466,12 +458,10 @@ def check_symmetry(grid3d):
         ix, iy, iz = int(k[0]), int(k[1]), int(k[2])
         if ix >= 0 and iy >= 0 and iz >= 0:
             if grid3d[ix][iy][iz] != np.conjugate(grid3d[-ix][-iy][-iz]):
-                print(
-                    '[{0} {1} {2}] is {3}\n'.format(ix, iy, iz,
-                                                    grid3d[ix][iy][iz]))
-                print(
-                    '[{0} {1} {2}] is {3}\n'.format(-ix, -iy, -iz,
-                                                    grid3d[-ix][-iy][-iz]))
+                print('[{0} {1} {2}] is {3}\n'.format(ix, iy, iz,
+                                                      grid3d[ix][iy][iz]))
+                print('[{0} {1} {2}] is {3}\n'.format(-ix, -iy, -iz,
+                                                      grid3d[-ix][-iy][-iz]))
                 print('check the value\n')
                 return False
     return True

@@ -5,9 +5,10 @@ Module for CHGCAR class
 translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 '''
 from __future__ import division, print_function  # Version safety
+
+import bz2
 import copy
 import os
-import bz2
 import sys
 
 try:

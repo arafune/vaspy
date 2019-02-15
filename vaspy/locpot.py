@@ -4,11 +4,13 @@
 This module provides LOCPOT class
 '''
 #
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function
+
 import os
 import sys
+
 import numpy as np
+
 try:
     import matplotlib.pyplot as plt
 except ImportError:
@@ -48,18 +50,18 @@ class LOCPOT(mesh3d.VASPGrid):
         axis_name = axis_name.capitalize()
         axes_length = self.poscar.axes_lengthes
         if axis_name == 'X':
-            horizontal_axis = np.linspace(
-                0, axes_length[0], self.grid.shape[0])
+            horizontal_axis = np.linspace(0, axes_length[0],
+                                          self.grid.shape[0])
             plt.clf()
             plt.xlim(xmax=axes_length[0])
         if axis_name == 'Y':
-            horizontal_axis = np.linspace(
-                0, axes_length[1], self.grid.shape[1])
+            horizontal_axis = np.linspace(0, axes_length[1],
+                                          self.grid.shape[1])
             plt.clf()
             plt.xlim(xmax=axes_length[1])
         if axis_name == 'Z':
-            horizontal_axis = np.linspace(
-                0, axes_length[2], self.grid.shape[2])
+            horizontal_axis = np.linspace(0, axes_length[2],
+                                          self.grid.shape[2])
             plt.clf()
             plt.xlim(xmax=axes_length[2])
         y_average = self.grid.average_along_axis(axis_name, frame)
@@ -77,6 +79,7 @@ class LOCPOT(mesh3d.VASPGrid):
         plt.xlabel(xlabel)
         plt.ylabel("Energy  ( eV )")
         plt.show()
+
 
 # LVHAR-tag:  This tag is available in VASP.5.2.12 and newer version.
 # It determines whether the total local potential (file LOCPOT ) contains

@@ -5,23 +5,17 @@ VASPy
 
 modules for VASP pre/post-process
 """
+import logging
 import os.path
 import re
-import logging
-logging.disable(logging.DEBUG)
-__all__ = ['chgcar',
-           'doscar',
-           'outcar',
-           'poscar',
-           'procar',
-           'locpot',
-           'eigenval',
-           'wavecar',
-           'mesh3d',
-           'const',
-           'vsim_asc',
-           'tools']
+
 from vaspy import *
+
+logging.disable(logging.DEBUG)
+__all__ = [
+    'chgcar', 'doscar', 'outcar', 'poscar', 'procar', 'locpot', 'eigenval',
+    'wavecar', 'mesh3d', 'const', 'vsim_asc', 'tools'
+]
 
 
 def load(filename, mode=None, additional=None):
