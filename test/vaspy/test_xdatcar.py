@@ -1,11 +1,11 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-# import tempfile
-from nose.tools import eq_, ok_
-from nose.tools import with_setup, assert_equal, raises
-from nose.tools import assert_false
+
 import numpy as np
+# import tempfile
+from nose.tools import assert_equal, assert_false, eq_, ok_, raises, with_setup
+
 import vaspy.xdatcar as xdatcar
 
 
@@ -34,13 +34,13 @@ class TestXDATCAR(object):
         eq_([1, 2], self.xdatcar_test.ionnums)
         eq_(5, len(self.xdatcar_test.configurations))
         #
-        np.testing.assert_allclose([[0.33333333,  0.33333333,  0.24999815],
-                                    [0.66666667,  0.66666667,  0.29113380],
-                                    [0.66666667,  0.66666667,  0.20886348]],
+        np.testing.assert_allclose([[0.33333333, 0.33333333, 0.24999815],
+                                    [0.66666667, 0.66666667, 0.29113380],
+                                    [0.66666667, 0.66666667, 0.20886348]],
                                    self.xdatcar_test.configurations[0])
-        np.testing.assert_allclose([[0.33333333,  0.33333333,  0.24999815],
-                                    [0.66666667,  0.66666667,  0.29113854],
-                                    [0.66666667,  0.66666667,  0.20885874]],
+        np.testing.assert_allclose([[0.33333333, 0.33333333, 0.24999815],
+                                    [0.66666667, 0.66666667, 0.29113854],
+                                    [0.66666667, 0.66666667, 0.20885874]],
                                    self.xdatcar_test.configurations[4])
 
         # #  mode is '3', second atom
