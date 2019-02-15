@@ -5,30 +5,38 @@ script to use(demonstrate) vaspy.chgcar module
 """
 
 import argparse
+
 from vaspy.chgcar import CHGCAR
 
 # HINT list methods for --spin option below.
 # they are called with just one argument, CHGCAR instance.
 spinmethods = {
     'mag': CHGCAR.magnetization,
-    'magX': (lambda chg: chg.magnetization('x')),   # < Error !! FixMe
-    'magY': (lambda chg: chg.magnetization('y')),   # < Error !! FixMe
-    'magZ': (lambda chg: chg.magnetization('z')),   # < Error !! FixMe
+    'magX': (lambda chg: chg.magnetization('x')),  # < Error !! FixMe
+    'magY': (lambda chg: chg.magnetization('y')),  # < Error !! FixMe
+    'magZ': (lambda chg: chg.magnetization('z')),  # < Error !! FixMe
     'majority': CHGCAR.majorityspin,
     'minority': CHGCAR.minorityspin,
 }
 
-
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('--add', action='store_true', default=False,
-                   help="Add two CHGCAR files")
-group.add_argument('--merge', action='store_true', default=False,
-                   help="Add two CHGCAR files (ion position is not modified)")
-group.add_argument('--diff', action='store_true', default=False,
-                   help="Get difference of two CHGCAR files")
-group.add_argument('--spin', metavar='spin_operation',
-                   help="""spin-relatated operation.
+group.add_argument(
+    '--add', action='store_true', default=False, help="Add two CHGCAR files")
+group.add_argument(
+    '--merge',
+    action='store_true',
+    default=False,
+    help="Add two CHGCAR files (ion position is not modified)")
+group.add_argument(
+    '--diff',
+    action='store_true',
+    default=False,
+    help="Get difference of two CHGCAR files")
+group.add_argument(
+    '--spin',
+    metavar='spin_operation',
+    help="""spin-relatated operation.
 when this option is set --add, -diff are ignored,
 and CHGCAR_file_2 must not be set.
 spin operation is one of the followings:
@@ -45,8 +53,10 @@ majority : extract the part for the
 minority : extract the part for the
            minority spin (for spin resolved calc.)""")
 
-parser.add_argument('--output', metavar='file_name',
-                    help="""output file name
+parser.add_argument(
+    '--output',
+    metavar='file_name',
+    help="""output file name
 if not specified, use standard output""")
 #
 parser.add_argument('CHGCAR_file_1', type=CHGCAR)
