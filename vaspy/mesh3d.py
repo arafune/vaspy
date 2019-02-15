@@ -5,10 +5,13 @@ That is this is class VASPGRID is the parent class of CHGCAR,
 '''
 
 from __future__ import division, print_function
+
 import bz2
 import copy
 import os
+
 import numpy as np
+
 from vaspy import poscar, tools
 
 
@@ -89,8 +92,7 @@ class VASPGrid(object):
         self.poscar.load_array(tmp)
         # read grid size and use it as separator
         separator = thefile.readline()
-        self.grid.shape = tuple([int(string) for string
-                                 in separator.split()])
+        self.grid.shape = tuple([int(string) for string in separator.split()])
         # Volumetric data
         if pickleddata:
             if os.path.splitext(pickleddata)[1] == '.npy':
@@ -327,22 +329,19 @@ class Grid3D(object):
         numpy.ndarray
             2D numpy array that sliced from 3D mesh data.
         '''
-        griddata = self.data[frame_i * self.size: (frame_i + 1) * self.size]
+        griddata = self.data[frame_i * self.size:(frame_i + 1) * self.size]
         axis = axis.lower()
         if axis == 'x':
-            return griddata.reshape(self.shape[2],
-                                    self.shape[1],
+            return griddata.reshape(self.shape[2], self.shape[1],
                                     self.shape[0])[position, :, :]
         elif axis == 'y':
-            return griddata.reshape(self.shape[2],
-                                    self.shape[1],
+            return griddata.reshape(self.shape[2], self.shape[1],
                                     self.shape[0])[:, position, :]
         elif axis == 'z':
-            return griddata.reshape(self.shape[2],
-                                    self.shape[1],
+            return griddata.reshape(self.shape[2], self.shape[1],
                                     self.shape[0])[position, :, :]
 
-    def integrate(self, from_coor, to_coor, axis, frame_i=0):
+    def integrate(self, axis, from_coor=None, to_coor=None, frame_i=0):
         '''
         Return 2D data integrated occupacy along the 'axis'
         from_coor to to_coor.
@@ -366,26 +365,23 @@ class Grid3D(object):
             2D numpy array that integrated from 3D mesh data
 
         '''
-        griddata = self.data[frame_i * self.size: (frame_i + 1) * self.size]
+        griddata = self.data[frame_i * self.size:(frame_i + 1) * self.size]
         axis = axis.lower()
         if axis == 'x':
             return np.sum(
-                griddata.reshape(self.shape[2],
-                                 self.shape[1],
+                griddata.reshape(self.shape[2], self.shape[1],
                                  self.shape[0])[:, :, from_coor:to_coor],
                 axis=0)
         elif axis == 'y':
             return np.sum(
-                griddata.reshape(self.shape[2],
-                                 self.shape[1],
+                griddata.reshape(self.shape[2], self.shape[1],
                                  self.shape[0])[:, from_coor:to_coor, :],
-                axis=0)
+                axis=1)
         elif axis == 'z':
             return np.sum(
-                griddata.reshape(self.shape[2],
-                                 self.shape[1],
+                griddata.reshape(self.shape[2], self.shape[1],
                                  self.shape[0])[from_coor:to_coor, :, :],
-                axis=0)
+                axis=2)
         else:
             raise ValueError('incorrect axis')
 
@@ -400,16 +396,14 @@ class Grid3D(object):
             a string representation of VASPGrid object
         '''
         outputstr = ''
-        mesharray = self.data.reshape(self.nframe,
-                                      self.size)
+        mesharray = self.data.reshape(self.nframe, self.size)
         for tmp in mesharray:
             output = []
-            outputstr += '\n  {0}  {1}  {2}\n'.format(self.shape[0],
-                                                      self.shape[1],
-                                                      self.shape[2])
+            outputstr += '\n  {0}  {1}  {2}\n'.format(
+                self.shape[0], self.shape[1], self.shape[2])
             for array in tools.each_slice(tmp, 5):
-                output.append(''.join('  {0:18.11E}'.format(i)
-                                      for i in array if i is not None))
+                output.append(''.join(
+                    '  {0:18.11E}'.format(i) for i in array if i is not None))
             outputstr += '\n'.join(output)
         return outputstr + '\n'
 
@@ -431,16 +425,15 @@ class Grid3D(object):
             average value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size:
-                         (frame_i + 1) * self.size].reshape((self.shape[2],
-                                                             self.shape[1],
-                                                             self.shape[0]))
+        data = self.data[frame_i * self.size:(frame_i + 1) *
+                         self.size].reshape((self.shape[2], self.shape[1],
+                                             self.shape[0]))
         if axis_name == 'X':
-            data = np.average(np.average(
-                np.transpose(data, (2, 0, 1)), axis=2), axis=1)
+            data = np.average(
+                np.average(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
         elif axis_name == 'Y':
-            data = np.average(np.average(
-                np.transpose(data, (1, 0, 2)), axis=2), axis=1)
+            data = np.average(
+                np.average(np.transpose(data, (1, 0, 2)), axis=2), axis=1)
         elif axis_name == 'Z':
             data = np.average(np.average(data, axis=2), axis=1)
         else:
@@ -465,16 +458,15 @@ class Grid3D(object):
             minimum value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size:
-                         (frame_i + 1) * self.size].reshape((self.shape[2],
-                                                             self.shape[1],
-                                                             self.shape[0]))
+        data = self.data[frame_i * self.size:(frame_i + 1) *
+                         self.size].reshape((self.shape[2], self.shape[1],
+                                             self.shape[0]))
         if axis_name == 'X':
-            data = np.min(np.min(
-                np.transpose(data, (2, 0, 1)), axis=2), axis=1)
+            data = np.min(
+                np.min(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
         elif axis_name == 'Y':
-            data = np.min(np.min(
-                np.transpose(data, (1, 0, 2)), axis=2), axis=1)
+            data = np.min(
+                np.min(np.transpose(data, (1, 0, 2)), axis=2), axis=1)
         elif axis_name == 'Z':
             data = np.min(np.min(data, axis=2), axis=1)
         else:
@@ -499,16 +491,15 @@ class Grid3D(object):
             maximum value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size:
-                         (frame_i + 1) * self.size].reshape((self.shape[2],
-                                                             self.shape[1],
-                                                             self.shape[0]))
+        data = self.data[frame_i * self.size:(frame_i + 1) *
+                         self.size].reshape((self.shape[2], self.shape[1],
+                                             self.shape[0]))
         if axis_name == 'X':
-            data = np.max(np.max(
-                np.transpose(data, (2, 0, 1)), axis=2), axis=1)
+            data = np.max(
+                np.max(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
         elif axis_name == 'Y':
-            data = np.max(np.max(
-                np.transpose(data, (1, 0, 2)), axis=2), axis=1)
+            data = np.max(
+                np.max(np.transpose(data, (1, 0, 2)), axis=2), axis=1)
         elif axis_name == 'Z':
             data = np.max(np.max(data, axis=2), axis=1)
         else:
@@ -533,16 +524,15 @@ class Grid3D(object):
             median value along the axis
         '''
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size:
-                         (frame_i + 1) * self.size].reshape((self.shape[2],
-                                                             self.shape[1],
-                                                             self.shape[0]))
+        data = self.data[frame_i * self.size:(frame_i + 1) *
+                         self.size].reshape((self.shape[2], self.shape[1],
+                                             self.shape[0]))
         if axis_name == 'X':
-            data = np.median(np.median(
-                np.transpose(data, (2, 0, 1)), axis=2), axis=1)
+            data = np.median(
+                np.median(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
         elif axis_name == 'Y':
-            data = np.median(np.median(
-                np.transpose(data, (1, 0, 2)), axis=2), axis=1)
+            data = np.median(
+                np.median(np.transpose(data, (1, 0, 2)), axis=2), axis=1)
         elif axis_name == 'Z':
             data = np.median(np.median(data, axis=2), axis=1)
         else:
