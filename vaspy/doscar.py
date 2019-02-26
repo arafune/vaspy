@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
-This module provides DOSCAR and related classes.
+"""This module provides DOSCAR and related classes.
 
 From VASP webpage::
 
@@ -38,7 +37,7 @@ From VASP webpage::
   If you want to get an accurate DOS for the final configuration
   copy CONTCAR to POSCAR and make another static (ISTART=1; NSW=0)
   calculation.
-'''
+"""
 
 from __future__ import division  # Version safety
 from __future__ import print_function  # Version safety
@@ -63,8 +62,7 @@ except ImportError:
 
 
 class DOSCAR(object):  # Version safety
-    '''
-    Class for DOSCAR file
+    """Class for DOSCAR file.
 
     A container of DOS object
 
@@ -83,9 +81,11 @@ class DOSCAR(object):  # Version safety
     dos_container: list
         stores the DOS object. By default, the first item is the TDOS, and the
         latter items are PDOS.
-    '''
+
+    """
 
     def __init__(self, filename=None):
+        """Initialize."""
         self.natom = 0
         self.nbands = 0
         self.dos_container = list()
@@ -101,15 +101,14 @@ class DOSCAR(object):  # Version safety
             self.load_file(thefile)
 
     def load_file(self, thefile):
-        '''
-        parse DOSCAR file and store it in memory
+        """Parse DOSCAR file and store it in memory.
 
         Parameters
         ------------
-
         thefile: StringIO
             "DOSCAR" file
-        '''
+
+        """
         firstline = thefile.readline()
         self.natom = int(firstline[0:4])
         [thefile.readline() for i in range(4)]
@@ -139,8 +138,7 @@ class DOSCAR(object):  # Version safety
 
 
 class DOS(object):  # Version safety
-    '''
-    Class for DOS
+    """Class for DOS.
 
     List object consisting two elements.
     The first element is the the energy.
@@ -152,9 +150,11 @@ class DOS(object):  # Version safety
     dos: list
          the dos data.
          By default, the first column is the energy, the latter is the density.
-    '''
+
+    """
 
     def __init__(self, array=None):
+        """Initialize."""
         self.dos = np.array([])
         if array is not None:
             self.dos = array.transpose()
@@ -164,20 +164,18 @@ class DOS(object):  # Version safety
         return len(self.dos)
 
     def fermi_correction(self, fermi):
-        '''
-        Fermi level Correction
+        """Correct energy by Fermi level.
 
         Parameters
         ----------
-
         fermi: float
             fermi level
-        '''
+
+        """
         self.dos[0] -= fermi
 
     def energies(self, i=None):
-        '''
-        Return the *i*-th energy of the object
+        r"""Return the *i*-th energy of the object.
 
         Parameters
         ----------
@@ -186,20 +184,18 @@ class DOS(object):  # Version safety
 
         Returns
         --------
-
         np.ndarray
               the energy value of the i-th point when i set. \
         If arg is null, return the all energies in DOS object.
-        '''
+
+        """
         if i is None:
             return self.dos[0]
         else:
             return self.dos[0][i]
 
     def export_csv(self, filename, header=None):
-        '''
-        Export data to file object (or file-like object) as csv format.
-        '''
+        """Export data to file object (or file-like object) as csv format."""
         transposed_dos = self.dos.transpose()
         if header is None:
             with open(filename, mode='wb') as fhandle:
@@ -216,22 +212,21 @@ class DOS(object):  # Version safety
 
 
 class TDOS(DOS):
-    '''
-    Class for total DOS
+    """Class for total DOS.
 
     Parameters
     ----------
-
     array: np.array
         DOS data
 
     Attributes
     ----------
-
     header
-    '''
+
+    """
 
     def __init__(self, array):
+        """Initialize."""
         super(TDOS, self).__init__(array)
         if len(self.dos) == 2:
             self.header = "Energy\tTDOS"
@@ -239,23 +234,19 @@ class TDOS(DOS):
             self.header = "Energy\tTDOS_up\tTDOS_down"
 
     def export_csv(self, filename):
-        '''
-        Export data to file object (or file-like object) as csv format.
-        '''
+        """Export data to file object (or file-like object) as csv format."""
         header = self.header
         super(TDOS, self).export_csv(filename, header=header)
 
     def graphview(self):
-        '''
-        Show graphview by using matplotlib'''
+        """Show graphview by matplotlib."""
         for density in self.dos[1:]:
             plt.plot(self.dos[0], density)
         plt.show()
 
 
 class PDOS(DOS):
-    '''
-    Class for partial DOS
+    """Class for partial DOS.
 
     Attributes
     ----------
@@ -269,14 +260,15 @@ class PDOS(DOS):
 
     Parameters
     -----------
-
     array: numpy.ndarray
         DOS data
     site: str
         site name
-    '''
+
+    """
 
     def __init__(self, array=None, site=None):
+        """Initialize."""
         super(PDOS, self).__init__(array)
         self.site = "" if site is None else site
         self.orbital_spin = list()
@@ -307,8 +299,7 @@ class PDOS(DOS):
                 raise ValueError("Check the DOS data")
 
     def graphview(self, *orbitalnames):
-        '''
-        Show DOS graph by using matplotlib.  For 'just seeing' use. '''
+        """Show DOS graph by using matplotlib.  For 'just seeing' use."""
         try:
             alist = [
                 self.orbital_spin.index(orbname) for orbname in orbitalnames
@@ -323,15 +314,14 @@ class PDOS(DOS):
         plt.show()
 
     def export_csv(self, filename, site=None):
-        '''
-        Export data to file object (or file-like object) as csv format.
+        """Export data to file object (or file-like object) as csv format.
 
         Parameters
         ----------
-
         filename: str
            filename for output
-        '''
+
+        """
         tmp = ["Energy"]
         for i in self.orbital_spin:
             if site is not None:
@@ -344,12 +334,10 @@ class PDOS(DOS):
         super(PDOS, self).export_csv(filename, header=header)
 
     def plot_dos(self, orbitals, fermi=0.0):  # Not implemented yet
-        '''
-        Plot DOS spectra with matplotlib.pyplot
+        """Plot DOS spectra with matplotlib.pyplot.
 
         Parameters
         ----------
-
         orbitals: str
              orbital name
 
@@ -357,27 +345,26 @@ class PDOS(DOS):
 
         Warning
         --------
-
         not implemented yet!!
 
-        '''
+        """
         pass
 
     def __add__(self, other):
-        '''
+        """Add two DOS objects.
+
         x.__add__(y) <-> x+y
 
         Parameters
         -----------
-
         other: PDOS
-            len(other.energies) must be equal to  len(self.energies).
+            len(other.energies) must be equal to len(self.energies).
 
         Returns
         -------
-
         PDOS
-        '''
+
+        """
         if not isinstance(other, PDOS):
             return NotImplemented
         if len(self.dos) == 0 and self.site == "":

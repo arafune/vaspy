@@ -65,8 +65,9 @@ if args.poscar:
         vasp_poscar.ionnums = ionnums
         vasp_poscar.coordinate_type = 'CARTESIAN'
         vasp_poscar.positions = motion_frames[frame]
-        vasp_poscar.save('POSCAR_mode_' + str(args.mode) + '_frame_' +
-                         str(frame) + '.vasp')
+        vasp_poscar.save('POSCAR_mode_' + str(args.mode)
+                         + '_frame_'
+                         + str(frame) + '.vasp')
 else:
     xdatcar_str = vsim_data.system_name + '_mode_' + str(args.mode) + '\n'
     xdatcar_str += '       1.00\n'

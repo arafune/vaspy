@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-VASPy
-======
+"""VASPy.
 
 modules for VASP pre/post-process
 """
@@ -17,18 +15,19 @@ __all__ = [
     'wavecar', 'mesh3d', 'const', 'vsim_asc', 'tools'
 ]
 
+__version__ = "0.5.0"
+
 
 def load(filename, mode=None, additional=None):
-    '''
-    load file.  Guess the file type by the filename.
+    """Load files.
+
+    Guess the file type by the filename.
     Use `mode` option to specify the file type.
 
     Parameters
     ----------
-
     filename: str
         filename
-
     mode: str, optional
        optional argument mode
 
@@ -37,7 +36,8 @@ def load(filename, mode=None, additional=None):
         * 'mode' is the optional argument, because this function judges
     the file mode mainly from its name
         * mode is poscar, outcar, chgcar, procar (case insensitive)
-    '''
+
+    """
     from . import poscar, outcar, chgcar, doscar, locpot, procar
     from . import eigenval, wavecar
 

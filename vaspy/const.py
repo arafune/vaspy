@@ -1,5 +1,5 @@
 # -*- coding:  utf-8 -*-
-'''This module provide constant data such as atom mass etc'''
+"""This module provide constant data such as atom mass etc."""
 radii = {
     'Ac': 2.15,
     'Ag': 1.45,

@@ -6,6 +6,8 @@ script to use(demonstrate) vaspy.chgcar module
 
 import argparse
 
+import numpy as np
+
 from vaspy.chgcar import CHGCAR
 
 # HINT list methods for --spin option below.
@@ -65,6 +67,29 @@ parser.add_argument('CHGCAR_file_2', type=CHGCAR, nargs='?')
 # *None* is stored in arguments.CHGCAR_file_2, not CHGCAR(None)
 
 args = parser.parse_args()
+
+
+def check_position_axes(chgcar1, chgcar2):
+    """Check the cell vectors and atom positions are same in two CHGCAR.
+
+    Parameters
+    -----------
+    chgcar1, chgcar2: vaspy.CHGCAR
+
+    Returns
+    -------
+    bool
+
+    """
+    cell1 = chgcar1.poscar.cell_vecs
+    cell2 = chgcar2.poscar.cell_vecs
+    pos1 = np.array(chgcar1.poscar.positions)
+    pos2 = np.array(chgcar2.poscar.positions)
+    assert np.allclose(cell1, cell2), "UnitCells are inconsistent.  Abort."
+    assert np.allclose(pos1, pos2), "Atom positions are inconsistent!!!　Abort."
+    return True
+
+
 #
 if args.spin is not None:
     if args.CHGCAR_file_2 is not None:
@@ -91,8 +116,10 @@ if args.add or args.diff or args.merge:
     if args.add:
         dest_chgcar = args.CHGCAR_file_1 + args.CHGCAR_file_2
     elif args.diff:
+        check_position_axes(args.CHGCAR_file_1, args.CHGCAR_file_2)
         dest_chgcar = args.CHGCAR_file_1 - args.CHGCAR_file_2
     elif args.merge:
+        check_position_axes(args.CHGCAR_file_1, args.CHGCAR_file_2)
         dest_chgcar = args.CHGCAR_file_1.merge(args.CHGCAR_file_2)
 #
 if args.output is not None:

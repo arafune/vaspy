@@ -1,8 +1,8 @@
-'''mesh3D Module to provide class VASPGRID FFT-grid NG(X,Y,Z)F
+"""mesh3D Module to provide class VASPGRID FFT-grid NG(X,Y,Z)F
 
 That is this is class VASPGRID is the parent class of CHGCAR,
  LOCPOT, and ELFCAR.  The ELFCAR class has not yet implemented yet, though.
-'''
+"""
 
 from __future__ import division, print_function
 
@@ -18,8 +18,7 @@ from vaspy import poscar, tools
 class VASPGrid(object):
     # Todo: Use Composite pattern!!!
     # VASPGrid should consists of POSCAR and Mesh3D object!!
-    '''
-    Class for VaspGrid used in CHGCAR, LOCPOT, ELFCAR...
+    """Class for VaspGrid used in CHGCAR, LOCPOT, ELFCAR, etc.
 
     General format of the file uses VaspGrid format::
 
@@ -50,11 +49,12 @@ class VASPGrid(object):
 
     Attributes
     -----------------
-
     poscar, grid, additional
-    '''
+
+    """
 
     def __init__(self, filename=None, pickleddata=None):
+        """Initialize."""
         self.poscar = poscar.POSCAR()
         self.grid = Grid3D()
         self.additional = []
@@ -69,18 +69,17 @@ class VASPGrid(object):
             self.load_file(thefile, pickleddata)
 
     def load_file(self, thefile, pickleddata=None):
-        '''
-        Construct the object from the file
+        """Construct the object from the file.
 
         Parameters
-        ---------------
-
+        ----------
         thefile: StringIO
             file
 
         pickleddata: str
             griddata stored by np.save or np.savez
-        '''
+
+        """
         separator = None
         tmp = []
         griddata = ''
@@ -134,29 +133,27 @@ class VASPGrid(object):
         thefile.close()
 
     def __str__(self):
-        '''
-        x.__str__() <=> str(x)
+        """x.__str__() <=> str(x)
 
         Returns
         -------
-
         str
             a string representation of VASPGrid object
-        '''
+
+        """
         poscarstr = self.poscar.str_short()
         meshstr = self.grid.__str__()
         return poscarstr + meshstr + '\n'
 
     def save(self, filename):
-        '''
-        Save object as the same file-style
+        """Save object as the same file-style.
 
         Parameters
         -----------
-
         filename: str
             file name
-        '''
+
+        """
         try:  # Version safety
             thefile = open(filename, mode='w', newline='\n')
         except TypeError:
@@ -165,37 +162,36 @@ class VASPGrid(object):
             thefile.write(str(self))
 
     def frame(self, frame_i):
-        '''
-        Return VASPGrid object for only frame_i th frame
+        """Return VASPGrid object for only frame_i th frame.
 
         Parameters
         ----------
-
         frame_i: int
             frame index
-        '''
+
+        """
         output_vaspgrid = VASPGrid()
         output_vaspgrid.poscar = self.poscar
         output_vaspgrid.grid = self.grid.frame(frame_i)
         return output_vaspgrid
 
     def merge(self, other):
-        '''
-        Add density data
+        """Add density data.
+
+        Add two VASPGrid object, but POSCAR part remains same as original.
+        Use this method to calculate Bader analysis, for example.
 
         Parameters
         ---------------
-
         other: VASPGrid
             Addtion VaspGrid object
 
         Returns
         -----------
-
         VASPGrid
             Rusultant by summing two grid values
 
-        '''
+        """
         add_grid = copy.deepcopy(self)
         try:
             add_grid.grid.data = self.grid.data + other.grid.data
@@ -204,22 +200,21 @@ class VASPGrid(object):
         return add_grid
 
     def __add__(self, other):
-        '''
+        """Add both density and atom position.
+
         x.__add__(y) <=> x + y
 
         Parameters
         ---------------
-
         other: VASPGrid
             Addtion VaspGrid object
 
         Returns
         -----------
-
         Grid3D
             Rusultant by summing two grid values and poscar is also added.
 
-        '''
+        """
         add_grid = copy.deepcopy(self)
         add_grid.poscar = self.poscar + other.poscar
         try:
@@ -229,30 +224,27 @@ class VASPGrid(object):
         return add_grid
 
     def __sub__(self, other):
-        '''
-        x.__sub__(y) <=> x - y
+        """Subtract the density.
 
+        x.__sub__(y) <=> x - y
         Parameters
         ---------------
-
         other: VASPGrid
             difference VASPGrid object
 
         Returns
         ----------
-
         Grid3D
             Resultant by difference between two objects.
 
         Note
         --------
-
         The resultant grid data is the difference between two objects,
         of course. On the other hand, the atom position information
         unchange by this method.  Use the 'minuend' object.  The atom
         information in subrtrahend object is totally ignored.
-        '''
 
+        """
         diff_grid = copy.deepcopy(self)
         try:
             diff_grid.grid.data = self.grid.data - other.grid.data
@@ -262,15 +254,13 @@ class VASPGrid(object):
 
 
 class Grid3D(object):
-    '''
-    Class for NG(X,Y,Z)F in VASP
+    """Class for NG(X,Y,Z)F in VASP.
 
     This class is used chg_array in CHGCAR, Potential in LOCPOT,
     electron localization function (ELF) in ELFCAR
 
     Attributes
     ----------
-
     size: tuple
         number of mesh in the single frame
     nframe: int
@@ -280,9 +270,11 @@ class Grid3D(object):
     data: list or numpy.ndarray
         1D-list or 1D-numpy array.
         The length of grid is shape[0] * shape[1] * shape[2]
-    '''
+
+    """
 
     def __init__(self, shape=(0, 0, 0), data=None):
+        """Initialize."""
         self.shape = shape
         if data is None:
             self.data = []
@@ -291,33 +283,32 @@ class Grid3D(object):
 
     @property
     def size(self):
-        '''Return the number of meshes in the frame'''
+        """Return the number of meshes in the frame."""
         return self.shape[0] * self.shape[1] * self.shape[2]
 
     @property
     def nframe(self):
-        '''Return the number of grid frames'''
+        """Return the number of grid frames."""
         return divmod(self.data.size, self.size)[0]
 
     def frame(self, frame_i):
-        '''
-        Return the i-th frame
+        """Return the i-th frame.
 
         Parameters
         -----------
         frame_i:int
            frame index
-        '''
+
+        """
         assert frame_i < self.nframe
         dest = copy.deepcopy(self)
         dest.data = self.data.reshape(self.nframe, self.size)[frame_i]
         return dest
 
     def slice(self, position, axis='z', frame_i=0):
-        '''
+        """
         Parameters
         ----------
-
         axis: str
             'x', 'y', or 'z'.  Case insensitive.
         position: int
@@ -325,10 +316,10 @@ class Grid3D(object):
 
         Return
         ------
-
         numpy.ndarray
             2D numpy array that sliced from 3D mesh data.
-        '''
+
+        """
         griddata = self.data[frame_i * self.size:(frame_i + 1) * self.size]
         axis = axis.lower()
         if axis == 'x':
@@ -342,29 +333,26 @@ class Grid3D(object):
                                     self.shape[0])[position, :, :]
 
     def integrate(self, axis, from_coor=None, to_coor=None, frame_i=0):
-        '''
-        Return 2D data integrated occupacy along the 'axis'
-        from_coor to to_coor.
+        """Return 2D data integrated occupacy along the 'axis'.
+
+        Integration range can be specified by from_coor and to_coor.
+        If not specified, from 0 to end.
 
         Parameters
         ----------
-
         axis: str
             'x', 'y', or 'z'.  Case insensitive
-
         from_coor: int
             'from' value of range of interval integration
-
         to_coor: int
             'to' value of range interval integration
 
         Return
         ------
-
         numpy.ndarray
             2D numpy array that integrated from 3D mesh data
 
-        '''
+        """
         griddata = self.data[frame_i * self.size:(frame_i + 1) * self.size]
         axis = axis.lower()
         if axis == 'x':
@@ -386,15 +374,16 @@ class Grid3D(object):
             raise ValueError('incorrect axis')
 
     def __str__(self):
-        '''
+        """Return as string object.
+
         x.__str__() <=> str(x)
 
         Returns
         -------
-
         str
             a string representation of VASPGrid object
-        '''
+
+        """
         outputstr = ''
         mesharray = self.data.reshape(self.nframe, self.size)
         for tmp in mesharray:
@@ -408,12 +397,10 @@ class Grid3D(object):
         return outputstr + '\n'
 
     def average_along_axis(self, axis_name, frame_i=0):
-        '''
-        Calculate average value of potential along 'axis'
+        """Calculate average value of potential along 'axis'.
 
         Parameters
         ----------
-
         axis_name: str
              'X', 'Y', or 'Z'
         mode: int, optional (default is 0)
@@ -423,11 +410,13 @@ class Grid3D(object):
         -------
         numpy.ndarray
             average value along the axis
-        '''
+
+        """
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size:(frame_i + 1) *
-                         self.size].reshape((self.shape[2], self.shape[1],
-                                             self.shape[0]))
+        data = self.data[frame_i * self.size:(frame_i + 1)
+                         * self.size].reshape((self.shape[2],
+                                               self.shape[1],
+                                               self.shape[0]))
         if axis_name == 'X':
             data = np.average(
                 np.average(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
@@ -441,12 +430,10 @@ class Grid3D(object):
         return data
 
     def min_along_axis(self, axis_name, frame_i=0):
-        '''
-        Calculate minimum value of potential along 'axis'
+        """Calculate minimum value of potential along 'axis'.
 
         Parameters
         -----------
-
         axis_name: str
              'X', 'Y', or 'Z'
         mode: int, optional (default is 0)
@@ -456,11 +443,13 @@ class Grid3D(object):
         -------
         numpy.ndarray
             minimum value along the axis
-        '''
+
+        """
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size:(frame_i + 1) *
-                         self.size].reshape((self.shape[2], self.shape[1],
-                                             self.shape[0]))
+        data = self.data[frame_i * self.size:(frame_i + 1)
+                         * self.size].reshape((self.shape[2],
+                                               self.shape[1],
+                                               self.shape[0]))
         if axis_name == 'X':
             data = np.min(
                 np.min(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
@@ -474,12 +463,10 @@ class Grid3D(object):
         return data
 
     def max_along_axis(self, axis_name, frame_i=0):
-        '''
-        Calculate maximum value of potential along 'axis'
+        """Calculate maximum value of potential along 'axis'.
 
         Parameters
         -----------
-
         axis_name: str
              'X', 'Y', or 'Z'
         mode: int, optional (default is 0)
@@ -489,11 +476,13 @@ class Grid3D(object):
         -------
         numpy.ndarray
             maximum value along the axis
-        '''
+
+        """
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size:(frame_i + 1) *
-                         self.size].reshape((self.shape[2], self.shape[1],
-                                             self.shape[0]))
+        data = self.data[frame_i * self.size:(frame_i + 1)
+                         * self.size].reshape((self.shape[2],
+                                               self.shape[1],
+                                               self.shape[0]))
         if axis_name == 'X':
             data = np.max(
                 np.max(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
@@ -507,12 +496,10 @@ class Grid3D(object):
         return data
 
     def median_along_axis(self, axis_name, frame_i=0):
-        '''
-        Calculate median value of potential along 'axis'
+        """Calculate median value of potential along 'axis'.
 
         Parameters
         -----------
-
         axis_name: str
              'X', 'Y', or 'Z'
         mode: int, optional (default is 0)
@@ -522,11 +509,13 @@ class Grid3D(object):
         -------
         numpy.ndarray
             median value along the axis
-        '''
+
+        """
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size:(frame_i + 1) *
-                         self.size].reshape((self.shape[2], self.shape[1],
-                                             self.shape[0]))
+        data = self.data[frame_i * self.size:(frame_i + 1)
+                         * self.size].reshape((self.shape[2],
+                                               self.shape[1],
+                                               self.shape[0]))
         if axis_name == 'X':
             data = np.median(
                 np.median(np.transpose(data, (2, 0, 1)), axis=2), axis=1)

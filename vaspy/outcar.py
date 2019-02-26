@@ -12,13 +12,10 @@ import os.path
 
 
 class OUTCAR(object):  # Version safety
-    '''
-    Class for OUTCAR file that stores calculation details
-    and/or calculation progress
+    """Class for OUTCAR file.
 
     Attributes
     -------------
-
     natom: int
         number of atom
     iontypes: list
@@ -46,9 +43,11 @@ class OUTCAR(object):  # Version safety
     Todo
     ------
       posforce should be devided to positions and forces
-    '''
+
+    """
 
     def __init__(self, filename=None):
+        """Initialize."""
         self.natom = 0
         self.iontypes = []
         self.ionnums = []
@@ -75,9 +74,7 @@ class OUTCAR(object):  # Version safety
             self.load_file(thefile)
 
     def set_atom_names(self):
-        '''
-        build atom_names (the list of atomname_with_index)
-        '''
+        """Build atom_names (the list of atomname_with_index)."""
         self.atom_names = []
         for elm, ionnum in zip(self.iontypes, self.ionnums):
             for j in range(1, ionnum + 1):
@@ -94,9 +91,7 @@ class OUTCAR(object):  # Version safety
         return self.atom_names
 
     def set_posforce_title(self):
-        """
-        build posforce_title
-        """
+        """Build posforce_title."""
         self.set_atom_names()
         self.posforce_title = [[
             i + "_x",
@@ -108,15 +103,14 @@ class OUTCAR(object):  # Version safety
         ] for i in self.atom_names]
 
     def load_file(self, thefile):
-        '''
-        Effectively, this is a constructor of OUTCAR object.
+        """Parse OUTCAR file.
 
         Parameters
         ----------
-
         thefile: StringIO
             "OUTCAR" file
-        '''
+
+        """
         # local variables
         section = []
         posforce = []
@@ -212,8 +206,7 @@ class OUTCAR(object):  # Version safety
         thefile.close()
 
     def select_posforce_header(self, posforce_flag, *sites):
-        '''Return the position and force header selected
-        '''
+        """Return the position and force header selected."""
         if sites == () or sites[0] == []:
             sites = range(1, self.natom + 1)
         if isinstance(sites[0], (list, tuple)):
@@ -230,14 +223,14 @@ class OUTCAR(object):  # Version safety
 # correct?
 
     def select_posforce(self, posforce_flag, *sites):
-        '''
-        Return the position and force selected by posforce_flag
+        """Return the position and force selected by posforce_flag.
 
         Note
         -------
         posforce_flag: An 6-element True/False list that indicates
                   the output (ex.) [True, True, False, True, True, False]
-        '''
+
+        """
         if sites == () or sites[0] == []:
             sites = range(1, self.natom + 1)
         if isinstance(sites[0], (list, tuple)):
