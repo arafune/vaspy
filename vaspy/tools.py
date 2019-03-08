@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
 Module for tools used in vaspy
-'''
+"""
 
 from __future__ import division, print_function  # Version safety
 
@@ -20,31 +20,30 @@ else:
 
 
 def each_slice(iterable, n, fillvalue=None):
-    '''
-    each_slice(iterable, n[, fillvalue]) => iterator
+    """each_slice(iterable, n[, fillvalue]) => iterator
 
     make new iterator object which get n item from [iterable] at once.
-'''
+    """
     args = [iter(iterable)] * n
     return ZIPLONG(*args, fillvalue=fillvalue)  # Version safety
 
 
 def removeall(L, value):
-    '''
-    remove all *value* in [list] L
+    """Remove all *value* in [list] L.
 
     Note
     ----
 
     Currently, this function is not used. (Obsolute?)
-    '''
+    """
     while L.count(value):
         L.remove(value)
     return L
 
 
 def flatten(nested, target=Iterable, ignore=FLATTEN_IGNORE):
-    '''
+    """Flatten iterabable object.
+
     flatten(iterable) => list
 
     flatten nested iterable.
@@ -56,7 +55,7 @@ def flatten(nested, target=Iterable, ignore=FLATTEN_IGNORE):
 
     >>> flatten((1, [range(2), 3, set([4, 5]), [6]], frozenset([7, 8])))
     [1, 0, 1, 3, 4, 5, 6, 8, 7]
-'''
+    """
     if (isinstance(nested, target) and not isinstance(nested, ignore)):
         nested = list(nested)
     i = 0
@@ -78,18 +77,15 @@ _RESINGLE = re.compile(r'\d+')
 
 
 def parse_Atomselection(L):
-    '''
-    Return list of ordered "String" represents the number
+    """Return list of ordered "String" represents the number.
 
     Parameters
     ----------
-
     L: str
         range of the atoms. the numbers deliminated by "-" or ","
 
     Returns
     --------
-
     list
        ordered "String" represents the number.
 
@@ -98,7 +94,8 @@ def parse_Atomselection(L):
 
     >>> parse_Atomselection("1-5,8,8,9-15,10")
     ['1', '10', '11', '12', '13', '14', '15', '2', '3', '4', '5', '8', '9']
-'''
+
+    """
     array = L.split(',')
     output = set()
     for each in array:
@@ -112,8 +109,7 @@ def parse_Atomselection(L):
 
 
 def parse_AtomselectionNum(L):
-    '''
-    Very similar with parse_Atomselection but returns the array of the
+    """Very similar with parse_Atomselection but returns the array of the
     number not array of the string.
 
     Parameters
@@ -134,7 +130,7 @@ def parse_AtomselectionNum(L):
     >>> parse_AtomselectionNum("1-5,8,8,9-15,10")
     [1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15]
 
-    '''
+    """
     return sorted(int(i) for i in parse_Atomselection(L))
 
 
@@ -162,22 +158,22 @@ if __name__ == '__main__':
     }
     available = ['all'] + list(demo.keys())
     parser = argparse.ArgumentParser(
-        description='''collection of tools used in this package.''',
+        description="""collection of tools used in this package.""",
         formatter_class=argparse.RawTextHelpFormatter,
-        epilog='''-a/--args option arguments are interpleted by eval().
+        epilog="""-a/--args option arguments are interpleted by eval().
 so strings must be given with quotations("" or '').
 Because command line regards spaces as break,
 list argument must be written without any space.
-(i.e. [1,2,3,4,5] is valid, while [1, 2, 3, 4, 5] is invalid.)''')
+(i.e. [1,2,3,4,5] is valid, while [1, 2, 3, 4, 5] is invalid.)""")
     parser.add_argument(
         'choice',
         metavar='funcname',
         nargs='+',
         choices=available,
-        help='''Demonstrate choosen function.
+        help="""Demonstrate choosen function.
 *all* shows all function in the choice.
 If -a/--args option is given, get argument(s) from command line.
-Otherwise use prepared argument(s).''')
+Otherwise use prepared argument(s).""")
     parser.add_argument(
         '-a',
         '--args',
@@ -185,9 +181,9 @@ Otherwise use prepared argument(s).''')
         nargs='+',
         action='append',
         dest='values',
-        help='''Use given argument(s) for demonstration.
+        help="""Use given argument(s) for demonstration.
 You have to use this option for each function.
-See epilog for notices for argument notation.''')
+See epilog for notices for argument notation.""")
     args = parser.parse_args()
 
     if 'all' in args.choice:
@@ -200,8 +196,8 @@ See epilog for notices for argument notation.''')
             values = demo[func]
         else:
             if argcounts[func] != len(args.values[index]):
-                print('''argument number not match (require {0}, given {1})
-use default values.'''.format(argcounts[func], len(args.values[index])))
+                print("""argument number not match (require {0}, given {1})
+use default values.""".format(argcounts[func], len(args.values[index])))
                 values = demo[func]
             else:
                 values = [eval(s) for s in args.values[index]]

@@ -1,6 +1,4 @@
-'''
-This module provides EIGENVAL.
-'''
+"""This module provides EIGENVAL."""
 
 from __future__ import division, print_function
 
@@ -19,11 +17,12 @@ except ImportError:
 
 
 class EnergyBand(object):
-    '''Simple band structure object for analyzing by using ipython.
+    """Simple band structure object for analyzing by using ipython.
+
+    Class for band structure
 
     Attributes
     ----------
-
     kvecs: numpy.ndarray
         kvectors
     kdistances: numpy.ndarray
@@ -41,7 +40,6 @@ class EnergyBand(object):
 
     Parameters
     ----------
-
     kvecs: numpy.ndarray
          1D array data of k-vectors.
     energies: numpy.ndarray
@@ -51,9 +49,11 @@ class EnergyBand(object):
          '4' means noncollinear spin.
          In this class does not distinguish non-collinear spin
          and No-spin.  (default is 1)
-    '''
+
+    """
 
     def __init__(self, kvecs=(), energies=(), nspin=1):
+        """Initialize."""
         self.kvecs = np.array(kvecs)
         self.numk = len(self.kvecs)
         self.label = {}
@@ -76,7 +76,7 @@ class EnergyBand(object):
 
     @property
     def kdistances(self):
-        '''Return kdistances'''
+        """Return kdistances."""
         return np.cumsum(
             np.linalg.norm(
                 np.concatenate((np.array([[0, 0, 0]]),
@@ -84,25 +84,25 @@ class EnergyBand(object):
                 axis=1))
 
     def fermi_correction(self, fermi):
-        '''Correct the Fermi level
+        """Correct the Fermi level.
 
         Parameters
         ----------
-
         fermi: float
              value of the Fermi level.
-        '''
+
+        """
         self.energies -= fermi
 
     def make_label(self, *keys):
-        '''Return array the used for label for CSV-like data
+        """Return array the used for label for CSV-like data.
 
         Parameters
         ----------
-
         keys: tuple
           key tuple used for label
-        '''
+
+        """
         label_list = []
         for key in keys:
             for tmp in self.label[key]:
@@ -110,12 +110,13 @@ class EnergyBand(object):
         return label_list
 
     def to_3dlist(self, **kwargs):
-        '''Return 3D mentional list
+        """Return 3D mentional list.
 
         list[band_i, [k_i, energy, (energy_down)]]
 
         This list format would be useful for str output
-        '''
+
+        """
         bandstructure = []
         for energies in self.energies.T.tolist():
             band = []
@@ -127,7 +128,7 @@ class EnergyBand(object):
         return bandstructure
 
     def to_csv(self, csv_file, blankline=True):
-        '''Write data to csv file
+        """Write data to csv file.
 
         Parameters
         ------------
@@ -137,7 +138,8 @@ class EnergyBand(object):
            string for label (put it on the first line)
         blankline: boolean
            It True (default), the blank line is inserted between band data
-        '''
+
+        """
         label_str = '\t'.join(self.make_label('k', 'energy')) + '\n'
         with open(csv_file, 'w') as fhandle:
             fhandle.writelines(label_str)
@@ -148,14 +150,15 @@ class EnergyBand(object):
                     fhandle.writelines('\n')
 
     def __str__(self):
-        '''
+        """Return the str object.
+
         Returns
         --------
-
         str
             a string represntation of EnergyBand.
             **Useful for gnuplot and Igor**.
-        '''
+
+        """
         labels = self.make_label('k', 'energy')
         output = labels[0]
         for label in labels[1:]:
@@ -172,12 +175,10 @@ class EnergyBand(object):
         return output
 
     def figure(self, color='blue', spin_i=0):
-        '''
-        Return Axes object of the energy band.
+        """Return Axes object of the energy band.
 
         Parameters
-        ----------
-
+        -----------
         color: str, optional (default is 'blue')
             color of the band line
 
@@ -185,12 +186,11 @@ class EnergyBand(object):
             default is 0
 
         Returns
-        --------
+        ---------
         matplotlib.pyplot.Axes
 
         Example
-        -------
-
+        --------
         Here is a typical code::
 
            fig = plt.figure()
@@ -199,29 +199,29 @@ class EnergyBand(object):
            ax.set_ylim(-5, 5)
            ax.set_xlim(0, 4)
            plt.show()
-        '''
-        _ = [
-            plt.plot(
-                self.kdistances, self.energies[spin_i, :, band_i], color=color)
+
+        """
+        [plt.plot(
+            self.kdistances, self.energies[spin_i, :, band_i], color=color)
             for band_i in range(self.energies.shape[2])
-        ]
+         ]
         return plt.gca()
 
     def show(self, yrange=None, spin_i=0):  # How to set default value?
-        '''
-        Draw band structure by using maptlotlib.
+        """Draw band structure by using maptlotlib.
+
         For 'just seeing' use.
 
         Parameters
         ----------
-
         yrange: tuple, optional  (default: all range)
              Minimum and maximum value of the y-axis.
              If not specified, use the matplotlib default value.
 
         spin_i: int  (default is 0 for no spin or 'up' spin)
              Spin index. For spin-polarized collinear band
-        '''
+
+        """
         for band_i in range(self.energies.shape[2]):
             plt.plot(
                 self.kdistances,
@@ -236,7 +236,7 @@ class EnergyBand(object):
     def to_physical_kvector(self,
                             recvec=((1.0, 0.0, 0.0), (0.0, 1.0, 0.0),
                                     (0.0, 0.0, 1.0))):
-        '''Change kvec unit to inverse AA
+        """Change kvec unit to inverse AA.
 
         Parameters
         -----------
@@ -246,18 +246,17 @@ class EnergyBand(object):
             .. Note:: Don't forget that the reciprocal vector used
                       in VASP needs 2PI to match  the conventional
                       unit of the wavevector.
-        '''
+
+        """
         recvec = np.array(recvec)
         self.kvecs = np.array([recvec.dot(kvecs) for kvecs in self.kvecs])
 
 
 class EIGENVAL(EnergyBand):
-    '''
-    Class for storing the data of EIGENVAL file.
+    """Class for storing the data of EIGENVAL file.
 
     Parameters
     -----------
-
     filename: str
         File name of 'EIGENVAL'
 
@@ -265,9 +264,11 @@ class EIGENVAL(EnergyBand):
     ----------
     natom: int
         Number of atoms
-    '''
+
+    """
 
     def __init__(self, filename=None):
+        """Initialize."""
         super(EIGENVAL, self).__init__()
         self.natom = 0
         #
@@ -282,9 +283,7 @@ class EIGENVAL(EnergyBand):
             self.load_file()
 
     def load_file(self):
-        '''
-        A virtual parser of EIGENVAL
-        '''
+        """Parse EIGENVAL."""
         self.natom, _, _, self.nspin = [
             int(i) for i in next(self.thefile).split()
         ]

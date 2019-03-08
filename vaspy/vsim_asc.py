@@ -1,5 +1,5 @@
 # -*- codinng: utf-8 -*-
-'''This module provides vsim_asc class
+"""This module provides vsim_asc class.
 
 This module might not be a member of vaspy. But the input file .*ascii
 is generated usually by phonopy, and the input files needed to phonopy
@@ -12,7 +12,7 @@ This module generates
 2) POVRAY scene file for animation
 
 The first is absolutely required.
- '''
+ """
 import bz2
 import itertools
 import logging
@@ -31,14 +31,12 @@ stream_handler.setFormatter(handler_format)
 
 
 class VSIM_ASC(object):
-    '''VSIM_ASC
+    """Class for VSIM_ASC.
 
     Collection of phonon mode data from v_scim ascii file
 
-
     Attributes
     -----------
-
     system_name: str
         System name
     ions: list
@@ -52,9 +50,11 @@ class VSIM_ASC(object):
     d_vectors: np.array
         d_vectors[mode#][atom#] returns the displacement (complex) vector
     lattice.vectors: np.array
-'''
+
+    """
 
     def __init__(self, filename=None):
+        """Initialize."""
         self.system_name = ""
         self.ions = []
         #
@@ -72,14 +72,14 @@ class VSIM_ASC(object):
             self.load_file(thefile)
 
     def load_file(self, thefile):
-        '''vsim.ascii parser
+        """Parse vsim.ascii.
 
         Parameters
         ----------
-
         thefile: StringIO
             "VSIM.ascii" file
-'''
+
+        """
         phonon_lines = []
         # the first line is system name
         self.system_name = next(thefile)[1:].strip()
@@ -130,11 +130,10 @@ class VSIM_ASC(object):
                            supercell=(2, 2, 1),
                            n_frames=30,
                            magnitude=1):
-        '''Build data for creating POSCAR etc.,
+        """Build data for creating POSCAR etc.
 
         Parameters
         ----------
-
         mode: int
            mode number
         supercell: tuple
@@ -142,7 +141,7 @@ class VSIM_ASC(object):
         n_frames: int
            total number of animation frmaes
 
-'''
+        """
         qpt = self.qpts[mode]
         bmatrix = 2 * np.pi * np.linalg.inv(self.lattice_vectors).transpose()
         qpt_cart = qpt.dot(bmatrix)
@@ -157,9 +156,9 @@ class VSIM_ASC(object):
                     range(supercell[0]), range(supercell[1]),
                     range(supercell[2])):
                 logger.debug(' cell_id:{}'.format(cell_id))
-                abs_pos = position + (self.lattice_vectors[0] * cell_id[0] +
-                                      self.lattice_vectors[1] * cell_id[1] +
-                                      self.lattice_vectors[2] * cell_id[2])
+                abs_pos = position + (self.lattice_vectors[0] * cell_id[0]
+                                      + self.lattice_vectors[1] * cell_id[1]
+                                      + self.lattice_vectors[2] * cell_id[2])
                 positions = animate_atom_phonon(
                     abs_pos,
                     qpt_cart,
@@ -171,20 +170,19 @@ class VSIM_ASC(object):
 
 
 def supercell_lattice_vectors(lattice_vectors, cell_id):
-    '''Return lattice vectors of supercell
+    """Return lattice vectors of supercell.
 
     Parameters
     ----------
-
     lattice_vectors: np.array
         3x3 matrix for original lattice vectors
     cell_id: tuple, list
 
     Returns
     -------
-
     np.array
-'''
+
+    """
     supercell_vectors = []
     for x, x_i in zip(lattice_vectors, cell_id):
         supercell_vectors.append(x * x_i)
@@ -198,11 +196,10 @@ def animate_atom_phonon(position,
                         s_frame=0,
                         e_frame=None,
                         magnitude=1.0):
-    '''Return atom position series determined by d_vector and q
+    """Return atom position series determined by d_vector and q.
 
     Parameters
     ------------
-
     position: list, tuple, np.array
        position of atom in cartesian coordinate
     qpt_cart: np.array
@@ -220,24 +217,23 @@ def animate_atom_phonon(position,
 
     Returns
     ---------
-
     positions: list
         List of atom position representing animation
-'''
 
+    """
     position0 = np.array(position)  # for safe
     positions = []
     if not e_frame:
         e_frame = s_frame + n_frames - 1
     for frame in range(s_frame, e_frame + 1):
         exponent = np.exp(
-            1.0j *
-            (np.dot(position0, qpt_cart) - 2 * np.pi * frame / n_frames))
+            1.0j * (np.dot(position0, qpt_cart)
+                    - 2 * np.pi * frame / n_frames))
         logger.debug('r:{}, qpt_cart;{}, frame:{}, n_frames:{}'.format(
             position0, qpt_cart, frame, n_frames))
         logger.debug('arg_exponent:{}'.format(
-            1.0j *
-            (np.dot(position0, qpt_cart) - 2 * np.pi * frame / n_frames)))
+            1.0j * (np.dot(position0, qpt_cart)
+                    - 2 * np.pi * frame / n_frames)))
         logger.debug('exponent:{}'.format(exponent))
         normal_displ = np.array(
             list(map((lambda y: (y.real)), [x * exponent for x in d_vector])))
@@ -253,25 +249,23 @@ def animate_atom_phonon(position,
 
 
 def ions_to_iontypes_ionnums(ions):
-    '''Return ionnums and iontypes list
+    r"""Return ionnums and iontypes list.
 
     Returns
     --------
-
     ionnums
         list of number of ions
-
     iontypes
         list of ionnames
 
 
-    Example
-    -----------
-
+    Examples
+    --------
     >>> ions_to_iontypes_ionnums(['Si', 'Si', 'Ag', 'Ag', 'Ag', \
                                   'Ag', 'H', 'H', 'Si'])
     ([2, 4, 2, 1], ['Si', 'Ag', 'H', 'Si'])
-'''
+
+    """
     thelast = ''
     ionnums = []
     iontypes = []

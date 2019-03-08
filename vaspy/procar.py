@@ -28,41 +28,43 @@ logging.basicConfig(
 
 
 class ProjectionBand(eigenval.EnergyBand):
-    '''Band structure including orbital projection
+    """Class for band structure including orbital projection.
+
+    This is the child class of eigenval.EnergyBand which represents
+    the band structure, to represent the orbital.
 
     Attributes
     -----------
-
     natom: int
        number of atoms
     proj: numpy.ndarray
        Orbital projection. proj[spin_i, k_i, band_i, site_i, orbital_i]
     phase: numpy.ndarray
        Phase data.  phase[spin_i, k_i, band_i, site_i, orbital_i]
-    '''
+
+    """
 
     def __init__(self, kvecs=(), energies=(), proj=(), phase=(), nspin=1):
+        """Initialize."""
         super(ProjectionBand, self).__init__()
         self.natom = 0
         self.proj = proj
         self.phase = phase
 
     def append_sumsite(self, sites, site_name):
-        '''Append site-sum results
+        """Append site-sum results.
 
         After this method, shape changes as following
-
         self[nspin, numk, nbands, natom + 1, norbital]
 
         Parameters
         ------------
-
         sites: tuple
             site index for summention
-
         site_name: str
             label name for summed site, such as 'silicene', and 'SurfaceAu'
-        '''
+
+        """
         # As the original label['site'] is just a number beginnig from zero
         if len(sites) == 1 and sites[0] in self.label[sites][:self.natom]:
             self.label['site'][sites[0]] = site_name
@@ -75,21 +77,19 @@ class ProjectionBand(eigenval.EnergyBand):
         return sumsite
 
     def append_sumorbital(self, orbitals, orbital_name):
-        '''Append orbital-sum results
+        """Append orbital-sum results.
 
         After this method, shape changes as following
-
         self[nspin, numk, nbands, natom, norbital + 1]
 
         Parameters
         -----------
-
         orbitals: tuple
            orbital index for summention
-
         oribtal_name : str
            label name for summed orbital, such as 'p' and 'sp'
-        '''
+
+        """
         if orbital_name in self.label['orbital']:
             return None
         self.label['orbital'].append(orbital_name)
@@ -100,7 +100,7 @@ class ProjectionBand(eigenval.EnergyBand):
         return sumorbital
 
     def orb_index(self, arg):
-        '''Return the indexes corresponding orbital names
+        """Return the indexes corresponding orbital names.
 
         This method returns the tuple of orbital number in
         self.label['orbital'].
@@ -111,19 +111,19 @@ class ProjectionBand(eigenval.EnergyBand):
         returns the indexes of the orbitals to be composed as the
         tuple.
 
+
         Parameters
         ----------
-
         arg: str
             name of (composed) orbital
 
+
         Returns
         --------
-
         tuple
             number corresponding to (composed) orbital name.
 
-        '''
+        """
         orbital_names = self.label['orbital']
         orbname = check_orb_name(arg)
         if orbname in orbital_names:
@@ -149,17 +149,16 @@ class ProjectionBand(eigenval.EnergyBand):
             raise RuntimeError(err)
 
     def make_label(self, site_indexes=None, orbital_indexes_sets=None):
-        '''Return array the used for **label** for CSV-like data
+        """Return array the used for **label** for CSV-like data.
 
         Parameters
         ----------
-
         site_indexes: tuple
           key tuple used for label
-
         orbital_indexes_sets: tuple
           index tuple for output
-        '''
+
+        """
         label_list = super(ProjectionBand, self).make_label('k', 'energy')
         if not (site_indexes and orbital_indexes_sets):
             return label_list
@@ -177,7 +176,7 @@ class ProjectionBand(eigenval.EnergyBand):
         return label_list
 
     def to_3dlist(self, site_indexes=(), orbital_indexes_sets=()):
-        '''Return 3D list data that are easily converted to txt data for csv
+        """Return 3D list data that are easily converted to txt data for csv.
 
         Parameters
         ------------
@@ -190,12 +189,12 @@ class ProjectionBand(eigenval.EnergyBand):
 
         Returns
         --------
-
         list:
             3D list, the first dimenstion corresponds to the data for  band_i
             and each band_i contains kdistances, energy (or energies), and
             orbital data.
-        '''
+
+        """
         assert len(site_indexes) == len(orbital_indexes_sets), \
             'must len(sites)==len(orbitals)'
         if not (site_indexes and orbital_indexes_sets):
@@ -227,7 +226,7 @@ class ProjectionBand(eigenval.EnergyBand):
                site_indexes=(),
                orbital_indexes_sets=(),
                blankline=True):
-        '''Write data to csv file
+        """Write data to csv file.
 
         Parameters
         ----------
@@ -237,7 +236,8 @@ class ProjectionBand(eigenval.EnergyBand):
            string for label (put it on the first line)
         blankline: boolean
            It True (default), the blank line is inserted between band data
-        '''
+
+        """
         label_str = '\t'.join(
             self.make_label(site_indexes, orbital_indexes_sets)) + '\n'
         with open(csv_file, 'w') as fhandle:
@@ -249,11 +249,10 @@ class ProjectionBand(eigenval.EnergyBand):
                     fhandle.writelines('\n')
 
     def text_sheet(self, site_indexes=(), orbital_indexes_sets=()):
-        '''Return csv-like text data
+        """Return csv-like text data.
 
         Parameters
         -----------
-
         site_indexes: list or tuple that contains int
            site name for output  (the elements must be in self.label['site'])
            e.g., (3, 5)
@@ -263,9 +262,9 @@ class ProjectionBand(eigenval.EnergyBand):
 
         Returns
         --------
-
         str
-        '''
+
+        """
         assert len(site_indexes) == len(orbital_indexes_sets), \
             'must len(site_indexes)==len(orbitals_indexes_sets)'
         output = '\t'.join(self.make_label(site_indexes, orbital_indexes_sets))
@@ -282,17 +281,7 @@ class ProjectionBand(eigenval.EnergyBand):
 
 
 class PROCAR(ProjectionBand):  # Version safety
-    '''
-    Class for storing the data saved in PROCAR file.
-
-    Parameters
-    -----------
-
-    PROCAR_file: str
-        File name of "PROCAR".
-    phase_read: boolean
-        Set True is you read phase data.
-
+    """Class for storing the data saved in PROCAR file.
 
     PROCAR consists of the following lines.  Appear once per file.
 
@@ -334,14 +323,15 @@ class PROCAR(ProjectionBand):  # Version safety
 
     Parameters
     ----------
-
     filename: str
          Filename of *PROCAR* file
     phase_read: boolean
          True if read phase data (default is false)
-    '''
+
+    """
 
     def __init__(self, filename=None, phase_read=False):
+        """Initialize."""
         super(PROCAR, self).__init__()
         if filename:
             if os.path.splitext(filename)[1] == ".bz2":
@@ -354,18 +344,16 @@ class PROCAR(ProjectionBand):  # Version safety
             self.load_file(thefile, phase_read)
 
     def load_file(self, thefile, phase_read=False):
-        '''
-        A virtual parser of PROCAR
+        """Parse PROCAR.
 
         Parameters
         ----------
-
         thefile: StringIO
             'PROCAR' file
-
         phase_read: boolean
             Switch for loading phase characters
-        '''
+
+        """
         first_line = next(thefile)
         if 'PROCAR lm decomposed + phase' not in first_line:
             thefile.close()
@@ -467,12 +455,11 @@ class PROCAR(ProjectionBand):  # Version safety
         thefile.close()
 
     def __repr__(self):
-        '''
-        __str__() <=> str(x)
+        """__str__() <=> str(x)
 
-        show the PROCAR character, not contents.
-        '''
-        template1 = '''The properties of this procar:
+        Show the PROCAR character, not contents.
+        """
+        template1 = """The properties of this procar:
   # of k-points: {0.numk}
   # of bands: {0.nbands}
   # of atoms: {0.natom}
@@ -483,13 +470,13 @@ class PROCAR(ProjectionBand):  # Version safety
   # of orbital component: {4}
     ((# of k-points) * (# of bands) * (# of ions) =
         {0.numk}*{0.nbands}*{0.natom}={5})
-  # of phase component: {6}'''
+  # of phase component: {6}"""
         string = ""
         for orb in self.label['orbital']:
             string += '{0}  '.format(orb)
-        template2 = '''
+        template2 = """
   # Orbitals are: {0}
-        '''.format(str)
+        """.format(str)
         return template1.format(
             self, len(self.kvecs), len(self.energies), self.numk * self.nbands,
             len(self.proj), self.numk * self.nbands * self.natom,
@@ -497,23 +484,22 @@ class PROCAR(ProjectionBand):  # Version safety
 
 
 def check_orb_name(arg):
-    '''
-    Return arg without change if arg is a member of the 'orbital name'.
-    i.e., if arg is an alias of the (more appropriate) orbital
+    """Return arg without change if arg is a member of the 'orbital name'.
+
+    If arg is an alias of the (more appropriate) orbital
     name, return it as is.  If arg is neither the appropriate
     orbital name nor the alias, raise ValueError.
 
     Parameters
     ----------
-
     arg: str
         the string to be checked as the orbital name
 
     Returns
     --------
-
     str
-    '''
+
+    """
     translate_dict = {
         'pypx': 'pxpy',
         'pzpx': 'pxpz',
@@ -539,8 +525,12 @@ def check_orb_name(arg):
 
 
 def shortcheck(procar):
-    '''Return numk, nbands, nion, orbital_names and
-    True/False if collienar calculation'''
+    """Check whether PROCAR file is good.
+
+    Return numk, nbands, nion, orbital_names and
+    True/False if collienar calculation
+
+    """
     if 'PROCAR lm decomposed + phase' not in next(procar):
         procar.close()
         raise RuntimeError("This PROCAR is not a proper format\n \
@@ -549,7 +539,7 @@ def shortcheck(procar):
     numk, nbands, natom = [
         int(i) for i in (tmp[14:20], tmp[39:43], tmp[62:-1])
     ]
-    _ = [next(procar) for i in range(5)]
+    [next(procar) for i in range(5)]
     section = []
     orbitals = []
     phases = []

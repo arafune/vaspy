@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
-This module provides LOCPOT class
-'''
+"""This module provides LOCPOT class."""
 #
 from __future__ import division, print_function
 
@@ -25,28 +23,27 @@ except ImportError:
 
 
 class LOCPOT(mesh3d.VASPGrid):
-    '''
-    Class for LOCPOT
+    """Class for LOCPOT.
 
     LOCPOT format is essentially same as that of CHGCAR
 
-'''
+    """
 
     def __init__(self, filename=None, pickleddata=None):
+        """Initialize."""
         super(LOCPOT, self).__init__(filename, pickleddata)
 
     def plot_potential_along_axis(self, axis_name, frame=0):  # FIXME!!
-        '''
-        Plot potential curve along the axis
+        """Plot potential curve along the axis.
 
         Parameters
         ----------
-
         axis_name: str
             the name of the axis (X, Y, or Z)
         frame: int, optional  (default is 0)
             'select frame potential' (very optional)
-        '''
+
+        """
         axis_name = axis_name.capitalize()
         axes_length = self.poscar.axes_lengthes
         if axis_name == 'X':
