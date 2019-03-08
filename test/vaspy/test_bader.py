@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -+-
 '''Unit test for OUTCAR class'''
 import os
-from nose.tools import with_setup
-from nose.tools import eq_
-from nose.tools import ok_
+
 import numpy as np
+from nose.tools import eq_, ok_, with_setup
+
 import vaspy.bader
 
 
@@ -30,9 +30,8 @@ class TestBader(object):
         eq_(157.7708, self.acf.vacvol)
         eq_(2828.000, self.acf.nelectron)
         eq_(344, self.acf.natom)
-        np.testing.assert_array_almost_equal(
-            [6.745000, -37.491966, 11.674620],
-            self.acf.positions[0])
+        np.testing.assert_array_almost_equal([6.745000, -37.491966, 11.674620],
+                                             self.acf.positions[0])
         eq_(3.526327, self.acf.charges[0])
         eq_(0.423581, self.acf.mindists[0])
         eq_(17.540723, self.acf.vols[0])

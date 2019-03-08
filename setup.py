@@ -3,13 +3,14 @@
 '''
 from distutils.core import setup
 import sys
+from vaspy import __version__
 
 reqpkgs = ['numpy', 'matplotlib']
 if sys.hexversion < 0x20700f0 or 0x30000f0 <= sys.hexversion < 0x30200f0:
     reqpkgs.append('argparse')
 
 setup(name='VASPy',
-      version='0.4.3',
+      version=__version__,
       author='Mao Kanno',
       author_email='mkanno.t.k@13.alumni.u-tokyo.ac.jp',
       maintainer='Ryuichi Arafune',
@@ -35,8 +36,7 @@ setup(name='VASPy',
                'scripts/vaspy-outcar.py',
                'scripts/vaspy-poscar.py',
                'scripts/vaspy-wavecar.py',
-               'scripts/vaspy-vsim_poscar.py',
-               'scripts/vaspy-vsim_xdatcar.py',
+               'scripts/vaspy-vsim.py',
                'scripts/vaspy-xdatcar.py',
                'scripts/vaspy-procar.py'],
       requires=reqpkgs,

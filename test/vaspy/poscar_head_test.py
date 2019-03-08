@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from nose.tools import with_setup
-from nose.tools import eq_
-from nose.tools import ok_
 import numpy as np
+from nose.tools import eq_, ok_, with_setup
+
 import vaspy.poscar
 
 

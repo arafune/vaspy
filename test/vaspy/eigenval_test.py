@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 '''Test for EIGENVAL class'''
 import os
-from nose.tools import eq_
-from nose.tools import ok_
-from nose.tools import with_setup
-from nose.tools import assert_equal
-from nose.tools import raises
-import vaspy.eigenval as eigenval
+
 import numpy as np
+from nose.tools import assert_equal, eq_, ok_, raises, with_setup
+
+import vaspy.eigenval as eigenval
 
 
 class TestEIGENVAL(object):
@@ -28,26 +26,24 @@ class TestEIGENVAL(object):
         eq_((2, 1, 1890), self.eigenval_spin.energies.shape)
         np.testing.assert_array_equal([0., 0., 0.],
                                       self.eigenval_spin.kvecs[0])
-        np.testing.assert_array_almost_equal(
-            [[-22.893072, -22.891405, -22.841659,
-              -22.832997, -22.761726, -22.737184]],
-            self.eigenval_spin.energies[0, :, :6])
-        np.testing.assert_array_equal(
-            [5.806516], self.eigenval_spin.energies[0, :, -1])
-        np.testing.assert_array_equal(
-            [5.813531], self.eigenval_spin.energies[1, :, -1])
+        np.testing.assert_array_almost_equal([[
+            -22.893072, -22.891405, -22.841659, -22.832997, -22.761726,
+            -22.737184
+        ]], self.eigenval_spin.energies[0, :, :6])
+        np.testing.assert_array_equal([5.806516],
+                                      self.eigenval_spin.energies[0, :, -1])
+        np.testing.assert_array_equal([5.813531],
+                                      self.eigenval_spin.energies[1, :, -1])
         #
         eq_(1, self.eigenval_soi.natom)
         eq_(1, self.eigenval_soi.nspin)
         eq_(54, self.eigenval_soi.nbands)
         eq_(625, self.eigenval_soi.numk)
         np.testing.assert_array_equal(
-            [-9.548122, -9.491253, -9.322813,
-             -9.050432, -8.691472, -8.285128],
+            [-9.548122, -9.491253, -9.322813, -9.050432, -8.691472, -8.285128],
             self.eigenval_soi.energies[0, :, 0][0:6])
         np.testing.assert_array_almost_equal(
-            26.193038,
-            self.eigenval_soi.energies[0, :, -1][-1])
+            26.193038, self.eigenval_soi.energies[0, :, -1][-1])
 
     @with_setup(setup=setup)
     def test_make_label(self):

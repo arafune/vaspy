@@ -1,13 +1,29 @@
 vaspy package
 =============
 
-.. Submodules
-.. ----------
+Submodules
+----------
+
+vaspy.bader module
+------------------
+
+.. automodule:: vaspy.bader
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 vaspy.chgcar module
 -------------------
 
 .. automodule:: vaspy.chgcar
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vaspy.const module
+------------------
+
+.. automodule:: vaspy.const
     :members:
     :undoc-members:
     :show-inheritance:
@@ -21,7 +37,7 @@ vaspy.doscar module
     :show-inheritance:
 
 vaspy.eigenval module
-----------------------
+---------------------
 
 .. automodule:: vaspy.eigenval
     :members:
@@ -32,6 +48,14 @@ vaspy.locpot module
 -------------------
 
 .. automodule:: vaspy.locpot
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vaspy.mesh3d module
+-------------------
+
+.. automodule:: vaspy.mesh3d
     :members:
     :undoc-members:
     :show-inheritance:
@@ -60,39 +84,6 @@ vaspy.procar module
     :undoc-members:
     :show-inheritance:
 
-vaspy.vsim_asc module
-----------------------
-
-.. automodule:: vaspy.vsim_asc
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-vaspy.xdatcar module
-----------------------
-
-.. automodule:: vaspy.xdatcar
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-vaspy.wavecar module
-----------------------
-
-.. automodule:: vaspy.wavecar
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-vaspy.mesh3d module
----------------------
-
-.. automodule:: vaspy.mesh3d
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 vaspy.tools module
 ------------------
 
@@ -101,11 +92,35 @@ vaspy.tools module
     :undoc-members:
     :show-inheritance:
 
+vaspy.vsim\_asc module
+----------------------
 
-.. Module contents
-.. ---------------
+.. automodule:: vaspy.vsim_asc
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-.. .. automodule:: vaspy
-..     :members:
-..     :undoc-members:
-..     :show-inheritance:
+vaspy.wavecar module
+--------------------
+
+.. automodule:: vaspy.wavecar
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+vaspy.xdatcar module
+--------------------
+
+.. automodule:: vaspy.xdatcar
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: vaspy
+    :members:
+    :undoc-members:
+    :show-inheritance:

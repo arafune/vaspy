@@ -1,30 +1,32 @@
 # -*- coding: utf-8 -*-
-'''This module provide XDATCAR class
-'''
+"""This module provide XDATCAR class."""
 
-import os
 import bz2
+import os
+
 import numpy as np
+
 import vaspy.poscar
 
 
 class XDATCAR(vaspy.poscar.POSCAR_HEAD):
-    '''class for XDATCAR format
+    """Class for XDATCAR.
 
     Attributes
     ----------
-
     configurations: list
-'''
+
+    """
 
     def __init__(self, filename=None):
-        '''
+        """Initialize.
+
         Parameters
         ----------
-
         arg: str
             XDATCAR file name
-'''
+
+        """
         super(XDATCAR, self).__init__()
         self.configurations = []
         if filename:
@@ -38,14 +40,14 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
             self.load_file(thefile)
 
     def load_file(self, thefile):
-        '''A virtual parser of PROCAR
+        """Parse PROCAR.
 
         Parameters
         ----------
-
         thefile: StringIO
             'XDATCAR' file
-'''
+
+        """
         self.system_name = next(thefile).strip()
         self.scaling_factor = float(next(thefile).strip())
         self.cell_vecs[0] = np.array([float(x) for x in next(thefile).split()])
@@ -65,19 +67,19 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
         self.configurations.append(positions)
 
     def __str__(self):
-        '''
+        """Return as str.
+
         Returns
         -------
-
         str
             a string representation of XDATCAR
-'''
+
+        """
         tmp = self.system_name + '\n'
         tmp += '        {}\n'.format(self.scaling_factor)
         for i in range(3):
             tmp += '      {:#.6f}   {:#.6f}    {:6f}\n'.format(
-                self.cell_vecs[i][0],
-                self.cell_vecs[i][1],
+                self.cell_vecs[i][0], self.cell_vecs[i][1],
                 self.cell_vecs[i][2])
         for element in self.iontypes:
             tmp += '    {}'.format(element)

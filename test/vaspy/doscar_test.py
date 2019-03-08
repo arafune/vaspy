@@ -1,18 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import unittest
 import os
+import unittest
+
 import numpy as np
-from vaspy.doscar import DOSCAR, DOS, TDOS, PDOS
+
+from vaspy.doscar import DOS, DOSCAR, PDOS, TDOS
 
 
 class TestDOSCAR(unittest.TestCase):
-
     def setUp(self):
         currentpath = (os.path.abspath(os.path.dirname(__file__)))
         testDOS = currentpath + "/DOSCAR_dummy"
         self.testDOSCAR = DOSCAR(testDOS)
+
     pass
 
 

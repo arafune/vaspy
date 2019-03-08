@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
-'''
-Module for bader class
+"""Module for bader class.
 
 Bader charge anaslysis performed by bader.
 (http://theory.cm.utexas.edu/henkelman/code/bader/)
 
 This program is not a part of vasp but it deeply connects with the vasp.
-'''
+"""
 
 from __future__ import division  # Version safety
 from __future__ import print_function
-import os.path
+
 import bz2
+import os.path
+
 import numpy as np
 
 
 class BaderACF(object):
-    '''class for storing bader charge analysis (ACF.dat)
+    r"""Class for storing bader charge analysis (ACF.dat).
 
           ACF.dat contains the coordinates of each atom, the charge
           associated with it according to Bader partitioning, percentage of
@@ -26,13 +27,12 @@ class BaderACF(object):
           used.
 
 
-    Properties
+    Attributes
     ----------
-
     natom: int
        Number of atoms
     positions: list
-       Atom positions in AA
+       Atom positions in :math:`\AA`
     charges: list
        charges
     vols: list
@@ -43,9 +43,11 @@ class BaderACF(object):
        vacuum volume
     nelectron: float
        number of electron
-    '''
+
+    """
 
     def __init__(self, filename=None):
+        """Initialize."""
         self.natom = 0
         self.positions = []
         self.charges = []
@@ -65,13 +67,14 @@ class BaderACF(object):
             self.parse(thefile)
 
     def parse(self, thefile):
-        '''Parse AFC.dat
+        """Parse AFC.dat.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         thefile: StringIO
             'ACF.dat' file
-        '''
+
+        """
         # the first line is like:
         #     X     Y     Z     CHARGE      MIN DIST   ATOMIC VOL
         next(thefile)

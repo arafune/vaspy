@@ -3,8 +3,8 @@
 '''This module provides test routines for __init__.py for vaspy module
 '''
 import os
-from nose.tools import ok_, eq_
-from nose.tools import with_setup
+
+from nose.tools import eq_, ok_, with_setup
 
 import vaspy
 
