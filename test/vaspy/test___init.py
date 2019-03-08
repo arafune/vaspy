@@ -3,16 +3,18 @@
 '''This module provides test routines for __init__.py for vaspy module
 '''
 import os
-from nose.tools import ok_, eq_
-from nose.tools import with_setup
+
+from nose.tools import eq_, ok_, with_setup
 
 import vaspy
+
 
 class TestInitModule(object):
     '''Class for Test of vaspy.module
 
     The functions should be tested are in __init__.py
     '''
+
     def setup(self):
         self.datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
 

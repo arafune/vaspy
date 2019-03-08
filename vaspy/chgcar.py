@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-'''
-Module for CHGCAR class
+"""Module for CHGCAR class.
 
 translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
-'''
+"""
 from __future__ import division, print_function  # Version safety
+
+import bz2
 import copy
 import os
-import bz2
 import sys
 
 try:
@@ -19,8 +19,7 @@ except ImportError:
 
 
 class CHGCAR(mesh3d.VASPGrid):
-    '''
-    Class for CHGCAR
+    """Class for CHGCAR.
 
     An example of the first few lines of CHGCAR. ::
 
@@ -43,16 +42,17 @@ class CHGCAR(mesh3d.VASPGrid):
 
     Attributes
     ----------
-
     spin: int or list
         Represents spin character
 
     Notes
     -----
-    the current verstion ignores "augmentation occupacies".
-    '''
+    Current verstion ignores "augmentation occupacies".
+
+    """
 
     def __init__(self, filename=None, pickleddata=None):
+        """Initialize."""
         super(CHGCAR, self).__init__(None)
         self.spin = 1
         if filename:
@@ -66,15 +66,14 @@ class CHGCAR(mesh3d.VASPGrid):
             self.load_file(thefile, pickleddata)
 
     def load_file(self, thefile, pickleddata=None):
-        '''
-        Parse CHGCAR file to construct CHGCAR object
+        """Parse CHGCAR file to construct CHGCAR object.
 
         Parameters
         ----------
-
         thefile: StringIO
             CHGCAR file
-        '''
+
+        """
         super(CHGCAR, self).load_file(thefile, pickleddata)
         if self.grid.nframe == 1:
             self.spin = [""]
@@ -86,8 +85,7 @@ class CHGCAR(mesh3d.VASPGrid):
             raise RuntimeError("CHGCAR is correct?")
 
     def magnetization(self, direction=None):
-        '''
-        Return CHGCAR for magnetization
+        """Return CHGCAR for magnetization.
 
         For collinear spin-polarized calculations
         (``ISPIN=2`` but ``LSORBIT=.FALSE.``),
@@ -106,17 +104,16 @@ class CHGCAR(mesh3d.VASPGrid):
 
         Parameters
         ----------
-
         direction: str, optional
             specify x, y, z or t in noncollinear calculation.
             't' means the total.
 
         Returns
         -------
-
         CHGCAR
              CHGCAR of the spin-distribution
-        '''
+
+        """
         if len(self.spin) == 1:
             raise RuntimeError("This CHGCAR is not spinresolved version")
         dest = copy.deepcopy(self)
@@ -140,18 +137,17 @@ class CHGCAR(mesh3d.VASPGrid):
         return dest
 
     def majorityspin(self):
-        '''
-        Return CHGCAR for majority spin
+        """Return CHGCAR for majority spin.
 
         This method is for CHGCAR given by ``ISPIN=2`` but not-SOI
         calculations.
 
         Returns
         -------
-
         vaspy.chgcar.CHGCAR
             CHGCAR for the majority spin charge
-        '''
+
+        """
         if len(self.spin) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         dest = copy.deepcopy(self)
@@ -161,18 +157,17 @@ class CHGCAR(mesh3d.VASPGrid):
         return dest
 
     def minorityspin(self):
-        '''
-        Return CHGCAR for minority spin
+        """Return CHGCAR for minority spin.
 
         This method is for CHGCAR given by ``ISPIN=2`` but not-SOI
         calculations.
 
         Returns
         ---------
-
         vaspy.chgcar.CHGCAR
-            CHGCAR for the minority  spin charge
-        '''
+            CHGCAR for the minority spin charge
+
+        """
         if len(self.spin) != 2:
             raise RuntimeError('This CHGCAR is not spinresolved version')
         dest = copy.deepcopy(self)

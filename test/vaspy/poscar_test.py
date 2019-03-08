@@ -2,15 +2,17 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import division, print_function  # Version safety
-import unittest
+
 import os
 import tempfile
+import unittest
+
 import numpy as np
+
 import vaspy.poscar
 
 
 class TestPOSCAR(unittest.TestCase):
-
     def setUp(self):
         global test_poscar_string
         filePOSCAR = tempfile.mkstemp()
@@ -25,29 +27,31 @@ class TestPOSCAR(unittest.TestCase):
         '''Test for POSCAR class: fundamental data read'''
         # a=os.getcwd()  # return the directory where nose execute.
         self.assertEqual('NiC4S4', self.testposcar.system_name)
-        np.testing.assert_allclose(np.array([0.866025404, -0.5, 0.]),
-                                   self.testposcar.cell_vecs[0])
-        np.testing.assert_allclose(np.array([0.866025404, 0.5, 0.]),
-                                   self.testposcar.cell_vecs[1])
+        np.testing.assert_allclose(
+            np.array([0.866025404, -0.5, 0.]), self.testposcar.cell_vecs[0])
+        np.testing.assert_allclose(
+            np.array([0.866025404, 0.5, 0.]), self.testposcar.cell_vecs[1])
         self.testposcar.cell_vecs[2] = (1, 0, 0)
-        np.testing.assert_allclose(np.array([1, 0, 0]),
-                                   self.testposcar.cell_vecs[2])
-        self.assertEqual(['#0:Ni1', '#1:Ni2', '#2:Ni3',
-                          '#3:C1', '#4:C2', '#5:C3', '#6:C4',
-                          '#7:C5', '#8:C6', '#9:C7', '#10:C8',
-                          '#11:C9', '#12:C10', '#13:C11', '#14:C12',
-                          '#15:S1', '#16:S2', '#17:S3', '#18:S4',
-                          '#19:S5', '#20:S6', '#21:S7', '#22:S8',
-                          '#23:S9', '#24:S10', '#25:S11', '#26:S12'],
-                         self.testposcar.atom_identifer)
+        np.testing.assert_allclose(
+            np.array([1, 0, 0]), self.testposcar.cell_vecs[2])
+        self.assertEqual([
+            '#0:Ni1', '#1:Ni2', '#2:Ni3', '#3:C1', '#4:C2', '#5:C3', '#6:C4',
+            '#7:C5', '#8:C6', '#9:C7', '#10:C8', '#11:C9', '#12:C10',
+            '#13:C11', '#14:C12', '#15:S1', '#16:S2', '#17:S3', '#18:S4',
+            '#19:S5', '#20:S6', '#21:S7', '#22:S8', '#23:S9', '#24:S10',
+            '#25:S11', '#26:S12'
+        ], self.testposcar.atom_identifer)
 
     def test_point_in_box(self):
-        self.assertFalse(vaspy.poscar.point_in_box(
-            (0.5, 0.5, 0.2), self.testposcar.cell_vecs))
-        self.assertTrue(vaspy.poscar.point_in_box(
-            (0.5, 0.1, 0.2), self.testposcar.cell_vecs))
-        self.assertTrue(vaspy.poscar.point_in_box(
-            (0.5, 0.5, 0.2), ((1, 0, 0), (0, 1, 0), (0, 0, 1))))
+        self.assertFalse(
+            vaspy.poscar.point_in_box((0.5, 0.5, 0.2),
+                                      self.testposcar.cell_vecs))
+        self.assertTrue(
+            vaspy.poscar.point_in_box((0.5, 0.1, 0.2),
+                                      self.testposcar.cell_vecs))
+        self.assertTrue(
+            vaspy.poscar.point_in_box((0.5, 0.5, 0.2), ((1, 0, 0), (0, 1, 0),
+                                                        (0, 0, 1))))
 
     def test_is_cartesian(self):
         self.assertFalse(self.testposcar.is_cartesian())
@@ -64,11 +68,12 @@ class TestPOSCAR(unittest.TestCase):
         self.assertFalse(self.blancposcar.selective)
 
     def test_pos(self):
-        np.testing.assert_array_equal(np.array([0., 0.5, 0.5]),
-                                      self.testposcar.positions[2])
-        np.testing.assert_allclose(np.array([0.23764, 0.429027113, 0.5]),
-                                   self.testposcar.positions[3],
-                                   rtol=1e-04)
+        np.testing.assert_array_equal(
+            np.array([0., 0.5, 0.5]), self.testposcar.positions[2])
+        np.testing.assert_allclose(
+            np.array([0.23764, 0.429027113, 0.5]),
+            self.testposcar.positions[3],
+            rtol=1e-04)
 
     def test_tune_scaling_factor(self):
         self.testposcar.tune_scaling_factor(1.0)
@@ -120,8 +125,7 @@ class TestPOSCAR(unittest.TestCase):
         np.testing.assert_allclose([0.5, 0.5, 0.5], tmp[9][0])
         np.testing.assert_allclose([0.5, 0., 0.5], tmp[9][1])
         np.testing.assert_allclose([0., 0.5, 0.5], tmp[9][2])
-        np.testing.assert_allclose([0.237639553, 0.429027113, 0.5],
-                                   tmp[9][3])
+        np.testing.assert_allclose([0.237639553, 0.429027113, 0.5], tmp[9][3])
         # ...
         self.assertEqual('T T T', tmp[10][0])
         self.assertEqual('T T T', tmp[10][1])
@@ -143,34 +147,34 @@ class TestPOSCAR(unittest.TestCase):
         '''Tests for poscar supercell method'''
         supercell = self.testposcar.supercell(3, 2, 1)
         np.testing.assert_allclose(
-            np.array([2.59807621, -1.5, 0.]),
-            supercell.cell_vecs[0])
+            np.array([2.59807621, -1.5, 0.]), supercell.cell_vecs[0])
         np.testing.assert_allclose(
-            np.array([1.73205081, 1., 0.]),
-            supercell.cell_vecs[1])
+            np.array([1.73205081, 1., 0.]), supercell.cell_vecs[1])
         np.testing.assert_allclose(
-            np.array([0.0, 0.0, 1.02529049]),
-            supercell.cell_vecs[2])
+            np.array([0.0, 0.0, 1.02529049]), supercell.cell_vecs[2])
         self.assertEqual('NiC4S4', supercell.system_name)
         self.assertEqual(['Ni', 'C', 'S'], supercell.iontypes)
         self.assertEqual([18, 72, 72], supercell.ionnums)
         supercell = self.testposcar.supercell(1, 1, 1)
-        np.testing.assert_allclose(
-            self.testposcar.positions[0],
-            supercell.positions[0])
+        np.testing.assert_allclose(self.testposcar.positions[0],
+                                   supercell.positions[0])
         supercell = self.testposcar.supercell(3, 2, 1)
         np.testing.assert_allclose(
             supercell.positions[0],
-            np.array([self.testposcar.positions[0][0]/3,
-                      self.testposcar.positions[0][1]/2,
-                      self.testposcar.positions[0][2]/1]))
+            np.array([
+                self.testposcar.positions[0][0] / 3,
+                self.testposcar.positions[0][1] / 2,
+                self.testposcar.positions[0][2] / 1
+            ]))
         np.testing.assert_allclose(
             supercell.positions[1],
-            np.array([self.testposcar.positions[0][0] / 3 + 1 * (1 / 3),
-                      self.testposcar.positions[0][1] / 2,
-                      self.testposcar.positions[0][2] / 1]))
+            np.array([
+                self.testposcar.positions[0][0] / 3 + 1 * (1 / 3),
+                self.testposcar.positions[0][1] / 2,
+                self.testposcar.positions[0][2] / 1
+            ]))
         supercell = self.testposcar.supercell(3, 2, 1)
-        self.assertEqual(6*len(self.testposcar.positions),
+        self.assertEqual(6 * len(self.testposcar.positions),
                          len(supercell.positions))
 
     def test_nearest(self):
@@ -187,6 +191,7 @@ class TestPOSCAR(unittest.TestCase):
 
     def test_plus(self):
         pass
+
 
 test_poscar_string = """NiC4S4
 14.63
@@ -225,7 +230,6 @@ Direct
 -0.553429027	-0.333333333	0.5  T  T  T
 -0.333333333	-0.553429027	0.5  T  T  T
 """
-
 
 tmpstr_original = """NiC4S4
 14.63

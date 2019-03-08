@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
-This module provides LOCPOT class
-'''
+"""This module provides LOCPOT class."""
 #
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function
+
 import os
 import sys
+
 import numpy as np
+
 try:
     import matplotlib.pyplot as plt
 except ImportError:
@@ -23,43 +23,42 @@ except ImportError:
 
 
 class LOCPOT(mesh3d.VASPGrid):
-    '''
-    Class for LOCPOT
+    """Class for LOCPOT.
 
     LOCPOT format is essentially same as that of CHGCAR
 
-'''
+    """
 
     def __init__(self, filename=None, pickleddata=None):
+        """Initialize."""
         super(LOCPOT, self).__init__(filename, pickleddata)
 
     def plot_potential_along_axis(self, axis_name, frame=0):  # FIXME!!
-        '''
-        Plot potential curve along the axis
+        """Plot potential curve along the axis.
 
         Parameters
         ----------
-
         axis_name: str
             the name of the axis (X, Y, or Z)
         frame: int, optional  (default is 0)
             'select frame potential' (very optional)
-        '''
+
+        """
         axis_name = axis_name.capitalize()
-        axes_length = self.poscar.get_axes_lengthes()
+        axes_length = self.poscar.axes_lengthes
         if axis_name == 'X':
-            horizontal_axis = np.linspace(
-                0, axes_length[0], self.grid.shape[0])
+            horizontal_axis = np.linspace(0, axes_length[0],
+                                          self.grid.shape[0])
             plt.clf()
             plt.xlim(xmax=axes_length[0])
         if axis_name == 'Y':
-            horizontal_axis = np.linspace(
-                0, axes_length[1], self.grid.shape[1])
+            horizontal_axis = np.linspace(0, axes_length[1],
+                                          self.grid.shape[1])
             plt.clf()
             plt.xlim(xmax=axes_length[1])
         if axis_name == 'Z':
-            horizontal_axis = np.linspace(
-                0, axes_length[2], self.grid.shape[2])
+            horizontal_axis = np.linspace(0, axes_length[2],
+                                          self.grid.shape[2])
             plt.clf()
             plt.xlim(xmax=axes_length[2])
         y_average = self.grid.average_along_axis(axis_name, frame)
@@ -77,6 +76,7 @@ class LOCPOT(mesh3d.VASPGrid):
         plt.xlabel(xlabel)
         plt.ylabel("Energy  ( eV )")
         plt.show()
+
 
 # LVHAR-tag:  This tag is available in VASP.5.2.12 and newer version.
 # It determines whether the total local potential (file LOCPOT ) contains

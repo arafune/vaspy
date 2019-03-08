@@ -1,19 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from nose.tools import with_setup
-from nose.tools import eq_
-from nose.tools import ok_
 import numpy as np
+from nose.tools import eq_, ok_, with_setup
+
 import vaspy.poscar
 
 
 class TestPOSCAR_Head(object):
     def setup(self):
-        self.poscar_head=vaspy.poscar.POSCAR_HEAD()
-        self.poscar_head.iontypes=['Ag', 'Si']
-        self.poscar_head.ionnums=[3, 5]
-        self.poscar_head.system_name='testPOSCAR'
+        self.poscar_head = vaspy.poscar.POSCAR_HEAD()
+        self.poscar_head.iontypes = ['Ag', 'Si']
+        self.poscar_head.ionnums = [3, 5]
+        self.poscar_head.system_name = 'testPOSCAR'
 
     @with_setup(setup=setup)
     def test_poscar_head(self):
