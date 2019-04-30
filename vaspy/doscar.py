@@ -160,7 +160,7 @@ class DOS(object):  # Version safety
             self.dos = array.transpose()
 
     def __len__(self):
-        """x.__len__() <=> len(x)"""
+        """x.__len__() <=> len(x)."""
         return len(self.dos)
 
     def fermi_correction(self, fermi):
@@ -199,16 +199,17 @@ class DOS(object):  # Version safety
         transposed_dos = self.dos.transpose()
         if header is None:
             with open(filename, mode='wb') as fhandle:
-                np.savetxt(
-                    fhandle, transposed_dos, delimiter='\t', newline='\n')
+                np.savetxt(fhandle,
+                           transposed_dos,
+                           delimiter='\t',
+                           newline='\n')
         else:
             with open(filename, mode='wb') as fhandle:
-                np.savetxt(
-                    fhandle,
-                    transposed_dos,
-                    header=header,
-                    delimiter='\t',
-                    newline='\n')
+                np.savetxt(fhandle,
+                           transposed_dos,
+                           header=header,
+                           delimiter='\t',
+                           newline='\n')
 
 
 class TDOS(DOS):

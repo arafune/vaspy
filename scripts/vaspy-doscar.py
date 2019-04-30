@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-script to use(demonstrate) vaspy.doscar
-"""
+"""Script to use(demonstrate) vaspy.doscar."""
 
 import argparse
 import os
@@ -17,13 +15,12 @@ sys.path.append(os.path.dirname(os.path.abspath(mypath)))
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('doscar', metavar='DOSCAR_file')
-parser.add_argument(
-    '-o',
-    '--outcar',
-    metavar='OUTCAR_file',
-    nargs='?',
-    default=NotImplemented,
-    help="""Use OUTCAR file.
+parser.add_argument('-o',
+                    '--outcar',
+                    metavar='OUTCAR_file',
+                    nargs='?',
+                    default=NotImplemented,
+                    help="""Use OUTCAR file.
 If file path is not given,
 try to open OUTCAR file
 in the same directory to DOSCAR.""")
@@ -31,32 +28,29 @@ in the same directory to DOSCAR.""")
 # -o data/OUTCAR => args.outcar == "data/OUTCAR"
 # -o             => args.outcar == None
 # (not given)    => args.outcar == NotImplemented (default)
-parser.add_argument(
-    '-f',
-    '--fermi',
-    metavar='value',
-    type=float,
-    default=0.0,
-    help="""Fermi level correction.
+parser.add_argument('-f',
+                    '--fermi',
+                    metavar='value',
+                    type=float,
+                    default=0.0,
+                    help="""Fermi level correction.
 Energy shifts by this value.
 if --outcar is set, this option is ignored.""")
-parser.add_argument(
-    '-s',
-    '--site',
-    metavar='atoms',
-    action='append',
-    dest='atomset',
-    type=tools.parse_AtomselectionNum,
-    help="""atom # specified with range.
+parser.add_argument('-s',
+                    '--site',
+                    metavar='atoms',
+                    action='append',
+                    dest='atomset',
+                    type=tools.parse_AtomselectionNum,
+                    help="""atom # specified with range.
 Use "-" or ","
 (ex.) --site 1,2,7-9""")
-parser.add_argument(
-    '-a',
-    '--as',
-    metavar='name',
-    action='append',
-    dest='atomsetname',
-    help="""the name of the range identified by --site.
+parser.add_argument('-a',
+                    '--as',
+                    metavar='name',
+                    action='append',
+                    dest='atomsetname',
+                    help="""the name of the range identified by --site.
 (ex.) --as layer1
 the name is used in the output filename.""")
 
@@ -78,8 +72,8 @@ if atomlist == []:
 #
 doses = [TDOS(doscar.dos_container.pop(0))]
 #
-doses.extend(
-    PDOS(*each) for each in zip(doscar.dos_container, atomlist))  # tmp[1:] ?
+doses.extend(PDOS(*each)
+             for each in zip(doscar.dos_container, atomlist))  # tmp[1:] ?
 #
 # Fermi level correction
 #
