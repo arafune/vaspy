@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-script to use(demonstrate) vaspy.chgcar module
-"""
+"""Script to use(demonstrate) vaspy.chgcar module."""
 
 import argparse
 
@@ -23,22 +21,21 @@ spinmethods = {
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument(
-    '--add', action='store_true', default=False, help="Add two CHGCAR files")
-group.add_argument(
-    '--merge',
-    action='store_true',
-    default=False,
-    help="Add two CHGCAR files (ion position is not modified)")
-group.add_argument(
-    '--diff',
-    action='store_true',
-    default=False,
-    help="Get difference of two CHGCAR files")
-group.add_argument(
-    '--spin',
-    metavar='spin_operation',
-    help="""spin-relatated operation.
+group.add_argument('--add',
+                   action='store_true',
+                   default=False,
+                   help="Add two CHGCAR files")
+group.add_argument('--merge',
+                   action='store_true',
+                   default=False,
+                   help="Add two CHGCAR files (ion position is not modified)")
+group.add_argument('--diff',
+                   action='store_true',
+                   default=False,
+                   help="Get difference of two CHGCAR files")
+group.add_argument('--spin',
+                   metavar='spin_operation',
+                   help="""spin-relatated operation.
 when this option is set --add, -diff are ignored,
 and CHGCAR_file_2 must not be set.
 spin operation is one of the followings:
@@ -55,10 +52,9 @@ majority : extract the part for the
 minority : extract the part for the
            minority spin (for spin resolved calc.)""")
 
-parser.add_argument(
-    '--output',
-    metavar='file_name',
-    help="""output file name
+parser.add_argument('--output',
+                    metavar='file_name',
+                    help="""output file name
 if not specified, use standard output""")
 #
 parser.add_argument('CHGCAR_file_1', type=CHGCAR)

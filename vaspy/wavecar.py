@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Module for WAVECAR class
-"""
+"""Module for WAVECAR class."""
 
 from __future__ import division, print_function  # Version safety
 
@@ -87,8 +86,10 @@ class WAVECAR(object):
 
         """
         self.wfc.seek(0)
-        self.recl, self.nspin, self.rtag = np.array(
-            np.fromfile(self.wfc, dtype=np.float, count=3), dtype=int)
+        self.recl, self.nspin, self.rtag = np.array(np.fromfile(self.wfc,
+                                                                dtype=np.float,
+                                                                count=3),
+                                                    dtype=int)
         self.wfc.seek(self.recl)
         #        print(self.wfc.tell())
         #
@@ -104,14 +105,14 @@ class WAVECAR(object):
         self.rcpcell = np.linalg.inv(self.realcell).T
         unit_cell_vector_magnitude = np.linalg.norm(self.realcell, axis=1)
         cutoff = np.ceil(
-            np.sqrt(self.encut / Ry_in_eV)
-            / (2 * np.pi / (unit_cell_vector_magnitude / au_in_AA)))
+            np.sqrt(self.encut / Ry_in_eV) /
+            (2 * np.pi / (unit_cell_vector_magnitude / au_in_AA)))
         # FFT Minimum grid size. Always odd!!
         self.ngrid = np.array(2 * cutoff + 1, dtype=int)
 
     def check_DwNGZHalf(self):
-        r"""Set self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
-        about half of the number of gvectors equals number of plane waves"""
+        r"""self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
+        about half of the number of gvectors equals number of plane waves."""
         if self.gamma:
             return True
         if (self.gvectors(0).shape[0] // 2 == self.nplwvs[0]
@@ -151,8 +152,9 @@ class WAVECAR(object):
                 pos += k_i * (self.nbands + 1)
                 self.wfc.seek(pos * self.recl)
                 #                print(self.wfc.tell())
-                dump = np.fromfile(
-                    self.wfc, dtype=np.float, count=4 + 3 * self.nbands)
+                dump = np.fromfile(self.wfc,
+                                   dtype=np.float,
+                                   count=4 + 3 * self.nbands)
                 if spin_i == 0:
                     self.nplwvs[k_i] = int(dump[0])
                     self.kvecs[k_i] = dump[1:4]
@@ -167,9 +169,9 @@ class WAVECAR(object):
                     0,
                 ],
                  np.cumsum(
-                     np.linalg.norm(
-                         np.dot(np.diff(self.kvecs, axis=0), self.rcpcell),
-                         axis=1))))
+                     np.linalg.norm(np.dot(np.diff(self.kvecs, axis=0),
+                                           self.rcpcell),
+                                    axis=1))))
         return self.kpath, self.bands
 
     def gvectors(self, k_i=0):
@@ -199,9 +201,9 @@ class WAVECAR(object):
         kgrid = []
         kgrid = make_kgrid(self.ngrid, self.gamma, para=PARALLEL)
         hbar2over2m = 13.605826 * 0.529177249 * 0.529177249
-        energy_k = hbar2over2m * np.linalg.norm(
-            np.dot(kgrid + kvec[np.newaxis, :], 2 * np.pi * self.rcpcell),
-            axis=1)**2
+        energy_k = hbar2over2m * np.linalg.norm(np.dot(
+            kgrid + kvec[np.newaxis, :], 2 * np.pi * self.rcpcell),
+                                                axis=1)**2
         g_vec = kgrid[np.where(energy_k < self.encut)[0]]
         return np.asarray(g_vec, dtype=int)
 
@@ -317,8 +319,9 @@ class WAVECAR(object):
                              dtype=np.complex128)
             phi_k[0][gvec[:, 0], gvec[:, 1],
                      gvec[:, 2]] = bandcoeff[:bandcoeff.size // 2]
-            phi_k[1][gvec[:, 0], gvec[:, 1], gvec[:, 2]] = bandcoeff[
-                bandcoeff.size // 2:]
+            phi_k[1][gvec[:, 0], gvec[:, 1], gvec[:, 2]] = bandcoeff[bandcoeff.
+                                                                     size //
+                                                                     2:]
         #
         if self.gamma:
             if PARALLEL:
@@ -358,8 +361,8 @@ class WAVECAR(object):
             re = np.real(phi_r)
             im = np.imag(phi_r)
             if phi_r.ndim == 3:
-                vaspgrid.grid.data = np.concatenate((re.flatten('F'),
-                                                     im.flatten('F')))
+                vaspgrid.grid.data = np.concatenate(
+                    (re.flatten('F'), im.flatten('F')))
             else:  # SOI
                 vaspgrid.grid.data = np.concatenate(
                     ((re[0] + re[1]).flatten('F'),
@@ -369,8 +372,7 @@ class WAVECAR(object):
         return vaspgrid
 
     def __str__(self):
-        """Print out the system parameters.
-        """
+        """Print out the system parameters."""
         the1stline = "record length  =       {0}  "
         the1stline += "spins =           {1}  "
         the1stline += "prec flag        {2}"
@@ -380,15 +382,17 @@ class WAVECAR(object):
         string += "\nreal space lattice vectors:"
         for i in range(3):
             string += "\na" + str(i + 1)
-            string += " = {0}    {1}    {2}".format(
-                self.realcell[i][0], self.realcell[i][1], self.realcell[i][2])
+            string += " = {0}    {1}    {2}".format(self.realcell[i][0],
+                                                    self.realcell[i][1],
+                                                    self.realcell[i][2])
         string += "\n"
         string += "\nvolume unit cell =   {0}".format(self.volume)
         string += "\nReciprocal lattice vectors:"
         for i in range(3):
             string += "\nb" + str(i + 1)
-            string += " = {0}    {1}    {2}".format(
-                self.rcpcell[i][0], self.rcpcell[i][1], self.rcpcell[i][2])
+            string += " = {0}    {1}    {2}".format(self.rcpcell[i][0],
+                                                    self.rcpcell[i][1],
+                                                    self.rcpcell[i][2])
         # string +="\nreciprocal lattice vector magnitudes:"
         return string
 
