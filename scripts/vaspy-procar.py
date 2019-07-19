@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-script to use (demonstrate) vaspy.procar module.
-"""
+"""Script to use (demonstrate) vaspy.procar module."""
 
 import argparse
 import functools as ft
@@ -14,49 +12,44 @@ import vaspy.procar as procar
 from vaspy import tools
 from vaspy.outcar import OUTCAR
 
-logging.basicConfig(
-    level=logging.DEBUG, format=' %(asctime)s - %(levelname)s -%(message)s')
+logging.basicConfig(level=logging.DEBUG,
+                    format=' %(asctime)s - %(levelname)s -%(message)s')
 logging.disable(logging.WARN)
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument(
-    '--outcar',
-    metavar='outcar_file',
-    help='''Use "OUTCAR" for the Fermi level correction.
+parser.add_argument('--outcar',
+                    metavar='outcar_file',
+                    help='''Use "OUTCAR" for the Fermi level correction.
 outcar_file must be specified.
 NOTE:  E-fermi of OUTCAR generated in
 Band-calculation may NOT be reliable.''')
-parser.add_argument(
-    '--fermi',
-    metavar='value',
-    type=float,
-    help='''Fermi level correction
+parser.add_argument('--fermi',
+                    metavar='value',
+                    type=float,
+                    help='''Fermi level correction
 Energy shifts by this value
 if --outcar is set, this option is ignored''')
-parser.add_argument(
-    '--site',
-    metavar='atom_indices',
-    dest='atomindex',
-    action='append',
-    type=tools.parse_AtomselectionNum,
-    help='''atom index specifed with range.
+parser.add_argument('--site',
+                    metavar='atom_indices',
+                    dest='atomindex',
+                    action='append',
+                    type=tools.parse_AtomselectionNum,
+                    help='''atom index specifed with range.
 Use "-" or ","
  (ex.) --site 1,2,7-9''')
-parser.add_argument(
-    '--as',
-    metavar='name',
-    nargs='+',
-    dest='atomsetname',
-    action='append',
-    help='''the name of the sites identified
+parser.add_argument('--as',
+                    metavar='name',
+                    nargs='+',
+                    dest='atomsetname',
+                    action='append',
+                    help='''the name of the sites identified
 by --site option
 the name is used in the title of the column''')
-parser.add_argument(
-    '--orbital',
-    metavar='orbitals',
-    action='append',
-    type=ft.partial(re.split, r'[,:]'),
-    help='''orbital name deliminated by ":" or ",".
+parser.add_argument('--orbital',
+                    metavar='orbitals',
+                    action='append',
+                    type=ft.partial(re.split, r'[,:]'),
+                    help='''orbital name deliminated by ":" or ",".
 orbital names are:
 s, p, pxpy, pz, d, dxy, dyz, dz2, dxz, dx2
  (ex.) --orbital s:pxpy:d''')
@@ -125,5 +118,5 @@ logging.debug('orbital_indexes_sets:')
 logging.debug(orbital_indexes_sets)
 #
 print(
-    procar.text_sheet(
-        site_indexes=site_indexes, orbital_indexes_sets=orbital_indexes_sets))
+    procar.text_sheet(site_indexes=site_indexes,
+                      orbital_indexes_sets=orbital_indexes_sets))

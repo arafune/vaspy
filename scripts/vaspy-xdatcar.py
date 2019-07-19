@@ -1,8 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
-Script for manipulate XDATCAR files
-'''
+'''Script for manipulate XDATCAR files.'''
 
 import argparse
 import copy
@@ -11,26 +9,22 @@ from vaspy.poscar import POSCAR
 from vaspy.xdatcar import XDATCAR
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument(
-    '--merge',
-    action='store_true',
-    default=False,
-    help='''Merge some XDATCAR files those''')
-parser.add_argument(
-    '--split',
-    metavar='basenamePOSCAR',
-    help='''Split into several POSCAR files
+parser.add_argument('--merge',
+                    action='store_true',
+                    default=False,
+                    help='''Merge some XDATCAR files those''')
+parser.add_argument('--split',
+                    metavar='basenamePOSCAR',
+                    help='''Split into several POSCAR files
 The basename of POSCAR is provided by the argument''')
-parser.add_argument(
-    '--poscar',
-    action='store_true',
-    default=False,
-    help='export into XDATCAR file from POSCAR files')
-parser.add_argument(
-    "files",
-    nargs="+",
-    metavar="XDATCAR or POSCAR files",
-    help="XDATCAR file(s)")
+parser.add_argument('--poscar',
+                    action='store_true',
+                    default=False,
+                    help='export into XDATCAR file from POSCAR files')
+parser.add_argument("files",
+                    nargs="+",
+                    metavar="XDATCAR or POSCAR files",
+                    help="XDATCAR file(s)")
 #
 args = parser.parse_args()
 #

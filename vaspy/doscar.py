@@ -160,7 +160,7 @@ class DOS(object):  # Version safety
             self.dos = array.transpose()
 
     def __len__(self):
-        """x.__len__() <=> len(x)"""
+        """x.__len__() <=> len(x)."""
         return len(self.dos)
 
     def fermi_correction(self, fermi):

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Module for WAVECAR class
-"""
+"""Module for WAVECAR class."""
 
 from __future__ import division, print_function  # Version safety
 
@@ -112,8 +111,8 @@ class WAVECAR(object):
         self.ngrid = np.array(2 * cutoff + 1, dtype=int)
 
     def check_DwNGZHalf(self):
-        r"""Set self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
-        about half of the number of gvectors equals number of plane waves"""
+        r"""self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
+        about half of the number of gvectors equals number of plane waves."""
         if self.gamma:
             return True
         if (self.gvectors(0).shape[0] // 2 == self.nplwvs[0]
@@ -373,8 +372,7 @@ class WAVECAR(object):
         return vaspgrid
 
     def __str__(self):
-        """Print out the system parameters.
-        """
+        """Print out the system parameters."""
         the1stline = "record length  =       {0}  "
         the1stline += "spins =           {1}  "
         the1stline += "prec flag        {2}"
