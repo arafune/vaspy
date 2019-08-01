@@ -9,8 +9,7 @@ import vaspy.bader
 
 
 class TestBader(object):
-    '''class for test of vaspy.outcar module
-    '''
+    """Class for test of vaspy.outcar module."""
 
     def setup(self):
         '''Reading ACF.chg.dat for test'''
@@ -20,12 +19,12 @@ class TestBader(object):
 
     @with_setup(setup=setup)
     def test_read_basic_properties(self):
-        '''Test for reading basic properties'''
-        '''
+        """Test for reading basic properties."""
+        """
         VACUUM CHARGE:               1.2829
         VACUUM VOLUME:             157.7708
         NUMBER OF ELECTRONS:      2828.0000
-        '''
+        """
         eq_(1.2829, self.acf.vaccharge)
         eq_(157.7708, self.acf.vacvol)
         eq_(2828.000, self.acf.nelectron)

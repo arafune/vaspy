@@ -24,16 +24,16 @@ class TestPOSCAR(unittest.TestCase):
         os.remove(filePOSCAR[1])
 
     def test_fundamentals(self):
-        '''Test for POSCAR class: fundamental data read'''
+        """Test for POSCAR class: fundamental data read"""
         # a=os.getcwd()  # return the directory where nose execute.
         self.assertEqual('NiC4S4', self.testposcar.system_name)
-        np.testing.assert_allclose(
-            np.array([0.866025404, -0.5, 0.]), self.testposcar.cell_vecs[0])
-        np.testing.assert_allclose(
-            np.array([0.866025404, 0.5, 0.]), self.testposcar.cell_vecs[1])
+        np.testing.assert_allclose(np.array([0.866025404, -0.5, 0.]),
+                                   self.testposcar.cell_vecs[0])
+        np.testing.assert_allclose(np.array([0.866025404, 0.5, 0.]),
+                                   self.testposcar.cell_vecs[1])
         self.testposcar.cell_vecs[2] = (1, 0, 0)
-        np.testing.assert_allclose(
-            np.array([1, 0, 0]), self.testposcar.cell_vecs[2])
+        np.testing.assert_allclose(np.array([1, 0, 0]),
+                                   self.testposcar.cell_vecs[2])
         self.assertEqual([
             '#0:Ni1', '#1:Ni2', '#2:Ni3', '#3:C1', '#4:C2', '#5:C3', '#6:C4',
             '#7:C5', '#8:C6', '#9:C7', '#10:C8', '#11:C9', '#12:C10',
@@ -50,8 +50,8 @@ class TestPOSCAR(unittest.TestCase):
             vaspy.poscar.point_in_box((0.5, 0.1, 0.2),
                                       self.testposcar.cell_vecs))
         self.assertTrue(
-            vaspy.poscar.point_in_box((0.5, 0.5, 0.2), ((1, 0, 0), (0, 1, 0),
-                                                        (0, 0, 1))))
+            vaspy.poscar.point_in_box((0.5, 0.5, 0.2),
+                                      ((1, 0, 0), (0, 1, 0), (0, 0, 1))))
 
     def test_is_cartesian(self):
         self.assertFalse(self.testposcar.is_cartesian())
@@ -68,42 +68,38 @@ class TestPOSCAR(unittest.TestCase):
         self.assertFalse(self.blancposcar.selective)
 
     def test_pos(self):
-        np.testing.assert_array_equal(
-            np.array([0., 0.5, 0.5]), self.testposcar.positions[2])
-        np.testing.assert_allclose(
-            np.array([0.23764, 0.429027113, 0.5]),
-            self.testposcar.positions[3],
-            rtol=1e-04)
+        np.testing.assert_array_equal(np.array([0., 0.5, 0.5]),
+                                      self.testposcar.positions[2])
+        np.testing.assert_allclose(np.array([0.23764, 0.429027113, 0.5]),
+                                   self.testposcar.positions[3],
+                                   rtol=1e-04)
 
     def test_tune_scaling_factor(self):
         self.testposcar.tune_scaling_factor(1.0)
-        np.testing.assert_allclose(
-            np.array([12.66995166052, -7.315, 0.0]),
-            self.testposcar.cell_vecs[0],
-            rtol=1e-07)
+        np.testing.assert_allclose(np.array([12.66995166052, -7.315, 0.0]),
+                                   self.testposcar.cell_vecs[0],
+                                   rtol=1e-07)
 
     def test_tune_scaling_factor_withCartesian(self):
         self.testposcar.to_cartesian()
         self.testposcar.tune_scaling_factor(1.0)
-        np.testing.assert_allclose(
-            np.array([12.66995166052, -7.315, 0.0]),
-            self.testposcar.cell_vecs[0],
-            rtol=1e-07)
-        np.testing.assert_allclose(
-            np.array([12.66995166052, 0.0, 7.5000000001850005]),
-            self.testposcar.positions[0],
-            rtol=1e-06)
-        np.testing.assert_allclose(
-            np.array([8.4466344319, -1.4000000014, 7.500000000185]),
-            self.testposcar.positions[6],
-            rtol=1e-06)
+        np.testing.assert_allclose(np.array([12.66995166052, -7.315, 0.0]),
+                                   self.testposcar.cell_vecs[0],
+                                   rtol=1e-07)
+        np.testing.assert_allclose(np.array(
+            [12.66995166052, 0.0, 7.5000000001850005]),
+                                   self.testposcar.positions[0],
+                                   rtol=1e-06)
+        np.testing.assert_allclose(np.array(
+            [8.4466344319, -1.4000000014, 7.500000000185]),
+                                   self.testposcar.positions[6],
+                                   rtol=1e-06)
 
     def test_to_cartesian(self):
         self.testposcar.to_cartesian()
-        np.testing.assert_allclose(
-            np.array([0.494477, -0.047847, 0.512645]),
-            self.testposcar.positions[5],
-            rtol=1e-05)
+        np.testing.assert_allclose(np.array([0.494477, -0.047847, 0.512645]),
+                                   self.testposcar.positions[5],
+                                   rtol=1e-05)
         self.testposcar.to_direct()
 
     def test_to_direct(self):
@@ -146,12 +142,12 @@ class TestPOSCAR(unittest.TestCase):
     def test_poscar_supercell1(self):
         '''Tests for poscar supercell method'''
         supercell = self.testposcar.supercell(3, 2, 1)
-        np.testing.assert_allclose(
-            np.array([2.59807621, -1.5, 0.]), supercell.cell_vecs[0])
-        np.testing.assert_allclose(
-            np.array([1.73205081, 1., 0.]), supercell.cell_vecs[1])
-        np.testing.assert_allclose(
-            np.array([0.0, 0.0, 1.02529049]), supercell.cell_vecs[2])
+        np.testing.assert_allclose(np.array([2.59807621, -1.5, 0.]),
+                                   supercell.cell_vecs[0])
+        np.testing.assert_allclose(np.array([1.73205081, 1., 0.]),
+                                   supercell.cell_vecs[1])
+        np.testing.assert_allclose(np.array([0.0, 0.0, 1.02529049]),
+                                   supercell.cell_vecs[2])
         self.assertEqual('NiC4S4', supercell.system_name)
         self.assertEqual(['Ni', 'C', 'S'], supercell.iontypes)
         self.assertEqual([18, 72, 72], supercell.ionnums)

@@ -82,7 +82,7 @@ def check_position_axes(chgcar1, chgcar2):
     pos1 = np.array(chgcar1.poscar.positions)
     pos2 = np.array(chgcar2.poscar.positions)
     assert np.allclose(cell1, cell2), "UnitCells are inconsistent.  Abort."
-    assert np.allclose(pos1, pos2), "Atom positions are inconsistent!!!　Abort."
+    assert np.allclose(pos1, pos2), "Atom positions are inconsistent!!! Abort."
     return True
 
 
