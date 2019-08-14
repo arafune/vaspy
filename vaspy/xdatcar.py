@@ -53,8 +53,8 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
         self.cell_vecs[0] = np.array([float(x) for x in next(thefile).split()])
         self.cell_vecs[1] = np.array([float(x) for x in next(thefile).split()])
         self.cell_vecs[2] = np.array([float(x) for x in next(thefile).split()])
-        self.iontypes = next(thefile).split()
-        self.ionnums = [int(x) for x in next(thefile).split()]
+        self.atomtypes = next(thefile).split()
+        self.atomnums = [int(x) for x in next(thefile).split()]
         positions = []
         for line in thefile:
             if 'Direct configuration=' in line:
@@ -81,11 +81,11 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
             tmp += '      {:#.6f}   {:#.6f}    {:6f}\n'.format(
                 self.cell_vecs[i][0], self.cell_vecs[i][1],
                 self.cell_vecs[i][2])
-        for element in self.iontypes:
+        for element in self.atomtypes:
             tmp += '    {}'.format(element)
         tmp += '\n'
-        for ionnum in self.ionnums:
-            tmp += '    {}'.format(ionnum)
+        for atomnum in self.atomnums:
+            tmp += '    {}'.format(atomnum)
         tmp += '\n'
         for frame_index, positions in enumerate(self.configurations):
             tmp += 'Direct configuration=    {}\n'.format(frame_index + 1)

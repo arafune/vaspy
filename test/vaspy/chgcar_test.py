@@ -27,8 +27,8 @@ class TestCHGCAR(object):
         np.testing.assert_array_almost_equal(
             [9.33086564, 7.45015796, 3.32200981, -0.02888063, -0.83756195],
             add.grid.data[0:5])
-        np.testing.assert_array_equal([1, 1], add.poscar.ionnums)
-        np.testing.assert_array_equal(['Co', 'Co'], add.poscar.iontypes)
+        np.testing.assert_array_equal([1, 1], add.poscar.atomnums)
+        np.testing.assert_array_equal(['Co', 'Co'], add.poscar.atomtypes)
 
     @with_setup(setup=setup)
     def test_CHGmerge(self):
@@ -37,8 +37,8 @@ class TestCHGCAR(object):
         np.testing.assert_array_almost_equal(
             [9.33086564, 7.45015796, 3.32200981, -0.02888063, -0.83756195],
             merge.grid.data[0:5])
-        np.testing.assert_array_equal([1], merge.poscar.ionnums)
-        np.testing.assert_array_equal(['Co'], merge.poscar.iontypes)
+        np.testing.assert_array_equal([1], merge.poscar.atomnums)
+        np.testing.assert_array_equal(['Co'], merge.poscar.atomtypes)
 
     @with_setup(setup=setup)
     def testCHGdiff(self):
@@ -47,8 +47,8 @@ class TestCHGCAR(object):
         np.testing.assert_array_almost_equal(
             [-4.41988373, -3.52902219, -1.57358359, 0.0136803, 0.39673987],
             sub.grid.data[0:5])
-        np.testing.assert_array_equal([1], sub.poscar.ionnums)
-        np.testing.assert_array_equal(['Co'], sub.poscar.iontypes)
+        np.testing.assert_array_equal([1], sub.poscar.atomnums)
+        np.testing.assert_array_equal(['Co'], sub.poscar.atomtypes)
 
     @with_setup(setup=setup)
     def test_mag_spin(self):

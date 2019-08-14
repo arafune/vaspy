@@ -10,8 +10,8 @@ import vaspy.poscar
 class TestPOSCAR_Head(object):
     def setup(self):
         self.poscar_head = vaspy.poscar.POSCAR_HEAD()
-        self.poscar_head.iontypes = ['Ag', 'Si']
-        self.poscar_head.ionnums = [3, 5]
+        self.poscar_head.atomtypes = ['Ag', 'Si']
+        self.poscar_head.atomnums = [3, 5]
         self.poscar_head.system_name = 'testPOSCAR'
 
     @with_setup(setup=setup)

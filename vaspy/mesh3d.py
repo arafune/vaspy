@@ -388,11 +388,12 @@ class Grid3D(object):
         mesharray = self.data.reshape(self.nframe, self.size)
         for tmp in mesharray:
             output = []
-            outputstr += '\n  {0}  {1}  {2}\n'.format(
-                self.shape[0], self.shape[1], self.shape[2])
+            outputstr += '\n  {0}  {1}  {2}\n'.format(self.shape[0],
+                                                      self.shape[1],
+                                                      self.shape[2])
             for array in tools.each_slice(tmp, 5):
-                output.append(''.join(
-                    '  {0:18.11E}'.format(i) for i in array if i is not None))
+                output.append(''.join('  {0:18.11E}'.format(i) for i in array
+                                      if i is not None))
             outputstr += '\n'.join(output)
         return outputstr + '\n'
 
@@ -413,16 +414,17 @@ class Grid3D(object):
 
         """
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size:(frame_i + 1)
-                         * self.size].reshape((self.shape[2],
-                                               self.shape[1],
-                                               self.shape[0]))
+        data = self.data[frame_i * self.size:(frame_i + 1) *
+                         self.size].reshape(
+                             (self.shape[2], self.shape[1], self.shape[0]))
         if axis_name == 'X':
-            data = np.average(
-                np.average(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
+            data = np.average(np.average(np.transpose(data, (2, 0, 1)),
+                                         axis=2),
+                              axis=1)
         elif axis_name == 'Y':
-            data = np.average(
-                np.average(np.transpose(data, (1, 0, 2)), axis=2), axis=1)
+            data = np.average(np.average(np.transpose(data, (1, 0, 2)),
+                                         axis=2),
+                              axis=1)
         elif axis_name == 'Z':
             data = np.average(np.average(data, axis=2), axis=1)
         else:
@@ -446,16 +448,15 @@ class Grid3D(object):
 
         """
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size:(frame_i + 1)
-                         * self.size].reshape((self.shape[2],
-                                               self.shape[1],
-                                               self.shape[0]))
+        data = self.data[frame_i * self.size:(frame_i + 1) *
+                         self.size].reshape(
+                             (self.shape[2], self.shape[1], self.shape[0]))
         if axis_name == 'X':
-            data = np.min(
-                np.min(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
+            data = np.min(np.min(np.transpose(data, (2, 0, 1)), axis=2),
+                          axis=1)
         elif axis_name == 'Y':
-            data = np.min(
-                np.min(np.transpose(data, (1, 0, 2)), axis=2), axis=1)
+            data = np.min(np.min(np.transpose(data, (1, 0, 2)), axis=2),
+                          axis=1)
         elif axis_name == 'Z':
             data = np.min(np.min(data, axis=2), axis=1)
         else:
@@ -479,16 +480,15 @@ class Grid3D(object):
 
         """
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size:(frame_i + 1)
-                         * self.size].reshape((self.shape[2],
-                                               self.shape[1],
-                                               self.shape[0]))
+        data = self.data[frame_i * self.size:(frame_i + 1) *
+                         self.size].reshape(
+                             (self.shape[2], self.shape[1], self.shape[0]))
         if axis_name == 'X':
-            data = np.max(
-                np.max(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
+            data = np.max(np.max(np.transpose(data, (2, 0, 1)), axis=2),
+                          axis=1)
         elif axis_name == 'Y':
-            data = np.max(
-                np.max(np.transpose(data, (1, 0, 2)), axis=2), axis=1)
+            data = np.max(np.max(np.transpose(data, (1, 0, 2)), axis=2),
+                          axis=1)
         elif axis_name == 'Z':
             data = np.max(np.max(data, axis=2), axis=1)
         else:
@@ -512,16 +512,15 @@ class Grid3D(object):
 
         """
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size:(frame_i + 1)
-                         * self.size].reshape((self.shape[2],
-                                               self.shape[1],
-                                               self.shape[0]))
+        data = self.data[frame_i * self.size:(frame_i + 1) *
+                         self.size].reshape(
+                             (self.shape[2], self.shape[1], self.shape[0]))
         if axis_name == 'X':
-            data = np.median(
-                np.median(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
+            data = np.median(np.median(np.transpose(data, (2, 0, 1)), axis=2),
+                             axis=1)
         elif axis_name == 'Y':
-            data = np.median(
-                np.median(np.transpose(data, (1, 0, 2)), axis=2), axis=1)
+            data = np.median(np.median(np.transpose(data, (1, 0, 2)), axis=2),
+                             axis=1)
         elif axis_name == 'Z':
             data = np.median(np.median(data, axis=2), axis=1)
         else:

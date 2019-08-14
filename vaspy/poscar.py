@@ -64,10 +64,10 @@ class POSCAR_HEAD(object):
        system name
     scaling_factor: float
        scaling factor
-    iontypes : list
+    atomtypes : list
        list of ion name
-    ionnums : list
-       list of number of ions. Corresponding to `iontypes`
+    atomnums : list
+       list of number of atoms. Corresponding to `atomtypes`
 
     """
 
@@ -76,8 +76,8 @@ class POSCAR_HEAD(object):
         self.__cell_vecs = np.array([[0., 0., 0.], [0., 0., 0.], [0., 0., 0.]])
         self.system_name = ""
         self.scaling_factor = 0.
-        self.iontypes = []
-        self.ionnums = []
+        self.atomtypes = []
+        self.atomnums = []
         self.__atom_identifer = []
 
     @property
@@ -125,15 +125,15 @@ class POSCAR_HEAD(object):
         """Return list style of "atom_identifer" (e.g.  "#0:Ag1")."""
         # self.__atom_identifer = []
         # ii = 1
-        # for elm, n in zip(self.iontypes, self.ionnums):
+        # for elm, n in zip(self.atomtypes, self.atomnums):
         #     self.__atom_identifer.extend(
         #         '#{0}:{1}{2}'.format(ii + m, elm, m + 1) for m in range(n))
         #     ii += n
         # return self.__atom_identifer
         self.__atom_identifer = []
         atomnames = []
-        for elm, ionnums in zip(self.iontypes, self.ionnums):
-            for j in range(1, ionnums + 1):
+        for elm, atomnums in zip(self.atomtypes, self.atomnums):
+            for j in range(1, atomnums + 1):
                 elem_num = elm + str(j)
                 if elem_num not in atomnames:
                     atomnames.append(elem_num)
@@ -250,14 +250,14 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         self.cell_vecs[0] = [float(x) for x in next(poscar).split()]
         self.cell_vecs[1] = [float(x) for x in next(poscar).split()]
         self.cell_vecs[2] = [float(x) for x in next(poscar).split()]
-        self.iontypes = next(poscar).split()
+        self.atomtypes = next(poscar).split()
         # parse POSCAR evenif the element names are not set.
         # At present, the String representation number
         #   are used for the  dummy name.
-        if self.iontypes[0].isdigit():
-            self.ionnums = [int(i) for i in self.iontypes]
+        if self.atomtypes[0].isdigit():
+            self.atomnums = [int(i) for i in self.atomtypes]
         else:
-            self.ionnums = [int(x) for x in next(poscar).split()]
+            self.atomnums = [int(x) for x in next(poscar).split()]
         line7 = next(poscar)
         if re.search(r'^[\s]*Selective\b', line7, re.I):
             self.selective = True
@@ -299,7 +299,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
         """
         if to_site is None:
-            to_site = sum(self.ionnums)
+            to_site = sum(self.atomnums)
         if axis == 'x' or axis == 'X' or axis == 0:
             axis = 0
         elif axis == 'y' or axis == 'Y' or axis == 1:
@@ -344,7 +344,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         sposcar.cell_vecs[0] = sposcar.cell_vecs[0] * n_x
         sposcar.cell_vecs[1] = sposcar.cell_vecs[1] * n_y
         sposcar.cell_vecs[2] = sposcar.cell_vecs[2] * n_z
-        sposcar.ionnums = [i * n_x * n_y * n_z for i in sposcar.ionnums]
+        sposcar.atomnums = [i * n_x * n_y * n_z for i in sposcar.atomnums]
         spositions = sposcar.positions
         sposcar.positions = []
         spositions = [
@@ -403,14 +403,14 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         candidates27 = []
         if self.is_cartesian():
             for i, j, k in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
-                candidates27.append(i * self.cell_vecs[0]
-                                    + j * self.cell_vecs[1]
-                                    + k * self.cell_vecs[2] + position)
+                candidates27.append(i * self.cell_vecs[0] +
+                                    j * self.cell_vecs[1] +
+                                    k * self.cell_vecs[2] + position)
         else:
             for i, j, k in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
-                candidates27.append(i * np.array([1., 0., 0.])
-                                    + j * np.array([0., 1., 0.])
-                                    + k * np.array([0., 0., 1.]) + position)
+                candidates27.append(i * np.array([1., 0., 0.]) +
+                                    j * np.array([0., 1., 0.]) +
+                                    k * np.array([0., 0., 1.]) + position)
         return candidates27
 
     def rotate_atom(self, site, axis_name, theta_deg, center):
@@ -443,8 +443,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.to_cartesian()
         position = self.positions[site]
         position -= center / self.scaling_factor
-        position = globals()["rotate_" + axis_name.lower()
-                             ](theta_deg).dot(position)
+        position = globals()["rotate_" +
+                             axis_name.lower()](theta_deg).dot(position)
         position += center / self.scaling_factor
         self.positions[site] = position
 
@@ -534,8 +534,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             raise ValueError('scaling factor is different.')
         if np.linalg.norm(dest_poscar.cell_vecs - other.cell_vecs) != 0:
             raise ValueError('lattice vectors (cell matrix) are different.')
-        dest_poscar.iontypes.extend(other.iontypes)
-        dest_poscar.ionnums.extend(other.ionnums)
+        dest_poscar.atomtypes.extend(other.atomtypes)
+        dest_poscar.atomnums.extend(other.atomnums)
         dest_poscar.positions.extend(other.positions)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
         return dest_poscar
@@ -569,8 +569,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         original_scaling_factor = dest_poscar.scaling_factor
         other_poscar.tune_scaling_factor(original_scaling_factor)
         other_poscar.to_cartesian()
-        dest_poscar.iontypes.extend(other.iontypes)
-        dest_poscar.ionnums.extend(other.ionnums)
+        dest_poscar.atomtypes.extend(other.atomtypes)
+        dest_poscar.atomnums.extend(other.atomnums)
         dest_poscar.positions.extend(other.positions)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
         if original_is_direct:
@@ -592,9 +592,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         out_list.append(self.cell_vecs[0])
         out_list.append(self.cell_vecs[1])
         out_list.append(self.cell_vecs[2])
-        if not self.iontypes[0].isdigit():
-            out_list.append(self.iontypes)
-        out_list.append(self.ionnums)
+        if not self.atomtypes[0].isdigit():
+            out_list.append(self.atomtypes)
+        out_list.append(self.atomnums)
         if self.selective:
             out_list.append("Selective Dynamics")
         out_list.append(self.coordinate_type)
@@ -615,23 +615,22 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         tmp = []
         tmp.append(self.system_name)
         tmp.append(str(self.scaling_factor))
-        tmp.append(''.join(
-            '   {0:20.17f}'.format(i) for i in self.cell_vecs[0]))
-        tmp.append(''.join(
-            '   {0:20.17f}'.format(i) for i in self.cell_vecs[1]))
-        tmp.append(''.join(
-            '   {0:20.17f}'.format(i) for i in self.cell_vecs[2]))
-        if not self.iontypes[0].isdigit():
-            tmp.append(' ' + ' '.join(self.iontypes))
-        tmp.append(' ' + ' '.join(str(i) for i in self.ionnums))
+        tmp.append(''.join('   {0:20.17f}'.format(i)
+                           for i in self.cell_vecs[0]))
+        tmp.append(''.join('   {0:20.17f}'.format(i)
+                           for i in self.cell_vecs[1]))
+        tmp.append(''.join('   {0:20.17f}'.format(i)
+                           for i in self.cell_vecs[2]))
+        if not self.atomtypes[0].isdigit():
+            tmp.append(' ' + ' '.join(self.atomtypes))
+        tmp.append(' ' + ' '.join(str(i) for i in self.atomnums))
         if self.selective:
             tmp.append('Selective Dynamics')
         tmp.append(self.coordinate_type)
-        for pos, t_or_f, atom in tools.ZIPLONG(
-                self.positions,
-                self.coordinate_changeflags,
-                self.atom_identifer,
-                fillvalue=''):
+        for pos, t_or_f, atom in tools.ZIPLONG(self.positions,
+                                               self.coordinate_changeflags,
+                                               self.atom_identifer,
+                                               fillvalue=''):
             tmp.append(' '.join('  {0:20.17f}'.format(i)
                                 for i in pos) + ' ' + t_or_f + ' ' + atom)
         return '\n'.join(tmp) + '\n'
@@ -650,12 +649,12 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         tmp.append(self.system_name)
         tmp.append('  {0:.14f}'.format(self.scaling_factor))
         for k in range(3):
-            tmp.append(''.join(
-                '{0:12.6f}'.format(i) for i in self.cell_vecs[k]))
-        if not self.iontypes[0].isdigit():
-            tmp.append(' '
-                       + "".join(['{0:>5}'.format(i) for i in self.iontypes]))
-        tmp.append(''.join(['{0:>6}'.format(i) for i in self.ionnums]))
+            tmp.append(''.join('{0:12.6f}'.format(i)
+                               for i in self.cell_vecs[k]))
+        if not self.atomtypes[0].isdigit():
+            tmp.append(' ' +
+                       "".join(['{0:>5}'.format(i) for i in self.atomtypes]))
+        tmp.append(''.join(['{0:>6}'.format(i) for i in self.atomnums]))
         tmp.append(self.coordinate_type)
         for pos in self.positions:
             tmp.append(''.join('{0:10.6f}'.format(i) for i in pos))
@@ -779,14 +778,14 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if self.is_cartesian():
             vector = _vectorize(vector)
             for i in atomlist:
-                self.positions[i] = (
-                    self.positions[i] + vector / self.scaling_factor)
+                self.positions[i] = (self.positions[i] +
+                                     vector / self.scaling_factor)
         else:
             vector = _vectorize(vector)
             self.to_cartesian()
             for i in atomlist:
-                self.positions[i] = (
-                    self.positions[i] + vector / self.scaling_factor)
+                self.positions[i] = (self.positions[i] +
+                                     vector / self.scaling_factor)
             self.to_direct()
         return self.positions
 
@@ -814,7 +813,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
              translational vector
 
         """
-        atomrange = list(range(sum(self.ionnums)))
+        atomrange = list(range(sum(self.atomnums)))
         self.translate(vector, atomrange)
 
     def save(self, filename):

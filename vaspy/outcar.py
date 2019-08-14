@@ -18,9 +18,9 @@ class OUTCAR(object):  # Version safety
     -------------
     natom: int
         number of atom
-    iontypes: list
+    atomtypes: list
         list of ion name
-    ionnums: list
+    atomnums: list
         list of number of ions
     kvecs: list
         kvector
@@ -49,8 +49,8 @@ class OUTCAR(object):  # Version safety
     def __init__(self, filename=None):
         """Initialize."""
         self.natom = 0
-        self.iontypes = []
-        self.ionnums = []
+        self.atomtypes = []
+        self.atomnums = []
         self.posforce = []
         self.posforce_title = []
         self.atom_names = []
@@ -76,7 +76,7 @@ class OUTCAR(object):  # Version safety
     def set_atom_names(self):
         """Build atom_names (the list of atomname_with_index)."""
         self.atom_names = []
-        for elm, ionnum in zip(self.iontypes, self.ionnums):
+        for elm, ionnum in zip(self.atomtypes, self.atomnums):
             for j in range(1, ionnum + 1):
                 tmp = elm + str(j)
                 if tmp not in self.atom_names:
@@ -160,9 +160,9 @@ class OUTCAR(object):  # Version safety
                 if "number of dos" in line:
                     self.natom = int(line.split()[-1])
                 elif "TITEL  =" in line:
-                    self.iontypes.append(line.split()[3])
+                    self.atomtypes.append(line.split()[3])
                 elif "ions per type " in line:
-                    self.ionnums = [int(x) for x in line.split()[4:]]
+                    self.atomnums = [int(x) for x in line.split()[4:]]
                 elif "POSITION" in line and "TOTAL-FORCE" in line:
                     section.append("force")
                 elif "E-fermi" in line:
@@ -189,7 +189,7 @@ class OUTCAR(object):  # Version safety
                     pass
         self.atom_identifer = [
             name + ":#" + str(index + 1) for (index, name) in enumerate([
-                elm + str(j) for (elm, n) in zip(self.iontypes, self.ionnums)
+                elm + str(j) for (elm, n) in zip(self.atomtypes, self.atomnums)
                 for j in range(1,
                                int(n) + 1)
             ])
