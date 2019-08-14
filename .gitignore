@@ -12,3 +12,6 @@ GCOEFF.txt
 WAVECAR
 Results.txt
 WaveTrans
+.coverage
+test/vaspy/htmlcov
+nosetests.xml
