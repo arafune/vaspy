@@ -13,7 +13,7 @@ __all__ = [
     'wavecar', 'mesh3d', 'const', 'vsim_asc', 'tools'
 ]
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 
 
 def load(filename, mode=None, additional=None):
