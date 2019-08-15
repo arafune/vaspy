@@ -42,19 +42,6 @@ def each_slice(iterable, n, fillvalue=None):
     return ZIPLONG(*args, fillvalue=fillvalue)  # Version safety
 
 
-def removeall(L, value):
-    """Remove all *value* in [list] L.
-
-    Note
-    ----
-
-    Currently, this function is not used. (Obsolute?)
-    """
-    while L.count(value):
-        L.remove(value)
-    return L
-
-
 def flatten(nested, target=Iterable, ignore=FLATTEN_IGNORE):
     """Flatten iterabable object.
 
@@ -90,12 +77,12 @@ _RERANGE = re.compile(r'(\d+)-(\d+)')
 _RESINGLE = re.compile(r'\d+')
 
 
-def parse_Atomselection(L):
+def parse_Atomselection(input_str):
     """Return list of ordered "String" represents the number.
 
     Parameters
     ----------
-    L: str
+    input_str: str
         range of the atoms. the numbers deliminated by "-" or ","
 
     Returns
@@ -110,7 +97,7 @@ def parse_Atomselection(L):
     ['1', '10', '11', '12', '13', '14', '15', '2', '3', '4', '5', '8', '9']
 
     """
-    array = L.split(',')
+    array = input_str.split(',')
     output = set()
     for each in array:
         if re.search(_RERANGE, each):
@@ -122,14 +109,14 @@ def parse_Atomselection(L):
     return sorted(output)
 
 
-def parse_AtomselectionNum(L):
+def parse_AtomselectionNum(input_str):
     """Very similar with parse_Atomselection but returns the array of the
-    number not array of the string.
+    sorted number not array of the string.
 
     Parameters
     ------------
 
-    L: str
+    input_str: str
         range of the atoms. the numbers deliminated by "-" or ","
 
     Returns
@@ -145,7 +132,7 @@ def parse_AtomselectionNum(L):
     [1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15]
 
     """
-    return sorted(int(i) for i in parse_Atomselection(L))
+    return sorted(int(i) for i in parse_Atomselection(input_str))
 
 
 def atomtypes_atomnums_to_atoms(atomtypes, atomnums):
