@@ -4,17 +4,25 @@
 
 import argparse
 import functools as ft
-import logging
 import re
 from itertools import chain
+from logging import DEBUG, Formatter, StreamHandler, getLogger
 
 import vaspy.procar as procar
 from vaspy import tools
 from vaspy.outcar import OUTCAR
 
-logging.basicConfig(level=logging.DEBUG,
-                    format=' %(asctime)s - %(levelname)s -%(message)s')
-logging.disable(logging.WARN)
+# logger
+LOGLEVEL = DEBUG
+logger = getLogger(__name__)
+fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
+formatter = Formatter(fmt)
+handler = StreamHandler()
+handler.setLevel(LOGLEVEL)
+logger.setLevel(LOGLEVEL)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = True
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('--outcar',
@@ -56,11 +64,13 @@ s, p, pxpy, pz, d, dxy, dyz, dz2, dxz, dx2
 parser.add_argument('procar', metavar='PROCAR_file', help='''PROCAR file''')
 
 args = parser.parse_args()
-
+logger.debug("Debugging...")
 if args.outcar is not None:
     outcar = OUTCAR(args.outcar)
     fermi = outcar.fermi
+    logger.debug("Fermi: {}".format(fermi))
     recvec = [[v * 6.283185307179586 for v in recv] for recv in outcar.recvec]
+    logger.debug("recvec: {}".format(recvec))
 elif args.fermi is not None:
     fermi = args.fermi
 else:
@@ -68,6 +78,7 @@ else:
 procar = procar.PROCAR(args.procar)
 procar.fermi_correction(fermi)
 if recvec:
+    logger.debug("procar.kvecs: {}".format(procar.kvecs))
     procar.to_physical_kvector(recvec)
 #
 assert len(args.atomindex) == len(args.orbital) == len(args.atomsetname), \
@@ -80,24 +91,24 @@ flat_orbitals = tuple(chain.from_iterable(args.orbital))
 # internaly begins with "0".  (This is because VASP is fortran program !)
 siteindex = [[i - 1 for i in internal] for internal in args.atomindex]
 #
-logging.debug('siteindex are:')
-logging.debug(siteindex)
-logging.debug('sitenames are:')
-logging.debug(sitenames)
-logging.debug('orbitals are:')
-logging.debug(args.orbital)
-logging.debug('orbitals flat:')
-logging.debug(flat_orbitals)
+logger.debug('siteindex are:')
+logger.debug(siteindex)
+logger.debug('sitenames are:')
+logger.debug(sitenames)
+logger.debug('orbitals are:')
+logger.debug(args.orbital)
+logger.debug('orbitals flat:')
+logger.debug(flat_orbitals)
 #
 for sites, name in zip(siteindex, sitenames):
     procar.append_sumsite(tuple(sites), name)
 for orb in tuple(set(flat_orbitals)):
     procar.append_sumorbital(procar.orb_index(orb), orb)
 #
-logging.debug("label['site'] is")
-logging.debug(procar.label['site'])
-logging.debug("label['orbital'] is")
-logging.debug(procar.label['oribital'])
+logger.debug("label['site'] is")
+logger.debug(procar.label['site'])
+logger.debug("label['orbital'] is")
+logger.debug(procar.label['oribital'])
 #
 site_indexes = []
 orbtal_indexes_sets = []
@@ -112,10 +123,10 @@ for orbitals in args.orbital:
 site_indexes = tuple(site_indexes)
 orbital_indexes_sets = tuple(orbtal_indexes_sets)
 #
-logging.debug('site_indexes:')
-logging.debug(site_indexes)
-logging.debug('orbital_indexes_sets:')
-logging.debug(orbital_indexes_sets)
+logger.debug('site_indexes:')
+logger.debug(site_indexes)
+logger.debug('orbital_indexes_sets:')
+logger.debug(orbital_indexes_sets)
 #
 print(
     procar.text_sheet(site_indexes=site_indexes,

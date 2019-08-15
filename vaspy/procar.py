@@ -15,11 +15,24 @@ from __future__ import print_function  # Version safety
 
 import csv
 import re
+from logging import DEBUG, Formatter, StreamHandler, getLogger
 
 import numpy as np
 
 from vaspy import eigenval
 from vaspy.tools import open_by_suffix
+
+# logger
+LOGLEVEL = DEBUG
+logger = getLogger(__name__)
+fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
+formatter = Formatter(fmt)
+handler = StreamHandler()
+handler.setLevel(LOGLEVEL)
+logger.setLevel(LOGLEVEL)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = False
 
 
 class ProjectionBand(eigenval.EnergyBand):
