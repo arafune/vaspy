@@ -2,9 +2,7 @@
 
 from __future__ import division, print_function
 
-import bz2
 import csv
-import os
 import sys
 
 import numpy as np
@@ -14,6 +12,7 @@ try:
 except ImportError:
     sys.stderr.write(
         'Install matplotlib, or you cannot use methods relating to draw\n')
+from vaspy.tools import open_by_suffix
 
 
 class EnergyBand(object):
@@ -78,10 +77,9 @@ class EnergyBand(object):
     def kdistances(self):
         """Return kdistances."""
         return np.cumsum(
-            np.linalg.norm(
-                np.concatenate((np.array([[0, 0, 0]]),
-                                np.diff(self.kvecs, axis=0))),
-                axis=1))
+            np.linalg.norm(np.concatenate(
+                (np.array([[0, 0, 0]]), np.diff(self.kvecs, axis=0))),
+                           axis=1))
 
     def fermi_correction(self, fermi):
         """Correct the Fermi level.
@@ -201,10 +199,11 @@ class EnergyBand(object):
            plt.show()
 
         """
-        [plt.plot(
-            self.kdistances, self.energies[spin_i, :, band_i], color=color)
-            for band_i in range(self.energies.shape[2])
-         ]
+        [
+            plt.plot(self.kdistances,
+                     self.energies[spin_i, :, band_i],
+                     color=color) for band_i in range(self.energies.shape[2])
+        ]
         return plt.gca()
 
     def show(self, yrange=None, spin_i=0):  # How to set default value?
@@ -223,10 +222,9 @@ class EnergyBand(object):
 
         """
         for band_i in range(self.energies.shape[2]):
-            plt.plot(
-                self.kdistances,
-                self.energies[spin_i, :, band_i],
-                color='blue')
+            plt.plot(self.kdistances,
+                     self.energies[spin_i, :, band_i],
+                     color='blue')
         if yrange is not None:
             plt.ylim([yrange[0], yrange[1]])
         plt.xlim([self.kdistances[0], self.kdistances[-1]])
@@ -273,44 +271,31 @@ class EIGENVAL(EnergyBand):
         self.natom = 0
         #
         if filename:
-            if os.path.splitext(filename)[1] == '.bz2':
-                try:
-                    self.thefile = bz2.open(filename, mode='rt')
-                except AttributeError:
-                    self.thefile = bz2.BZ2File(filename, mode='r')
-            else:
-                self.thefile = open(filename)
-            self.load_file()
+            self.load_file(open_by_suffix(filename))
 
-    def load_file(self):
+    def load_file(self, thefile):
         """Parse EIGENVAL."""
-        self.natom, _, _, self.nspin = [
-            int(i) for i in next(self.thefile).split()
-        ]
+        self.natom, _, _, self.nspin = [int(i) for i in next(thefile).split()]
         if self.nspin == 2:
             self.label['energy'] = ['Energy_up', 'Energy_down']
         else:
             self.label['energy'] = ['Energy']
-        next(self.thefile)
-        next(self.thefile)
-        next(self.thefile)
-        next(self.thefile)
-        _, self.numk, self.nbands = [
-            int(i) for i in next(self.thefile).split()
-        ]
+        next(thefile)
+        next(thefile)
+        next(thefile)
+        next(thefile)
+        _, self.numk, self.nbands = [int(i) for i in next(thefile).split()]
         self.kvecs = []
         self.energies = []
         for _ in range(self.numk):
             # the first line in the sigleset begins with the blank
-            next(self.thefile)
-            self.kvecs.append(
-                [float(i) for i in next(self.thefile).split()[0:3]])
+            next(thefile)
+            self.kvecs.append([float(i) for i in next(thefile).split()[0:3]])
             for _ in range(self.nbands):
                 self.energies.append([
-                    float(i)
-                    for i in next(self.thefile).split()[1:self.nspin + 1]
+                    float(i) for i in next(thefile).split()[1:self.nspin + 1]
                 ])
         self.kvecs = np.array(self.kvecs)
         self.energies = np.array(self.energies).T.reshape(
             self.nspin, self.numk, self.nbands)
-        self.thefile.close()
+        thefile.close()

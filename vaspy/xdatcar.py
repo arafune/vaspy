@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """This module provide XDATCAR class."""
 
-import bz2
-import os
-
 import numpy as np
 
 import vaspy.poscar
+from vaspy.tools import open_by_suffix
 
 
 class XDATCAR(vaspy.poscar.POSCAR_HEAD):
@@ -30,14 +28,7 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
         super(XDATCAR, self).__init__()
         self.configurations = []
         if filename:
-            if os.path.splitext(filename)[1] == ".bz2":
-                try:
-                    thefile = bz2.open(filename, mode='rt')
-                except AttributeError:
-                    thefile = bz2.BZ2File(filename, mode='r')
-            else:
-                thefile = open(filename)
-            self.load_file(thefile)
+            self.load_file(open_by_suffix(filename))
 
     def load_file(self, thefile):
         """Parse PROCAR.
@@ -65,6 +56,7 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
                 position = np.array([float(x) for x in line.strip().split()])
                 positions.append(position)
         self.configurations.append(positions)
+        thefile.close()
 
     def __str__(self):
         """Return as str.

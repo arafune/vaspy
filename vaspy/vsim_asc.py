@@ -13,15 +13,14 @@ This module generates
 
 The first is absolutely required.
  """
-import bz2
 import itertools
 import logging
-import os.path
 from logging import Formatter, StreamHandler, getLogger
 
 import numpy as np
 
 import vaspy.const as const
+from vaspy.tools import open_by_suffix
 
 logger = getLogger("LogTest")
 logger.setLevel(logging.DEBUG)
@@ -62,14 +61,7 @@ class VSIM_ASC(object):
         self.freqs = []
         #
         if filename:
-            if os.path.splitext(filename)[1] == '.bz2':
-                try:
-                    thefile = bz2.open(filename, mode='rt')
-                except AttributeError:
-                    thefile = bz2.BZ2File(filename, mode='r')
-            else:
-                thefile = open(filename)
-            self.load_file(thefile)
+            self.load_file(open_by_suffix(filename))
 
     def load_file(self, thefile):
         """Parse vsim.ascii.
@@ -124,6 +116,7 @@ class VSIM_ASC(object):
         self.d_vectors = np.array(self.d_vectors).reshape(
             n_phonons, len(self.atoms), 3)
         self.freqs = np.array(self.freqs)
+        thefile.close()
 
     def build_phono_motion(self,
                            mode=0,

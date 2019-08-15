@@ -5,17 +5,9 @@ translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 """
 from __future__ import division, print_function  # Version safety
 
-import bz2
 import copy
-import os
-import sys
-
-try:
-    from vaspy import mesh3d
-except ImportError:
-    MYPATH = os.readlink(__file__) if os.path.islink(__file__) else __file__
-    sys.path.append(os.path.dirname(os.path.abspath(MYPATH)))
-    import mesh3d
+from vaspy import mesh3d
+from vaspy.tools import open_by_suffix
 
 
 class CHGCAR(mesh3d.VASPGrid):
@@ -56,14 +48,7 @@ class CHGCAR(mesh3d.VASPGrid):
         super(CHGCAR, self).__init__(None)
         self.spin = 1
         if filename:
-            if os.path.splitext(filename)[1] == '.bz2':
-                try:
-                    thefile = bz2.open(filename, mode='rt')
-                except AttributeError:
-                    thefile = bz2.BZ2File(filename, mode='r')
-            else:
-                thefile = open(filename)
-            self.load_file(thefile, pickleddata)
+            self.load_file(open_by_suffix(filename), pickleddata)
 
     def load_file(self, thefile, pickleddata=None):
         """Parse CHGCAR file to construct CHGCAR object.
@@ -83,6 +68,7 @@ class CHGCAR(mesh3d.VASPGrid):
             self.spin = ["mT", "mX", "mY", "mZ"]
         else:
             raise RuntimeError("CHGCAR is correct?")
+        thefile.close()
 
     def magnetization(self, direction=None):
         """Return CHGCAR for magnetization.

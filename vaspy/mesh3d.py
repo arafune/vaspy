@@ -6,13 +6,13 @@ That is this is class VASPGRID is the parent class of CHGCAR,
 
 from __future__ import division, print_function
 
-import bz2
 import copy
 import os
 
 import numpy as np
 
 from vaspy import poscar, tools
+from vaspy.tools import open_by_suffix
 
 
 class VASPGrid(object):
@@ -59,14 +59,7 @@ class VASPGrid(object):
         self.grid = Grid3D()
         self.additional = []
         if filename:
-            if os.path.splitext(filename)[1] == '.bz2':
-                try:
-                    thefile = bz2.open(filename, mode='rt')
-                except AttributeError:
-                    thefile = bz2.BZ2File(filename, mode='r')
-            else:
-                thefile = open(filename)
-            self.load_file(thefile, pickleddata)
+            self.load_file(open_by_suffix(filename), pickleddata)
 
     def load_file(self, thefile, pickleddata=None):
         """Construct the object from the file.

@@ -8,7 +8,9 @@ from __future__ import division, print_function  # Version safety
 
 import itertools as it
 import re
+import os
 from collections import Iterable
+import bz2
 
 # Version safety
 ZIPLONG = it.izip_longest if hasattr(it, 'izip_longest') else it.zip_longest
@@ -17,6 +19,18 @@ if not hasattr(__builtins__, 'basestring'):  # Version safety
     FLATTEN_IGNORE = (dict, str, bytes, bytearray)
 else:
     FLATTEN_IGNORE = (dict, basestring)
+
+
+def open_by_suffix(filename):
+    """Open file."""
+    if os.path.splitext(filename)[1] == '.bz2':
+        try:
+            thefile = bz2.open(filename, mode='rt')
+        except AttributeError:
+            thefile = bz2.BZ2File(filename, mode='r')
+    else:
+        thefile = open(filename)
+    return thefile
 
 
 def each_slice(iterable, n, fillvalue=None):
@@ -165,23 +179,21 @@ so strings must be given with quotations("" or '').
 Because command line regards spaces as break,
 list argument must be written without any space.
 (i.e. [1,2,3,4,5] is valid, while [1, 2, 3, 4, 5] is invalid.)""")
-    parser.add_argument(
-        'choice',
-        metavar='funcname',
-        nargs='+',
-        choices=available,
-        help="""Demonstrate choosen function.
+    parser.add_argument('choice',
+                        metavar='funcname',
+                        nargs='+',
+                        choices=available,
+                        help="""Demonstrate choosen function.
 *all* shows all function in the choice.
 If -a/--args option is given, get argument(s) from command line.
 Otherwise use prepared argument(s).""")
-    parser.add_argument(
-        '-a',
-        '--args',
-        metavar='values',
-        nargs='+',
-        action='append',
-        dest='values',
-        help="""Use given argument(s) for demonstration.
+    parser.add_argument('-a',
+                        '--args',
+                        metavar='values',
+                        nargs='+',
+                        action='append',
+                        dest='values',
+                        help="""Use given argument(s) for demonstration.
 You have to use this option for each function.
 See epilog for notices for argument notation.""")
     args = parser.parse_args()

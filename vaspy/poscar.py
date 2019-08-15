@@ -38,21 +38,13 @@ The below is an example of POSCAR file::
 
 from __future__ import division, print_function  # Version safety
 
-import bz2
 import copy
 import itertools as it
-import os
 import re
-import sys
 
 import numpy as np
-
-try:
-    from vaspy import tools
-except ImportError:
-    mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
-    sys.path.append(os.path.dirname(os.path.abspath(mypath)))
-    import tools
+from vaspy import tools
+from vaspy.tools import open_by_suffix
 
 
 class POSCAR_HEAD(object):
@@ -223,14 +215,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         super(POSCAR, self).__init__()
         POSCAR_POS.__init__(self)
         if isinstance(arg, str):
-            if os.path.splitext(arg)[1] == '.bz2':
-                try:
-                    thefile = bz2.open(arg, mode='rt')
-                except AttributeError:
-                    thefile = bz2.BZ2File(arg, mode='r')
-            else:
-                thefile = open(arg)
-            poscar = thefile.readlines()
+            poscar = open_by_suffix(arg).readlines()
             self.load_array(poscar)
         if isinstance(arg, (list, tuple)):
             self.load_array(arg)

@@ -42,11 +42,8 @@ From VASP webpage::
 from __future__ import division  # Version safety
 from __future__ import print_function  # Version safety
 
-import bz2
 import copy
-import os
 import sys
-
 import numpy as np
 
 try:
@@ -54,11 +51,7 @@ try:
 except ImportError:
     sys.stderr.write(
         'Install matplotlib, or you cannot use methods relating to draw\n')
-
-# if _sys.version_info[0] >= 3:  # Version safety
-#     from io import StringIO as _StringIO
-# else:
-#     from cStringIO import StringIO as _StringIO
+from vaspy.tools import open_by_suffix
 
 
 class DOSCAR(object):  # Version safety
@@ -91,14 +84,7 @@ class DOSCAR(object):  # Version safety
         self.dos_container = list()
 
         if filename:
-            if os.path.splitext(filename)[1] == '.bz2':
-                try:
-                    thefile = bz2.open(filename, mode='rt')
-                except AttributeError:
-                    thefile = bz2.BZ2File(filename, mode='r')
-            else:
-                thefile = open(filename)
-            self.load_file(thefile)
+            self.load_file(open_by_suffix(filename))
 
     def load_file(self, thefile):
         """Parse DOSCAR file and store it in memory.
@@ -135,6 +121,7 @@ class DOSCAR(object):  # Version safety
                 line = next(thefile)
             except StopIteration:
                 line = ""
+        thefile.close()
 
 
 class DOS(object):  # Version safety

@@ -7,8 +7,7 @@ This module provides OUTCAR class
 from __future__ import print_function  # Version safety
 from __future__ import unicode_literals  # Version safety
 
-import bz2
-import os.path
+from vaspy.tools import open_by_suffix
 
 
 class OUTCAR(object):  # Version safety
@@ -55,7 +54,7 @@ class OUTCAR(object):  # Version safety
         self.posforce_title = []
         self.atom_names = []
         self.fermi = 0.0
-        self.atom_identifer = []
+        self.site_label = []
         self.numk = 0
         self.nkdim = 0
         self.nbands = 0
@@ -64,14 +63,7 @@ class OUTCAR(object):  # Version safety
         self.kvecs = []
         self.weights = []
         if filename:
-            if os.path.splitext(filename)[1] == '.bz2':
-                try:
-                    thefile = bz2.open(filename, mode='rt')
-                except AttributeError:
-                    thefile = bz2.BZ2File(filename, mode='r')
-            else:
-                thefile = open(filename)
-            self.load_file(thefile)
+            self.load_file(open_by_suffix(filename))
 
     def set_atom_names(self):
         """Build atom_names (the list of atomname_with_index)."""
@@ -187,7 +179,7 @@ class OUTCAR(object):  # Version safety
                     section.append('kvec_weight')
                 else:
                     pass
-        self.atom_identifer = [
+        self.site_label = [
             name + ":#" + str(index + 1) for (index, name) in enumerate([
                 elm + str(j) for (elm, n) in zip(self.atomtypes, self.atomnums)
                 for j in range(1,
