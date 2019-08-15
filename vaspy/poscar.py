@@ -78,7 +78,7 @@ class POSCAR_HEAD(object):
         self.scaling_factor = 0.
         self.atomtypes = []
         self.atomnums = []
-        self.__atom_identifer = []
+        self.__site_label = []
 
     @property
     def cell_vecs(self):
@@ -121,16 +121,16 @@ class POSCAR_HEAD(object):
             raise TypeError
 
     @property
-    def atom_identifer(self):
-        """Return list style of "atom_identifer" (e.g.  "#0:Ag1")."""
-        # self.__atom_identifer = []
+    def site_label(self):
+        """Return list style of "site_label" (e.g.  "#0:Ag1")."""
+        # self.__site_label = []
         # ii = 1
         # for elm, n in zip(self.atomtypes, self.atomnums):
-        #     self.__atom_identifer.extend(
+        #     self.__site_label.extend(
         #         '#{0}:{1}{2}'.format(ii + m, elm, m + 1) for m in range(n))
         #     ii += n
-        # return self.__atom_identifer
-        self.__atom_identifer = []
+        # return self.__site_label
+        self.__site_label = []
         atomnames = []
         for elm, atomnums in zip(self.atomtypes, self.atomnums):
             for j in range(1, atomnums + 1):
@@ -143,15 +143,15 @@ class POSCAR_HEAD(object):
                         elem_num = elm + str(j)
                     else:
                         atomnames.append(elem_num)
-        self.__atom_identifer = [
+        self.__site_label = [
             "#" + str(s) + ":" + a
             for s, a in zip(range(0, len(atomnames)), atomnames)
         ]
-        return self.__atom_identifer
+        return self.__site_label
 
-    @atom_identifer.setter
-    def atom_identifer(self, value):
-        self.__atom_identifer = value
+    @site_label.setter
+    def site_label(self, value):
+        self.__site_label = value
 
 
 class POSCAR_POS(object):
@@ -266,7 +266,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.selective = False
             self.coordinate_type = line7
 
-        for line, _ in zip(poscar, self.atom_identifer):
+        for line, _ in zip(poscar, self.site_label):
             # if not elem: break
             tmp = line.split()
             self.positions.append(np.float_(np.array(tmp[:3])))
@@ -363,7 +363,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         for flags in self.coordinate_changeflags:
             for _ in range(n_x * n_y * n_z):
                 sposcar.coordinate_changeflags.append(flags)
-        sposcar.atom_identifer = []
+        sposcar.site_label = []
         if original_is_cartesian:
             sposcar.to_cartesian()
         return sposcar
@@ -600,7 +600,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         out_list.append(self.coordinate_type)
         out_list.append(self.positions)
         out_list.append(self.coordinate_changeflags)
-        out_list.append(self.atom_identifer)
+        out_list.append(self.site_label)
         return out_list
 
     def __str__(self):
@@ -629,7 +629,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         tmp.append(self.coordinate_type)
         for pos, t_or_f, atom in tools.ZIPLONG(self.positions,
                                                self.coordinate_changeflags,
-                                               self.atom_identifer,
+                                               self.site_label,
                                                fillvalue=''):
             tmp.append(' '.join('  {0:20.17f}'.format(i)
                                 for i in pos) + ' ' + t_or_f + ' ' + atom)

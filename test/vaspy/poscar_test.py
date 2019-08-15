@@ -40,7 +40,7 @@ class TestPOSCAR(unittest.TestCase):
             '#13:C11', '#14:C12', '#15:S1', '#16:S2', '#17:S3', '#18:S4',
             '#19:S5', '#20:S6', '#21:S7', '#22:S8', '#23:S9', '#24:S10',
             '#25:S11', '#26:S12'
-        ], self.testposcar.atom_identifer)
+        ], self.testposcar.site_label)
 
     def test_point_in_box(self):
         self.assertFalse(
