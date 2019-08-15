@@ -10,10 +10,8 @@ This program is not a part of vasp but it deeply connects with the vasp.
 from __future__ import division  # Version safety
 from __future__ import print_function
 
-import bz2
-import os.path
-
 import numpy as np
+from vaspy.tools import open_by_suffix
 
 
 class BaderACF(object):
@@ -57,14 +55,7 @@ class BaderACF(object):
         self.vacvol = 0
         self.nelectron = 0
         if filename:
-            if os.path.splitext(filename)[1] == '.bz2':
-                try:
-                    thefile = bz2.open(filename, mode='rt')
-                except AttributeError:
-                    thefile = bz2.BZ2File(filename, mode='r')
-            else:
-                thefile = open(filename)
-            self.parse(thefile)
+            self.parse(open_by_suffix(filename))
 
     def parse(self, thefile):
         """Parse AFC.dat.

@@ -8,7 +8,9 @@ from __future__ import division, print_function  # Version safety
 
 import itertools as it
 import re
+import os
 from collections import Iterable
+import bz2
 
 # Version safety
 ZIPLONG = it.izip_longest if hasattr(it, 'izip_longest') else it.zip_longest
@@ -19,6 +21,18 @@ else:
     FLATTEN_IGNORE = (dict, basestring)
 
 
+def open_by_suffix(filename):
+    """Open file."""
+    if os.path.splitext(filename)[1] == '.bz2':
+        try:
+            thefile = bz2.open(filename, mode='rt')
+        except AttributeError:
+            thefile = bz2.BZ2File(filename, mode='r')
+    else:
+        thefile = open(filename)
+    return thefile
+
+
 def each_slice(iterable, n, fillvalue=None):
     """each_slice(iterable, n[, fillvalue]) => iterator
 
@@ -26,19 +40,6 @@ def each_slice(iterable, n, fillvalue=None):
     """
     args = [iter(iterable)] * n
     return ZIPLONG(*args, fillvalue=fillvalue)  # Version safety
-
-
-def removeall(L, value):
-    """Remove all *value* in [list] L.
-
-    Note
-    ----
-
-    Currently, this function is not used. (Obsolute?)
-    """
-    while L.count(value):
-        L.remove(value)
-    return L
 
 
 def flatten(nested, target=Iterable, ignore=FLATTEN_IGNORE):
@@ -76,12 +77,12 @@ _RERANGE = re.compile(r'(\d+)-(\d+)')
 _RESINGLE = re.compile(r'\d+')
 
 
-def parse_Atomselection(L):
+def atom_selection_to_list(input_str, number=True):
     """Return list of ordered "String" represents the number.
 
     Parameters
     ----------
-    L: str
+    input_str: str
         range of the atoms. the numbers deliminated by "-" or ","
 
     Returns
@@ -92,11 +93,13 @@ def parse_Atomselection(L):
     Example
     --------
 
-    >>> parse_Atomselection("1-5,8,8,9-15,10")
+    >>> atom_selection_to_list("1-5,8,8,9-15,10", False)
     ['1', '10', '11', '12', '13', '14', '15', '2', '3', '4', '5', '8', '9']
+    >>> atom_selection_to_list("1-5,8,8,9-15,10")
+    [1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15]
 
     """
-    array = L.split(',')
+    array = input_str.split(',')
     output = set()
     for each in array:
         if re.search(_RERANGE, each):
@@ -105,33 +108,66 @@ def parse_Atomselection(L):
             output |= set(str(i) for i in range(int(start), int(stop) + 1))
         elif re.search(_RESINGLE, each):
             output.add(each)
+    if number:
+        return sorted(int(i) for i in output)
     return sorted(output)
 
 
-def parse_AtomselectionNum(L):
-    """Very similar with parse_Atomselection but returns the array of the
-    number not array of the string.
+def atomtypes_atomnums_to_atoms(atomtypes, atomnums):
+    """Return list representation for atom in use.
 
     Parameters
     ------------
+    atomtypes: list
+        atom names
+    atomnums: list
+        atom numbers
 
-    L: str
-        range of the atoms. the numbers deliminated by "-" or ","
-
-    Returns
-    ----------
-
-    list
-        ordered int represents the number.
-
-    Example
+    Examples
     --------
-
-    >>> parse_AtomselectionNum("1-5,8,8,9-15,10")
-    [1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15]
+    >>> test_nums = [2, 3, 2, 1]
+    >>> test_elements = ['Si', 'Ag', 'H', 'Si']
+    >>> atomtypes_atomnums_to_atoms(test_elements, test_nums)
+    ('Si', 'Si', 'Ag', 'Ag', 'Ag', 'H', 'H', 'Si')
 
     """
-    return sorted(int(i) for i in parse_Atomselection(L))
+    atoms = []
+    for elem, nums in zip(atomtypes, atomnums):
+        for _ in range(nums):
+            atoms.append(elem)
+    return tuple(atoms)
+
+
+def atoms_to_atomtypes_atomnums(atoms):
+    r"""Return atomnums and atomtypes list.
+
+    Returns
+    --------
+    atomnums
+        list of number of atoms
+    atomtypes
+        list of atomnames
+
+
+    Examples
+    --------
+    >>> test = ['Si', 'Si', 'Ag', 'Ag', 'Ag', 'H', 'H', 'Si']
+    >>> atoms_to_atomtypes_atomnums(test)
+    (['Si', 'Ag', 'H', 'Si'], [2, 3, 2, 1])
+
+    """
+    thelast = ''
+    atomnums = []
+    atomtypes = []
+    while atoms:
+        atom = atoms.pop(0)
+        if thelast == atom:
+            atomnums[-1] = atomnums[-1] + 1
+        else:
+            atomnums.append(1)
+            atomtypes.append(atom)
+        thelast = atom
+    return atomtypes, atomnums
 
 
 if __name__ == '__main__':
@@ -165,23 +201,21 @@ so strings must be given with quotations("" or '').
 Because command line regards spaces as break,
 list argument must be written without any space.
 (i.e. [1,2,3,4,5] is valid, while [1, 2, 3, 4, 5] is invalid.)""")
-    parser.add_argument(
-        'choice',
-        metavar='funcname',
-        nargs='+',
-        choices=available,
-        help="""Demonstrate choosen function.
+    parser.add_argument('choice',
+                        metavar='funcname',
+                        nargs='+',
+                        choices=available,
+                        help="""Demonstrate choosen function.
 *all* shows all function in the choice.
 If -a/--args option is given, get argument(s) from command line.
 Otherwise use prepared argument(s).""")
-    parser.add_argument(
-        '-a',
-        '--args',
-        metavar='values',
-        nargs='+',
-        action='append',
-        dest='values',
-        help="""Use given argument(s) for demonstration.
+    parser.add_argument('-a',
+                        '--args',
+                        metavar='values',
+                        nargs='+',
+                        action='append',
+                        dest='values',
+                        help="""Use given argument(s) for demonstration.
 You have to use this option for each function.
 See epilog for notices for argument notation.""")
     args = parser.parse_args()

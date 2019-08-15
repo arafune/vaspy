@@ -7,8 +7,7 @@ This module provides OUTCAR class
 from __future__ import print_function  # Version safety
 from __future__ import unicode_literals  # Version safety
 
-import bz2
-import os.path
+from vaspy.tools import open_by_suffix
 
 
 class OUTCAR(object):  # Version safety
@@ -18,9 +17,9 @@ class OUTCAR(object):  # Version safety
     -------------
     natom: int
         number of atom
-    iontypes: list
+    atomtypes: list
         list of ion name
-    ionnums: list
+    atomnums: list
         list of number of ions
     kvecs: list
         kvector
@@ -49,13 +48,13 @@ class OUTCAR(object):  # Version safety
     def __init__(self, filename=None):
         """Initialize."""
         self.natom = 0
-        self.iontypes = []
-        self.ionnums = []
+        self.atomtypes = []
+        self.atomnums = []
         self.posforce = []
         self.posforce_title = []
         self.atom_names = []
         self.fermi = 0.0
-        self.atom_identifer = []
+        self.site_label = []
         self.numk = 0
         self.nkdim = 0
         self.nbands = 0
@@ -64,19 +63,12 @@ class OUTCAR(object):  # Version safety
         self.kvecs = []
         self.weights = []
         if filename:
-            if os.path.splitext(filename)[1] == '.bz2':
-                try:
-                    thefile = bz2.open(filename, mode='rt')
-                except AttributeError:
-                    thefile = bz2.BZ2File(filename, mode='r')
-            else:
-                thefile = open(filename)
-            self.load_file(thefile)
+            self.load_file(open_by_suffix(filename))
 
     def set_atom_names(self):
         """Build atom_names (the list of atomname_with_index)."""
         self.atom_names = []
-        for elm, ionnum in zip(self.iontypes, self.ionnums):
+        for elm, ionnum in zip(self.atomtypes, self.atomnums):
             for j in range(1, ionnum + 1):
                 tmp = elm + str(j)
                 if tmp not in self.atom_names:
@@ -160,9 +152,9 @@ class OUTCAR(object):  # Version safety
                 if "number of dos" in line:
                     self.natom = int(line.split()[-1])
                 elif "TITEL  =" in line:
-                    self.iontypes.append(line.split()[3])
+                    self.atomtypes.append(line.split()[3])
                 elif "ions per type " in line:
-                    self.ionnums = [int(x) for x in line.split()[4:]]
+                    self.atomnums = [int(x) for x in line.split()[4:]]
                 elif "POSITION" in line and "TOTAL-FORCE" in line:
                     section.append("force")
                 elif "E-fermi" in line:
@@ -187,9 +179,9 @@ class OUTCAR(object):  # Version safety
                     section.append('kvec_weight')
                 else:
                     pass
-        self.atom_identifer = [
+        self.site_label = [
             name + ":#" + str(index + 1) for (index, name) in enumerate([
-                elm + str(j) for (elm, n) in zip(self.iontypes, self.ionnums)
+                elm + str(j) for (elm, n) in zip(self.atomtypes, self.atomnums)
                 for j in range(1,
                                int(n) + 1)
             ])

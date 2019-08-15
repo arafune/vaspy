@@ -15,7 +15,7 @@ class TestVsimASCII(object):
 '''
 
     def setup(self):
-        '''VSIM'''
+        """VSIM."""
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         datafile = datadir + "monolayer_hBN_phonon.ascii"
         self.hBN = vsim_asc.VSIM_ASC(datafile)
@@ -28,7 +28,7 @@ class TestVsimASCII(object):
         np.testing.assert_allclose([1.242498697, 2.152072878, 0],
                                    self.hBN.lattice_vectors[1])
         np.testing.assert_allclose([0, 0, 24.85], self.hBN.lattice_vectors[2])
-        eq_(['B', 'N'], self.hBN.ions)
+        eq_(['B', 'N'], self.hBN.atoms)
         #
         #
         np.testing.assert_allclose(

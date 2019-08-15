@@ -19,65 +19,59 @@ def split_to_float(string, n, name):
     return [float(i) for i in lis]
 
 
-parser = argparse.ArgumentParser(
-    formatter_class=argparse.RawTextHelpFormatter,
-    epilog="""
+parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
+                                 epilog="""
 NOTE: When you run this script on Windows Power Shell,
 commas are regarded as delimiter of values.
 So you must enclose values which contains commas with quotations.
 (ex.) --site 1,2,3 -> failure / --site "1,2,3" -> OK""")
-parser.add_argument(
-    '--site',
-    metavar='atoms',
-    action='append',
-    type=tools.parse_AtomselectionNum,
-    help='''atoms specified with range using "-"
+parser.add_argument('--site',
+                    metavar='atoms',
+                    action='append',
+                    type=tools.atom_selection_to_list,
+                    help='''atoms specified with range using "-"
 or comma-delimnated numbers.
  (ex.) --site 1,2,7-9''')
 
 group = parser.add_mutually_exclusive_group(required=False)
-group.add_argument(
-    '--translate',
-    metavar='x,y,z',
-    action='append',
-    type=ft.partial(split_to_float, n=3, name='translate'),
-    help='''displacement (AA unit) by three numbers
+group.add_argument('--translate',
+                   metavar='x,y,z',
+                   action='append',
+                   type=ft.partial(split_to_float, n=3, name='translate'),
+                   help='''displacement (AA unit) by three numbers
 separated by comma.''')
-group.add_argument(
-    '--rotateX',
-    metavar='theta,x,y,z',
-    type=ft.partial(split_to_float, n=4, name='rotateX'),
-    help='''Rotation around X-axis by "theta" at (x,y,z)
+group.add_argument('--rotateX',
+                   metavar='theta,x,y,z',
+                   type=ft.partial(split_to_float, n=4, name='rotateX'),
+                   help='''Rotation around X-axis by "theta" at (x,y,z)
 NOTE: this option is not taken into account
 the periodic boundary.''')
-group.add_argument(
-    '--rotateY',
-    metavar='theta,x,y,z',
-    type=ft.partial(split_to_float, n=4, name='rotateY'),
-    help='''Rotation around Y-axis by "theta" at (x,y,z)
+group.add_argument('--rotateY',
+                   metavar='theta,x,y,z',
+                   type=ft.partial(split_to_float, n=4, name='rotateY'),
+                   help='''Rotation around Y-axis by "theta" at (x,y,z)
 NOTE: this option is not taken into account
 the periodic boundary.''')
-group.add_argument(
-    '--rotateZ',
-    metavar='theta,x,y,z',
-    type=ft.partial(split_to_float, n=4, name='rotateZ'),
-    help='''Rotation around Z-axis by "theta" at (x,y,z)
+group.add_argument('--rotateZ',
+                   metavar='theta,x,y,z',
+                   type=ft.partial(split_to_float, n=4, name='rotateZ'),
+                   help='''Rotation around Z-axis by "theta" at (x,y,z)
 NOTE: this option is not taken into account
 the periodic boundary.''')
 
-parser.add_argument(
-    '--output',
-    metavar='file_name',
-    help='''output file name
+parser.add_argument('--output',
+                    metavar='file_name',
+                    help='''output file name
 if not specified, use standard output''')
-parser.add_argument(
-    'poscar', metavar='POSCAR_file (or CONTCAR_file)', type=POSCAR)
-parser.add_argument(
-    '--to_direct', action="store_true", help='''Change direct coordinates''')
-parser.add_argument(
-    '--to_cartesian',
-    action="store_true",
-    help='''Change cartesian coordinates''')
+parser.add_argument('poscar',
+                    metavar='POSCAR_file (or CONTCAR_file)',
+                    type=POSCAR)
+parser.add_argument('--to_direct',
+                    action="store_true",
+                    help='''Change direct coordinates''')
+parser.add_argument('--to_cartesian',
+                    action="store_true",
+                    help='''Change cartesian coordinates''')
 #
 args = parser.parse_args()
 # translate option and rotate option are not set simulaneously.
@@ -98,8 +92,9 @@ args.poscar.to_cartesian()
 #  if "atom" option is not set, all atoms are concerned.
 #
 if not args.site:
-    nAtoms = sum(args.poscar.ionnums)
-    args.site = [tools.parse_AtomselectionNum('1-{0}'.format(nAtoms))]
+    args.site = [
+        tools.atom_selection_to_list('1-{0}'.format(sum(args.poscar.ionnums)))
+    ]
 #
 #  Translation
 #

@@ -4,7 +4,6 @@
 #
 from __future__ import division, print_function
 
-import os
 import sys
 
 import numpy as np
@@ -14,12 +13,7 @@ try:
 except ImportError:
     sys.stderr.write(
         'Install matplotlib, or you cannot use methods relating to draw\n')
-try:
-    from vaspy import mesh3d
-except ImportError:
-    MYPATH = os.readlink(__file__) if os.path.islink(__file__) else __file__
-    sys.path.append(os.path.dirname(os.path.abspath(MYPATH)))
-    import mesh3d
+from vaspy import mesh3d
 
 
 class LOCPOT(mesh3d.VASPGrid):

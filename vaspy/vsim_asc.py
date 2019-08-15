@@ -13,15 +13,14 @@ This module generates
 
 The first is absolutely required.
  """
-import bz2
 import itertools
 import logging
-import os.path
 from logging import Formatter, StreamHandler, getLogger
 
 import numpy as np
 
 import vaspy.const as const
+from vaspy.tools import open_by_suffix
 
 logger = getLogger("LogTest")
 logger.setLevel(logging.DEBUG)
@@ -39,10 +38,10 @@ class VSIM_ASC(object):
     -----------
     system_name: str
         System name
-    ions: list
+    atoms: list
         Atoms used
     positions: list
-        List of ion position in static
+        List of atom position in static
     qpts: list
         List of qvectors
     freqs: list
@@ -56,20 +55,13 @@ class VSIM_ASC(object):
     def __init__(self, filename=None):
         """Initialize."""
         self.system_name = ""
-        self.ions = []
+        self.atoms = []
         #
         self.qpts = []
         self.freqs = []
         #
         if filename:
-            if os.path.splitext(filename)[1] == '.bz2':
-                try:
-                    thefile = bz2.open(filename, mode='rt')
-                except AttributeError:
-                    thefile = bz2.BZ2File(filename, mode='r')
-            else:
-                thefile = open(filename)
-            self.load_file(thefile)
+            self.load_file(open_by_suffix(filename))
 
     def load_file(self, thefile):
         """Parse vsim.ascii.
@@ -89,7 +81,7 @@ class VSIM_ASC(object):
         dzx, dzy, dzz = [float(x) for x in next(thefile).split()]
         self.lattice_vectors = np.array([[dxx, 0, 0], [dyx, dyy, 0],
                                          [dzx, dzy, dzz]])
-        self.ions = []
+        self.atoms = []
         self.positions = []
         self.d_vectors = []
         for line in thefile:
@@ -97,8 +89,8 @@ class VSIM_ASC(object):
             if line[0] == "#" or line[0] == "!":
                 phonon_lines.append(line[1:].strip())
             else:
-                x, y, z, ion = line.split()
-                self.ions.append(ion)
+                x, y, z, atom = line.split()
+                self.atoms.append(atom)
                 self.positions.append(np.array([float(x), float(y), float(z)]))
         # self.ionnums, self.iontypes = ions_to_iontypes_ionnums(self.ions)
         #
@@ -122,8 +114,9 @@ class VSIM_ASC(object):
                 ])
         n_phonons = len(self.freqs)
         self.d_vectors = np.array(self.d_vectors).reshape(
-            n_phonons, len(self.ions), 3)
+            n_phonons, len(self.atoms), 3)
         self.freqs = np.array(self.freqs)
+        thefile.close()
 
     def build_phono_motion(self,
                            mode=0,
@@ -152,19 +145,18 @@ class VSIM_ASC(object):
         animation_positions = []
         for atom_i, position in enumerate(self.positions):
 
-            for cell_id in itertools.product(
-                    range(supercell[0]), range(supercell[1]),
-                    range(supercell[2])):
+            for cell_id in itertools.product(range(supercell[0]),
+                                             range(supercell[1]),
+                                             range(supercell[2])):
                 logger.debug(' cell_id:{}'.format(cell_id))
-                abs_pos = position + (self.lattice_vectors[0] * cell_id[0]
-                                      + self.lattice_vectors[1] * cell_id[1]
-                                      + self.lattice_vectors[2] * cell_id[2])
-                positions = animate_atom_phonon(
-                    abs_pos,
-                    qpt_cart,
-                    self.d_vectors[mode][atom_i],
-                    n_frames=n_frames,
-                    magnitude=magnitude)
+                abs_pos = position + (self.lattice_vectors[0] * cell_id[0] +
+                                      self.lattice_vectors[1] * cell_id[1] +
+                                      self.lattice_vectors[2] * cell_id[2])
+                positions = animate_atom_phonon(abs_pos,
+                                                qpt_cart,
+                                                self.d_vectors[mode][atom_i],
+                                                n_frames=n_frames,
+                                                magnitude=magnitude)
                 animation_positions.append(positions)
         return animation_positions
 
@@ -227,13 +219,13 @@ def animate_atom_phonon(position,
         e_frame = s_frame + n_frames - 1
     for frame in range(s_frame, e_frame + 1):
         exponent = np.exp(
-            1.0j * (np.dot(position0, qpt_cart)
-                    - 2 * np.pi * frame / n_frames))
+            1.0j *
+            (np.dot(position0, qpt_cart) - 2 * np.pi * frame / n_frames))
         logger.debug('r:{}, qpt_cart;{}, frame:{}, n_frames:{}'.format(
             position0, qpt_cart, frame, n_frames))
         logger.debug('arg_exponent:{}'.format(
-            1.0j * (np.dot(position0, qpt_cart)
-                    - 2 * np.pi * frame / n_frames)))
+            1.0j *
+            (np.dot(position0, qpt_cart) - 2 * np.pi * frame / n_frames)))
         logger.debug('exponent:{}'.format(exponent))
         normal_displ = np.array(
             list(map((lambda y: (y.real)), [x * exponent for x in d_vector])))
@@ -246,38 +238,6 @@ def animate_atom_phonon(position,
         positions.append(position0 + magnitude * normal_displ)
         logger.debug('position.after_move:{}'.format(positions[-1]))
     return positions
-
-
-def ions_to_iontypes_ionnums(ions):
-    r"""Return ionnums and iontypes list.
-
-    Returns
-    --------
-    ionnums
-        list of number of ions
-    iontypes
-        list of ionnames
-
-
-    Examples
-    --------
-    >>> ions_to_iontypes_ionnums(['Si', 'Si', 'Ag', 'Ag', 'Ag', \
-                                  'Ag', 'H', 'H', 'Si'])
-    ([2, 4, 2, 1], ['Si', 'Ag', 'H', 'Si'])
-
-    """
-    thelast = ''
-    ionnums = []
-    iontypes = []
-    while ions:
-        ion = ions.pop(0)
-        if thelast == ion:
-            ionnums[-1] = ionnums[-1] + 1
-        else:
-            ionnums.append(1)
-            iontypes.append(ion)
-        thelast = ion
-    return ionnums, iontypes
 
 
 if __name__ == '__main__':

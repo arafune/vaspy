@@ -40,7 +40,7 @@ class TestPOSCAR(unittest.TestCase):
             '#13:C11', '#14:C12', '#15:S1', '#16:S2', '#17:S3', '#18:S4',
             '#19:S5', '#20:S6', '#21:S7', '#22:S8', '#23:S9', '#24:S10',
             '#25:S11', '#26:S12'
-        ], self.testposcar.atom_identifer)
+        ], self.testposcar.site_label)
 
     def test_point_in_box(self):
         self.assertFalse(
@@ -140,7 +140,7 @@ class TestPOSCAR(unittest.TestCase):
         self.testposcar.to_direct()
 
     def test_poscar_supercell1(self):
-        '''Tests for poscar supercell method'''
+        """Tests for poscar supercell method."""
         supercell = self.testposcar.supercell(3, 2, 1)
         np.testing.assert_allclose(np.array([2.59807621, -1.5, 0.]),
                                    supercell.cell_vecs[0])
@@ -149,8 +149,8 @@ class TestPOSCAR(unittest.TestCase):
         np.testing.assert_allclose(np.array([0.0, 0.0, 1.02529049]),
                                    supercell.cell_vecs[2])
         self.assertEqual('NiC4S4', supercell.system_name)
-        self.assertEqual(['Ni', 'C', 'S'], supercell.iontypes)
-        self.assertEqual([18, 72, 72], supercell.ionnums)
+        self.assertEqual(['Ni', 'C', 'S'], supercell.atomtypes)
+        self.assertEqual([18, 72, 72], supercell.atomnums)
         supercell = self.testposcar.supercell(1, 1, 1)
         np.testing.assert_allclose(self.testposcar.positions[0],
                                    supercell.positions[0])

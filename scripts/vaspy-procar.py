@@ -33,7 +33,7 @@ parser.add_argument('--site',
                     metavar='atom_indices',
                     dest='atomindex',
                     action='append',
-                    type=tools.parse_AtomselectionNum,
+                    type=tools.atom_selection_to_list,
                     help='''atom index specifed with range.
 Use "-" or ","
  (ex.) --site 1,2,7-9''')

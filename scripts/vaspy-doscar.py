@@ -41,7 +41,7 @@ parser.add_argument('-s',
                     metavar='atoms',
                     action='append',
                     dest='atomset',
-                    type=tools.parse_AtomselectionNum,
+                    type=tools.atom_selection_to_list,
                     help="""atom # specified with range.
 Use "-" or ","
 (ex.) --site 1,2,7-9""")

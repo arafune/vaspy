@@ -13,18 +13,13 @@ This module provides PROCAR, ProjectionBand classes.
 from __future__ import division  # Version safety
 from __future__ import print_function  # Version safety
 
-import bz2
 import csv
-import logging
-import os
 import re
 
 import numpy as np
 
 from vaspy import eigenval
-
-logging.basicConfig(
-    level=logging.DEBUG, format=' %(asctime)s - %(levelname)s -%(message)s')
+from vaspy.tools import open_by_suffix
 
 
 class ProjectionBand(eigenval.EnergyBand):
@@ -94,8 +89,8 @@ class ProjectionBand(eigenval.EnergyBand):
             return None
         self.label['orbital'].append(orbital_name)
         #    spin, k, band, atom
-        sumorbital = self.proj[:, :, :, :, orbitals].sum(
-            axis=-1, keepdims=True)
+        sumorbital = self.proj[:, :, :, :, orbitals].sum(axis=-1,
+                                                         keepdims=True)
         self.proj = np.concatenate((self.proj, sumorbital), axis=-1)
         return sumorbital
 
@@ -146,7 +141,7 @@ class ProjectionBand(eigenval.EnergyBand):
             return (orbital_names.index('px'), orbital_names.index('pz'))
         else:
             err = str(orbname) + " is not a proper (composed) orbital name."
-            raise RuntimeError(err)
+        raise RuntimeError(err)
 
     def make_label(self, site_indexes=None, orbital_indexes_sets=None):
         """Return array the used for **label** for CSV-like data.
@@ -211,9 +206,8 @@ class ProjectionBand(eigenval.EnergyBand):
         # このtranspose で、
         # A_mT_orb1, A_mX_orb1, A_mY_orb1, A_mZ_orb1, サイトB_mT_orb2...
         # というフォーマットになる。
-        output_proj = np.concatenate(
-            tuple(array_list), axis=-1).transpose(2, 1, 3, 0).reshape(
-                self.nbands, self.numk, -1)
+        output_proj = np.concatenate(tuple(array_list), axis=-1).transpose(
+            2, 1, 3, 0).reshape(self.nbands, self.numk, -1)
         kvalues = np.asarray(
             (self.kdistances.tolist()) * self.nbands)[:, np.newaxis].reshape(
                 self.nbands, self.numk, 1)
@@ -334,14 +328,7 @@ class PROCAR(ProjectionBand):  # Version safety
         """Initialize."""
         super(PROCAR, self).__init__()
         if filename:
-            if os.path.splitext(filename)[1] == ".bz2":
-                try:
-                    thefile = bz2.open(filename, mode='rt')
-                except AttributeError:
-                    thefile = bz2.BZ2File(filename, mode='r')
-            else:
-                thefile = open(filename)
-            self.load_file(thefile, phase_read)
+            self.load_file(open_by_suffix(filename), phase_read)
 
     def load_file(self, thefile, phase_read=False):
         """Parse PROCAR.
@@ -409,8 +396,8 @@ class PROCAR(ProjectionBand):  # Version safety
         self.label['orbital'] = orbital_names
         norbital = len(self.label['orbital'])
         self.label['site'] = list(range(self.natom))
-        self.nspin = self.proj.size // (
-            self.numk * self.nbands * self.natom * norbital)
+        self.nspin = self.proj.size // (self.numk * self.nbands * self.natom *
+                                        norbital)
         if phase_read:
             self.phase = np.fromstring(phase_r, dtype=float, sep=' ') + \
                 (0 + 1.0J) * np.fromstring(phase_i, dtype=float, sep=' ')
@@ -421,8 +408,8 @@ class PROCAR(ProjectionBand):  # Version safety
             self.label['energy'] = ['Energy']
             self.energies = np.asarray(energies).reshape(
                 1, self.numk, self.nbands)
-            self.proj = self.proj.reshape((self.nspin, self.numk, self.nbands,
-                                           self.natom, norbital))
+            self.proj = self.proj.reshape(
+                (self.nspin, self.numk, self.nbands, self.natom, norbital))
             if phase_read:
                 self.phase = self.phase.reshape(
                     (self.nspin, self.numk, self.nbands, self.natom,
@@ -432,8 +419,8 @@ class PROCAR(ProjectionBand):  # Version safety
             self.label['energy'] = ['Energy_up', 'Energy_down']
             self.energies = np.asarray(energies).reshape(
                 2, self.numk, self.nbands)
-            self.proj = self.proj.reshape((self.nspin, self.numk, self.nbands,
-                                           self.natom, norbital))
+            self.proj = self.proj.reshape(
+                (self.nspin, self.numk, self.nbands, self.natom, norbital))
             if phase_read:
                 self.phase = self.phase.reshape(
                     (self.nspin, self.numk, self.nbands, self.natom,
@@ -447,15 +434,26 @@ class PROCAR(ProjectionBand):  # Version safety
                                           self.natom, norbital).transpose(
                                               (2, 0, 1, 3, 4))
             if phase_read:
-                self.phase = self.phase.reshape((1, self.numk, self.nbands,
-                                                 self.natom, norbital - 1))
+                self.phase = self.phase.reshape(
+                    (1, self.numk, self.nbands, self.natom, norbital - 1))
         else:
             raise ValueError
         del energies
         thefile.close()
 
+    def set_spin_character(self, phase_read=False):
+        """Set label of Energy and Spin character.
+
+        Parameters
+        ----------
+        phase_read: boolean
+            If True, treat the shape of self.phase
+
+        """
+        pass
+
     def __repr__(self):
-        """__str__() <=> str(x)
+        """__str__() <=> str(x).
 
         Show the PROCAR character, not contents.
         """
@@ -519,9 +517,8 @@ def check_orb_name(arg):
         arg = translate_dict[arg]
     if arg in proper_orb_name_list:
         return arg
-    else:
-        errmsg = arg + ": (composed) orbital name was not defined."
-        raise ValueError(errmsg)
+    errmsg = arg + ": (composed) orbital name was not defined."
+    raise ValueError(errmsg)
 
 
 def shortcheck(procar):
@@ -539,7 +536,7 @@ def shortcheck(procar):
     numk, nbands, natom = [
         int(i) for i in (tmp[14:20], tmp[39:43], tmp[62:-1])
     ]
-    [next(procar) for i in range(5)]
+    _ = [next(procar) for i in range(5)]
     section = []
     orbitals = []
     phases = []

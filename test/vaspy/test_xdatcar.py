@@ -30,8 +30,8 @@ class TestXDATCAR(object):
                                    self.xdatcar_test.cell_vecs[1])
         np.testing.assert_allclose([0, 0, 38.0],
                                    self.xdatcar_test.cell_vecs[2])
-        eq_(['Mo', 'S'], self.xdatcar_test.iontypes)
-        eq_([1, 2], self.xdatcar_test.ionnums)
+        eq_(['Mo', 'S'], self.xdatcar_test.atomtypes)
+        eq_([1, 2], self.xdatcar_test.atomnums)
         eq_(5, len(self.xdatcar_test.configurations))
         #
         np.testing.assert_allclose([[0.33333333, 0.33333333, 0.24999815],
