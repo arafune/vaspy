@@ -46,6 +46,21 @@ class TestEIGENVAL(object):
             26.193038, self.eigenval_soi.energies[0, :, -1][-1])
 
     @with_setup(setup=setup)
+    def test_to_physical_kvector(self):
+        """Test for to_physical_kvector."""
+        np.testing.assert_array_almost_equal([[0., 0., 0.]],
+                                             self.eigenval_spin.kvecs)
+        np.testing.assert_array_almost_equal(
+            [[0., 0., 0.], [4.0e-02, 0, 0.0], [8.0e-02, 0, 0]],
+            self.eigenval_soi.kvecs[0:3])
+        self.eigenval_soi.to_physical_kvector(recvec=np.array(((2, 0,
+                                                                0), (0, 2, 0),
+                                                               (0, 0, 2))))
+        np.testing.assert_array_almost_equal(
+            [[0., 0., 0.], [8.0e-02, 0, 0.0], [16.0e-02, 0, 0]],
+            self.eigenval_soi.kvecs[0:3])
+
+    @with_setup(setup=setup)
     def test_make_label(self):
         '''test for make_label function'''
         labels_soi = self.eigenval_soi.make_label('k', 'energy')
