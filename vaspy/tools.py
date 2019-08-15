@@ -77,7 +77,7 @@ _RERANGE = re.compile(r'(\d+)-(\d+)')
 _RESINGLE = re.compile(r'\d+')
 
 
-def parse_Atomselection(input_str):
+def atom_selection_to_list(input_str, number=True):
     """Return list of ordered "String" represents the number.
 
     Parameters
@@ -93,8 +93,10 @@ def parse_Atomselection(input_str):
     Example
     --------
 
-    >>> parse_Atomselection("1-5,8,8,9-15,10")
+    >>> atom_selection_to_list("1-5,8,8,9-15,10", False)
     ['1', '10', '11', '12', '13', '14', '15', '2', '3', '4', '5', '8', '9']
+    >>> atom_selection_to_list("1-5,8,8,9-15,10")
+    [1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15]
 
     """
     array = input_str.split(',')
@@ -106,33 +108,9 @@ def parse_Atomselection(input_str):
             output |= set(str(i) for i in range(int(start), int(stop) + 1))
         elif re.search(_RESINGLE, each):
             output.add(each)
+    if number:
+        return sorted(int(i) for i in output)
     return sorted(output)
-
-
-def parse_AtomselectionNum(input_str):
-    """Very similar with parse_Atomselection but returns the array of the
-    sorted number not array of the string.
-
-    Parameters
-    ------------
-
-    input_str: str
-        range of the atoms. the numbers deliminated by "-" or ","
-
-    Returns
-    ----------
-
-    list
-        ordered int represents the number.
-
-    Example
-    --------
-
-    >>> parse_AtomselectionNum("1-5,8,8,9-15,10")
-    [1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15]
-
-    """
-    return sorted(int(i) for i in parse_Atomselection(input_str))
 
 
 def atomtypes_atomnums_to_atoms(atomtypes, atomnums):
