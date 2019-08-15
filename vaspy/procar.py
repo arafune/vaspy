@@ -14,16 +14,12 @@ from __future__ import division  # Version safety
 from __future__ import print_function  # Version safety
 
 import csv
-import logging
 import re
 
 import numpy as np
 
 from vaspy import eigenval
 from vaspy.tools import open_by_suffix
-
-logging.basicConfig(level=logging.DEBUG,
-                    format=' %(asctime)s - %(levelname)s -%(message)s')
 
 
 class ProjectionBand(eigenval.EnergyBand):
