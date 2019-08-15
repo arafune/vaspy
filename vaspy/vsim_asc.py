@@ -240,38 +240,6 @@ def animate_atom_phonon(position,
     return positions
 
 
-def atoms_to_atomtypes_atomnums(atoms):
-    r"""Return atomnums and atomtypes list.
-
-    Returns
-    --------
-    atomnums
-        list of number of atoms
-    atomtypes
-        list of atomnames
-
-
-    Examples
-    --------
-    >>> atoms_to_atomtypes_atomnums(['Si', 'Si', 'Ag', 'Ag', 'Ag', \
-                                  'Ag', 'H', 'H', 'Si'])
-    ([2, 4, 2, 1], ['Si', 'Ag', 'H', 'Si'])
-
-    """
-    thelast = ''
-    atomnums = []
-    atomtypes = []
-    while atoms:
-        atom = atoms.pop(0)
-        if thelast == atom:
-            atomnums[-1] = atomnums[-1] + 1
-        else:
-            atomnums.append(1)
-            atomtypes.append(atom)
-        thelast = atom
-    return atomnums, atomtypes
-
-
 if __name__ == '__main__':
     import doctest
     doctest.testmod()

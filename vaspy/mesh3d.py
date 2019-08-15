@@ -126,7 +126,7 @@ class VASPGrid(object):
         thefile.close()
 
     def __str__(self):
-        """x.__str__() <=> str(x)
+        """String representation.
 
         Returns
         -------
@@ -324,6 +324,8 @@ class Grid3D(object):
         elif axis == 'z':
             return griddata.reshape(self.shape[2], self.shape[1],
                                     self.shape[0])[position, :, :]
+        else:
+            raise RuntimeError('axis must be "x", "y" or "z".')
 
     def integrate(self, axis, from_coor=None, to_coor=None, frame_i=0):
         """Return 2D data integrated occupacy along the 'axis'.

@@ -148,6 +148,63 @@ def parse_AtomselectionNum(L):
     return sorted(int(i) for i in parse_Atomselection(L))
 
 
+def atomtypes_atomnums_to_atoms(atomtypes, atomnums):
+    """Return list representation for atom in use.
+
+    Parameters
+    ------------
+    atomtypes: list
+        atom names
+    atomnums: list
+        atom numbers
+
+    Examples
+    --------
+    >>> test_nums = [2, 3, 2, 1]
+    >>> test_elements = ['Si', 'Ag', 'H', 'Si']
+    >>> atomtypes_atomnums_to_atoms(test_elements, test_nums)
+    ('Si', 'Si', 'Ag', 'Ag', 'Ag', 'H', 'H', 'Si')
+
+    """
+    atoms = []
+    for elem, nums in zip(atomtypes, atomnums):
+        for _ in range(nums):
+            atoms.append(elem)
+    return tuple(atoms)
+
+
+def atoms_to_atomtypes_atomnums(atoms):
+    r"""Return atomnums and atomtypes list.
+
+    Returns
+    --------
+    atomnums
+        list of number of atoms
+    atomtypes
+        list of atomnames
+
+
+    Examples
+    --------
+    >>> test = ['Si', 'Si', 'Ag', 'Ag', 'Ag', 'H', 'H', 'Si']
+    >>> atoms_to_atomtypes_atomnums(test)
+    (['Si', 'Ag', 'H', 'Si'], [2, 3, 2, 1])
+
+    """
+    thelast = ''
+    atomnums = []
+    atomtypes = []
+    while atoms:
+        atom = atoms.pop(0)
+        if thelast == atom:
+            atomnums[-1] = atomnums[-1] + 1
+        else:
+            atomnums.append(1)
+            atomtypes.append(atom)
+        thelast = atom
+    return atomtypes, atomnums
+
+
 if __name__ == '__main__':
     import argparse
 

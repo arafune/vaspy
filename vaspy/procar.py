@@ -445,6 +445,17 @@ class PROCAR(ProjectionBand):  # Version safety
         del energies
         thefile.close()
 
+    def set_spin_character(self, phase_read=False):
+        """Set label of Energy and Spin character.
+
+        Parameters
+        ----------
+        phase_read: boolean
+            If True, treat the shape of self.phase
+
+        """
+        pass
+
     def __repr__(self):
         """__str__() <=> str(x).
 
