@@ -15,7 +15,7 @@ from __future__ import print_function  # Version safety
 
 import csv
 import re
-from logging import DEBUG, Formatter, StreamHandler, getLogger
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
 
@@ -23,7 +23,7 @@ from vaspy import eigenval
 from vaspy.tools import open_by_suffix
 
 # logger
-LOGLEVEL = DEBUG
+LOGLEVEL = INFO
 logger = getLogger(__name__)
 fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
 formatter = Formatter(fmt)
@@ -74,11 +74,17 @@ class ProjectionBand(eigenval.EnergyBand):
 
         """
         # As the original label['site'] is just a number beginnig from zero
-        if len(sites) == 1 and sites[0] in self.label[sites][:self.natom]:
+        logger.debug("self.label: {}".format(self.label))
+        logger.debug("self.natom: {}".format(self.natom))
+        logger.debug("sites: {}".format(sites))
+
+        if len(sites) == 1 and sites[0] in self.label['site'][:self.natom]:
             self.label['site'][sites[0]] = site_name
+            logger.debug("self.label: {}".format(self.label))
         if site_name in self.label['site']:
             return None
         self.label['site'].append(site_name)
+        logger.debug("self.label: {}".format(self.label))
         #    spin, k, band, atom
         sumsite = self.proj[:, :, :, sites, :].sum(axis=-2, keepdims=True)
         self.proj = np.concatenate((self.proj, sumsite), axis=-2)
@@ -263,7 +269,7 @@ class ProjectionBand(eigenval.EnergyBand):
         site_indexes: list or tuple that contains int
            site name for output  (the elements must be in self.label['site'])
            e.g., (3, 5)
-        orbitals: list or tuple that contains list or tuple of int
+        orbital_indexes_sets: list or tuple that contains list or tuple of int
            tuple (list)  of tuple (list) for output
            e.g., ((1 ,5 , 11), (0, 3))
 

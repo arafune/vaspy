@@ -6,14 +6,14 @@ import argparse
 import functools as ft
 import re
 from itertools import chain
-from logging import DEBUG, Formatter, StreamHandler, getLogger
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import vaspy.procar as procar
 from vaspy import tools
 from vaspy.outcar import OUTCAR
 
 # logger
-LOGLEVEL = DEBUG
+LOGLEVEL = INFO
 logger = getLogger(__name__)
 fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
 formatter = Formatter(fmt)
@@ -65,6 +65,7 @@ parser.add_argument('procar', metavar='PROCAR_file', help='''PROCAR file''')
 
 args = parser.parse_args()
 logger.debug("Debugging...")
+recvec = None
 if args.outcar is not None:
     outcar = OUTCAR(args.outcar)
     fermi = outcar.fermi
@@ -80,6 +81,8 @@ procar.fermi_correction(fermi)
 if recvec:
     logger.debug("procar.kvecs: {}".format(procar.kvecs))
     procar.to_physical_kvector(recvec)
+    logger.debug("procar.kvecs in (AA): {}".format(procar.kvecs))
+
 #
 assert len(args.atomindex) == len(args.orbital) == len(args.atomsetname), \
     "--atom, --as and --orbital are mismatched."
@@ -91,24 +94,18 @@ flat_orbitals = tuple(chain.from_iterable(args.orbital))
 # internaly begins with "0".  (This is because VASP is fortran program !)
 siteindex = [[i - 1 for i in internal] for internal in args.atomindex]
 #
-logger.debug('siteindex are:')
-logger.debug(siteindex)
-logger.debug('sitenames are:')
-logger.debug(sitenames)
-logger.debug('orbitals are:')
-logger.debug(args.orbital)
-logger.debug('orbitals flat:')
-logger.debug(flat_orbitals)
+logger.debug('siteindex: {}'.format(siteindex))
+logger.debug('sitenames: {}'.format(sitenames))
+logger.debug('args.orbitals: {}'.format(args.orbital))
+logger.debug('orbitals flat: {}'.format(flat_orbitals))
 #
 for sites, name in zip(siteindex, sitenames):
     procar.append_sumsite(tuple(sites), name)
 for orb in tuple(set(flat_orbitals)):
     procar.append_sumorbital(procar.orb_index(orb), orb)
 #
-logger.debug("label['site'] is")
-logger.debug(procar.label['site'])
-logger.debug("label['orbital'] is")
-logger.debug(procar.label['oribital'])
+logger.debug("label['site'] is {}".format(procar.label['site']))
+logger.debug("label['orbital'] is {}".format(procar.label['orbital']))
 #
 site_indexes = []
 orbtal_indexes_sets = []
@@ -119,14 +116,12 @@ for orbitals in args.orbital:
     for orb_in_site in orbitals:
         tmp.append(procar.label['orbital'].index(orb_in_site))
     tmp = tuple(tmp)
-    orbtal_indexes_sets(tmp)
+    orbtal_indexes_sets.append(tmp)
 site_indexes = tuple(site_indexes)
 orbital_indexes_sets = tuple(orbtal_indexes_sets)
 #
-logger.debug('site_indexes:')
-logger.debug(site_indexes)
-logger.debug('orbital_indexes_sets:')
-logger.debug(orbital_indexes_sets)
+logger.debug('site_indexes: {}'.format(site_indexes))
+logger.debug('orbital_indexes_sets: {}'.format(orbital_indexes_sets))
 #
 print(
     procar.text_sheet(site_indexes=site_indexes,
