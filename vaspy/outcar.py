@@ -165,7 +165,7 @@ class OUTCAR(object):  # Version safety
                     self.nbands = int(line.split()[14])
                 elif "reciprocal lattice vectors" in line:
                     self.recvec = [[
-                        float(i) for i in next(thefile).split()[3:]
+                        float(i) for i in next(thefile)[43:].split()
                     ] for i in range(3)]
                 elif " magnetization (x)" in line:
                     magnetizations = []
