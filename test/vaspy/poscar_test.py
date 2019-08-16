@@ -5,15 +5,15 @@ from __future__ import division, print_function  # Version safety
 
 import os
 import tempfile
-import unittest
 
 import numpy as np
+from nose.tools import assert_equal, assert_false, eq_, ok_, raises, with_setup
 
 import vaspy.poscar
 
 
-class TestPOSCAR(unittest.TestCase):
-    def setUp(self):
+class TestPOSCAR(object):
+    def setup(self):
         global test_poscar_string
         filePOSCAR = tempfile.mkstemp()
         f = open(filePOSCAR[1], 'w')
@@ -23,10 +23,11 @@ class TestPOSCAR(unittest.TestCase):
         self.blancposcar = vaspy.poscar.POSCAR()
         os.remove(filePOSCAR[1])
 
+    @with_setup(setup=setup)
     def test_fundamentals(self):
         """Test for POSCAR class: fundamental data read"""
         # a=os.getcwd()  # return the directory where nose execute.
-        self.assertEqual('NiC4S4', self.testposcar.system_name)
+        assert_equal('NiC4S4', self.testposcar.system_name)
         np.testing.assert_allclose(np.array([0.866025404, -0.5, 0.]),
                                    self.testposcar.cell_vecs[0])
         np.testing.assert_allclose(np.array([0.866025404, 0.5, 0.]),
@@ -34,7 +35,7 @@ class TestPOSCAR(unittest.TestCase):
         self.testposcar.cell_vecs[2] = (1, 0, 0)
         np.testing.assert_allclose(np.array([1, 0, 0]),
                                    self.testposcar.cell_vecs[2])
-        self.assertEqual([
+        assert_equal([
             '#0:Ni1', '#1:Ni2', '#2:Ni3', '#3:C1', '#4:C2', '#5:C3', '#6:C4',
             '#7:C5', '#8:C6', '#9:C7', '#10:C8', '#11:C9', '#12:C10',
             '#13:C11', '#14:C12', '#15:S1', '#16:S2', '#17:S3', '#18:S4',
@@ -42,31 +43,36 @@ class TestPOSCAR(unittest.TestCase):
             '#25:S11', '#26:S12'
         ], self.testposcar.site_label)
 
+    @with_setup(setup=setup)
     def test_point_in_box(self):
-        self.assertFalse(
+        assert_false(
             vaspy.poscar.point_in_box((0.5, 0.5, 0.2),
                                       self.testposcar.cell_vecs))
-        self.assertTrue(
+        ok_(
             vaspy.poscar.point_in_box((0.5, 0.1, 0.2),
                                       self.testposcar.cell_vecs))
-        self.assertTrue(
+        ok_(
             vaspy.poscar.point_in_box((0.5, 0.5, 0.2),
                                       ((1, 0, 0), (0, 1, 0), (0, 0, 1))))
 
+    @with_setup(setup=setup)
     def test_is_cartesian(self):
-        self.assertFalse(self.testposcar.is_cartesian())
+        assert_false(self.testposcar.is_cartesian())
         self.testposcar.to_cartesian()
-        self.assertTrue(self.testposcar.is_cartesian())
+        ok_(self.testposcar.is_cartesian())
 
+    @with_setup(setup=setup)
     def test_is_direct(self):
-        self.assertTrue(self.testposcar.is_direct())
+        ok_(self.testposcar.is_direct())
         self.testposcar.to_cartesian()
-        self.assertFalse(self.testposcar.is_direct())
+        assert_false(self.testposcar.is_direct())
 
+    @with_setup(setup=setup)
     def test_is_selective(self):
-        self.assertTrue(self.testposcar.selective)
-        self.assertFalse(self.blancposcar.selective)
+        ok_(self.testposcar.selective)
+        assert_false(self.blancposcar.selective)
 
+    @with_setup(setup=setup)
     def test_pos(self):
         np.testing.assert_array_equal(np.array([0., 0.5, 0.5]),
                                       self.testposcar.positions[2])
@@ -74,12 +80,14 @@ class TestPOSCAR(unittest.TestCase):
                                    self.testposcar.positions[3],
                                    rtol=1e-04)
 
+    @with_setup(setup=setup)
     def test_tune_scaling_factor(self):
         self.testposcar.tune_scaling_factor(1.0)
         np.testing.assert_allclose(np.array([12.66995166052, -7.315, 0.0]),
                                    self.testposcar.cell_vecs[0],
                                    rtol=1e-07)
 
+    @with_setup(setup=setup)
     def test_tune_scaling_factor_withCartesian(self):
         self.testposcar.to_cartesian()
         self.testposcar.tune_scaling_factor(1.0)
@@ -95,6 +103,7 @@ class TestPOSCAR(unittest.TestCase):
                                    self.testposcar.positions[6],
                                    rtol=1e-06)
 
+    @with_setup(setup=setup)
     def test_to_cartesian(self):
         self.testposcar.to_cartesian()
         np.testing.assert_allclose(np.array([0.494477, -0.047847, 0.512645]),
@@ -102,43 +111,47 @@ class TestPOSCAR(unittest.TestCase):
                                    rtol=1e-05)
         self.testposcar.to_direct()
 
+    @with_setup(setup=setup)
     def test_to_direct(self):
         tmp = self.testposcar.positions[5]
         self.testposcar.to_direct()
         np.testing.assert_array_equal(tmp, self.testposcar.positions[5])
 
+    @with_setup(setup=setup)
     def test_to_list(self):
         tmp = self.testposcar.to_list()
-        self.assertEqual("NiC4S4", tmp[0])
-        self.assertEqual(14.63, tmp[1])
+        assert_equal("NiC4S4", tmp[0])
+        assert_equal(14.63, tmp[1])
         np.testing.assert_allclose([0.8660254, -0.5, 0], tmp[2])
         np.testing.assert_allclose([0.8660254, 0.5, 0], tmp[3])
         np.testing.assert_allclose([0, 0, 1.0252904990], tmp[4])
-        self.assertEqual(['Ni', 'C', 'S'], tmp[5])
-        self.assertEqual([3, 12, 12], tmp[6])
-        self.assertEqual('Selective Dynamics', tmp[7])
-        self.assertEqual('Direct', tmp[8])
+        assert_equal(['Ni', 'C', 'S'], tmp[5])
+        assert_equal([3, 12, 12], tmp[6])
+        assert_equal('Selective Dynamics', tmp[7])
+        assert_equal('Direct', tmp[8])
         np.testing.assert_allclose([0.5, 0.5, 0.5], tmp[9][0])
         np.testing.assert_allclose([0.5, 0., 0.5], tmp[9][1])
         np.testing.assert_allclose([0., 0.5, 0.5], tmp[9][2])
         np.testing.assert_allclose([0.237639553, 0.429027113, 0.5], tmp[9][3])
         # ...
-        self.assertEqual('T T T', tmp[10][0])
-        self.assertEqual('T T T', tmp[10][1])
-        self.assertEqual('T F T', tmp[10][2])
+        assert_equal('T T T', tmp[10][0])
+        assert_equal('T T T', tmp[10][1])
+        assert_equal('T F T', tmp[10][2])
         #
-        self.assertEqual('#0:Ni1', tmp[11][0])
-        self.assertEqual('#1:Ni2', tmp[11][1])
-        self.assertEqual('#2:Ni3', tmp[11][2])
-        self.assertEqual('#3:C1', tmp[11][3])
+        assert_equal('#0:Ni1', tmp[11][0])
+        assert_equal('#1:Ni2', tmp[11][1])
+        assert_equal('#2:Ni3', tmp[11][2])
+        assert_equal('#3:C1', tmp[11][3])
 
+    @with_setup(setup=setup)
     def test_to_str(self):
         global tmpstr_original
         global tmpstr_after_rotate
-        self.assertEqual(tmpstr_original, self.testposcar.__str__())
+        assert_equal(tmpstr_original, self.testposcar.__str__())
         self.testposcar.rotate_atom(0, "z", 90, (0, 0, 0))
         self.testposcar.to_direct()
 
+    @with_setup(setup=setup)
     def test_poscar_supercell1(self):
         """Tests for poscar supercell method."""
         supercell = self.testposcar.supercell(3, 2, 1)
@@ -148,9 +161,9 @@ class TestPOSCAR(unittest.TestCase):
                                    supercell.cell_vecs[1])
         np.testing.assert_allclose(np.array([0.0, 0.0, 1.02529049]),
                                    supercell.cell_vecs[2])
-        self.assertEqual('NiC4S4', supercell.system_name)
-        self.assertEqual(['Ni', 'C', 'S'], supercell.atomtypes)
-        self.assertEqual([18, 72, 72], supercell.atomnums)
+        assert_equal('NiC4S4', supercell.system_name)
+        assert_equal(['Ni', 'C', 'S'], supercell.atomtypes)
+        assert_equal([18, 72, 72], supercell.atomnums)
         supercell = self.testposcar.supercell(1, 1, 1)
         np.testing.assert_allclose(self.testposcar.positions[0],
                                    supercell.positions[0])
@@ -170,8 +183,18 @@ class TestPOSCAR(unittest.TestCase):
                 self.testposcar.positions[0][2] / 1
             ]))
         supercell = self.testposcar.supercell(3, 2, 1)
-        self.assertEqual(6 * len(self.testposcar.positions),
-                         len(supercell.positions))
+        assert_equal(6 * len(self.testposcar.positions),
+                     len(supercell.positions))
+
+    @with_setup(setup=setup)
+    def test_poscar_split(self):
+        """Test for POSCAR.split."""
+        one, other = self.testposcar.split([2, 3, 4, 5, 6])
+        assert_equal(5, len(one.positions))
+        assert_equal(['Ni', 'C'], one.atomtypes)
+        assert_equal([1, 4], one.atomnums)
+        ok_(one.selective)
+        ok_(other.selective)
 
     def test_nearest(self):
         pass
@@ -302,6 +325,3 @@ Direct
   -0.55342902699999996   -0.33333333299999995    0.50000000000000000 T T T #25:S11
   -0.33333333299999995   -0.55342902699999996    0.50000000000000000 T T T #26:S12
 """
-
-if __name__ == '__main__':
-    unittest.main()

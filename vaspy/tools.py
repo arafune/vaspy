@@ -6,19 +6,15 @@ Module for tools used in vaspy
 
 from __future__ import division, print_function  # Version safety
 
-import itertools as it
-import re
-import os
-from collections import Iterable
 import bz2
+import itertools as it
+import os
+import re
+from collections import Iterable
 
 # Version safety
 ZIPLONG = it.izip_longest if hasattr(it, 'izip_longest') else it.zip_longest
-
-if not hasattr(__builtins__, 'basestring'):  # Version safety
-    FLATTEN_IGNORE = (dict, str, bytes, bytearray)
-else:
-    FLATTEN_IGNORE = (dict, basestring)
+FLATTEN_IGNORE = (dict, str, bytes, bytearray)  # or (dict, basestring)
 
 
 def open_by_suffix(filename):

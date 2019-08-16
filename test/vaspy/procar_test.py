@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Test for PROCAR class"""
-# import unittest
 import os
 
 import numpy as np

@@ -41,11 +41,24 @@ from __future__ import division, print_function  # Version safety
 import copy
 import itertools as it
 import re
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
 
 from vaspy import tools
 from vaspy.tools import open_by_suffix
+
+# logger
+LOGLEVEL = INFO
+logger = getLogger(__name__)
+fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
+formatter = Formatter(fmt)
+handler = StreamHandler()
+handler.setLevel(LOGLEVEL)
+logger.setLevel(LOGLEVEL)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = False
 
 
 class POSCAR_HEAD(object):
@@ -137,8 +150,7 @@ class POSCAR_HEAD(object):
                     else:
                         atomnames.append(elem_num)
         self.__site_label = [
-            "#" + str(s) + ":" + a
-            for s, a in zip(range(0, len(atomnames)), atomnames)
+            "#" + str(s) + ":" + a for s, a in enumerate(atomnames)
         ]
         return self.__site_label
 
@@ -268,13 +280,13 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
         Parameters
         -----------
-        from_site: int, optional (default is 0)
+        from_site: int, default 0
             first index # for sort
 
-        to_site: int, optional (default is None)
+        to_site: int, default None
             last index # for sort
 
-        axis: str, optional  (default is `z`)
+        axis: str, default `z`
             Axis used for sort
 
 
@@ -292,7 +304,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             axis = 1
         elif axis == 'z' or axis == 'Z' or axis == 2:
             axis = 2
-        self.positions = self.positions[0:from_site] + sorted(
+        self.positions = self.positions[:from_site] + sorted(
             self.positions[from_site:to_site],
             key=lambda sortaxis: sortaxis[axis]) + self.positions[to_site:]
 
@@ -337,9 +349,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             np.array([x[0] / n_x, x[1] / n_y, x[2] / n_z]) for x in spositions
         ]
         for spos in spositions:
-            for i_z in range(0, n_z):
-                for i_y in range(0, n_y):
-                    for i_x in range(0, n_x):
+            for i_z in range(n_z):
+                for i_y in range(n_y):
+                    for i_x in range(n_x):
                         sposcar.positions.append(
                             np.array([
                                 spos[0] + i_x / n_x, spos[1] + i_y / n_y,
@@ -525,6 +537,51 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         dest_poscar.positions.extend(other.positions)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
         return dest_poscar
+
+    def split(self, indexes):
+        """Split into two POSCAR object.
+
+        Useful for differential charge distribution calculations.
+
+        Parameters
+        -----------
+        indexes: tuple or list
+            index array for a POSCAR file
+
+        Returns
+        -------
+        one, other: POSCAR
+            tuple of two POSCAR objects
+
+        """
+        one = copy.deepcopy(self)
+        other = copy.deepcopy(self)
+        one.positions = []
+        other.positions = []
+        one.coordinate_changeflags = []
+        other.coordinate_changeflags = []
+        logger.debug("one.positions: {}".format(one.positions))
+        atoms = tools.atomtypes_atomnums_to_atoms(self.atomtypes,
+                                                  self.atomnums)
+        logger.debug("atoms: {}".format(atoms))
+        one_atoms = []
+        other_atoms = []
+        for i, (element, position, coordinate_flag) in enumerate(
+                zip(atoms, self.positions, self.coordinate_changeflags)):
+            if i in indexes:
+                one_atoms.append(element)
+                one.positions.append(position)
+                one.coordinate_changeflags.append(coordinate_flag)
+            else:
+                other_atoms.append(element)
+                other.positions.append(position)
+                other.coordinate_changeflags.append(coordinate_flag)
+        logger.debug("one_atoms: {}".format(one_atoms))
+        one.atomtypes, one.atomnums = tools.atoms_to_atomtypes_atomnums(
+            one_atoms)
+        other.atomtypes, other.atomnums = tools.atoms_to_atomtypes_atomnums(
+            other_atoms)
+        return one, other
 
     def merge(self, other):
         """Return POSCAR generated from two POSCARs.

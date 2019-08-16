@@ -2,33 +2,27 @@
 # -*- coding: utf-8 -*-
 
 import os
-import unittest
 
 import numpy as np
+from nose.tools import assert_equal, assert_false, eq_, ok_, raises, with_setup
 
 from vaspy.doscar import DOS, DOSCAR, PDOS, TDOS
 
 
-class TestDOSCAR(unittest.TestCase):
+class TestDOSCAR(object):
     def setUp(self):
         currentpath = (os.path.abspath(os.path.dirname(__file__)))
         testDOS = currentpath + "/DOSCAR_dummy"
         self.testDOSCAR = DOSCAR(testDOS)
 
+
+class TestDOS(object):
     pass
 
 
-class TestDOS(unittest.TestCase):
+class TestTDOS(object):
     pass
 
 
-class TestTDOS(unittest.TestCase):
+class TestPDOS(object):
     pass
-
-
-class TestPDOS(unittest.TestCase):
-    pass
-
-
-if __name__ == '__main__':
-    unittest.main()

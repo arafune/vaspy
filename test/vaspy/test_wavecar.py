@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''Test for WAVECAR class'''
-# import unittest
 import os
 
 import numpy as np
@@ -123,9 +122,8 @@ class TestGrapheneWavecar(object):
     def test_realsapece_wfc(self):
         '''Test for generation real space wfc (Graphene)'''
         np.testing.assert_array_almost_equal([
-            0.00013770 + 0.0001743j, 0.00014605 + 0.00018611j,
-            0.00017262 + 0.00022051j, 0.00021561 + 0.00027499j,
-            0.00026360 + 0.00033486j
+            0.00013770 + 0.0001743j, 0.00014605 + 0.00018611j, 0.00017262 +
+            0.00022051j, 0.00021561 + 0.00027499j, 0.00026360 + 0.00033486j
         ],
                                              self.gr.realspace_wfc()[0][0][:5])
         vaspgrid = self.gr.realspace_wfc(poscar=self.gr_poscar)
@@ -243,9 +241,8 @@ class TestCobaltWavecar(object):
         '''Test for generation real space wfc (Cobalt)'''
         np.testing.assert_array_almost_equal(
             [
-                -7.84915157e-05 - 5.61362047e-05j,
-                -7.88077954e-05 - 5.63624713e-05j,
-                -7.92001487e-05 - 5.66431905e-05j,
+                -7.84915157e-05 - 5.61362047e-05j, -7.88077954e-05 -
+                5.63624713e-05j, -7.92001487e-05 - 5.66431905e-05j,
                 -7.92675956e-05 - 5.66915450e-05j,
                 -7.90423140e-05 - 5.65305135e-05j
             ],

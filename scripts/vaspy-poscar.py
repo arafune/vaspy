@@ -6,9 +6,21 @@ script to use(demonstrate) vaspy.poscar functions.
 
 import argparse
 import functools as ft
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 from vaspy import tools
 from vaspy.poscar import POSCAR
+
+LOGLEVEL = INFO
+logger = getLogger(__name__)
+fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
+formatter = Formatter(fmt)
+handler = StreamHandler()
+handler.setLevel(LOGLEVEL)
+logger.setLevel(LOGLEVEL)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = False
 
 
 def split_to_float(string, n, name):
@@ -72,8 +84,15 @@ parser.add_argument('--to_direct',
 parser.add_argument('--to_cartesian',
                     action="store_true",
                     help='''Change cartesian coordinates''')
+parser.add_argument('--split',
+                    nargs=2,
+                    help="""Split into two POSCAR files.
+The first is the file name for one POSCAR (molecule part).
+The second is the file name for other POSCAR (substrate part).""")
 #
 args = parser.parse_args()
+logger.debug("args: {}".format(args))
+
 # translate option and rotate option are not set simulaneously.
 if args.translate and any([args.rotateX, args.rotateY, args.rotateZ]):
     parser.error("Cannot set --translate and rotate option simultanaously.")
@@ -83,18 +102,16 @@ if (args.rotateX, args.rotateY, args.rotateZ).count(None) < 2:
 #
 
 ############
-
-# print(args.poscar) #DEBUG
 args.poscar.to_cartesian()
-# print(args.poscar) #DEBUG
 
 #
 #  if "atom" option is not set, all atoms are concerned.
 #
 if not args.site:
     args.site = [
-        tools.atom_selection_to_list('1-{0}'.format(sum(args.poscar.ionnums)))
+        tools.atom_selection_to_list('1-{0}'.format(sum(args.poscar.atomnums)))
     ]
+args.site = [i - 1 for i in args.site[0]]
 #
 #  Translation
 #
@@ -136,5 +153,10 @@ if args.to_cartesian:
 #
 if args.output is not None:
     args.poscar.save(args.output)
+elif args.split:
+    logger.debug('args.site: {}'.format(args.site))
+    one, other = args.poscar.split(args.site)
+    one.save(args.split[0])
+    other.save(args.split[1])
 else:
     print(args.poscar)
