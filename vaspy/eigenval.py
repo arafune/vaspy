@@ -4,15 +4,29 @@ from __future__ import division, print_function
 
 import csv
 import sys
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
+
+from vaspy.tools import open_by_suffix
 
 try:
     import matplotlib.pyplot as plt
 except ImportError:
     sys.stderr.write(
         'Install matplotlib, or you cannot use methods relating to draw\n')
-from vaspy.tools import open_by_suffix
+
+# logger
+LOGLEVEL = INFO
+logger = getLogger(__name__)
+fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
+formatter = Formatter(fmt)
+handler = StreamHandler()
+handler.setLevel(LOGLEVEL)
+logger.setLevel(LOGLEVEL)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = False
 
 
 class EnergyBand(object):
@@ -241,11 +255,15 @@ class EnergyBand(object):
         recvec: array, numpy.ndarray, optional (default is the unit vector)
             reciprocal vector
 
-            .. Note:: Don't forget that the reciprocal vector used
-                      in VASP needs 2PI to match  the conventional
-                      unit of the wavevector.
+        Notes
+        -----
+            Don't forget that the reciprocal vector used
+            in VASP needs 2PI to match  the conventional
+            unit of the wavevector.
 
         """
+        logger.debug("recvec: {}".format(recvec))
+        logger.debug("self.kvecs: {}".format(self.kvecs))
         recvec = np.array(recvec)
         self.kvecs = np.array([recvec.dot(kvecs) for kvecs in self.kvecs])
 

@@ -43,6 +43,7 @@ import itertools as it
 import re
 
 import numpy as np
+
 from vaspy import tools
 from vaspy.tools import open_by_suffix
 
@@ -277,8 +278,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             Axis used for sort
 
 
-        Note
-        -----
+        Notes
+        ------
         The first site # is "0". It's the pythonic way.
         The element difference is **not** taken into account.
 
