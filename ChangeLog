@@ -1,5 +1,7 @@
-2019-08-16  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
-  * Version 0.5.1b
+2019-08-17  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
+  * Version 0.5.2
+  * Bug fix
+      * mesh3d.grid.slice
 
 
 2019-08-16  Ryuichi Arafune  <ryuichi.arafune@gmail.com>

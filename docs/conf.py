@@ -23,9 +23,9 @@ copyright = '2019, Ryuichi Arafune'
 author = 'Ryuichi Arafune'
 
 # The short X.Y version
-version = '0.5.1b'
+version = '0.5.2'
 # The full version, including alpha/beta/rc tags
-release = '0.5.1b'
+release = '0.5.2'
 
 # -- General configuration ---------------------------------------------------
 
