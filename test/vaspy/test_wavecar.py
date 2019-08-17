@@ -75,6 +75,21 @@ class TestCOWavecar(object):
             -29.49120151, -14.03737717, -11.88106463, -11.88106223, -9.00976389
         ], kbands[0, 0, 0:5])  # The value can be taken from EIGENVAL
 
+    @with_setup(setup=setup)
+    def test_wavecar_str(self):
+        """Test for __str__ special method."""
+        output = self.co.__str__()
+        teststr = "record length  =       711680  spins =           2  "
+        teststr += "prec flag        45200\nno. k points =          1"
+        teststr += "\nno. bands =          54\nreal space lattice vectors:\n"
+        teststr += "a1 = 17.0    0.0    0.0\na2 = 0.0    17.0    0.0\n"
+        teststr += "a3 = 0.0    0.0    17.0\n\nvolume unit cell =   "
+        teststr += "4913.0000000000055\nReciprocal lattice vectors:\n"
+        teststr += "b1 = 0.058823529411764705    0.0    0.0"
+        teststr += "\nb2 = 0.0    0.058823529411764705"
+        teststr += "    0.0\nb3 = 0.0    0.0    0.058823529411764705"
+        eq_(teststr, output)
+
 
 class TestGrapheneWavecar(object):
     '''Class for Test WAVECAR module by using Graphene.wavecar'''

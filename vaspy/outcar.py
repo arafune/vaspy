@@ -217,7 +217,7 @@ class OUTCAR(object):  # Version safety
     def select_posforce(self, posforce_flag, *sites):
         """Return the position and force selected by posforce_flag.
 
-        Note
+        Notes
         -------
         posforce_flag: An 6-element True/False list that indicates
                   the output (ex.) [True, True, False, True, True, False]
