@@ -13,7 +13,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 # import os
-# import sys
+import vaspy
 # sys.path.insert(0, '/Users/arafune/src/vaspy/vaspy')
 
 # -- Project information -----------------------------------------------------
@@ -23,9 +23,9 @@ copyright = '2019, Ryuichi Arafune'
 author = 'Ryuichi Arafune'
 
 # The short X.Y version
-version = '0.5.2'
+version = vaspy.__version__
 # The full version, including alpha/beta/rc tags
-release = '0.5.2'
+release = version
 
 # -- General configuration ---------------------------------------------------
 
