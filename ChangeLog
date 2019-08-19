@@ -1,6 +1,28 @@
 2019-08-19  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
   * Version 0.5.4
   * Bug fix
+  * Coverage test
+
+    Name                Stmts   Miss  Cover
+    ---------------------------------------
+    vaspy/__init__.py      31     11    65%
+    vaspy/bader.py         33      0   100%
+    vaspy/chgcar.py        57     18    68%
+    vaspy/const.py          3      0   100%
+    vaspy/doscar.py       129     78    40%
+    vaspy/eigenval.py     126     39    69%
+    vaspy/locpot.py        42     31    26%
+    vaspy/mesh3d.py       184     29    84%
+    vaspy/outcar.py       124     27    78%
+    vaspy/poscar.py       388    125    68%
+    vaspy/procar.py       240     48    80%
+    vaspy/tools.py         92     51    45%
+    vaspy/vsim_asc.py      90     32    64%
+    vaspy/wavecar.py      196     14    93%
+    vaspy/xdatcar.py       44     15    66%
+    ---------------------------------------
+    TOTAL                1779    518    71%
+
 
 2019-08-17  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
   * Version 0.5.3

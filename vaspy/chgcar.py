@@ -6,6 +6,7 @@ translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 from __future__ import division, print_function  # Version safety
 
 import copy
+
 from vaspy import mesh3d
 from vaspy.tools import open_by_suffix
 
@@ -134,8 +135,7 @@ class CHGCAR(mesh3d.VASPGrid):
             CHGCAR for the majority spin charge
 
         """
-        if len(self.spin) != 2:
-            raise RuntimeError('This CHGCAR is not spinresolved version')
+        assert len(self.spin) == 2, 'This CHGCAR is not spinresolved version'
         dest = copy.deepcopy(self)
         tmp = dest.grid.data.reshape(2, self.grid.size)
         dest.grid.data = ((tmp[0] + tmp[1]) / 2)
@@ -154,8 +154,7 @@ class CHGCAR(mesh3d.VASPGrid):
             CHGCAR for the minority spin charge
 
         """
-        if len(self.spin) != 2:
-            raise RuntimeError('This CHGCAR is not spinresolved version')
+        assert len(self.spin) == 2, 'This CHGCAR is not spinresolved version'
         dest = copy.deepcopy(self)
         tmp = dest.grid.data.reshape(2, self.grid.size)
         dest.grid.data = ((tmp[0] - tmp[1]) / 2)

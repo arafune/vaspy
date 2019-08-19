@@ -9,9 +9,9 @@ import vaspy.chgcar
 
 
 class TestCHGCAR(object):
-    '''Class for test of CHGCAR module
+    """Class for test of CHGCAR module.
 
-    Use CHGCAR for test data'''
+    Use CHGCAR for test data."""
 
     def setup(self):
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
@@ -22,7 +22,7 @@ class TestCHGCAR(object):
 
     @with_setup(setup=setup)
     def test_CHGsum(self):
-        '''test for CHGCAR __add__ method'''
+        """Test for CHGCAR __add__ method."""
         add = self.chgcar_spin + self.chgcar_spin_2
         np.testing.assert_array_almost_equal(
             [9.33086564, 7.45015796, 3.32200981, -0.02888063, -0.83756195],
@@ -32,7 +32,7 @@ class TestCHGCAR(object):
 
     @with_setup(setup=setup)
     def test_CHGmerge(self):
-        '''test for CHGCAR merge method'''
+        """Test for CHGCAR merge method."""
         merge = self.chgcar_spin.merge(self.chgcar_spin_2)
         np.testing.assert_array_almost_equal(
             [9.33086564, 7.45015796, 3.32200981, -0.02888063, -0.83756195],
@@ -42,7 +42,7 @@ class TestCHGCAR(object):
 
     @with_setup(setup=setup)
     def testCHGdiff(self):
-        '''test for CHGCAR __sub__ method'''
+        """Test for CHGCAR __sub__ method."""
         sub = self.chgcar_spin - self.chgcar_spin_2
         np.testing.assert_array_almost_equal(
             [-4.41988373, -3.52902219, -1.57358359, 0.0136803, 0.39673987],
@@ -52,8 +52,7 @@ class TestCHGCAR(object):
 
     @with_setup(setup=setup)
     def test_mag_spin(self):
-        '''test for CHGCAR magnetization
-        '''
+        """Test for CHGCAR magnetization."""
         magCHG = self.chgcar_spin.magnetization()
         eq_(4 * 4 * 6, magCHG.grid.data.size)
         np.testing.assert_array_almost_equal([
@@ -64,7 +63,7 @@ class TestCHGCAR(object):
 
     @with_setup(setup=setup)
     def test_mag_majority(self):
-        '''CHGCAR majority spin'''
+        """Test for CHGCAR majority spin."""
         majorspin = self.chgcar_spin.majorityspin()
         eq_(4 * 4 * 6, majorspin.grid.data.size)
         np.testing.assert_array_almost_equal(
@@ -73,7 +72,7 @@ class TestCHGCAR(object):
 
     @with_setup(setup=setup)
     def test_mag_minority(self):
-        '''CHGCAR minority spin'''
+        """Test for CHGCAR minority spin."""
         minorspin = self.chgcar_spin.minorityspin()
         eq_(4 * 4 * 6, minorspin.grid.data.size)
         np.testing.assert_array_almost_equal(

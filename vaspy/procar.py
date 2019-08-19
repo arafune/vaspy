@@ -58,6 +58,7 @@ class ProjectionBand(eigenval.EnergyBand):
         self.natom = 0
         self.proj = proj
         self.phase = phase
+        self.kvecs = []
 
     def append_sumsite(self, sites, site_name):
         """Append site-sum results.
@@ -361,16 +362,16 @@ class PROCAR(ProjectionBand):  # Version safety
 
         """
         first_line = next(thefile)
-        if 'PROCAR lm decomposed + phase' not in first_line:
-            thefile.close()
-            raise RuntimeError("This PROCAR is not a proper format\n \
-                                Check your INCAR the calculations.\n")
-        kvecs = []
+        assert 'PROCAR lm decomposed + phase' in first_line, \
+            "This PROCAR is not a proper format\n \
+            Check your INCAR the calculations.\n"
+
+        self.kvecs = []
         energies = []
         orbitals = ''
         phase_r = ''
         phase_i = ''
-        orbital_names = []
+        self.label['orbital'] = []
         for line in thefile:
             if line.isspace():
                 continue
@@ -380,9 +381,9 @@ class PROCAR(ProjectionBand):  # Version safety
                 ]
             elif "k-point " in line:
                 try:
-                    kvecs.append([float(i) for i in line.split()[3:6]])
+                    self.kvecs.append([float(i) for i in line.split()[3:6]])
                 except ValueError:
-                    kvecs.append([
+                    self.kvecs.append([
                         np.float_(line[18:29]),
                         np.float_(line[29:40]),
                         np.float_(line[40:51])
@@ -390,8 +391,8 @@ class PROCAR(ProjectionBand):  # Version safety
             elif "band " in line:
                 energies.append(float(line.split()[4]))
             elif "ion" in line:
-                if "tot" in line and not orbital_names:
-                    orbital_names = line.split()[1:]
+                if "tot" in line and not self.label['orbital']:
+                    self.label['orbital'] = line.split()[1:]
                 line = next(thefile)
                 while 'ion ' not in line:
                     if 'tot ' not in line:
@@ -408,11 +409,9 @@ class PROCAR(ProjectionBand):  # Version safety
                         except StopIteration:
                             continue
         #
-        self.kvecs = np.asarray(kvecs[:self.numk])
-        del kvecs
+        self.kvecs = np.asarray(self.kvecs[:self.numk])
         self.proj = np.fromstring(orbitals, dtype=float, sep=' ')
         del orbitals
-        self.label['orbital'] = orbital_names
         norbital = len(self.label['orbital'])
         self.label['site'] = list(range(self.natom))
         self.nspin = self.proj.size // (self.numk * self.nbands * self.natom *
