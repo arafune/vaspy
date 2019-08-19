@@ -317,7 +317,7 @@ class Grid3D(object):
         axis = axis.lower()
         if axis == 'x':
             return griddata.reshape(self.shape[2], self.shape[1],
-                                    self.shape[0])[position, :, :]
+                                    self.shape[0])[:, :, position]
         elif axis == 'y':
             return griddata.reshape(self.shape[2], self.shape[1],
                                     self.shape[0])[:, position, :]
@@ -354,7 +354,7 @@ class Grid3D(object):
             return np.sum(
                 griddata.reshape(self.shape[2], self.shape[1],
                                  self.shape[0])[:, :, from_coor:to_coor],
-                axis=0)
+                axis=2)
         elif axis == 'y':
             return np.sum(
                 griddata.reshape(self.shape[2], self.shape[1],
@@ -364,7 +364,7 @@ class Grid3D(object):
             return np.sum(
                 griddata.reshape(self.shape[2], self.shape[1],
                                  self.shape[0])[from_coor:to_coor, :, :],
-                axis=2)
+                axis=0)
         else:
             raise ValueError('incorrect axis')
 

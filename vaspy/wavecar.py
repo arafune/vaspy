@@ -404,10 +404,9 @@ def make_kgrid(ngrid, gamma=False, para=PARALLEL):
     -----------
     ngrid: tuple or array-like
         Grid size
-    gamma: boolean, optional (default is false)
+    gamma: boolean, default, false
         Set true if only gamma calculations (use vasp with -DwNGZHalf)
     para: boolean, optional (default is global variable `PARALLEL`)
-
 
     Returns
     --------
