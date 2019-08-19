@@ -23,6 +23,7 @@ class TestHatomWavecar(object):
     def test_wavecar_header_and_band(self):
         '''Test for H atom WAVECAR header'''
         ok_(self.h.gamma)
+        ok_(self.h.check_DwNGZHalf())
         eq_(1, self.h.nspin)
         eq_(np.complex64, self.h.prec)
         eq_(1, self.h.numk)
@@ -35,6 +36,8 @@ class TestHatomWavecar(object):
         #
         eq_(260834, self.h.nplwvs[0])
         np.testing.assert_array_equal((260834, 3), self.h.gvectors().shape)
+        np.testing.assert_array_almost_equal([0, 0, 0, 0, 0],
+                                             self.h.realspace_wfc()[0][0][:5])
 
 
 class TestCOWavecar(object):
