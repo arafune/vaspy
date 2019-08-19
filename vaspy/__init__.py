@@ -10,10 +10,10 @@ from vaspy import *
 
 __all__ = [
     'chgcar', 'doscar', 'outcar', 'poscar', 'procar', 'locpot', 'eigenval',
-    'wavecar', 'mesh3d', 'const', 'vsim_asc', 'tools'
+    'wavecar', 'mesh3d', 'const', 'vsim_asc', 'tools', 'load'
 ]
 
-__version__ = "0.5.3"
+__version__ = "0.5.4"
 
 
 def load(filename, mode=None, additional=None):
@@ -32,8 +32,10 @@ def load(filename, mode=None, additional=None):
     Notes
     -----
         * 'mode' is the optional argument, because this function judges
-    the file mode mainly from its name
-        * mode is poscar, outcar, chgcar, procar (case insensitive)
+          the file mode mainly from its name.
+
+        * mode is poscar, outcar, chgcar, procar, locpot, doscar,
+          eigenval, wavecar (case insensitive).
 
     """
     from . import poscar, outcar, chgcar, doscar, locpot, procar

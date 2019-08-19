@@ -1,6 +1,15 @@
 vaspy package
 =============
 
+Module contents
+---------------
+
+.. automodule:: vaspy
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+ 
 Submodules
 ----------
 
@@ -117,10 +126,3 @@ vaspy.xdatcar module
     :show-inheritance:
 
 
-Module contents
----------------
-
-.. automodule:: vaspy
-    :members:
-    :undoc-members:
-    :show-inheritance:
