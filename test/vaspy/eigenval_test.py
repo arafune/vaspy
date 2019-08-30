@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Test for EIGENVAL class'''
+"""Test for EIGENVAL class."""
 import os
 
 import numpy as np
@@ -9,8 +9,7 @@ import vaspy.eigenval as eigenval
 
 
 class TestEIGENVAL(object):
-    '''Class for EIGENVAL class test'''
-
+    """Class for EIGENVAL class test."""
     def setup(self):
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         self.eigenval_spin = eigenval.EIGENVAL(datadir + 'EIGENVAL.spin')
@@ -18,7 +17,7 @@ class TestEIGENVAL(object):
 
     @with_setup(setup=setup)
     def test_check_basic_parameters(self):
-        '''Checking the basic parameters stored'''
+        """Check the basic parameters stored."""
         eq_(344, self.eigenval_spin.natom)
         eq_(2, self.eigenval_spin.nspin)
         eq_(1890, self.eigenval_spin.nbands)
@@ -62,7 +61,7 @@ class TestEIGENVAL(object):
 
     @with_setup(setup=setup)
     def test_make_label(self):
-        '''test for make_label function'''
+        """Test for make_label function."""
         labels_soi = self.eigenval_soi.make_label('k', 'energy')
         eq_('#k', labels_soi[0])
         eq_('Energy', labels_soi[1])
