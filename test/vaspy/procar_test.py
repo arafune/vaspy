@@ -16,7 +16,6 @@ class TestSinglePROCAR(object):
     Use PROCAR_single for test data (dummy PROCAR)
 
     """
-
     def setup(self):
         """PROCAR object by using file of "PROCAR_single" in data directory."""
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
@@ -95,15 +94,15 @@ class TestSinglePROCAR(object):
     def test_singleprocar_sum_site_orbital(self):
         """Testing: sum by site and then sum by orbital (PROCAR_single).
 
-        Also test for orb_index
+        Also test for orbital_index
 
         """
         self.singleprocar.append_sumsite((0, 2), site_name='zero_two')
-        p = self.singleprocar.orb_index('p')
+        p = self.singleprocar.orbital_index('p')
         self.singleprocar.append_sumorbital(p, 'p')
-        pxpy = self.singleprocar.orb_index('pxpy')
+        pxpy = self.singleprocar.orbital_index('pxpy')
         self.singleprocar.append_sumorbital(pxpy, 'pxpy')
-        d = self.singleprocar.orb_index('d')
+        d = self.singleprocar.orbital_index('d')
         self.singleprocar.append_sumorbital(d, 'd')
         np.testing.assert_allclose(self.singleprocar.proj[0, 0, 0, 3], [
             0.0020, 0.0022, 0.0024, 0.0026, 0.0028, 0.0030, 0.0032, 0.0034,
@@ -122,13 +121,13 @@ class TestSinglePROCAR(object):
         self.singleprocar.append_sumsite((0, 2), 'zero_two')
         for orb in ('p', 'pxpy', 'd'):
             self.singleprocar.append_sumorbital(
-                self.singleprocar.orb_index(orb), orb)
+                self.singleprocar.orbital_index(orb), orb)
         eq_(self.singleprocar.make_label((3, ), ((10, 11, 12), )),
             ['#k', 'Energy', 'zero_two_p', 'zero_two_pxpy', 'zero_two_d'])
         # same as above
         eq_(
             self.singleprocar.make_label((3, ),
-                                         ((self.singleprocar.orb_index(o)
+                                         ((self.singleprocar.orbital_index(o)
                                            for o in ('p', 'pxpy', 'd')), )),
             ['#k', 'Energy', 'zero_two_p', 'zero_two_pxpy', 'zero_two_d'])
 
@@ -142,7 +141,7 @@ class TestSinglePROCAR(object):
         self.singleprocar.append_sumsite((0, 2), 'zero_two')
         for orb in ('p', 'pxpy', 'd'):
             self.singleprocar.append_sumorbital(
-                self.singleprocar.orb_index(orb), orb)
+                self.singleprocar.orbital_index(orb), orb)
         eq_(self.singleprocar.make_label((3, ), ((10, 11, 12), )),
             ['#k', 'Energy', 'zero_two_p', 'zero_two_pxpy', 'zero_two_d'])
         eq_(
@@ -160,7 +159,6 @@ class TestSpinPolarizedPROCAR(object):
     """Class for Test of PROCAR module.
 
     Use PROCAR_spin_dummy for test data (dummy PROCAR)"""
-
     def setup(self):
         """PROCAR object by using file of "PROCAR_single" in data directory."""
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
@@ -254,8 +252,8 @@ class TestSpinPolarizedPROCAR(object):
         raise RuntimeError when no item in sitecomposed."""
         self.spinprocar.append_sumsite((0, 2), 'zero_two')
         for orb in ('p', 'pxpy', 'd'):
-            self.spinprocar.append_sumorbital(self.spinprocar.orb_index(orb),
-                                              orb)
+            self.spinprocar.append_sumorbital(
+                self.spinprocar.orbital_index(orb), orb)
         np.testing.assert_allclose(self.spinprocar.proj[0][0][0][3], [
             0.0020, 0.0022, 0.0024, 0.0026, 0.0028, 0.0030, 0.0032, 0.0034,
             0.0036, 0.0252, 0.0072, 0.0048, 0.0160
@@ -275,8 +273,8 @@ class TestSpinPolarizedPROCAR(object):
         """
         self.spinprocar.append_sumsite((0, 2), 'test')
         for orb in ('p', 'pxpy', 'd'):
-            self.spinprocar.append_sumorbital(self.spinprocar.orb_index(orb),
-                                              orb)
+            self.spinprocar.append_sumorbital(
+                self.spinprocar.orbital_index(orb), orb)
         eq_(self.spinprocar.make_label((3, ), (((10, ), (11, ), (12, )), )), [
             '#k', 'Energy_up', 'Energy_down', 'test_up_p', 'test_down_p',
             'test_up_pxpy', 'test_down_pxpy', 'test_up_d', 'test_down_d'
@@ -313,7 +311,6 @@ class TestSOIPROCAR(object):
     """Class for Test of PROCAR module.
 
     Use PROCAR_SOI_dummy for test data (dummy PROCAR)"""
-
     def setup(self):
         """PROCAR object by using file of "PROCAR_single" in data directory"""
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
@@ -427,7 +424,7 @@ class TestSOIPROCAR(object):
         """
         self.soiprocar.append_sumsite((0, 2), 'test')
         for orb in ('p', 'pxpy', 'd'):
-            self.soiprocar.append_sumorbital(self.soiprocar.orb_index(orb),
+            self.soiprocar.append_sumorbital(self.soiprocar.orbital_index(orb),
                                              orb)
         np.testing.assert_allclose(
             self.soiprocar.proj[0][0][0][3],  # mT
@@ -452,7 +449,7 @@ class TestSOIPROCAR(object):
         """
         self.soiprocar.append_sumsite((0, 2), 'test')
         for orb in ('p', 'pxpy', 'd'):
-            self.soiprocar.append_sumorbital(self.soiprocar.orb_index(orb),
+            self.soiprocar.append_sumorbital(self.soiprocar.orbital_index(orb),
                                              orb)
         for orb in ('p', 'pxpy', 'd'):
             self.soiprocar.append_sumorbital(

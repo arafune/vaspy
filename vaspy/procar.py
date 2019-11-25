@@ -51,7 +51,6 @@ class ProjectionBand(eigenval.EnergyBand):
        Phase data.  phase[spin_i, k_i, band_i, site_i, orbital_i]
 
     """
-
     def __init__(self, kvecs=(), energies=(), proj=(), phase=(), nspin=1):
         """Initialize."""
         super(ProjectionBand, self).__init__()
@@ -114,7 +113,7 @@ class ProjectionBand(eigenval.EnergyBand):
         self.proj = np.concatenate((self.proj, sumorbital), axis=-1)
         return sumorbital
 
-    def orb_index(self, arg):
+    def orbital_index(self, arg):
         """Return the indexes corresponding orbital names.
 
         This method returns the tuple of orbital number in
@@ -343,7 +342,6 @@ class PROCAR(ProjectionBand):  # Version safety
          True if read phase data (default is false)
 
     """
-
     def __init__(self, filename=None, phase_read=False):
         """Initialize."""
         super(PROCAR, self).__init__()
