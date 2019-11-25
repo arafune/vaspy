@@ -119,7 +119,7 @@ class ProjectionBand(eigenval.EnergyBand):
         This method returns the tuple of orbital number in
         self.label['orbital'].
         (i.e. self.label['orbital'].index(orbitalname).  If the
-        orbital name has not been in self.orb_names (i.e. if the
+        orbital name has not been in self.orbital_names (i.e. if the
         orbital name is not used in PROCAR file) but the orbital name
         is appropriate as the composed orbital ((ex.) sp, pxpy),
         returns the indexes of the orbitals to be composed as the
@@ -139,27 +139,28 @@ class ProjectionBand(eigenval.EnergyBand):
 
         """
         orbital_names = self.label['orbital']
-        orbname = check_orb_name(arg)
-        if orbname in orbital_names:
-            return (orbital_names.index(orbname), )
-        elif orbname == 'p':
+        orbital_name = check_orbital_name(arg)
+        if orbital_name in orbital_names:
+            return (orbital_names.index(orbital_name), )
+        elif orbital_name == 'p':
             return (orbital_names.index('px'), orbital_names.index('py'),
                     orbital_names.index('pz'))
-        elif orbname == 'd':
+        elif orbital_name == 'd':
             return (orbital_names.index('dxy'), orbital_names.index('dyz'),
                     orbital_names.index('dx2'), orbital_names.index('dxz'),
                     orbital_names.index('dz2'))
-        elif orbname == 'sp':
+        elif orbital_name == 'sp':
             return (orbital_names.index('s'), orbital_names.index('px'),
                     orbital_names.index('py'), orbital_names.index('pz'))
-        elif orbname == 'pxpy':
+        elif orbital_name == 'pxpy':
             return (orbital_names.index('px'), orbital_names.index('py'))
-        elif orbname == 'pypz':
+        elif orbital_name == 'pypz':
             return (orbital_names.index('py'), orbital_names.index('pz'))
-        elif orbname == 'pxpz':
+        elif orbital_name == 'pxpz':
             return (orbital_names.index('px'), orbital_names.index('pz'))
         else:
-            err = str(orbname) + " is not a proper (composed) orbital name."
+            err = str(
+                orbital_name) + " is not a proper (composed) orbital name."
         raise RuntimeError(err)
 
     def make_label(self, site_indexes=None, orbital_indexes_sets=None):
@@ -497,7 +498,7 @@ class PROCAR(ProjectionBand):  # Version safety
             len(self.phase)) + template2
 
 
-def check_orb_name(arg):
+def check_orbital_name(arg):
     """Return arg without change if arg is a member of the 'orbital name'.
 
     If arg is an alias of the (more appropriate) orbital
@@ -526,12 +527,12 @@ def check_orb_name(arg):
         'pzpypx': 'p',
         'spd': 'tot'
     }
-    proper_orb_name_list = [
+    proper_orbital_name_list = [
         's', 'py', 'pz', 'px', 'dxy', 'dyz', 'dz2', 'dxz', 'dx2', 'tot'
     ] + ['sp', 'p', 'pxpy', 'pxpz', 'pypz', 'spd', 'd']
     if arg in translate_dict.keys():
         arg = translate_dict[arg]
-    if arg in proper_orb_name_list:
+    if arg in proper_orbital_name_list:
         return arg
     errmsg = arg + ": (composed) orbital name was not defined."
     raise ValueError(errmsg)

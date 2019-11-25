@@ -119,9 +119,9 @@ class TestSinglePROCAR(object):
     def test_singleprocar_setheader(self):
         """Test for Band_with_projection.set_header."""
         self.singleprocar.append_sumsite((0, 2), 'zero_two')
-        for orb in ('p', 'pxpy', 'd'):
+        for orbital in ('p', 'pxpy', 'd'):
             self.singleprocar.append_sumorbital(
-                self.singleprocar.orbital_index(orb), orb)
+                self.singleprocar.orbital_index(orbital), orbital)
         eq_(self.singleprocar.make_label((3, ), ((10, 11, 12), )),
             ['#k', 'Energy', 'zero_two_p', 'zero_two_pxpy', 'zero_two_d'])
         # same as above
@@ -139,9 +139,9 @@ class TestSinglePROCAR(object):
 
 """)
         self.singleprocar.append_sumsite((0, 2), 'zero_two')
-        for orb in ('p', 'pxpy', 'd'):
+        for orbital in ('p', 'pxpy', 'd'):
             self.singleprocar.append_sumorbital(
-                self.singleprocar.orbital_index(orb), orb)
+                self.singleprocar.orbital_index(orbital), orbital)
         eq_(self.singleprocar.make_label((3, ), ((10, 11, 12), )),
             ['#k', 'Energy', 'zero_two_p', 'zero_two_pxpy', 'zero_two_d'])
         eq_(
@@ -251,9 +251,9 @@ class TestSpinPolarizedPROCAR(object):
 
         raise RuntimeError when no item in sitecomposed."""
         self.spinprocar.append_sumsite((0, 2), 'zero_two')
-        for orb in ('p', 'pxpy', 'd'):
+        for orbital in ('p', 'pxpy', 'd'):
             self.spinprocar.append_sumorbital(
-                self.spinprocar.orbital_index(orb), orb)
+                self.spinprocar.orbital_index(orbital), orbital)
         np.testing.assert_allclose(self.spinprocar.proj[0][0][0][3], [
             0.0020, 0.0022, 0.0024, 0.0026, 0.0028, 0.0030, 0.0032, 0.0034,
             0.0036, 0.0252, 0.0072, 0.0048, 0.0160
@@ -272,9 +272,9 @@ class TestSpinPolarizedPROCAR(object):
         """test for Band_with_projection.set_header  (SPIN).
         """
         self.spinprocar.append_sumsite((0, 2), 'test')
-        for orb in ('p', 'pxpy', 'd'):
+        for orbital in ('p', 'pxpy', 'd'):
             self.spinprocar.append_sumorbital(
-                self.spinprocar.orbital_index(orb), orb)
+                self.spinprocar.orbital_index(orbital), orbital)
         eq_(self.spinprocar.make_label((3, ), (((10, ), (11, ), (12, )), )), [
             '#k', 'Energy_up', 'Energy_down', 'test_up_p', 'test_down_p',
             'test_up_pxpy', 'test_down_pxpy', 'test_up_d', 'test_down_d'
@@ -423,9 +423,9 @@ class TestSOIPROCAR(object):
         raise RuntimeError when no item in sitecomposed
         """
         self.soiprocar.append_sumsite((0, 2), 'test')
-        for orb in ('p', 'pxpy', 'd'):
-            self.soiprocar.append_sumorbital(self.soiprocar.orbital_index(orb),
-                                             orb)
+        for orbital in ('p', 'pxpy', 'd'):
+            self.soiprocar.append_sumorbital(
+                self.soiprocar.orbital_index(orbital), orbital)
         np.testing.assert_allclose(
             self.soiprocar.proj[0][0][0][3],  # mT
             [
@@ -448,12 +448,12 @@ class TestSOIPROCAR(object):
         """test for make_label  (SOI)
         """
         self.soiprocar.append_sumsite((0, 2), 'test')
-        for orb in ('p', 'pxpy', 'd'):
-            self.soiprocar.append_sumorbital(self.soiprocar.orbital_index(orb),
-                                             orb)
-        for orb in ('p', 'pxpy', 'd'):
+        for orbital in ('p', 'pxpy', 'd'):
             self.soiprocar.append_sumorbital(
-                self.soiprocar.label['orbital'].index(orb), orb)
+                self.soiprocar.orbital_index(orbital), orbital)
+        for orbital in ('p', 'pxpy', 'd'):
+            self.soiprocar.append_sumorbital(
+                self.soiprocar.label['orbital'].index(orbital), orbital)
         eq_(self.soiprocar.make_label((3, ), ((10, 11, 12), )), [
             '#k', 'Energy', 'test_mT_p', 'test_mX_p', 'test_mY_p', 'test_mZ_p',
             'test_mT_pxpy', 'test_mX_pxpy', 'test_mY_pxpy', 'test_mZ_pxpy',

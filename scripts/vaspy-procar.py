@@ -113,8 +113,8 @@ for site in sitenames:
     site_indexes.append(procar.label['site'].index(site))
 for orbitals in args.orbital:
     tmp = []
-    for orb_in_site in orbitals:
-        tmp.append(procar.label['orbital'].index(orb_in_site))
+    for orbital_in_site in orbitals:
+        tmp.append(procar.label['orbital'].index(orbital_in_site))
     tmp = tuple(tmp)
     orbtal_indexes_sets.append(tmp)
 site_indexes = tuple(site_indexes)
