@@ -205,7 +205,7 @@ class ProjectionBand(eigenval.EnergyBand):
         Returns
         --------
         list:
-            3D list, the first dimenstion corresponds to the data for  band_i
+            3D list, the first dimenstion corresponds to the data for band_i
             and each band_i contains kdistances, energy (or energies), and
             orbital data.
 

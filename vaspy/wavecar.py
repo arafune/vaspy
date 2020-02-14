@@ -64,7 +64,6 @@ class WAVECAR(object):
         True if Wavecar by vasp with -DwNGZHalf
 
     """
-
     def __init__(self, filename='WAVECAR'):
         """Ideanitialize WAVECAR class."""
         self.wfc = open(filename, 'rb')
