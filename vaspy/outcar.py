@@ -131,6 +131,8 @@ class OUTCAR(object):  # Version safety
                 else:
                     magnetizations.append(
                         [float(x) for x in line.split()[1:4]])
+                    if self.natom == 1:
+                        section.pop()
             elif section == ['total_charge']:
                 if "---------------------------------" in line:
                     pass
@@ -143,6 +145,8 @@ class OUTCAR(object):  # Version safety
                     pass
                 else:
                     total_charges.append([float(x) for x in line.split()[1:4]])
+                    if self.natom == 1:
+                        section.pop()
             elif section == ['kvec_weight']:
                 if len(line) > 3:
                     kvec_weight.append([float(x) for x in line.split()])
