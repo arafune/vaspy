@@ -48,7 +48,7 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
         self.atomnums = [int(x) for x in next(thefile).split()]
         positions = []
         for line in thefile:
-            if 'Direct configuration=' in line:
+            if "Direct configuration=" in line:
                 if positions:
                     self.configurations.append(positions)
                     positions = []
@@ -67,21 +67,22 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
             a string representation of XDATCAR
 
         """
-        tmp = self.system_name + '\n'
-        tmp += '        {}\n'.format(self.scaling_factor)
+        tmp = self.system_name + "\n"
+        tmp += "        {}\n".format(self.scaling_factor)
         for i in range(3):
-            tmp += '      {:#.6f}   {:#.6f}    {:6f}\n'.format(
-                self.cell_vecs[i][0], self.cell_vecs[i][1],
-                self.cell_vecs[i][2])
+            tmp += "      {:#.6f}   {:#.6f}    {:6f}\n".format(
+                self.cell_vecs[i][0], self.cell_vecs[i][1], self.cell_vecs[i][2]
+            )
         for element in self.atomtypes:
-            tmp += '    {}'.format(element)
-        tmp += '\n'
+            tmp += "    {}".format(element)
+        tmp += "\n"
         for atomnum in self.atomnums:
-            tmp += '    {}'.format(atomnum)
-        tmp += '\n'
+            tmp += "    {}".format(atomnum)
+        tmp += "\n"
         for frame_index, positions in enumerate(self.configurations):
-            tmp += 'Direct configuration=    {}\n'.format(frame_index + 1)
+            tmp += "Direct configuration=    {}\n".format(frame_index + 1)
             for position in positions:
-                tmp += '    {:#.6f}    {:#.6f}    {:6f}\n'.format(
-                    position[0], position[1], position[2])
+                tmp += "    {:#.6f}    {:#.6f}    {:6f}\n".format(
+                    position[0], position[1], position[2]
+                )
         return tmp

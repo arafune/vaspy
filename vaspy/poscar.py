@@ -67,21 +67,21 @@ class POSCAR_HEAD(object):
     Attributes
     ----------
     system_name: str
-       system name
+        system name
     scaling_factor: float
-       scaling factor
+        scaling factor
     atomtypes : list
-       list of ion name
+        list of ion name
     atomnums : list
-       list of number of atoms. Corresponding to `atomtypes`
+        list of number of atoms. Corresponding to `atomtypes`
 
     """
 
     def __init__(self):
         """Initialization."""
-        self.__cell_vecs = np.array([[0., 0., 0.], [0., 0., 0.], [0., 0., 0.]])
+        self.__cell_vecs = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
         self.system_name = ""
-        self.scaling_factor = 0.
+        self.scaling_factor = 0.0
         self.atomtypes = []
         self.atomnums = []
         self.__site_label = []
@@ -149,9 +149,7 @@ class POSCAR_HEAD(object):
                         elem_num = elm + str(j)
                     else:
                         atomnames.append(elem_num)
-        self.__site_label = [
-            "#" + str(s) + ":" + a for s, a in enumerate(atomnames)
-        ]
+        self.__site_label = ["#" + str(s) + ":" + a for s, a in enumerate(atomnames)]
         return self.__site_label
 
     @site_label.setter
@@ -187,7 +185,7 @@ class POSCAR_POS(object):
             True if coordinate is cartesian
 
         """
-        return bool(re.search(r'^[ck]', self.coordinate_type, re.I))
+        return bool(re.search(r"^[ck]", self.coordinate_type, re.I))
 
     def is_direct(self):
         """Return True if DIRECT coordinate is set.
@@ -239,7 +237,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         Parameters
         ----------
         poscar: str, list, tuple
-             POSCAR data
+            POSCAR data
 
         """
         poscar = iter(map(str.rstrip, poscar))  # Version safety
@@ -257,7 +255,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         else:
             self.atomnums = [int(x) for x in next(poscar).split()]
         line7 = next(poscar)
-        if re.search(r'^[\s]*Selective\b', line7, re.I):
+        if re.search(r"^[\s]*Selective\b", line7, re.I):
             self.selective = True
             self.coordinate_type = next(poscar)
         else:
@@ -269,13 +267,13 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             tmp = line.split()
             self.positions.append(np.float_(np.array(tmp[:3])))
             if self.selective:
-                self.coordinate_changeflags.append(' '.join(tmp[3:]))
+                self.coordinate_changeflags.append(" ".join(tmp[3:]))
 
     def __iter__(self):
         for each in self.positions:
             yield each
 
-    def sort(self, from_site=0, to_site=None, axis='z'):
+    def sort(self, from_site=0, to_site=None, axis="z"):
         """Sort positions attribute by coordinate.
 
         Parameters
@@ -298,15 +296,19 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         """
         if to_site is None:
             to_site = sum(self.atomnums)
-        if axis == 'x' or axis == 'X' or axis == 0:
+        if axis == "x" or axis == "X" or axis == 0:
             axis = 0
-        elif axis == 'y' or axis == 'Y' or axis == 1:
+        elif axis == "y" or axis == "Y" or axis == 1:
             axis = 1
-        elif axis == 'z' or axis == 'Z' or axis == 2:
+        elif axis == "z" or axis == "Z" or axis == 2:
             axis = 2
-        self.positions = self.positions[:from_site] + sorted(
-            self.positions[from_site:to_site],
-            key=lambda sortaxis: sortaxis[axis]) + self.positions[to_site:]
+        self.positions = (
+            self.positions[:from_site]
+            + sorted(
+                self.positions[from_site:to_site], key=lambda sortaxis: sortaxis[axis]
+            )
+            + self.positions[to_site:]
+        )
 
     def supercell(self, n_x, n_y, n_z):
         r"""Return the :math:`(n_x \\times n_y \\times n_z)` supercell.
@@ -327,9 +329,11 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             POSCAR object of the supercell
 
         """
-        if not isinstance(n_x, int) \
-           or not isinstance(n_y, int) \
-           or not isinstance(n_z, int):
+        if (
+            not isinstance(n_x, int)
+            or not isinstance(n_y, int)
+            or not isinstance(n_z, int)
+        ):
             raise ValueError("arguments must be positive integer")
         if n_x <= 0 or n_y <= 0 or n_z <= 0:
             raise ValueError("arguments must be positive integer")
@@ -353,10 +357,14 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                 for i_y in range(n_y):
                     for i_x in range(n_x):
                         sposcar.positions.append(
-                            np.array([
-                                spos[0] + i_x / n_x, spos[1] + i_y / n_y,
-                                spos[2] + i_z / n_z
-                            ]))
+                            np.array(
+                                [
+                                    spos[0] + i_x / n_x,
+                                    spos[1] + i_y / n_y,
+                                    spos[2] + i_z / n_z,
+                                ]
+                            )
+                        )
         sposcar.coordinate_changeflags = []
         for flags in self.coordinate_changeflags:
             for _ in range(n_x * n_y * n_z):
@@ -401,14 +409,20 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         candidates27 = []
         if self.is_cartesian():
             for i, j, k in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
-                candidates27.append(i * self.cell_vecs[0] +
-                                    j * self.cell_vecs[1] +
-                                    k * self.cell_vecs[2] + position)
+                candidates27.append(
+                    i * self.cell_vecs[0]
+                    + j * self.cell_vecs[1]
+                    + k * self.cell_vecs[2]
+                    + position
+                )
         else:
             for i, j, k in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
-                candidates27.append(i * np.array([1., 0., 0.]) +
-                                    j * np.array([0., 1., 0.]) +
-                                    k * np.array([0., 0., 1.]) + position)
+                candidates27.append(
+                    i * np.array([1.0, 0.0, 0.0])
+                    + j * np.array([0.0, 1.0, 0.0])
+                    + k * np.array([0.0, 0.0, 1.0])
+                    + position
+                )
         return candidates27
 
     def rotate_atom(self, site, axis_name, theta_deg, center):
@@ -434,15 +448,14 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if len(center) != 3:
             raise ValueError
         if not point_in_box(center / self.scaling_factor, self.cell_vecs):
-            raise ValueError('the center must be in the Braves lattice')
+            raise ValueError("the center must be in the Braves lattice")
         if not isinstance(site, int):
-            raise ValueError('argument error in rotate_atom method')
+            raise ValueError("argument error in rotate_atom method")
         if not self.is_cartesian():
             self.to_cartesian()
         position = self.positions[site]
         position -= center / self.scaling_factor
-        position = globals()["rotate_" +
-                             axis_name.lower()](theta_deg).dot(position)
+        position = globals()["rotate_" + axis_name.lower()](theta_deg).dot(position)
         position += center / self.scaling_factor
         self.positions[site] = position
 
@@ -464,7 +477,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         for site in site_list:
             self.rotate_atom(site, axis_name, theta_deg, center)
 
-    def rotate_cell(self, theta_deg, axis_name='Z'):
+    def rotate_cell(self, theta_deg, axis_name="Z"):
         """Rotate unit-cell (rotation angle is set by degree).
 
         Parameters
@@ -481,11 +494,11 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.to_direct()
         axis_name = axis_name.capitalize()
 
-        if axis_name == 'X':
+        if axis_name == "X":
             self.cell_vecs = np.dot(rotate_x(theta_deg), self.cell_vecs.T).T
-        elif axis_name == 'Y':
+        elif axis_name == "Y":
             self.cell_vecs = np.dot(rotate_y(theta_deg), self.cell_vecs.T).T
-        elif axis_name == 'Z':
+        elif axis_name == "Z":
             self.cell_vecs = np.dot(rotate_z(theta_deg), self.cell_vecs.T).T
         if original_is_cartesian:
             self.to_cartesian()
@@ -529,9 +542,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             return NotImplemented
         dest_poscar = copy.deepcopy(self)
         if dest_poscar.scaling_factor != other.scaling_factor:
-            raise ValueError('scaling factor is different.')
+            raise ValueError("scaling factor is different.")
         if np.linalg.norm(dest_poscar.cell_vecs - other.cell_vecs) != 0:
-            raise ValueError('lattice vectors (cell matrix) are different.')
+            raise ValueError("lattice vectors (cell matrix) are different.")
         dest_poscar.atomtypes.extend(other.atomtypes)
         dest_poscar.atomnums.extend(other.atomnums)
         dest_poscar.positions.extend(other.positions)
@@ -561,13 +574,13 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         one.coordinate_changeflags = []
         other.coordinate_changeflags = []
         logger.debug("one.positions: {}".format(one.positions))
-        atoms = tools.atomtypes_atomnums_to_atoms(self.atomtypes,
-                                                  self.atomnums)
+        atoms = tools.atomtypes_atomnums_to_atoms(self.atomtypes, self.atomnums)
         logger.debug("atoms: {}".format(atoms))
         one_atoms = []
         other_atoms = []
         for i, (element, position, coordinate_flag) in enumerate(
-                zip(atoms, self.positions, self.coordinate_changeflags)):
+            zip(atoms, self.positions, self.coordinate_changeflags)
+        ):
             if i in indexes:
                 one_atoms.append(element)
                 one.positions.append(position)
@@ -577,10 +590,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                 other.positions.append(position)
                 other.coordinate_changeflags.append(coordinate_flag)
         logger.debug("one_atoms: {}".format(one_atoms))
-        one.atomtypes, one.atomnums = tools.atoms_to_atomtypes_atomnums(
-            one_atoms)
-        other.atomtypes, other.atomnums = tools.atoms_to_atomtypes_atomnums(
-            other_atoms)
+        one.atomtypes, one.atomnums = tools.atoms_to_atomtypes_atomnums(one_atoms)
+        other.atomtypes, other.atomnums = tools.atoms_to_atomtypes_atomnums(other_atoms)
         return one, other
 
     def merge(self, other):
@@ -658,25 +669,26 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         tmp = []
         tmp.append(self.system_name)
         tmp.append(str(self.scaling_factor))
-        tmp.append(''.join('   {0:20.17f}'.format(i)
-                           for i in self.cell_vecs[0]))
-        tmp.append(''.join('   {0:20.17f}'.format(i)
-                           for i in self.cell_vecs[1]))
-        tmp.append(''.join('   {0:20.17f}'.format(i)
-                           for i in self.cell_vecs[2]))
+        tmp.append("".join("   {0:20.17f}".format(i) for i in self.cell_vecs[0]))
+        tmp.append("".join("   {0:20.17f}".format(i) for i in self.cell_vecs[1]))
+        tmp.append("".join("   {0:20.17f}".format(i) for i in self.cell_vecs[2]))
         if not self.atomtypes[0].isdigit():
-            tmp.append(' ' + ' '.join(self.atomtypes))
-        tmp.append(' ' + ' '.join(str(i) for i in self.atomnums))
+            tmp.append(" " + " ".join(self.atomtypes))
+        tmp.append(" " + " ".join(str(i) for i in self.atomnums))
         if self.selective:
-            tmp.append('Selective Dynamics')
+            tmp.append("Selective Dynamics")
         tmp.append(self.coordinate_type)
-        for pos, t_or_f, atom in tools.ZIPLONG(self.positions,
-                                               self.coordinate_changeflags,
-                                               self.site_label,
-                                               fillvalue=''):
-            tmp.append(' '.join('  {0:20.17f}'.format(i)
-                                for i in pos) + ' ' + t_or_f + ' ' + atom)
-        return '\n'.join(tmp) + '\n'
+        for pos, t_or_f, atom in tools.ZIPLONG(
+            self.positions, self.coordinate_changeflags, self.site_label, fillvalue=""
+        ):
+            tmp.append(
+                " ".join("  {0:20.17f}".format(i) for i in pos)
+                + " "
+                + t_or_f
+                + " "
+                + atom
+            )
+        return "\n".join(tmp) + "\n"
 
     def str_short(self):
         """Return str object (short version).
@@ -690,18 +702,16 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         """
         tmp = []
         tmp.append(self.system_name)
-        tmp.append('  {0:.14f}'.format(self.scaling_factor))
+        tmp.append("  {0:.14f}".format(self.scaling_factor))
         for k in range(3):
-            tmp.append(''.join('{0:12.6f}'.format(i)
-                               for i in self.cell_vecs[k]))
+            tmp.append("".join("{0:12.6f}".format(i) for i in self.cell_vecs[k]))
         if not self.atomtypes[0].isdigit():
-            tmp.append(' ' +
-                       "".join(['{0:>5}'.format(i) for i in self.atomtypes]))
-        tmp.append(''.join(['{0:>6}'.format(i) for i in self.atomnums]))
+            tmp.append(" " + "".join(["{0:>5}".format(i) for i in self.atomtypes]))
+        tmp.append("".join(["{0:>6}".format(i) for i in self.atomnums]))
         tmp.append(self.coordinate_type)
         for pos in self.positions:
-            tmp.append(''.join('{0:10.6f}'.format(i) for i in pos))
-        return '\n'.join(tmp) + '\n'
+            tmp.append("".join("{0:10.6f}".format(i) for i in pos))
+        return "\n".join(tmp) + "\n"
 
     def tune_scaling_factor(self, new_scaling_factor=1.0):
         """Change scaling factor to new value.
@@ -720,12 +730,10 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
         """
         old = self.scaling_factor
-        self.cell_vecs *= (old / new_scaling_factor)
+        self.cell_vecs *= old / new_scaling_factor
         self.scaling_factor = new_scaling_factor
         if self.is_cartesian():
-            self.positions = [
-                i * old / new_scaling_factor for i in self.positions
-            ]
+            self.positions = [i * old / new_scaling_factor for i in self.positions]
 
     def to_cartesian(self):
         """Change the coordinate to cartesian from direct."""
@@ -821,14 +829,12 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if self.is_cartesian():
             vector = _vectorize(vector)
             for i in atomlist:
-                self.positions[i] = (self.positions[i] +
-                                     vector / self.scaling_factor)
+                self.positions[i] = self.positions[i] + vector / self.scaling_factor
         else:
             vector = _vectorize(vector)
             self.to_cartesian()
             for i in atomlist:
-                self.positions[i] = (self.positions[i] +
-                                     vector / self.scaling_factor)
+                self.positions[i] = self.positions[i] + vector / self.scaling_factor
             self.to_direct()
         return self.positions
 
@@ -869,9 +875,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
         """
         try:  # Version safety
-            file = open(filename, mode='w', newline='\n')
+            file = open(filename, mode="w", newline="\n")
         except TypeError:
-            file = open(filename, mode='wb')
+            file = open(filename, mode="wb")
         with file:
             file.write(str(self))
 
@@ -923,10 +929,12 @@ def rotate_x(theta_deg):
     """
     degree = np.pi / 180.0
     return np.array(
-        [[1.0, 0.0, 0.0],
-         [0.0, np.cos(theta_deg * degree), -np.sin(theta_deg * degree)],
-         [0.0, np.sin(theta_deg * degree),
-          np.cos(theta_deg * degree)]])
+        [
+            [1.0, 0.0, 0.0],
+            [0.0, np.cos(theta_deg * degree), -np.sin(theta_deg * degree)],
+            [0.0, np.sin(theta_deg * degree), np.cos(theta_deg * degree)],
+        ]
+    )
 
 
 def rotate_y(theta_deg):
@@ -942,10 +950,12 @@ def rotate_y(theta_deg):
     """
     degree = np.pi / 180.0
     return np.array(
-        [[np.cos(theta_deg * degree), 0.0,
-          np.sin(theta_deg * degree)], [0.0, 1.0, 0.0],
-         [-np.sin(theta_deg * degree), 0.0,
-          np.cos(theta_deg * degree)]])
+        [
+            [np.cos(theta_deg * degree), 0.0, np.sin(theta_deg * degree)],
+            [0.0, 1.0, 0.0],
+            [-np.sin(theta_deg * degree), 0.0, np.cos(theta_deg * degree)],
+        ]
+    )
 
 
 def rotate_z(theta_deg):
@@ -961,9 +971,12 @@ def rotate_z(theta_deg):
     """
     degree = np.pi / 180.0
     return np.array(
-        [[np.cos(theta_deg * degree), -np.sin(theta_deg * degree), 0.0],
-         [np.sin(theta_deg * degree),
-          np.cos(theta_deg * degree), 0.0], [0.0, 0.0, 1.0]])
+        [
+            [np.cos(theta_deg * degree), -np.sin(theta_deg * degree), 0.0],
+            [np.sin(theta_deg * degree), np.cos(theta_deg * degree), 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
 
 
 def three_by_three(vec):
@@ -988,7 +1001,7 @@ def three_by_three(vec):
 
 def _vectorize(vector):
     if not isinstance(vector, (np.ndarray, np.matrix, list, tuple)):
-        raise TypeError('Cannot convert into vector.')
+        raise TypeError("Cannot convert into vector.")
     return np.array(vector).flatten()
 
 
@@ -996,4 +1009,5 @@ def _vectorize(vector):
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

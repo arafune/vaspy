@@ -49,8 +49,7 @@ import numpy as np
 try:
     import matplotlib.pyplot as plt
 except ImportError:
-    sys.stderr.write(
-        'Install matplotlib, or you cannot use methods relating to draw\n')
+    sys.stderr.write("Install matplotlib, or you cannot use methods relating to draw\n")
 from vaspy.tools import open_by_suffix
 
 
@@ -100,8 +99,9 @@ class DOSCAR(object):  # Version safety
         [thefile.readline() for i in range(4)]
         header = thefile.readline()
         self.nbands = int(header[32:37])
-        tdos = np.array([next(thefile).split() for i in range(self.nbands)],
-                        dtype=np.float64)
+        tdos = np.array(
+            [next(thefile).split() for i in range(self.nbands)], dtype=np.float64
+        )
         if tdos.shape[1] == 3:
             tdos = tdos[:, 0:2]
         elif tdos.shape[1] == 5:
@@ -115,8 +115,11 @@ class DOSCAR(object):  # Version safety
             line = ""
         while line == header:
             self.dos_container.append(
-                np.array([next(thefile).split() for i in range(self.nbands)],
-                         dtype=np.float64))
+                np.array(
+                    [next(thefile).split() for i in range(self.nbands)],
+                    dtype=np.float64,
+                )
+            )
             try:
                 line = next(thefile)
             except StopIteration:
@@ -167,13 +170,13 @@ class DOS(object):  # Version safety
         Parameters
         ----------
         i : int, optional (default is all energy)
-             index #
+            index #
 
         Returns
         --------
         np.ndarray
-              the energy value of the i-th point when i set. \
-        If arg is null, return the all energies in DOS object.
+            the energy value of the i-th point when i set. \
+            If arg is null, return the all energies in DOS object.
 
         """
         if i is None:
@@ -185,18 +188,13 @@ class DOS(object):  # Version safety
         """Export data to file object (or file-like object) as csv format."""
         transposed_dos = self.dos.transpose()
         if header is None:
-            with open(filename, mode='wb') as fhandle:
-                np.savetxt(fhandle,
-                           transposed_dos,
-                           delimiter='\t',
-                           newline='\n')
+            with open(filename, mode="wb") as fhandle:
+                np.savetxt(fhandle, transposed_dos, delimiter="\t", newline="\n")
         else:
-            with open(filename, mode='wb') as fhandle:
-                np.savetxt(fhandle,
-                           transposed_dos,
-                           header=header,
-                           delimiter='\t',
-                           newline='\n')
+            with open(filename, mode="wb") as fhandle:
+                np.savetxt(
+                    fhandle, transposed_dos, header=header, delimiter="\t", newline="\n"
+                )
 
 
 class TDOS(DOS):
@@ -260,9 +258,7 @@ class PDOS(DOS):
         super(PDOS, self).__init__(array)
         self.site = "" if site is None else site
         self.orbital_spin = list()
-        orbitalnames = [
-            "s", "py", "pz", "px", "dxy", "dyz", "dz2", "dxz", "dx2"
-        ]
+        orbitalnames = ["s", "py", "pz", "px", "dxy", "dyz", "dz2", "dxz", "dx2"]
         # The above order is refered from sphpro.F of vasp source
         spins_soi = ("mT", "mX", "mY", "mZ")
         spins = ("up", "down")
@@ -280,8 +276,7 @@ class PDOS(DOS):
                     self.dos[i] *= -1
             elif flag == 37:  # SOI
                 self.orbital_spin = [
-                    orb + "_" + spin for orb in orbitalnames
-                    for spin in spins_soi
+                    orb + "_" + spin for orb in orbitalnames for spin in spins_soi
                 ]
             else:
                 raise ValueError("Check the DOS data")
@@ -289,9 +284,7 @@ class PDOS(DOS):
     def graphview(self, *orbitalnames):
         """Show DOS graph by using matplotlib.  For 'just seeing' use."""
         try:
-            alist = [
-                self.orbital_spin.index(orbname) for orbname in orbitalnames
-            ]
+            alist = [self.orbital_spin.index(orbname) for orbname in orbitalnames]
         except ValueError:
             err = "Check argment of this function\n"
             err += "The following name(s) are accpted:\n"
@@ -307,7 +300,7 @@ class PDOS(DOS):
         Parameters
         ----------
         filename: str
-           filename for output
+            filename for output
 
         """
         tmp = ["Energy"]
@@ -327,7 +320,7 @@ class PDOS(DOS):
         Parameters
         ----------
         orbitals: str
-             orbital name
+            orbital name
 
         fermi: float, optional (default is 0.0)
 

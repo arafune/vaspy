@@ -8,12 +8,12 @@ import sys
 
 import numpy as np
 
+from vaspy import mesh3d
+
 try:
     import matplotlib.pyplot as plt
 except ImportError:
-    sys.stderr.write(
-        'Install matplotlib, or you cannot use methods relating to draw\n')
-from vaspy import mesh3d
+    sys.stderr.write("Install matplotlib, or you cannot use methods relating to draw\n")
 
 
 class LOCPOT(mesh3d.VASPGrid):
@@ -40,32 +40,29 @@ class LOCPOT(mesh3d.VASPGrid):
         """
         axis_name = axis_name.capitalize()
         axes_length = self.poscar.axes_lengthes
-        if axis_name == 'X':
-            horizontal_axis = np.linspace(0, axes_length[0],
-                                          self.grid.shape[0])
+        if axis_name == "X":
+            horizontal_axis = np.linspace(0, axes_length[0], self.grid.shape[0])
             plt.clf()
             plt.xlim(xmax=axes_length[0])
-        if axis_name == 'Y':
-            horizontal_axis = np.linspace(0, axes_length[1],
-                                          self.grid.shape[1])
+        if axis_name == "Y":
+            horizontal_axis = np.linspace(0, axes_length[1], self.grid.shape[1])
             plt.clf()
             plt.xlim(xmax=axes_length[1])
-        if axis_name == 'Z':
-            horizontal_axis = np.linspace(0, axes_length[2],
-                                          self.grid.shape[2])
+        if axis_name == "Z":
+            horizontal_axis = np.linspace(0, axes_length[2], self.grid.shape[2])
             plt.clf()
             plt.xlim(xmax=axes_length[2])
         y_average = self.grid.average_along_axis(axis_name, frame)
         y_max = self.grid.max_along_axis(axis_name, frame)
         y_min = self.grid.min_along_axis(axis_name, frame)
         y_median = self.grid.median_along_axis(axis_name, frame)
-        plt.plot(horizontal_axis, y_average, label='average')
-        plt.plot(horizontal_axis, y_max, label='max')
-        plt.plot(horizontal_axis, y_min, label='min')
-        plt.plot(horizontal_axis, y_median, label='median')
+        plt.plot(horizontal_axis, y_average, label="average")
+        plt.plot(horizontal_axis, y_max, label="max")
+        plt.plot(horizontal_axis, y_min, label="min")
+        plt.plot(horizontal_axis, y_median, label="median")
         xlabel = "Position along " + axis_name + "-axis (A)"
         title = "Local potential (" + axis_name + ")"
-        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+        plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left", borderaxespad=0)
         plt.title(title)
         plt.xlabel(xlabel)
         plt.ylabel("Energy  ( eV )")

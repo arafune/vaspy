@@ -16,21 +16,21 @@ class CHGCAR(mesh3d.VASPGrid):
 
     An example of the first few lines of CHGCAR. ::
 
-           hBN-Cu                              # 1st line poscar.POSCAR[0]
-           1.00000000000000                    # 2nd line poscar.POSCAR[1]
-             6.762964    0.000000    0.000000  # 3rd line poscar.POSCAR[2]
-             3.381482    5.856898    0.000000  # 4th line poscar.POSCAR[3]
-             0.000000    0.000000   29.004836  # 5th line poscar.POSCAR[4]
-           B    Cu   N    Si                   # 6th line poscar.POSCAR[5]
-             7    21     7     6               # 7th line poscar.POSCAR[6]
-           Direct                              # 8th line poscar.POSCAR[7]
-             0.047680  0.261795  0.361962      # 9th line poscar.POSCAR[8]
-             ....
-                                               # the single blanck line
-           240   240   288                     # number of gridmesh
-           0.0000 0.0005 0.0002 0.0020 0.0001  # five columns in each line
-           0.0030 0.0025 0.0001 0.0023 0.0003  #  ...
-           ...                                 #  ...
+        hBN-Cu                            # 1st line poscar.POSCAR[0]
+        1.00000000000000                  # 2nd line poscar.POSCAR[1]
+        6.762964    0.000000    0.000000  # 3rd line poscar.POSCAR[2]
+        3.381482    5.856898    0.000000  # 4th line poscar.POSCAR[3]
+        0.000000    0.000000   29.004836  # 5th line poscar.POSCAR[4]
+        B    Cu   N    Si                 # 6th line poscar.POSCAR[5]
+        7    21     7     6               # 7th line poscar.POSCAR[6]
+        Direct                            # 8th line poscar.POSCAR[7]
+        0.047680  0.261795  0.361962      # 9th line poscar.POSCAR[8]
+        ...
+                                            # the single blanck line
+        240   240   288                     # number of gridmesh
+        0.0000 0.0005 0.0002 0.0020 0.0001  # five columns in each line
+        0.0030 0.0025 0.0001 0.0023 0.0003  #  ...
+        ...                                 #  ...
 
 
     Attributes
@@ -98,7 +98,7 @@ class CHGCAR(mesh3d.VASPGrid):
         Returns
         -------
         CHGCAR
-             CHGCAR of the spin-distribution
+            CHGCAR of the spin-distribution
 
         """
         if len(self.spin) == 1:
@@ -108,16 +108,16 @@ class CHGCAR(mesh3d.VASPGrid):
             dest.grid = dest.grid.frame(1)
             dest.spin = ["up-down"]
         elif len(self.spin) == 4:
-            if direction is None or direction == 't':
+            if direction is None or direction == "t":
                 dest.grid = dest.grid.frame(0)
                 dest.spin = ["mT"]
-            if direction == 'x':
+            if direction == "x":
                 dest.grid = dest.grid.frame(1)
                 dest.spin = ["mX"]
-            elif direction == 'y':
+            elif direction == "y":
                 dest.grid = dest.grid.frame(2)
                 dest.spin = ["mY"]
-            elif direction == 'z':
+            elif direction == "z":
                 dest.grid = dest.grid.frame(3)
                 dest.spin = ["mZ"]
         dest.grid.data = dest.grid.data.flatten()
@@ -135,10 +135,10 @@ class CHGCAR(mesh3d.VASPGrid):
             CHGCAR for the majority spin charge
 
         """
-        assert len(self.spin) == 2, 'This CHGCAR is not spinresolved version'
+        assert len(self.spin) == 2, "This CHGCAR is not spinresolved version"
         dest = copy.deepcopy(self)
         tmp = dest.grid.data.reshape(2, self.grid.size)
-        dest.grid.data = ((tmp[0] + tmp[1]) / 2)
+        dest.grid.data = (tmp[0] + tmp[1]) / 2
         dest.spin = ["up"]
         return dest
 
@@ -154,9 +154,9 @@ class CHGCAR(mesh3d.VASPGrid):
             CHGCAR for the minority spin charge
 
         """
-        assert len(self.spin) == 2, 'This CHGCAR is not spinresolved version'
+        assert len(self.spin) == 2, "This CHGCAR is not spinresolved version"
         dest = copy.deepcopy(self)
         tmp = dest.grid.data.reshape(2, self.grid.size)
-        dest.grid.data = ((tmp[0] - tmp[1]) / 2)
+        dest.grid.data = (tmp[0] - tmp[1]) / 2
         dest.spin = ["down"]
         return dest
