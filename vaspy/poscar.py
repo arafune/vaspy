@@ -398,7 +398,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         -----------
         position: numpy.ndarray, list
             atom position defined in the coordinated by
-                         cell_vecs ( scaling facter is not accounted).
+            cell_vecs ( scaling facter is not accounted).
 
         Returns
         --------
@@ -440,8 +440,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             center position for rotation.
 
 
-        :Todo: check the center in the Braves lattice.
-               take into account the periodic boundary.
+        :Todo:  check the center in the Braves lattice.
+                take into account the periodic boundary.
 
         """
         center = _vectorize(center)
@@ -469,9 +469,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         axis_name:
             "X", "x", "Y", "y", "Z",or "z".  Rotation axis.
         theta_deg: float
-             Rotation angle (Degrees).
+            Rotation angle (Degrees).
         center: numpy.ndarray, list, tuple
-             Position of rotation center
+            Position of rotation center
 
         """
         for site in site_list:
@@ -811,9 +811,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         Parameters
         ----------
         vector: list, tuple, numpy.array
-             translational vector (in Cartesian frame)
+            translational vector (in Cartesian frame)
         atomlist: list
-             list of the atom to be moved
+            list of the atom to be moved
 
 
         Note
@@ -823,7 +823,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         Returns
         --------
         numpy.ndarray
-              position
+                position
 
         """
         if self.is_cartesian():
@@ -859,7 +859,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         Parameters
         -----------
         vector: list, numpy.array
-             translational vector
+            translational vector
 
         """
         atomrange = list(range(sum(self.atomnums)))
@@ -871,7 +871,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         Parameters
         ----------
         filename: str
-             File name for save
+            File name for save
 
         """
         try:  # Version safety
@@ -923,8 +923,8 @@ def rotate_x(theta_deg):
     ---------
     >>> rotate_x(60)
     array([[ 1.       ,  0.       ,  0.       ],
-           [ 0.       ,  0.5      , -0.8660254],
-           [ 0.       ,  0.8660254,  0.5      ]])
+            [ 0.       ,  0.5      , -0.8660254],
+            [ 0.       ,  0.8660254,  0.5      ]])
 
     """
     degree = np.pi / 180.0
@@ -944,8 +944,8 @@ def rotate_y(theta_deg):
     --------
     >>> rotate_y(60)
     array([[ 0.5      ,  0.       ,  0.8660254],
-           [ 0.       ,  1.       ,  0.       ],
-           [-0.8660254,  0.       ,  0.5      ]])
+        [ 0.       ,  1.       ,  0.       ],
+        [-0.8660254,  0.       ,  0.5      ]])
 
     """
     degree = np.pi / 180.0
@@ -965,8 +965,8 @@ def rotate_z(theta_deg):
     --------
     >>> rotate_z(60)
     array([[ 0.5      , -0.8660254,  0.       ],
-           [ 0.8660254,  0.5      ,  0.       ],
-           [ 0.       ,  0.       ,  1.       ]])
+        [ 0.8660254,  0.5      ,  0.       ],
+        [ 0.       ,  0.       ,  1.       ]])
 
     """
     degree = np.pi / 180.0

@@ -238,4 +238,3 @@ class OUTCAR(object):  # Version safety
             ]
             for one_cycle in self.posforce
         ]
-

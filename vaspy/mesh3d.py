@@ -32,8 +32,8 @@ class VASPGrid(object):
         Direct                            # 8th line poscar.POSCAR[7]
         0.047680  0.261795  0.361962      # 9th line poscar.POSCAR[8]
         ....
-                                          # the single blanck line
-        240   240   288                   # number of gridmesh
+                                            # the single blanck line
+        240   240   288                     # number of gridmesh
         0.0000 0.0005 0.0002 0.0020 0.0001  # five columns in each line
         0.0030 0.0025 0.0001 0.0023 0.0003  #  ...
         ...                                 #  ...
@@ -290,7 +290,7 @@ class Grid3D(object):
         Parameters
         -----------
         frame_i:int
-           frame index
+            frame index
 
         """
         assert frame_i < self.nframe

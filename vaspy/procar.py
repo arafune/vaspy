@@ -500,22 +500,22 @@ class PROCAR(ProjectionBand):  # Version safety
         Show the PROCAR character, not contents.
         """
         template1 = """The properties of this procar:
-  # of k-points: {0.numk}
-  # of bands: {0.nbands}
-  # of atoms: {0.natom}
-  # of spin: {0.nspin}
-  # of kvecs: {1}
-  # of energies: {2}
+    # of k-points: {0.numk}
+    # of bands: {0.nbands}
+    # of atoms: {0.natom}
+    # of spin: {0.nspin}
+    # of kvecs: {1}
+    # of energies: {2}
     ((# of k-points) * (# of bands) = {0.numk}*{0.nbands}={3})
-  # of orbital component: {4}
+    # of orbital component: {4}
     ((# of k-points) * (# of bands) * (# of ions) =
         {0.numk}*{0.nbands}*{0.natom}={5})
-  # of phase component: {6}"""
+    # of phase component: {6}"""
         string = ""
         for orb in self.label["orbital"]:
             string += "{0}  ".format(orb)
         template2 = """
-  # Orbitals are: {0}
+    # Orbitals are: {0}
         """.format(
             str
         )
