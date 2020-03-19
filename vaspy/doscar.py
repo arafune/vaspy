@@ -4,39 +4,39 @@
 
 From VASP webpage::
 
-  The file DOSCAR contains the DOS and integrated DOS The units are
-  "number of states/unit cell". For dynamic simulations and relaxations,
-  an averaged DOS and an averaged integrated DOS is written to the file.
-  For a description of how the averaging is done see 7.18, 7.32).
-  The first few lines of the DOSCAR file are made up by a header,
-  which is followed by NDOS lines holding three data
+| The file DOSCAR contains the DOS and integrated DOS The units are
+| "number of states/unit cell". For dynamic simulations and relaxations,
+| an averaged DOS and an averaged integrated DOS is written to the file.
+| For a description of how the averaging is done see 7.18, 7.32).
+| The first few lines of the DOSCAR file are made up by a header,
+| which is followed by NDOS lines holding three data
+|
+| energy     dos     integrated_dos
+|
+| For spin-polarized calculations each line holds five data
+|
+| energy     dos(up) dos(dwn)  integrated_dos(up) integrated_dos(dwn)
 
-   energy     dos     integrated_dos
+|  If RWIGS (Wigner Seitz radii, see section 7.29) is set in the INCAR file,
+|  a l- and site-projected DOS is calculated and also written to the file
+|  DOSCAR. One set of data is written for each ion,
+|  each set of data holds NDOS lines with the following data
+|
+|   energy s-dos p-dos d-dos
+|
+|  and
+|
+|   energy s-dos(up) p-dos(up) d-dos(up) s-dos(dwn) p-dos(dwn) d-dos(dwn)
+|
+| for the non spin-polarized and spin polarized case respectively.
+|  The units of the l- and site projected DOS are states/atom.
+|  Please mind, that the site projected DOS is not evaluated
+|  in the parallel version if NPAR is not equal to 1.
 
-  For spin-polarized calculations each line holds five data
-
-   energy     dos(up) dos(dwn)  integrated_dos(up) integrated_dos(dwn)
-
-  If RWIGS (Wigner Seitz radii, see section 7.29) is set in the INCAR file,
-  a l- and site-projected DOS is calculated and also written to the file
-  DOSCAR. One set of data is written for each ion,
-  each set of data holds NDOS lines with the following data
-
-   energy s-dos p-dos d-dos
-
-  and
-
-   energy s-dos(up) p-dos(up) d-dos(up) s-dos(dwn) p-dos(dwn) d-dos(dwn)
-
-  for the non spin-polarized and spin polarized case respectively.
-  The units of the l- and site projected DOS are states/atom.
-  Please mind, that the site projected DOS is not evaluated
-  in the parallel version if NPAR is not equal to 1.
-
-  Mind: For relaxations the DOSCAR is usually useless.
-  If you want to get an accurate DOS for the final configuration
-  copy CONTCAR to POSCAR and make another static (ISTART=1; NSW=0)
-  calculation.
+|  Mind: For relaxations the DOSCAR is usually useless.
+|  If you want to get an accurate DOS for the final configuration
+|  copy CONTCAR to POSCAR and make another static (ISTART=1; NSW=0)
+|  calculation.
 """
 
 from __future__ import division  # Version safety
@@ -138,8 +138,8 @@ class DOS(object):  # Version safety
     Attributes
     -----------
     dos: list
-         the dos data.
-         By default, the first column is the energy, the latter is the density.
+        the dos data.
+        By default, the first column is the energy, the latter is the density.
 
     """
 

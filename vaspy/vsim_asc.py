@@ -12,14 +12,14 @@ This module generates
 2) POVRAY scene file for animation
 
 The first is absolutely required.
- """
+"""
 import itertools
 import logging
 from logging import Formatter, StreamHandler, getLogger
 
 import numpy as np
 
-import vaspy.const as const
+# import vaspy.const as const
 from vaspy.tools import open_by_suffix
 
 logger = getLogger("LogTest")

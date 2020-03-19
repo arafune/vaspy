@@ -86,7 +86,7 @@ class OUTCAR(object):  # Version safety
         """Build posforce_title."""
         self.set_atom_names()
         self.posforce_title = [
-            [i + "_x", i + "_y", i + "_z", i + "_fx", i + "_fy", i + "_fz",]
+            [i + "_x", i + "_y", i + "_z", i + "_fx", i + "_fy", i + "_fz"]
             for i in self.atom_names
         ]
 
