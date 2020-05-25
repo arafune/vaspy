@@ -83,7 +83,7 @@ def atom_selection_to_list(input_str, number=True):
     Returns
     --------
     list
-       ordered "String" represents the number.
+        ordered "String" represents the number.
 
     Example
     --------
