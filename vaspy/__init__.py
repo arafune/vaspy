@@ -9,6 +9,7 @@ import re
 from vaspy import *
 
 __all__ = [
+    "bader",
     "chgcar",
     "doscar",
     "outcar",
@@ -49,7 +50,7 @@ def load(filename, mode=None, additional=None):
             eigenval, wavecar (case insensitive).
 
     """
-    from . import poscar, outcar, chgcar, doscar, locpot, procar
+    from . import poscar, outcar, chgcar, doscar, locpot, procar, bader
     from . import eigenval, wavecar
 
     filenamebase = os.path.basename(filename).lower()
@@ -73,5 +74,7 @@ def load(filename, mode=None, additional=None):
         return eigenval.EIGENVAL(filename)
     elif re.search(r"wavecar", filenamebase) or mode == "wavecar":
         return wavecar.WAVECAR(filename)
+    elif re.search(r"acf", filenamebase) or mode == "bader":
+        return bader.BaderACF(filename)
     else:
         raise RuntimeError("The loding mode cannot be identified!  Set 'mode'")
