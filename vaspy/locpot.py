@@ -27,7 +27,7 @@ class LOCPOT(mesh3d.VASPGrid):
         """Initialize."""
         super(LOCPOT, self).__init__(filename, pickleddata)
 
-    def plot_potential_along_axis(self, axis_name, frame=0):  # FIXME!!
+    def plot_potential_along_axis(self, axis_name, frame=0, save=None):  # FIXME!!
         """Plot potential curve along the axis.
 
         Parameters
@@ -66,6 +66,8 @@ class LOCPOT(mesh3d.VASPGrid):
         plt.title(title)
         plt.xlabel(xlabel)
         plt.ylabel("Energy  ( eV )")
+        if save:
+            plt.savefig(save, dpi=600, format="png")
         plt.show()
 
 
