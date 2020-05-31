@@ -12,7 +12,7 @@ from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 import numpy as np
 from mayavi import mlab
 
-from vaspy import tools
+from vaspy import tools, const
 from vaspy.poscar import POSCAR
 import vaspy
 
@@ -68,6 +68,7 @@ def view3d(
     """
 
     poscar = vaspy_poscar
+    poscar.to_cartesian()
     poscar.tune_scaling_factor(1.0)
     unit_cell = poscar.cell_vecs
     ## poscar.atomnums = [144, 288, 19, 18, 2, 3]
@@ -77,8 +78,20 @@ def view3d(
     site_indexes = {}
     for atom in uniq_atom_symbols:
         site_indexes[atom] = [i for i, x in enumerate(atom_symbols) if x == atom]
-    uniq_atomnums = [len(site_indexes[atom]) for atom in uniq_atom_symbols]
     cell_box = draw_cell_box(unit_cell, line_thickness, line_color)
+    #
+    for atom in uniq_atom_symbols:
+        atom_positions = np.array(poscar.positions)[site_indexes[atom]]
+        mlab.points3d(
+            atom_positions[:, 0],
+            atom_positions[:, 1],
+            atom_positions[:, 2],
+            np.ones(len(site_indexes[atom])) * const.radii[atom],
+            color=const.colors[atom],
+            resolution=60,  #  tunable ?
+            scale_factor=1.0,  # tunable ?
+            name="Atom_{}".format(atom),
+        )
 
 
 def draw_cell_box(unit_cell, line_thickness, line_color):
