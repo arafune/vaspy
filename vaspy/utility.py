@@ -17,7 +17,7 @@ from vaspy import tools, const
 from vaspy.poscar import POSCAR
 import vaspy
 
-LOGLEVEL = DEBUG
+LOGLEVEL = INFO
 logger = getLogger(__name__)
 fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
 formatter = Formatter(fmt)
