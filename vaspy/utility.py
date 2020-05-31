@@ -100,7 +100,8 @@ def view3d(
         if i in const.max_bond_length:
             active_bonds[i] = const.max_bond_length[i]
     # step 2: find the connections
-    for bonds, length in active_bonds:
+    logger.debug(active_bonds.keys())
+    for bonds, length in active_bonds.items():
         atom_a, atom_b = bonds
         connect_sites = []
         if atom_a == atom_b:
@@ -117,6 +118,36 @@ def view3d(
                     < length
                 ):
                     connect_sites.append(i)
+        if not connect_sites:
+            continue
+        positions_a = np.array(poscar.positions)[[i[0] for i in connect_sites]]
+        positions_b = np.array(poscar.positions)[[i[1] for i in connect_sites]]
+        positions_middle = (positions_a + positions_b) / 2.0
+        positions_T = np.zeros((len(connect_sites) * 2, 3))
+        positions_T[1::2, :] = positions_middle
+        bond_connectivity = np.vstack(
+            [range(0, 2 * len(connect_sites), 2), range(1, 2 * len(connect_sites), 2)]
+        ).T
+        positions_T[0::2, :] = positions_a
+        bond_a = mlab.plot3d(
+            positions_T[:, 0],
+            positions_T[:, 1],
+            positions_T[:, 2],
+            tube_radius=0.1,
+            color=const.colors[atom_a],
+            name="Bonds_{}-{}".format(atom_a, atom_b),
+        )
+        bond_a.mlab_source.dataset.lines = bond_connectivity
+        positions_T[0::2, :] = positions_b
+        bond_b = mlab.plot3d(
+            positions_T[:, 0],
+            positions_T[:, 1],
+            positions_T[:, 2],
+            tube_radius=0.1,
+            color=const.colors[atom_b],
+            name="Bonds_{}-{}".format(atom_a, atom_b),
+        )
+        bond_b.mlab_source.dataset.lines = bond_connectivity
 
 
 def draw_cell_box(unit_cell, line_thickness, line_color):
