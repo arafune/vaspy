@@ -34,10 +34,11 @@ def view3d(
     repeat=(1, 1, 1),
     output="output.tiff",
     figsize=(800, 800),
-    bgcolor=(255, 255, 255),
+    bgcolor=(1, 1, 1),
     line_thickness=0.05,
     line_color=(0, 0, 0),
     is_parallel=True,
+    scale=20.0,
     theta=90,
     phi=0,
 ):
@@ -67,8 +68,9 @@ def view3d(
     phi: float
         the azimuth angle of the camera.
     """
-
+    #
     poscar = vaspy_poscar
+    poscar.repack_in_cell()
     poscar.to_cartesian()
     poscar.tune_scaling_factor(1.0)
     unit_cell = poscar.cell_vecs
@@ -79,8 +81,34 @@ def view3d(
     site_indexes = {}
     for atom in uniq_atom_symbols:
         site_indexes[atom] = [i for i, x in enumerate(atom_symbols) if x == atom]
-    cell_box = draw_cell_box(unit_cell, line_thickness, line_color)
+    mlab.clf()
+    fig = mlab.figure(bgcolor=bgcolor, size=figsize)
+    logger.debug("The type of 'fig' is {}".format(type(fig)))
+    # Draw cell box
+    # cell_box = draw_cell_box(unit_cell, line_thickness, line_color)
+    # logger.debug("The type of 'cell_box' is {}".format(type(cell_box)))
+    corner_indexes = np.array(np.meshgrid(range(2), range(2), range(2), indexing="ij"))
+    corner_coordinates = np.array(
+        np.tensordot(unit_cell, corner_indexes, axes=(0, 0))
+    ).reshape((3, -1))
+    corner_indexes = corner_indexes.reshape((3, -1))
+    connections = []
+    for i in range(corner_indexes.shape[1]):
+        for j in range(i):
+            L = corner_indexes[:, i] - corner_indexes[:, j]
+            if list(L).count(0) == 2:
+                connections.append((i, j))
+    cell_box = mlab.plot3d(
+        corner_coordinates[0],
+        corner_coordinates[1],
+        corner_coordinates[2],
+        tube_radius=line_thickness,
+        color=line_color,
+        name="CellBox",
+    )
+    cell_box.mlab_source.dataset.lines = np.array(connections)
     #
+    # Draw atoms
     for atom in uniq_atom_symbols:
         atom_positions = np.array(poscar.positions)[site_indexes[atom]]
         mlab.points3d(
@@ -89,7 +117,7 @@ def view3d(
             atom_positions[:, 2],
             np.ones(len(site_indexes[atom])) * const.radii[atom],
             color=const.colors[atom],
-            resolution=60,  #  tunable ?
+            resolution=60,  # tunable ?
             scale_factor=1.0,  # tunable ?
             name="Atom_{}".format(atom),
         )
@@ -123,31 +151,45 @@ def view3d(
         positions_a = np.array(poscar.positions)[[i[0] for i in connect_sites]]
         positions_b = np.array(poscar.positions)[[i[1] for i in connect_sites]]
         positions_middle = (positions_a + positions_b) / 2.0
-        positions_T = np.zeros((len(connect_sites) * 2, 3))
-        positions_T[1::2, :] = positions_middle
+        positions_bonding = np.zeros((len(connect_sites) * 2, 3))
+        positions_bonding[1::2, :] = positions_middle
         bond_connectivity = np.vstack(
             [range(0, 2 * len(connect_sites), 2), range(1, 2 * len(connect_sites), 2)]
         ).T
-        positions_T[0::2, :] = positions_a
+        # plot the first half of the bond (from atom_a to the half.)
+        positions_bonding[0::2, :] = positions_a
         bond_a = mlab.plot3d(
-            positions_T[:, 0],
-            positions_T[:, 1],
-            positions_T[:, 2],
-            tube_radius=0.1,
+            positions_bonding[:, 0],
+            positions_bonding[:, 1],
+            positions_bonding[:, 2],
+            tube_radius=0.1,  # should be tunable ?
             color=const.colors[atom_a],
             name="Bonds_{}-{}".format(atom_a, atom_b),
         )
         bond_a.mlab_source.dataset.lines = bond_connectivity
-        positions_T[0::2, :] = positions_b
+        # plot the last half of the bond (from atom_b to the half.)
+        positions_bonding[0::2, :] = positions_b
         bond_b = mlab.plot3d(
-            positions_T[:, 0],
-            positions_T[:, 1],
-            positions_T[:, 2],
+            positions_bonding[:, 0],
+            positions_bonding[:, 1],
+            positions_bonding[:, 2],
             tube_radius=0.1,
             color=const.colors[atom_b],
             name="Bonds_{}-{}".format(atom_a, atom_b),
         )
         bond_b.mlab_source.dataset.lines = bond_connectivity
+    logger.debug("ALL setting should be done.")
+    if is_parallel:
+        fig.scene.parallel_projection = True
+        fig.scene.camera.parallel_scale = scale
+        logger.debug(" fig.scene.camera.parallel_scale is {}".format(scale))
+    else:
+        fig.scene.parallel_projection = False
+    mlab.orientation_axes()
+    mlab.view(azimuth=phi, elevation=theta, distance=10)
+    logger.debug("mlab.view ... done")
+    mlab.savefig(output)
+    logger.debug("mlab.save ... done. output file name is {}".format(output))
 
 
 def draw_cell_box(unit_cell, line_thickness, line_color):
