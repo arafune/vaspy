@@ -9,6 +9,7 @@ difficult to make a series of figures of the model structure.
 
 import argparse
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
+import itertools
 import numpy as np
 from mayavi import mlab
 
@@ -92,6 +93,30 @@ def view3d(
             scale_factor=1.0,  # tunable ?
             name="Atom_{}".format(atom),
         )
+    # Drow bonds
+    # step 1: find the bond to draw
+    active_bonds = {}
+    for i in itertools.product(uniq_atom_symbols, uniq_atom_symbols):
+        if i in const.max_bond_length:
+            active_bonds[i] = const.max_bond_length[i]
+    # step 2: find the connections
+    for bonds, length in active_bonds:
+        atom_a, atom_b = bonds
+        connect_sites = []
+        if atom_a == atom_b:
+            for i in itertools.combinations(site_indexes[atom_a], 2):
+                if (
+                    np.linalg.norm(poscar.positions[i[0]] - poscar.positions[i[1]])
+                    < length
+                ):
+                    connect_sites.append(i)
+        else:
+            for i in itertools.product(site_indexes[atom_a], site_indexes[atom_b]):
+                if (
+                    np.linalg.norm(poscar.positions[i[0]] - poscar.positions[i[1]])
+                    < length
+                ):
+                    connect_sites.append(i)
 
 
 def draw_cell_box(unit_cell, line_thickness, line_color):
