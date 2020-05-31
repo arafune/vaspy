@@ -43,7 +43,7 @@ def view3d(
     phi=0,
 ):
     """Drow 3D view by using mayavi.
-    
+
     Parameters
     -------------
     vaspy_obj: vaspy.poscar.POSCAR or vaspy.CHGCAR.CHGCAR, vaspy.CHGCAR.LOCPOT
@@ -68,7 +68,7 @@ def view3d(
     phi: float
         the azimuth angle of the camera.
     """
-    #
+    # Read POSCAR
     poscar = vaspy_poscar
     poscar.repack_in_cell()
     poscar.to_cartesian()
@@ -81,8 +81,8 @@ def view3d(
     site_indexes = {}
     for atom in uniq_atom_symbols:
         site_indexes[atom] = [i for i, x in enumerate(atom_symbols) if x == atom]
-    mlab.clf()
     fig = mlab.figure(bgcolor=bgcolor, size=figsize)
+    mlab.clf()
     logger.debug("The type of 'fig' is {}".format(type(fig)))
     # Draw cell box
     # cell_box = draw_cell_box(unit_cell, line_thickness, line_color)
