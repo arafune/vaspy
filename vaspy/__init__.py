@@ -22,6 +22,7 @@ __all__ = [
     "vsim_asc",
     "tools",
     "load",
+    "utility",
 ]
 
 __version__ = "0.5.4"

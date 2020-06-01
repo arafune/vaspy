@@ -34,6 +34,7 @@ def view3d(
     repeat=(1, 1, 1),
     output="output.tiff",
     figsize=(800, 800),
+    fgcolor=(0, 0, 0),
     bgcolor=(1, 1, 1),
     line_thickness=0.05,
     line_color=(0, 0, 0),
@@ -46,8 +47,8 @@ def view3d(
 
     Parameters
     -------------
-    vaspy_obj: vaspy.poscar.POSCAR or vaspy.CHGCAR.CHGCAR, vaspy.CHGCAR.LOCPOT
-        VASPY object that include POSCAR object
+    vaspy_obj: vaspy.poscar.POSCAR, vaspy.chgcar.CHGCAR or vaspy.locpot.LOCPOT
+        VASPY object that includes POSCAR object
     repeat: tuple of three int. default: (1, 1, 1)
         number of the unit cell repeat. For drawing the supercell structure
         ##FUTURE
@@ -81,7 +82,7 @@ def view3d(
     site_indexes = {}
     for atom in uniq_atom_symbols:
         site_indexes[atom] = [i for i, x in enumerate(atom_symbols) if x == atom]
-    fig = mlab.figure(1, bgcolor=bgcolor, size=figsize)
+    fig = mlab.figure(1, bgcolor=bgcolor, fgcolor=fgcolor, size=figsize)
     mlab.clf()
     logger.debug("The type of 'fig' is {}".format(type(fig)))
     # Draw cell box
@@ -165,11 +166,17 @@ def view3d(
         logger.debug(" fig.scene.camera.parallel_scale is {}".format(scale))
     else:
         fig.scene.parallel_projection = False
-    mlab.orientation_axes()
+    orientation_axes = mlab.orientation_axes()
+    ## for coloring the text of the axis, (X, Y, Z)
+    ## https://github.com/enthought/mayavi/issues/750
+    orientation_axes.axes.x_axis_caption_actor2d.caption_text_property.color = fgcolor
+    orientation_axes.axes.y_axis_caption_actor2d.caption_text_property.color = fgcolor
+    orientation_axes.axes.z_axis_caption_actor2d.caption_text_property.color = fgcolor
     mlab.view(azimuth=phi, elevation=theta, distance=10)
     logger.debug("mlab.view ... done")
     mlab.savefig(output, magnification=5)
     logger.debug("mlab.save ... done. output file name is {}".format(output))
+    return mlab.gcf()
 
 
 def draw_cell_box(unit_cell, line_thickness, line_color):
@@ -203,3 +210,24 @@ def draw_cell_box(unit_cell, line_thickness, line_color):
     )
     cell_box.mlab_source.dataset.lines = np.array(connections)
     return mlab.gcf()
+
+
+if __name__ == "__main__":
+    arg = argparse.ArgumentParser()
+    arg.add_argument(
+        "-o",
+        action="store",
+        dest="outImg",
+        type=str,
+        default="output.tiff",
+        help="Output image name",
+    )
+    arg.add_argument(
+        "-size",
+        action="store",
+        dest="outImgSize",
+        nargs=2,
+        type=int,
+        default=(400, 400),
+        help="Output image size",
+    )
