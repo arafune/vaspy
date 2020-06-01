@@ -52,7 +52,7 @@ def load(filename, mode=None, additional=None):
 
     """
     from . import poscar, outcar, chgcar, doscar, locpot, procar, bader
-    from . import eigenval, wavecar
+    from . import eigenval, wavecar, utility
 
     filenamebase = os.path.basename(filename).lower()
     if isinstance(mode, str):
