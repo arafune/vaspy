@@ -81,7 +81,7 @@ def view3d(
     site_indexes = {}
     for atom in uniq_atom_symbols:
         site_indexes[atom] = [i for i, x in enumerate(atom_symbols) if x == atom]
-    fig = mlab.figure(bgcolor=bgcolor, size=figsize)
+    fig = mlab.figure(1, bgcolor=bgcolor, size=figsize)
     mlab.clf()
     logger.debug("The type of 'fig' is {}".format(type(fig)))
     # Draw cell box
@@ -188,5 +188,5 @@ def view3d(
     mlab.orientation_axes()
     mlab.view(azimuth=phi, elevation=theta, distance=10)
     logger.debug("mlab.view ... done")
-    mlab.savefig(output)
+    mlab.savefig(output, magnification=5)
     logger.debug("mlab.save ... done. output file name is {}".format(output))
