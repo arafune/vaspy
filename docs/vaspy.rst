@@ -126,3 +126,11 @@ vaspy.xdatcar module
     :show-inheritance:
 
 
+vaspy.utility module
+--------------------
+
+.. automodule:: vaspy.utility
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
