@@ -68,7 +68,7 @@ if not any(pff):
 
 outcar = args.outcarfiles.pop(0)
 if args.site is None:
-    args.site = list(range(1, outcar.nions + 1))
+    args.site = list(range(1, outcar.natom + 1))
 
 headers = outcar.select_posforce_header(pff, args.site)
 posforce = outcar.select_posforce(pff, args.site)
