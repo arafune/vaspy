@@ -32,7 +32,7 @@ logger.propagate = False
 def view3d(
     vaspy_poscar,
     repeat=(1, 1, 1),
-    output="output.tiff",
+    output=None,
     figsize=(800, 800),
     fgcolor=(0, 0, 0),
     bgcolor=(1, 1, 1),
@@ -172,10 +172,75 @@ def view3d(
     orientation_axes.axes.x_axis_caption_actor2d.caption_text_property.color = fgcolor
     orientation_axes.axes.y_axis_caption_actor2d.caption_text_property.color = fgcolor
     orientation_axes.axes.z_axis_caption_actor2d.caption_text_property.color = fgcolor
-    mlab.view(azimuth=phi, elevation=theta, distance=10)
-    logger.debug("mlab.view ... done")
-    mlab.savefig(output, magnification=5)
+
+    if output:
+        mlab.view(azimuth=phi, elevation=theta, distance=10)
+        mlab.savefig(output, magnification=5)
     logger.debug("mlab.save ... done. output file name is {}".format(output))
+    return mlab.gcf()
+
+
+def view_atom_with_surface(
+    vaspy_chgcar,
+    repeat=(1, 1, 1),
+    output=None,
+    figsize=(800, 800),
+    fgcolor=(0, 0, 0),
+    bgcolor=(1, 1, 1),
+    line_thickness=0.05,
+    line_color=(0, 0, 0),
+    is_parallel=True,
+    volume_iso_color=(1, 1, 1),
+    scale=20.0,
+    theta=90,
+    phi=0,
+):
+    poscar = vaspy_chgcar.poscar
+    grid_size = vaspy_chgcar.grid.shape
+    volume_data = vaspy_chgcar.grid.data.reshape(
+        (grid_size[2], grid_size[1], grid_size[0])
+    ).T
+    #
+    view3d(
+        poscar,
+        output=None,
+        figsize=figsize,
+        fgcolor=fgcolor,
+        bgcolor=bgcolor,
+        line_thickness=line_thickness,
+        line_color=line_color,
+        is_parallel=is_parallel,
+        scale=scale,
+        theta=theta,
+        phi=phi,
+    )
+    poscar.repack_in_cell()
+    poscar.to_cartesian()
+    poscar.tune_scaling_factor(1.0)
+    unit_cell = poscar.cell_vecs
+    #
+    positions = np.tensordot(
+        unit_cell,
+        np.mgrid[
+            0 : 1 : grid_size[0] * 1j,
+            0 : 1 : grid_size[1] * 1j,
+            0 : 1 : grid_size[2] * 1j,
+        ],
+        axes=(0, 0),
+    )
+    #
+    mlab.contour3d(
+        positions[0],
+        positions[1],
+        positions[2],
+        volume_data,
+        color=volume_iso_color,
+        transparent=True,
+        name="VolumeData",
+    )
+    mlab.view(azimuth=phi, elevation=theta, distance=10)
+    if output:
+        mlab.savefig(output, magnification=5)
     return mlab.gcf()
 
 
