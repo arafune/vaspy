@@ -85,30 +85,10 @@ def view3d(
     mlab.clf()
     logger.debug("The type of 'fig' is {}".format(type(fig)))
     # Draw cell box
-    # cell_box = draw_cell_box(unit_cell, line_thickness, line_color)
-    # logger.debug("The type of 'cell_box' is {}".format(type(cell_box)))
-    corner_indexes = np.array(np.meshgrid(range(2), range(2), range(2), indexing="ij"))
-    corner_coordinates = np.array(
-        np.tensordot(unit_cell, corner_indexes, axes=(0, 0))
-    ).reshape((3, -1))
-    corner_indexes = corner_indexes.reshape((3, -1))
-    connections = []
-    for i in range(corner_indexes.shape[1]):
-        for j in range(i):
-            L = corner_indexes[:, i] - corner_indexes[:, j]
-            if list(L).count(0) == 2:
-                connections.append((i, j))
-    cell_box = mlab.plot3d(
-        corner_coordinates[0],
-        corner_coordinates[1],
-        corner_coordinates[2],
-        tube_radius=line_thickness,
-        color=line_color,
-        name="CellBox",
-    )
-    cell_box.mlab_source.dataset.lines = np.array(connections)
+    draw_cell_box(unit_cell, line_thickness, line_color)
     #
     # Draw atoms
+    #
     for atom in uniq_atom_symbols:
         atom_positions = np.array(poscar.positions)[site_indexes[atom]]
         mlab.points3d(
@@ -190,3 +170,36 @@ def view3d(
     logger.debug("mlab.view ... done")
     mlab.savefig(output, magnification=5)
     logger.debug("mlab.save ... done. output file name is {}".format(output))
+
+
+def draw_cell_box(unit_cell, line_thickness, line_color):
+    """Return mlab.plot3d object of cell box
+
+    unit_cell: three vector
+        Represent the unit cell
+    line_thickness: float
+        thickness of the box line
+    line_color: tuple of int
+        color of the box line
+    """
+    corner_indexes = np.array(np.meshgrid(range(2), range(2), range(2), indexing="ij"))
+    corner_coordinates = np.array(
+        np.tensordot(unit_cell, corner_indexes, axes=(0, 0))
+    ).reshape((3, -1))
+    corner_indexes = corner_indexes.reshape((3, -1))
+    connections = []
+    for i in range(corner_indexes.shape[1]):
+        for j in range(i):
+            L = corner_indexes[:, i] - corner_indexes[:, j]
+            if list(L).count(0) == 2:
+                connections.append((i, j))
+    cell_box = mlab.plot3d(
+        corner_coordinates[0],
+        corner_coordinates[1],
+        corner_coordinates[2],
+        tube_radius=line_thickness,
+        color=line_color,
+        name="CellBox",
+    )
+    cell_box.mlab_source.dataset.lines = np.array(connections)
+    return mlab.gcf()
