@@ -11,6 +11,7 @@ import itertools as it
 import os
 import re
 from collections import Iterable
+import numpy as np
 
 # Version safety
 ZIPLONG = it.izip_longest if hasattr(it, "izip_longest") else it.zip_longest
@@ -163,6 +164,24 @@ def atoms_to_atomtypes_atomnums(atoms):
             atomtypes.append(atom)
         thelast = atom
     return atomtypes, atomnums
+
+
+def cuboid(vectors):
+    """Return the coordinates for cuboid that includes tetrahedron represented by vectors.
+    
+    Parameters
+    ------------
+    vectors: array-like.
+        Three vectors for tetrahedron.
+
+    Return
+    """
+    a = np.array(vectors[0])
+    b = np.array(vectors[1])
+    c = np.array(vectors[2])
+    o = np.array((0, 0, 0))
+    points = np.array((o, a, b, c, a + b, a + c, b + c, a + b + c))
+    return np.array((np.min(points.T, axis=1), np.max(points.T, axis=1)))
 
 
 if __name__ == "__main__":
