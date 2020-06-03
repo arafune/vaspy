@@ -181,7 +181,15 @@ def cuboid(vectors):
     c = np.array(vectors[2])
     o = np.array((0, 0, 0))
     points = np.array((o, a, b, c, a + b, a + c, b + c, a + b + c))
-    return np.array((np.min(points.T, axis=1), np.max(points.T, axis=1)))
+    box = np.array((np.min(points.T, axis=1), np.max(points.T, axis=1))).T
+    return box
+    """return np.array(
+        (
+            (np.array([p[1] - p[0] for p in box])[0], 0, 0),
+            (0, np.array([p[1] - p[0] for p in box])[1], 0),
+            (0, 0, np.array([p[1] - p[0] for p in box])[2]),
+        )
+    )"""
 
 
 if __name__ == "__main__":

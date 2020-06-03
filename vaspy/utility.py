@@ -305,3 +305,41 @@ if __name__ == "__main__":
         default=(400, 400),
         help="Output image size",
     )
+
+
+def grid_nums(original_grids, tetrahedron_vectors, cuboid_vectors):
+    """Return tuple of the Grid determined from the original grids"""
+    new_grids = []
+    for lab_axis in cuboid_vectors:
+        cosins = [
+            np.dot(molecular_axis, lab_axis)
+            / np.linalg.norm(molecular_axis)
+            / np.linalg.norm(lab_axis)
+            for molecular_axis in tetrahedron_vectors
+        ]
+        max_index = np.argmax(cosins)
+        new_grids.append(
+            int(
+                round(
+                    original_grids[max_index]
+                    / (
+                        np.linalg.norm(tetrahedron_vectors[max_index])
+                        * cosins[max_index]
+                        / np.linalg.norm(lab_axis)
+                    )
+                )
+            )
+        )
+    return new_grids
+
+
+def new_grid_nums(original_grids, tetrahedron_vectors):
+    cuboid_box = tools.cuboid(tetrahedron_vectors)
+    cuboid = np.array(
+        (
+            ([p[1] - p[0] for p in cuboid_box][0], 0, 0),
+            (0, [p[1] - p[0] for p in cuboid_box][1], 0),
+            (0, 0, [p[1] - p[0] for p in cuboid_box][2]),
+        )
+    )
+    return tuple(grid_nums(original_grids, tetrahedron_vectors, cuboid))
