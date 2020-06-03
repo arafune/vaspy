@@ -166,6 +166,7 @@ def view3d(
         logger.debug(" fig.scene.camera.parallel_scale is {}".format(scale))
     else:
         fig.scene.parallel_projection = False
+    """
     orientation_axes = mlab.orientation_axes()
     ## for coloring the text of the axis, (X, Y, Z)
     ## https://github.com/enthought/mayavi/issues/750
@@ -177,6 +178,7 @@ def view3d(
         mlab.view(azimuth=phi, elevation=theta, distance=10)
         mlab.savefig(output, magnification=5)
     logger.debug("mlab.save ... done. output file name is {}".format(output))
+    """
     return mlab.gcf()
 
 
@@ -195,6 +197,13 @@ def view_atom_with_surface(
     theta=90,
     phi=0,
 ):
+    """Draw contour surface from CHGCAR, LOCPOT, etc.
+    
+    Important
+    -----------
+    The unit cell must be rectangle.  This limitation comes from mayavi.
+    """
+
     poscar = vaspy_chgcar.poscar
     grid_size = vaspy_chgcar.grid.shape
     volume_data = vaspy_chgcar.grid.data.reshape(
@@ -238,9 +247,9 @@ def view_atom_with_surface(
         transparent=True,
         name="VolumeData",
     )
-    mlab.view(azimuth=phi, elevation=theta, distance=10)
+    """"    mlab.view(azimuth=phi, elevation=theta, distance=10)
     if output:
-        mlab.savefig(output, magnification=5)
+        mlab.savefig(output, magnification=5)"""
     return mlab.gcf()
 
 
