@@ -286,7 +286,7 @@ def draw_cell_box(unit_cell, line_thickness, line_color):
     return mlab.gcf()
 
 
-def _grid_nums(original_grids, crystal_axes, lab_axes):
+def _grid_nums(n_grids, crystal_axes, lab_axes):
     """Return tuple of the Grid determined from the original grids
     
     Parameters
@@ -307,7 +307,7 @@ def _grid_nums(original_grids, crystal_axes, lab_axes):
         new_grids.append(
             int(
                 round(
-                    original_grids[max_index]
+                    n_grids[max_index]
                     / (
                         np.linalg.norm(crystal_axes[max_index])
                         * cosins[max_index]
@@ -319,12 +319,12 @@ def _grid_nums(original_grids, crystal_axes, lab_axes):
     return new_grids
 
 
-def grid_nums(original_grids, crystal_axes):
+def grid_nums(n_grids, crystal_axes):
     """Return the number of gris of the Laboratory frame.
 
     Parameters
     -----------
-    original_grids: tuple
+    n_grids: tuple
         number of grid points. (Written in CHGCAR)
     crystal_axes: array_like
         Three vectors for the laboratory frame.
@@ -340,10 +340,24 @@ def grid_nums(original_grids, crystal_axes):
             (0, 0, [p[1] - p[0] for p in lab_box][2]),
         )
     )
-    return tuple(_grid_nums(original_grids, crystal_axes, lab_axes))
+    return tuple(_grid_nums(n_grids, crystal_axes, lab_axes))
 
 
-def find_diagonal_points(crystal_axes, )
+def find_diagonal_points(n_grids, crystal_axes):
+    """Return the tuple of the index corresponds to origin and its diagonal point.
+
+    Parameters
+    ----------
+
+    crystal_axes: array-like
+        Three vectors that represents a-, b- and c-axis.
+    n_grids
+
+    Returns
+    --------
+    """
+    cuboid = tools.cuboid(crystal_axes)
+    pass
 
 
 if __name__ == "__main__":
