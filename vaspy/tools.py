@@ -172,7 +172,7 @@ def cuboid(vectors):
     Parameters
     ------------
     vectors: array-like.
-        Three vectors for tetrahedron.
+        Three vectors for tetrahedron.  (Crystal axis a,b,c)
 
     Return
     """
