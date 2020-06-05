@@ -320,6 +320,18 @@ def _grid_nums(original_grids, crystal_axes, lab_axes):
 
 
 def grid_nums(original_grids, crystal_axes):
+    """Return the number of gris of the Laboratory frame.
+
+    Parameters
+    -----------
+    original_grids: tuple
+        number of grid points. (Written in CHGCAR)
+    crystal_axes: array_like
+        Three vectors for the laboratory frame.
+
+    Return: tuple
+        number of grid points of the laboratory frame.
+    """
     lab_box = tools.cuboid(crystal_axes)
     lab_axes = np.array(
         (
@@ -329,6 +341,9 @@ def grid_nums(original_grids, crystal_axes):
         )
     )
     return tuple(_grid_nums(original_grids, crystal_axes, lab_axes))
+
+
+def find_diagonal_points(crystal_axes, )
 
 
 if __name__ == "__main__":
