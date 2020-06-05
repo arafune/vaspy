@@ -286,7 +286,7 @@ def draw_cell_box(unit_cell, line_thickness, line_color):
     return mlab.gcf()
 
 
-def grid_nums(original_grids, crystal_axes, lab_axes):
+def _grid_nums(original_grids, crystal_axes, lab_axes):
     """Return tuple of the Grid determined from the original grids
     
     Parameters
@@ -319,7 +319,7 @@ def grid_nums(original_grids, crystal_axes, lab_axes):
     return new_grids
 
 
-def new_grid_nums(original_grids, crystal_axes):
+def grid_nums(original_grids, crystal_axes):
     lab_box = tools.cuboid(crystal_axes)
     lab_axes = np.array(
         (
@@ -328,7 +328,7 @@ def new_grid_nums(original_grids, crystal_axes):
             (0, 0, [p[1] - p[0] for p in lab_box][2]),
         )
     )
-    return tuple(grid_nums(original_grids, crystal_axes, lab_axes)
+    return tuple(_grid_nums(original_grids, crystal_axes, lab_axes))
 
 
 if __name__ == "__main__":
