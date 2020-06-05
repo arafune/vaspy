@@ -166,7 +166,7 @@ def atoms_to_atomtypes_atomnums(atoms):
     return atomtypes, atomnums
 
 
-def cuboid(vectors):
+def cuboid(crystal_axes):
     """Return the coordinates for cuboid that includes tetrahedron represented by vectors.
     
     Parameters
@@ -176,9 +176,9 @@ def cuboid(vectors):
 
     Return
     """
-    a = np.array(vectors[0])
-    b = np.array(vectors[1])
-    c = np.array(vectors[2])
+    a = np.array(crystal_axes[0])
+    b = np.array(crystal_axes[1])
+    c = np.array(crystal_axes[2])
     o = np.array((0, 0, 0))
     points = np.array((o, a, b, c, a + b, a + c, b + c, a + b + c))
     box = np.array((np.min(points.T, axis=1), np.max(points.T, axis=1))).T
