@@ -17,7 +17,7 @@ from vaspy import tools, const
 from vaspy.poscar import POSCAR
 import vaspy
 
-LOGLEVEL = INFO
+LOGLEVEL = DEBUG
 logger = getLogger(__name__)
 fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
 formatter = Formatter(fmt)
@@ -343,7 +343,7 @@ def grid_nums(n_grids, crystal_axes):
     return tuple(_grid_nums(n_grids, crystal_axes, lab_axes))
 
 
-def find_diagonal_points(n_grids, crystal_axes):
+def _find_diagonal_indexes(n_grids, crystal_axes):
     """Return the tuple of the index corresponds to origin and its diagonal point.
 
     Parameters
@@ -357,7 +357,20 @@ def find_diagonal_points(n_grids, crystal_axes):
     --------
     """
     cuboid = tools.cuboid(crystal_axes)
-    pass
+    n_labgrids = grid_nums(n_grids, crystal_axes)
+    o = (0, 0, 0)
+    diag = crystal_axes[0] + crystal_axes[1] + crystal_axes[2]
+    logger.debug("diag: {}".format(diag))
+    index_o = []
+    index_diag = []
+    for i in range(3):
+        tmp = np.abs(np.mgrid[cuboid[i][0] : cuboid[i][1] : n_labgrids[i] * 1j] - o[i])
+        index_o.append(np.where(tmp == tmp.min())[0][0])
+        tmp = np.abs(
+            np.mgrid[cuboid[i][0] : cuboid[i][1] : n_labgrids[i] * 1j] - diag[i]
+        )
+        index_diag.append(np.where(tmp == tmp.min())[0][0])
+    return tuple(index_o), tuple(index_diag)
 
 
 if __name__ == "__main__":
