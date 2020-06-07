@@ -89,8 +89,9 @@ if args.plot:
             data = np.array(data) - data[0]
         plt.plot(data, label=name)
     plt.legend(
-        bbox_to_anchor=(0.0, -0.1),
+        bbox_to_anchor=(-0.1, -0.1),
         loc="upper left",
+        # loc="best",
         borderaxespad=0,
         ncol=len(headers) // 10 + 1,
     )

@@ -729,11 +729,13 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         If you change the cell size, change scaling_factor attribute directly
 
         """
-        old = self.scaling_factor
-        self.cell_vecs *= old / new_scaling_factor
-        self.scaling_factor = new_scaling_factor
+        self.cell_vecs *= self.scaling_factor / new_scaling_factor
         if self.is_cartesian():
-            self.positions = [i * old / new_scaling_factor for i in self.positions]
+            self.positions = [
+                position * self.scaling_factor / new_scaling_factor
+                for position in self.positions
+            ]
+        self.scaling_factor = new_scaling_factor
 
     def to_cartesian(self):
         """Change the coordinate to cartesian from direct."""
