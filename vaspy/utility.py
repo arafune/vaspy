@@ -17,7 +17,7 @@ from vaspy import tools, const
 from vaspy.poscar import POSCAR
 import vaspy
 
-LOGLEVEL = INFO
+LOGLEVEL = DEBUG
 logger = getLogger(__name__)
 fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
 formatter = Formatter(fmt)
@@ -373,7 +373,9 @@ def _find_diagonal_indexes(n_grids, crystal_axes):
     return tuple(index_o), tuple(index_diag)
 
 
-def reallocate_to_labframe(mesh_in_direct_coor, crystal_axes, volume_data):
+def reallocate_to_labframe(
+    mesh_in_direct_coor, crystal_axes, volume_data, no_roll=False
+):
     """Return the volume mesh data in lab frame (Cartesian coordinate).
 
     Parameters
@@ -395,32 +397,40 @@ def reallocate_to_labframe(mesh_in_direct_coor, crystal_axes, volume_data):
         volume_data = volume_data.reshape(mesh_in_direct_coor, order="F")
 
     lab_grid = grid_nums(mesh_in_direct_coor, crystal_axes)
-    ## cuboid = tools.cuboid(crystal_axes)
+    cuboid = tools.cuboid(crystal_axes)
+    len_cuboid = np.array(
+        (
+            cuboid[0][1] - cuboid[0][0],
+            cuboid[1][1] - cuboid[1][0],
+            cuboid[2][1] - cuboid[2][0],
+        )
+    )
+    logger.info("cuboid: {}, len_cuboid: {}".format(cuboid, len_cuboid))
+    len_cyrstal_axes = np.linalg.norm(crystal_axes, axis=1)
+    logger.info("len_crystal_axes: {}".format(len_cyrstal_axes))
     lab_frame = np.empty(lab_grid, dtype=np.float)
     lab_frame[:, :, :] = np.nan
     logger.debug("Shape of lab_frame: {}".format(lab_frame.shape))
     nx = np.linspace(0, 1, mesh_in_direct_coor[0], endpoint=False)
-    logger.debug("nx {}".format(nx))
     ny = np.linspace(0, 1, mesh_in_direct_coor[1], endpoint=False)
     nz = np.linspace(0, 1, mesh_in_direct_coor[2], endpoint=False)
-    det = np.linalg.det(crystal_axes.transpose())
+    index_o = []
+    for i in range(3):
+        tmp = np.abs(np.linspace(cuboid[i][0], cuboid[i][1], lab_grid[i]))
+        idx = np.where(tmp == tmp.min())[0][0]
+        index_o.append(idx)
+    logger.debug("index_o: {}".format(index_o))
     logger.debug("mesh_in_direct_coor is {}".format(mesh_in_direct_coor))
     for i_x in range(mesh_in_direct_coor[0]):
         for i_y in range(mesh_in_direct_coor[1]):
             for i_z in range(mesh_in_direct_coor[2]):
                 logger.debug("ix, iy, iz: {},{}, {}".format(i_x, i_y, i_z))
+                lab_coordinate = crystal_axes.transpose().dot(
+                    np.array((nx[i_x], ny[i_y], nz[i_z]))
+                )
+                relative_lab_coordinate = lab_coordinate / len_cuboid
                 lab_index = (
-                    (
-                        (
-                            crystal_axes.transpose().dot(
-                                np.array((nx[i_x], ny[i_y], nz[i_z]))
-                            )
-                            / det
-                        )
-                        * np.array(mesh_in_direct_coor)
-                    )
-                    .round()
-                    .astype(int)
+                    (np.array(lab_grid) * relative_lab_coordinate).round().astype(int)
                 )
                 logger.debug(
                     "lab_index at {}, {}, {} is {}".format(i_x, i_y, i_z, lab_index)
@@ -429,7 +439,9 @@ def reallocate_to_labframe(mesh_in_direct_coor, crystal_axes, volume_data):
                 lab_frame[lab_index[0], lab_index[1], lab_index[2]] = volume_data[
                     i_x, i_y, i_z
                 ]
-    return lab_frame
+    if no_roll:
+        return lab_frame
+    return np.roll(lab_frame, index_o, (0, 1, 2))
 
 
 if __name__ == "__main__":
