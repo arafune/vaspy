@@ -198,7 +198,7 @@ def view_atom_with_surface(
     phi=0,
 ):
     """Draw contour surface from CHGCAR, LOCPOT, etc.
-    
+
     Important
     -----------
     The unit cell must be rectangle.  This limitation comes from mayavi.
@@ -288,7 +288,7 @@ def draw_cell_box(unit_cell, line_thickness, line_color):
 
 def _grid_nums(n_grids, crystal_axes, lab_axes):
     """Return tuple of the Grid determined from the original grids
-    
+
     Parameters
     ----------
     original_grids:
@@ -373,17 +373,16 @@ def _find_diagonal_indexes(n_grids, crystal_axes):
     return tuple(index_o), tuple(index_diag)
 
 
-def reallocate_to_labaxes_mesh(mesh_in_direct_coor, crystal_axes):
+def reallocate_to_labaxes_mesh(mesh_in_direct_coor, crystal_axes, volume_data):
     """Return the volume mesh data in lab frame (Cartesian coordinate).
-    
+
     Parameters
     --------------
-    
+
     mesh_in_direct_coor: tuple of int
         Number of mesh size
     crystal_axes: array-like
         Vector of crystal axes.
-    
 
     Returns
     --------
@@ -392,7 +391,9 @@ def reallocate_to_labaxes_mesh(mesh_in_direct_coor, crystal_axes):
     """
 
     lab_grid = grid_nums(mesh_in_direct_coor, crystal_axes)
-    cuboid = tools.cuboid(crystal_axes)
+    ## cuboid = tools.cuboid(crystal_axes)
+    lab_frame = np.empty(lab_grid, dtype=np.float)
+    lab_frame[:, :, :] = np.nan
     nx = np.linspace(0, 1, mesh_in_direct_coor[0])
     ny = np.linspace(0, 1, mesh_in_direct_coor[1])
     nz = np.linspace(0, 1, mesh_in_direct_coor[2])
@@ -400,12 +401,14 @@ def reallocate_to_labaxes_mesh(mesh_in_direct_coor, crystal_axes):
     for i_x in range(mesh_in_direct_coor[0]):
         for i_y in range(mesh_in_direct_coor[1]):
             for i_z in range(mesh_in_direct_coor[2]):
-                ( crystal_axes.transpose().dot(
-                            np.array((nx[i_x], ny[i_y], nz[i_z]))
-                        )
-                        / det
-                    )
-                    * np.array(mesh_in_direct_coor)
+                lab_index = (
+                    crystal_axes.transpose().dot(np.array((nx[i_x], ny[i_y], nz[i_z])))
+                    / det
+                )
+                * np.array(mesh_in_direct_coor).round().astype(int)
+                lab_frame[lab_index[0]][lab_index[1]][lab_index[2]] = volume_data[i_x][
+                    i_y
+                ][i_z]
 
 
 if __name__ == "__main__":
