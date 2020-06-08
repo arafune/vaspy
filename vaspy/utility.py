@@ -373,6 +373,41 @@ def _find_diagonal_indexes(n_grids, crystal_axes):
     return tuple(index_o), tuple(index_diag)
 
 
+def reallocate_to_labaxes_mesh(mesh_in_direct_coor, crystal_axes):
+    """Return the volume mesh data in lab frame (Cartesian coordinate).
+    
+    Parameters
+    --------------
+    
+    mesh_in_direct_coor: tuple of int
+        Number of mesh size
+    crystal_axes: array-like
+        Vector of crystal axes.
+    
+
+    Returns
+    --------
+    np.array
+
+    """
+
+    lab_grid = grid_nums(mesh_in_direct_coor, crystal_axes)
+    cuboid = tools.cuboid(crystal_axes)
+    nx = np.linspace(0, 1, mesh_in_direct_coor[0])
+    ny = np.linspace(0, 1, mesh_in_direct_coor[1])
+    nz = np.linspace(0, 1, mesh_in_direct_coor[2])
+    det = np.linalg.det(crystal_axes.transpose())
+    for i_x in range(mesh_in_direct_coor[0]):
+        for i_y in range(mesh_in_direct_coor[1]):
+            for i_z in range(mesh_in_direct_coor[2]):
+                ( crystal_axes.transpose().dot(
+                            np.array((nx[i_x], ny[i_y], nz[i_z]))
+                        )
+                        / det
+                    )
+                    * np.array(mesh_in_direct_coor)
+
+
 if __name__ == "__main__":
     arg = argparse.ArgumentParser()
     arg.add_argument(
