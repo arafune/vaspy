@@ -17,7 +17,7 @@ from vaspy import tools, const
 from vaspy.poscar import POSCAR
 import vaspy
 
-LOGLEVEL = DEBUG
+LOGLEVEL = INFO
 logger = getLogger(__name__)
 fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
 formatter = Formatter(fmt)
@@ -391,27 +391,45 @@ def reallocate_to_labframe(mesh_in_direct_coor, crystal_axes, volume_data):
     np.array
 
     """
-    assert mesh_in_direct_coor == volume_data.shape
+    if not mesh_in_direct_coor == volume_data.shape:
+        volume_data = volume_data.reshape(mesh_in_direct_coor, order="F")
 
     lab_grid = grid_nums(mesh_in_direct_coor, crystal_axes)
     ## cuboid = tools.cuboid(crystal_axes)
     lab_frame = np.empty(lab_grid, dtype=np.float)
     lab_frame[:, :, :] = np.nan
-    nx = np.linspace(0, 1, mesh_in_direct_coor[0])
-    ny = np.linspace(0, 1, mesh_in_direct_coor[1])
-    nz = np.linspace(0, 1, mesh_in_direct_coor[2])
+    logger.debug("Shape of lab_frame: {}".format(lab_frame.shape))
+    nx = np.linspace(0, 1, mesh_in_direct_coor[0], endpoint=False)
+    logger.debug("nx {}".format(nx))
+    ny = np.linspace(0, 1, mesh_in_direct_coor[1], endpoint=False)
+    nz = np.linspace(0, 1, mesh_in_direct_coor[2], endpoint=False)
     det = np.linalg.det(crystal_axes.transpose())
+    logger.debug("mesh_in_direct_coor is {}".format(mesh_in_direct_coor))
     for i_x in range(mesh_in_direct_coor[0]):
         for i_y in range(mesh_in_direct_coor[1]):
             for i_z in range(mesh_in_direct_coor[2]):
+                logger.debug("ix, iy, iz: {},{}, {}".format(i_x, i_y, i_z))
                 lab_index = (
-                    crystal_axes.transpose().dot(np.array((nx[i_x], ny[i_y], nz[i_z])))
-                    / det
+                    (
+                        (
+                            crystal_axes.transpose().dot(
+                                np.array((nx[i_x], ny[i_y], nz[i_z]))
+                            )
+                            / det
+                        )
+                        * np.array(mesh_in_direct_coor)
+                    )
+                    .round()
+                    .astype(int)
                 )
-                * np.array(mesh_in_direct_coor).round().astype(int)
-                lab_frame[lab_index[0]][lab_index[1]][lab_index[2]] = volume_data[i_x][
-                    i_y
-                ][i_z]
+                logger.debug(
+                    "lab_index at {}, {}, {} is {}".format(i_x, i_y, i_z, lab_index)
+                )
+                logger.debug("lab_index {}".format(lab_index))
+                lab_frame[lab_index[0], lab_index[1], lab_index[2]] = volume_data[
+                    i_x, i_y, i_z
+                ]
+    return lab_frame
 
 
 if __name__ == "__main__":
