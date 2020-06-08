@@ -403,9 +403,9 @@ def reallocate_to_labframe(
             cuboid[2][1] - cuboid[2][0],
         )
     )
-    logger.info("cuboid: {}, len_cuboid: {}".format(cuboid, len_cuboid))
+    logger.debug("cuboid: {}, len_cuboid: {}".format(cuboid, len_cuboid))
     len_cyrstal_axes = np.linalg.norm(crystal_axes, axis=1)
-    logger.info("len_crystal_axes: {}".format(len_cyrstal_axes))
+    logger.debug("len_crystal_axes: {}".format(len_cyrstal_axes))
     lab_frame = np.empty(lab_grid, dtype=np.float)
     lab_frame[:, :, :] = np.nan
     logger.debug("Shape of lab_frame: {}".format(lab_frame.shape))
@@ -419,22 +419,18 @@ def reallocate_to_labframe(
         index_o.append(idx)
     logger.debug("index_o: {}".format(index_o))
     logger.debug("mesh_in_direct_coor is {}".format(mesh_in_direct_coor))
-    for i_x in range(mesh_in_direct_coor[0]):
-        for i_y in range(mesh_in_direct_coor[1]):
-            for i_z in range(mesh_in_direct_coor[2]):
-                lab_coordinate = crystal_axes.transpose().dot(
-                    np.array((nx[i_x], ny[i_y], nz[i_z]))
-                )
-                relative_lab_coordinate = lab_coordinate / len_cuboid
-                lab_index = (
-                    (np.array(lab_grid) * relative_lab_coordinate).round().astype(int)
-                )
-                logger.debug(
-                    "lab_index at {}, {}, {} is {}".format(i_x, i_y, i_z, lab_index)
-                )
-                lab_frame[lab_index[0], lab_index[1], lab_index[2]] = volume_data[
-                    i_x, i_y, i_z
-                ]
+    for i_x, i_y, i_z in itertools.product(
+        range(mesh_in_direct_coor[0]),
+        range(mesh_in_direct_coor[1]),
+        range(mesh_in_direct_coor[2]),
+    ):
+        lab_coordinate = crystal_axes.transpose().dot(
+            np.array((nx[i_x], ny[i_y], nz[i_z]))
+        )
+        relative_lab_coordinate = lab_coordinate / len_cuboid
+        lab_index = (np.array(lab_grid) * relative_lab_coordinate).round().astype(int)
+        logger.debug("lab_index at {}, {}, {} is {}".format(i_x, i_y, i_z, lab_index))
+        lab_frame[lab_index[0], lab_index[1], lab_index[2]] = volume_data[i_x, i_y, i_z]
     if no_roll:
         return lab_frame
     return np.roll(lab_frame, index_o, (0, 1, 2))
