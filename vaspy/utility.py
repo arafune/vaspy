@@ -307,7 +307,7 @@ if __name__ == "__main__":
     )
 
 
-def grid_nums(original_grids, tetrahedron_vectors, cuboid_vectors):
+def _grid_nums(original_grids, tetrahedron_vectors, cuboid_vectors):
     """Return tuple of the Grid determined from the original grids"""
     new_grids = []
     for lab_axis in cuboid_vectors:
@@ -333,7 +333,7 @@ def grid_nums(original_grids, tetrahedron_vectors, cuboid_vectors):
     return new_grids
 
 
-def new_grid_nums(original_grids, tetrahedron_vectors):
+def grid_nums(original_grids, tetrahedron_vectors):
     cuboid_box = tools.cuboid(tetrahedron_vectors)
     cuboid = np.array(
         (
@@ -342,4 +342,39 @@ def new_grid_nums(original_grids, tetrahedron_vectors):
             (0, 0, [p[1] - p[0] for p in cuboid_box][2]),
         )
     )
-    return tuple(grid_nums(original_grids, tetrahedron_vectors, cuboid))
+    return tuple(_grid_nums(original_grids, tetrahedron_vectors, cuboid))
+
+
+def reallocate_to_labaxes_mesh(mesh_in_direct_coor, crystal_axes):
+    """Return the volume mesh data in lab frame (Cartesian coordinate).
+    
+    Parameters
+    --------------
+    
+    mesh_in_direct_coor: tuple of int
+        Number of mesh size
+    crystal_axes: array-like
+        Vector of crystal axes.
+    
+
+    Returns
+    --------
+    np.array
+
+    """
+
+    lab_grid = grid_nums(mesh_in_direct_coor, crystal_axes)
+    cuboid = tools.cuboid(crystal_axes)
+    nx = np.linspace(0, 1, mesh_in_direct_coor[0])
+    ny = np.linspace(0, 1, mesh_in_direct_coor[1])
+    nz = np.linspace(0, 1, mesh_in_direct_coor[2])
+    det = np.linalg.det(crystal_axes.transpose())
+    for i_x in range(mesh_in_direct_coor[0]):
+        for i_y in range(mesh_in_direct_coor[1]):
+            for i_z in range(mesh_in_direct_coor[2]):
+                ( crystal_axes.transpose().dot(
+                            np.array((nx[i_x], ny[i_y], nz[i_z]))
+                        )
+                        / det
+                    )
+                    * np.array(mesh_in_direct_coor)
