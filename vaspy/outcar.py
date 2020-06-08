@@ -74,7 +74,6 @@ class OUTCAR(object):  # Version safety
                 if tmp not in self.atom_names:
                     self.atom_names.append(tmp)
                 else:
-                    #                    jj = j
                     while tmp in self.atom_names:
                         j = j + 1
                         tmp = elm + str(j)
