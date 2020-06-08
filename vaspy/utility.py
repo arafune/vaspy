@@ -5,8 +5,6 @@
 In generarl, VESTA is pretty nice. However, due to GUI, it is
 difficult to make a series of figures of the model structure.
 """
-
-
 import argparse
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 import itertools
@@ -17,7 +15,7 @@ from vaspy import tools, const
 from vaspy.poscar import POSCAR
 import vaspy
 
-LOGLEVEL = DEBUG
+LOGLEVEL = INFO
 logger = getLogger(__name__)
 fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
 formatter = Formatter(fmt)
@@ -424,7 +422,6 @@ def reallocate_to_labframe(
     for i_x in range(mesh_in_direct_coor[0]):
         for i_y in range(mesh_in_direct_coor[1]):
             for i_z in range(mesh_in_direct_coor[2]):
-                logger.debug("ix, iy, iz: {},{}, {}".format(i_x, i_y, i_z))
                 lab_coordinate = crystal_axes.transpose().dot(
                     np.array((nx[i_x], ny[i_y], nz[i_z]))
                 )
@@ -435,7 +432,6 @@ def reallocate_to_labframe(
                 logger.debug(
                     "lab_index at {}, {}, {} is {}".format(i_x, i_y, i_z, lab_index)
                 )
-                logger.debug("lab_index {}".format(lab_index))
                 lab_frame[lab_index[0], lab_index[1], lab_index[2]] = volume_data[
                     i_x, i_y, i_z
                 ]
