@@ -8,6 +8,8 @@ from __future__ import print_function  # Version safety
 from __future__ import unicode_literals  # Version safety
 
 from vaspy.tools import open_by_suffix
+from typing import List, Union, TextIO, BinaryIO
+import bz2
 
 
 class OUTCAR(object):  # Version safety
@@ -45,7 +47,7 @@ class OUTCAR(object):  # Version safety
 
     """
 
-    def __init__(self, filename=None):
+    def __init__(self, filename: str = None) -> None:
         """Initialize."""
         self.natom = 0
         self.atomtypes = []
@@ -65,7 +67,7 @@ class OUTCAR(object):  # Version safety
         if filename:
             self.load_file(open_by_suffix(filename))
 
-    def set_atom_names(self):
+    def set_atom_names(self) -> List[str]:
         """Build atom_names (the list of atomname_with_index)."""
         self.atom_names = []
         for elm, ionnum in zip(self.atomtypes, self.atomnums):
@@ -81,7 +83,7 @@ class OUTCAR(object):  # Version safety
                         self.atom_names.append(tmp)
         return self.atom_names
 
-    def set_posforce_title(self):
+    def set_posforce_title(self) -> None:
         """Build posforce_title."""
         self.set_atom_names()
         self.posforce_title = [
@@ -89,7 +91,7 @@ class OUTCAR(object):  # Version safety
             for i in self.atom_names
         ]
 
-    def load_file(self, thefile):
+    def load_file(self, thefile: Union[TextIO, BinaryIO, bz2.BZ2File]) -> None:
         """Parse OUTCAR file.
 
         Parameters
@@ -197,7 +199,7 @@ class OUTCAR(object):  # Version safety
             self.weights.append(i[3])
         thefile.close()
 
-    def select_posforce_header(self, posforce_flag, *sites):
+    def select_posforce_header(self, posforce_flag, *sites) -> List[str]:
         """Return the position and force header selected."""
         if sites == () or sites[0] == []:
             sites = range(1, self.natom + 1)
@@ -214,7 +216,7 @@ class OUTCAR(object):  # Version safety
     # if boolian==True for ithAtom in self.posforce_title  ] #which is
     # correct?
 
-    def select_posforce(self, posforce_flag, *sites):
+    def select_posforce(self, posforce_flag, *sites) -> List[bool]:
         """Return the position and force selected by posforce_flag.
 
         Notes

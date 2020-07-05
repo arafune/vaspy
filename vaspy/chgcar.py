@@ -44,7 +44,7 @@ class CHGCAR(mesh3d.VASPGrid):
 
     """
 
-    def __init__(self, filename=None, pickleddata=None):
+    def __init__(self, filename=None, pickleddata=None) -> None:
         """Initialize."""
         super(CHGCAR, self).__init__(None)
         self.spin = 1

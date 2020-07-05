@@ -8,6 +8,8 @@ from scipy.fftpack import ifftn
 
 import vaspy.mesh3d as mesh3d
 import vaspy.poscar as poscar
+from nptyping import NDArray
+
 
 Ry_in_eV = 13.605826
 au_in_AA = 0.529177249
@@ -65,17 +67,17 @@ class WAVECAR(object):
 
     """
 
-    def __init__(self, filename="WAVECAR"):
+    def __init__(self, filename: str = "WAVECAR") -> None:
         """Ideanitialize WAVECAR class."""
         self.wfc = open(filename, "rb")
-        self.gamma = False
+        self.gamma: bool = False
         #
         self.header()
         self.band()
         if self.numk == 1:
             self.check_DwNGZHalf()
 
-    def header(self):
+    def header(self) -> None:
         """Read the information of the system.
 
         Information of the system is stored in the first two record

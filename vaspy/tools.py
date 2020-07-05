@@ -12,13 +12,15 @@ import os
 import re
 from collections import Iterable
 import numpy as np
+from typing import List, Iterable, Tuple, TextIO, BinaryIO, Union
+from nptyping import NDArray
 
 # Version safety
 ZIPLONG = it.izip_longest if hasattr(it, "izip_longest") else it.zip_longest
 FLATTEN_IGNORE = (dict, str, bytes, bytearray)  # or (dict, basestring)
 
 
-def open_by_suffix(filename):
+def open_by_suffix(filename: str) -> Union[TextIO, BinaryIO, bz2.BZ2File]:
     """Open file."""
     if os.path.splitext(filename)[1] == ".bz2":
         try:
@@ -30,7 +32,7 @@ def open_by_suffix(filename):
     return thefile
 
 
-def each_slice(iterable, n, fillvalue=None):
+def each_slice(iterable: Iterable, n: int, fillvalue=None):
     """each_slice(iterable, n[, fillvalue]) => iterator
 
     make new iterator object which get n item from [iterable] at once.
@@ -39,41 +41,11 @@ def each_slice(iterable, n, fillvalue=None):
     return ZIPLONG(*args, fillvalue=fillvalue)  # Version safety
 
 
-def flatten(nested, target=Iterable, ignore=FLATTEN_IGNORE):
-    """Flatten iterabable object.
-
-    flatten(iterable) => list
-
-    flatten nested iterable.
-    expand object which is included in *target*
-    AND NOT included in *ignore*.
-    default *include* is all iterable object.
-    defualt *ignore* is dict() and str-like objects.
-    (i.e. str, bytes, unicode(2.x), bytearray(3.x))
-
-    >>> flatten((1, [range(2), 3, set([4, 5]), [6]], frozenset([7, 8])))
-    [1, 0, 1, 3, 4, 5, 6, 8, 7]
-    """
-    if isinstance(nested, target) and not isinstance(nested, ignore):
-        nested = list(nested)
-    i = 0
-    while i < len(nested):
-        while isinstance(nested[i], target) and not isinstance(nested[i], ignore):
-            if not nested[i]:
-                nested.pop(i)
-                i -= 1
-                break
-            else:
-                nested[i : i + 1] = nested[i]
-        i += 1
-    return nested
-
-
 _RERANGE = re.compile(r"(\d+)-(\d+)")
 _RESINGLE = re.compile(r"\d+")
 
 
-def atom_selection_to_list(input_str, number=True):
+def atom_selection_to_list(input_str: str, number: bool = True) -> List[int]:
     """Return list of ordered "String" represents the number.
 
     Parameters
@@ -109,7 +81,9 @@ def atom_selection_to_list(input_str, number=True):
     return sorted(output)
 
 
-def atomtypes_atomnums_to_atoms(atomtypes, atomnums):
+def atomtypes_atomnums_to_atoms(
+    atomtypes: Iterable[str], atomnums: Iterable[int]
+) -> Tuple[str, ...]:
     """Return list representation for atom in use.
 
     Parameters
@@ -134,7 +108,7 @@ def atomtypes_atomnums_to_atoms(atomtypes, atomnums):
     return tuple(atoms)
 
 
-def atoms_to_atomtypes_atomnums(atoms):
+def atoms_to_atomtypes_atomnums(atoms: List[str]) -> Tuple[List[str], List[int]]:
     r"""Return atomnums and atomtypes list.
 
     Returns
@@ -166,7 +140,7 @@ def atoms_to_atomtypes_atomnums(atoms):
     return atomtypes, atomnums
 
 
-def cuboid(crystal_axes):
+def cuboid(crystal_axes: NDArray[(3, 3), float]) -> NDArray:
     """Return the coordinates for cuboid that includes tetrahedron represented by vectors.
     
     Parameters

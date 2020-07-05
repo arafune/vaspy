@@ -7,8 +7,9 @@ import os.path
 import re
 
 from vaspy import *
+from typing import Optional, Union, List, Any
 
-__all__ = [
+__all__: List[str] = [
     "bader",
     "chgcar",
     "doscar",
@@ -26,10 +27,12 @@ __all__ = [
     "utility",
 ]
 
-__version__ = "0.5.4"
+__version__: str = "0.5.4"
 
 
-def load(filename, mode=None, additional=None):
+def load(
+    filename: str, mode: Optional[str] = None, additional: Union[bool, str, None] = None
+) -> Any:
     """Load files.
 
     Guess the file type by the filename.

@@ -7,6 +7,8 @@ import sys
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
+from nptyping import NDArray
+from typing import Optional, Tuple
 
 from vaspy.tools import open_by_suffix
 
@@ -66,7 +68,7 @@ class EnergyBand(object):
 
     def __init__(self, kvecs=(), energies=(), nspin=1):
         """Initialize."""
-        self.kvecs = np.array(kvecs)
+        self.kvecs: NDArray = np.array(kvecs)
         self.numk = len(self.kvecs)
         self.label = {}
         try:
@@ -87,7 +89,7 @@ class EnergyBand(object):
         self.label["k"] = ["#k"]
 
     @property
-    def kdistances(self):
+    def kdistances(self) -> NDArray:
         """Return kdistances."""
         return np.cumsum(
             np.linalg.norm(
@@ -96,7 +98,7 @@ class EnergyBand(object):
             )
         )
 
-    def fermi_correction(self, fermi):
+    def fermi_correction(self, fermi: float) -> None:
         """Correct the Fermi level.
 
         Parameters
@@ -107,7 +109,7 @@ class EnergyBand(object):
         """
         self.energies -= fermi
 
-    def make_label(self, *keys):
+    def make_label(self, *keys) -> List[str]:
         """Return array the used for label for CSV-like data.
 
         Parameters
@@ -139,7 +141,7 @@ class EnergyBand(object):
             bandstructure.append(band)
         return bandstructure
 
-    def to_csv(self, csv_file, blankline=True):
+    def to_csv(self, csv_file: str, blankline: bool = True) -> None:
         """Write data to csv file.
 
         Parameters
@@ -152,7 +154,7 @@ class EnergyBand(object):
             It True (default), the blank line is inserted between band data
 
         """
-        label_str = "\t".join(self.make_label("k", "energy")) + "\n"
+        label_str: str = "\t".join(self.make_label("k", "energy")) + "\n"
         with open(csv_file, "w") as fhandle:
             fhandle.writelines(label_str)
             writer = csv.writer(fhandle, delimiter="\t")
@@ -161,7 +163,7 @@ class EnergyBand(object):
                 if blankline:
                     fhandle.writelines("\n")
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return the str object.
 
         Returns
@@ -186,7 +188,7 @@ class EnergyBand(object):
             output += "\n"
         return output
 
-    def figure(self, color="blue", spin_i=0):
+    def figure(self, color: str = "blue", spin_i: int = 0):
         """Return Axes object of the energy band.
 
         Parameters
@@ -219,7 +221,9 @@ class EnergyBand(object):
         ]
         return plt.gca()
 
-    def show(self, yrange=None, spin_i=0):  # How to set default value?
+    def show(
+        self, yrange: Optional[Tuple[float, float]] = None, spin_i: int = 0
+    ) -> None:  # How to set default value?
         """Draw band structure by using maptlotlib.
 
         For 'just seeing' use.
@@ -244,7 +248,7 @@ class EnergyBand(object):
 
     def to_physical_kvector(
         self, recvec=((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0))
-    ):
+    ) -> None:
         """Change kvec unit to inverse AA.
 
         Parameters
@@ -280,7 +284,7 @@ class EIGENVAL(EnergyBand):
 
     """
 
-    def __init__(self, filename=None):
+    def __init__(self, filename: Optional[str] = None) -> None:
         """Initialize."""
         super(EIGENVAL, self).__init__()
         self.natom = 0

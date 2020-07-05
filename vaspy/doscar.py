@@ -45,6 +45,8 @@ from __future__ import print_function  # Version safety
 import copy
 import sys
 import numpy as np
+from typing import Optional
+from nptyping import NDArray
 
 try:
     import matplotlib.pyplot as plt
@@ -76,11 +78,11 @@ class DOSCAR(object):  # Version safety
 
     """
 
-    def __init__(self, filename=None):
+    def __init__(self, filename: Optional[str] = None) -> None:
         """Initialize."""
-        self.natom = 0
-        self.nbands = 0
-        self.dos_container = list()
+        self.natom: int = 0
+        self.nbands: int = 0
+        self.dos_container: list = list()
 
         if filename:
             self.load_file(open_by_suffix(filename))
@@ -164,7 +166,7 @@ class DOS(object):  # Version safety
         """
         self.dos[0] -= fermi
 
-    def energies(self, i=None):
+    def energies(self, i: Optional[str] = None):
         r"""Return the *i*-th energy of the object.
 
         Parameters
@@ -211,7 +213,7 @@ class TDOS(DOS):
 
     """
 
-    def __init__(self, array):
+    def __init__(self, array) -> None:
         """Initialize."""
         super(TDOS, self).__init__(array)
         if len(self.dos) == 2:
@@ -253,7 +255,7 @@ class PDOS(DOS):
 
     """
 
-    def __init__(self, array=None, site=None):
+    def __init__(self, array=None, site=None) -> None:
         """Initialize."""
         super(PDOS, self).__init__(array)
         self.site = "" if site is None else site
