@@ -8,7 +8,7 @@ from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
 from nptyping import NDArray
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 from vaspy.tools import open_by_suffix
 
