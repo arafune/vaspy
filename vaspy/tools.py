@@ -7,20 +7,20 @@ Module for tools used in vaspy
 from __future__ import division, print_function  # Version safety
 
 import bz2
-import itertools as it
+from itertools import zip_longest
 import os
 import re
 from collections import Iterable
 import numpy as np
-from typing import List, Iterable, Tuple, TextIO, BinaryIO, Union
+from typing import List, Iterable, Tuple, Union, IO, Any, Optional
 from nptyping import NDArray
 
 # Version safety
-ZIPLONG = it.izip_longest if hasattr(it, "izip_longest") else it.zip_longest
+# ZIPLONG = it.izip_longest if hasattr(it, "izip_longest") else it.zip_longest
 FLATTEN_IGNORE = (dict, str, bytes, bytearray)  # or (dict, basestring)
 
 
-def open_by_suffix(filename: str) -> Union[TextIO, BinaryIO, bz2.BZ2File]:
+def open_by_suffix(filename: str) -> IO[Any]:
     """Open file."""
     if os.path.splitext(filename)[1] == ".bz2":
         try:
@@ -32,20 +32,24 @@ def open_by_suffix(filename: str) -> Union[TextIO, BinaryIO, bz2.BZ2File]:
     return thefile
 
 
-def each_slice(iterable: Iterable, n: int, fillvalue=None):
+def each_slice(
+    iterable: Iterable, n: int, fillvalue: Optional[float] = None
+) -> Iterable[Any]:
     """each_slice(iterable, n[, fillvalue]) => iterator
 
     make new iterator object which get n item from [iterable] at once.
     """
     args = [iter(iterable)] * n
-    return ZIPLONG(*args, fillvalue=fillvalue)  # Version safety
+    return zip_longest(*args, fillvalue=fillvalue)
 
 
 _RERANGE = re.compile(r"(\d+)-(\d+)")
 _RESINGLE = re.compile(r"\d+")
 
 
-def atom_selection_to_list(input_str: str, number: bool = True) -> List[int]:
+def atom_selection_to_list(
+    input_str: str, number: bool = True
+) -> List[Union[int, str]]:
     """Return list of ordered "String" represents the number.
 
     Parameters
@@ -78,7 +82,7 @@ def atom_selection_to_list(input_str: str, number: bool = True) -> List[int]:
             output.add(each)
     if number:
         return sorted(int(i) for i in output)
-    return sorted(output)
+    return sorted(list(output))
 
 
 def atomtypes_atomnums_to_atoms(
@@ -127,8 +131,8 @@ def atoms_to_atomtypes_atomnums(atoms: List[str]) -> Tuple[List[str], List[int]]
 
     """
     thelast = ""
-    atomnums = []
-    atomtypes = []
+    atomnums: List[int] = []
+    atomtypes: List[str] = []
     while atoms:
         atom = atoms.pop(0)
         if thelast == atom:
@@ -169,7 +173,7 @@ def cuboid(crystal_axes: NDArray[(3, 3), float]) -> NDArray:
 if __name__ == "__main__":
     import argparse
 
-    def EACH_SLICE_DEMO(L, n):
+    def EACH_SLICE_DEMO(L: List[Any], n: int) -> List[Any]:
         return list(each_slice(L, n))
 
     demo = {

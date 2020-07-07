@@ -699,7 +699,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if self.selective:
             tmp.append("Selective Dynamics")
         tmp.append(self.coordinate_type)
-        for pos, t_or_f, atom in tools.ZIPLONG(
+        for pos, t_or_f, atom in it.zip_longest(
             self.positions, self.coordinate_changeflags, self.site_label, fillvalue=""
         ):
             tmp.append(
