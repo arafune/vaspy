@@ -203,10 +203,18 @@ def view_atom_with_surface(
     """
 
     poscar = vaspy_chgcar.poscar
+    poscar.repack_in_cell()
+    poscar.to_cartesian()
+    poscar.tune_scaling_factor(1.0)
+    unit_cell = poscar.cell_vecs
     grid_size = vaspy_chgcar.grid.shape
-    volume_data = vaspy_chgcar.grid.data.reshape(
-        (grid_size[2], grid_size[1], grid_size[0])
-    ).T
+    lab_grid_size = grid_nums(grid_size, poscar.cell_vecs)
+    if grid_size == lab_grid_size:
+        volume_data = vaspy_chgcar.grid.frame(0).data.reshape(grid_size, order="F")
+    else:
+        volume_data = reallocate_to_labframe(
+            grid_size, unit_cell, vaspy_chgcar.grid.frame(0).data
+        )
     #
     view3d(
         poscar,
@@ -221,20 +229,13 @@ def view_atom_with_surface(
         theta=theta,
         phi=phi,
     )
-    poscar.repack_in_cell()
-    poscar.to_cartesian()
-    poscar.tune_scaling_factor(1.0)
-    unit_cell = poscar.cell_vecs
-    #
-    positions = np.tensordot(
-        unit_cell,
-        np.mgrid[
-            0 : 1 : grid_size[0] * 1j,
-            0 : 1 : grid_size[1] * 1j,
-            0 : 1 : grid_size[2] * 1j,
-        ],
-        axes=(0, 0),
-    )
+
+    cuboid = tools.cuboid(unit_cell)
+    positions = np.mgrid[
+        cuboid[0][0] : cuboid[0][1] : lab_grid_size[0] * 1j,
+        cuboid[1][0] : cuboid[1][1] : lab_grid_size[1] * 1j,
+        cuboid[2][0] : cuboid[2][1] : lab_grid_size[2] * 1j,
+    ]
     #
     mlab.contour3d(
         positions[0],

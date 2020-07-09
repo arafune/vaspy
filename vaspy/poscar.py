@@ -572,7 +572,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
         return dest_poscar
 
-    def split(self, indexes):
+    def split(self, indexes: Union[List[int], Tuple[int, ...]]):
         """Split into two POSCAR object.
 
         Useful for differential charge distribution calculations.
@@ -652,7 +652,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             dest_poscar.to_direct()
         return dest_poscar
 
-    def to_list(self) -> list:
+    def to_list(self) -> List[Any]:
         """Return POSCAR as list.
 
         Returns
