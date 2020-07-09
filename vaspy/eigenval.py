@@ -8,7 +8,7 @@ from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
 from nptyping import NDArray
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Any, IO
 
 from vaspy.tools import open_by_suffix
 
@@ -66,7 +66,9 @@ class EnergyBand(object):
 
     """
 
-    def __init__(self, kvecs=(), energies=(), nspin=1):
+    def __init__(
+        self, kvecs=(), energies: NDArray[(Any,), float] = (), nspin=1
+    ) -> None:
         """Initialize."""
         self.kvecs: NDArray = np.array(kvecs)
         self.numk = len(self.kvecs)
@@ -75,7 +77,7 @@ class EnergyBand(object):
             self.nbands = len(energies) // len(kvecs)
         except ZeroDivisionError:
             self.nbands = 0
-        self.energies = energies
+        self.energies: NDArray[(Any,), float] = energies
         self.nspin = nspin
         if self.nspin == 1:  # standard
             self.label["spin"] = [""]
@@ -247,7 +249,10 @@ class EnergyBand(object):
         plt.show()
 
     def to_physical_kvector(
-        self, recvec=((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0))
+        self,
+        recvec: NDArray[(3, 3), float] = np.array(
+            ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)),
+        ),
     ) -> None:
         """Change kvec unit to inverse AA.
 
@@ -292,7 +297,7 @@ class EIGENVAL(EnergyBand):
         if filename:
             self.load_file(open_by_suffix(filename))
 
-    def load_file(self, thefile):
+    def load_file(self, thefile: IO) -> None:
         """Parse EIGENVAL."""
         self.natom, _, _, self.nspin = [int(i) for i in next(thefile).split()]
         if self.nspin == 2:

@@ -5,6 +5,7 @@
 from __future__ import division, print_function
 
 import sys
+from typing import Optional
 
 import numpy as np
 
@@ -23,11 +24,13 @@ class LOCPOT(mesh3d.VASPGrid):
 
     """
 
-    def __init__(self, filename=None, pickleddata=None):
+    def __init__(self, filename: Optional[str] = None, pickleddata=None) -> None:
         """Initialize."""
         super(LOCPOT, self).__init__(filename, pickleddata)
 
-    def plot_potential_along_axis(self, axis_name, frame=0, save=None):  # FIXME!!
+    def plot_potential_along_axis(
+        self, axis_name: str, frame: Optional[int] = 0, save: Optional[str] = None
+    ) -> None:  # FIXME!!
         """Plot potential curve along the axis.
 
         Parameters

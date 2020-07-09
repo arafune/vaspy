@@ -8,6 +8,8 @@ from __future__ import division, print_function
 
 import copy
 import os
+from typing import Optional, IO, Tuple, List
+from nptyping import NDArray
 
 import numpy as np
 
@@ -53,7 +55,7 @@ class VASPGrid(object):
 
     """
 
-    def __init__(self, filename=None, pickleddata=None):
+    def __init__(self, filename: Optional[str] = None, pickleddata=None) -> None:
         """Initialize."""
         self.poscar = poscar.POSCAR()
         self.grid = Grid3D()
@@ -61,7 +63,7 @@ class VASPGrid(object):
         if filename:
             self.load_file(open_by_suffix(filename), pickleddata)
 
-    def load_file(self, thefile, pickleddata=None):
+    def load_file(self, thefile: IO, pickleddata=None) -> None:
         """Construct the object from the file.
 
         Parameters
@@ -77,13 +79,13 @@ class VASPGrid(object):
         tmp = []
         griddata = ""
         # read POSCAR part
-        line = thefile.readline()
+        line: str = thefile.readline()
         while not line.isspace():
             tmp.append(line.strip("\n"))
             line = thefile.readline()
         self.poscar.load_array(tmp)
         # read grid size and use it as separator
-        separator = thefile.readline()
+        separator: str = thefile.readline()
         self.grid.shape = tuple([int(string) for string in separator.split()])
         # Volumetric data
         if pickleddata:
@@ -138,7 +140,7 @@ class VASPGrid(object):
         meshstr = self.grid.__str__()
         return poscarstr + meshstr + "\n"
 
-    def save(self, filename):
+    def save(self, filename: str) -> None:
         """Save object as the same file-style.
 
         Parameters
@@ -154,7 +156,7 @@ class VASPGrid(object):
         with thefile:
             thefile.write(str(self))
 
-    def frame(self, frame_i):
+    def frame(self, frame_i: int):
         """Return VASPGrid object for only frame_i th frame.
 
         Parameters
@@ -266,16 +268,20 @@ class Grid3D(object):
 
     """
 
-    def __init__(self, shape=(0, 0, 0), data=None):
+    def __init__(
+        self,
+        shape: Tuple[int, int, int] = (0, 0, 0),
+        data: Optional[List[float]] = None,
+    ) -> None:
         """Initialize."""
         self.shape = shape
         if data is None:
-            self.data = []
+            self.data = np.array([])
         else:
             self.data = np.asarray(data)
 
     @property
-    def size(self):
+    def size(self) -> Tuple[int, int, int]:
         """Return the number of meshes in the frame."""
         return self.shape[0] * self.shape[1] * self.shape[2]
 
@@ -284,7 +290,7 @@ class Grid3D(object):
         """Return the number of grid frames."""
         return divmod(self.data.size, self.size)[0]
 
-    def frame(self, frame_i):
+    def frame(self, frame_i: int) -> NDArray:
         """Return the i-th frame.
 
         Parameters
@@ -298,7 +304,7 @@ class Grid3D(object):
         dest.data = self.data.reshape(self.nframe, self.size)[frame_i]
         return dest
 
-    def slice(self, position, axis="z", frame_i=0):
+    def slice(self, position, axis: str = "z", frame_i: int = 0) -> NDArray:
         """
         Parameters
         ----------
@@ -330,7 +336,13 @@ class Grid3D(object):
         else:
             raise RuntimeError('axis must be "x", "y" or "z".')
 
-    def integrate(self, axis, from_coor=None, to_coor=None, frame_i=0):
+    def integrate(
+        self,
+        axis: str,
+        from_coor: Optional[int] = None,
+        to_coor: Optional[int] = None,
+        frame_i: int = 0,
+    ) -> NDArray:
         """Return 2D data integrated occupacy along the 'axis'.
 
         Integration range can be specified by from_coor and to_coor.
@@ -377,7 +389,7 @@ class Grid3D(object):
         else:
             raise ValueError("incorrect axis")
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return as string object.
 
         x.__str__() <=> str(x)
@@ -402,7 +414,7 @@ class Grid3D(object):
             outputstr += "\n".join(output)
         return outputstr + "\n"
 
-    def average_along_axis(self, axis_name, frame_i=0):
+    def average_along_axis(self, axis_name: str, frame_i: int = 0) -> NDArray:
         """Calculate average value of potential along 'axis'.
 
         Parameters
@@ -432,7 +444,7 @@ class Grid3D(object):
             raise "Wrong axis name set"
         return data
 
-    def min_along_axis(self, axis_name, frame_i=0):
+    def min_along_axis(self, axis_name: str, frame_i: int = 0) -> NDArray:
         """Calculate minimum value of potential along 'axis'.
 
         Parameters
@@ -462,7 +474,7 @@ class Grid3D(object):
             raise "Wrong axis name set"
         return data
 
-    def max_along_axis(self, axis_name, frame_i=0):
+    def max_along_axis(self, axis_name: str, frame_i: int = 0) -> NDArray:
         """Calculate maximum value of potential along 'axis'.
 
         Parameters
@@ -492,7 +504,7 @@ class Grid3D(object):
             raise "Wrong axis name set"
         return data
 
-    def median_along_axis(self, axis_name, frame_i=0):
+    def median_along_axis(self, axis_name: str, frame_i: int = 0) -> NDArray:
         """Calculate median value of potential along 'axis'.
 
         Parameters
