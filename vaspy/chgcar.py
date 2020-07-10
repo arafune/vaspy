@@ -6,6 +6,7 @@ translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 from __future__ import division, print_function  # Version safety
 
 import copy
+from typing import Optional, IO, Union, List
 
 from vaspy import mesh3d
 from vaspy.tools import open_by_suffix
@@ -44,14 +45,16 @@ class CHGCAR(mesh3d.VASPGrid):
 
     """
 
-    def __init__(self, filename=None, pickleddata=None) -> None:
+    def __init__(
+        self, filename: Optional[str] = None, pickleddata: Optional[str] = None
+    ) -> None:
         """Initialize."""
         super(CHGCAR, self).__init__(None)
-        self.spin = 1
+        self.spin: List[str] = [""]
         if filename:
             self.load_file(open_by_suffix(filename), pickleddata)
 
-    def load_file(self, thefile, pickleddata=None):
+    def load_file(self, thefile: IO, pickleddata: Optional[str] = None) -> None:
         """Parse CHGCAR file to construct CHGCAR object.
 
         Parameters
@@ -71,7 +74,7 @@ class CHGCAR(mesh3d.VASPGrid):
             raise RuntimeError("CHGCAR is correct?")
         thefile.close()
 
-    def magnetization(self, direction=None):
+    def magnetization(self, direction: Optional[str] = None) -> "CHGCAR":
         """Return CHGCAR for magnetization.
 
         For collinear spin-polarized calculations
@@ -123,7 +126,7 @@ class CHGCAR(mesh3d.VASPGrid):
         dest.grid.data = dest.grid.data.flatten()
         return dest
 
-    def majorityspin(self):
+    def majorityspin(self) -> "CHGCAR":
         """Return CHGCAR for majority spin.
 
         This method is for CHGCAR given by ``ISPIN=2`` but not-SOI
@@ -142,7 +145,7 @@ class CHGCAR(mesh3d.VASPGrid):
         dest.spin = ["up"]
         return dest
 
-    def minorityspin(self):
+    def minorityspin(self) -> "CHGCAR":
         """Return CHGCAR for minority spin.
 
         This method is for CHGCAR given by ``ISPIN=2`` but not-SOI

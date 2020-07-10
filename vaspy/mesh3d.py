@@ -55,7 +55,9 @@ class VASPGrid(object):
 
     """
 
-    def __init__(self, filename: Optional[str] = None, pickleddata=None) -> None:
+    def __init__(
+        self, filename: Optional[str] = None, pickleddata: Optional[str] = None
+    ) -> None:
         """Initialize."""
         self.poscar = poscar.POSCAR()
         self.grid = Grid3D()
@@ -63,7 +65,7 @@ class VASPGrid(object):
         if filename:
             self.load_file(open_by_suffix(filename), pickleddata)
 
-    def load_file(self, thefile: IO, pickleddata=None) -> None:
+    def load_file(self, thefile: IO, pickleddata: Optional[str] = None) -> None:
         """Construct the object from the file.
 
         Parameters
@@ -75,7 +77,7 @@ class VASPGrid(object):
             griddata stored by np.save or np.savez
 
         """
-        separator = None
+        separator: str = ""
         tmp = []
         griddata = ""
         # read POSCAR part
@@ -85,7 +87,7 @@ class VASPGrid(object):
             line = thefile.readline()
         self.poscar.load_array(tmp)
         # read grid size and use it as separator
-        separator: str = thefile.readline()
+        separator = thefile.readline()
         self.grid.shape = tuple([int(string) for string in separator.split()])
         # Volumetric data
         if pickleddata:
@@ -127,7 +129,7 @@ class VASPGrid(object):
         self.grid.data = np.fromstring(griddata, dtype=float, sep=" ")
         thefile.close()
 
-    def __str__(self):
+    def __str__(self) -> str:
         """String representation.
 
         Returns
@@ -149,6 +151,7 @@ class VASPGrid(object):
             file name
 
         """
+        thefile: IO
         try:  # Version safety
             thefile = open(filename, mode="w", newline="\n")
         except TypeError:
@@ -156,7 +159,7 @@ class VASPGrid(object):
         with thefile:
             thefile.write(str(self))
 
-    def frame(self, frame_i: int):
+    def frame(self, frame_i: int) -> "VASPGrid":
         """Return VASPGrid object for only frame_i th frame.
 
         Parameters
@@ -170,7 +173,7 @@ class VASPGrid(object):
         output_vaspgrid.grid = self.grid.frame(frame_i)
         return output_vaspgrid
 
-    def merge(self, other):
+    def merge(self, other: "VASPGrid") -> "VASPGrid":
         """Add density data.
 
         Add two VASPGrid object, but POSCAR part remains same as original.
@@ -194,7 +197,7 @@ class VASPGrid(object):
             raise RuntimeError("The mesh shapes are different each other")
         return add_grid
 
-    def __add__(self, other):
+    def __add__(self, other: "VASPGrid") -> "VASPGrid":
         """Add both density and atom position.
 
         x.__add__(y) <=> x + y
@@ -218,7 +221,7 @@ class VASPGrid(object):
             raise RuntimeError("The mesh shapes are different each other")
         return add_grid
 
-    def __sub__(self, other):
+    def __sub__(self, other: "VASPGrid") -> "VASPGrid":
         """Subtract the density.
 
         x.__sub__(y) <=> x - y
@@ -276,17 +279,17 @@ class Grid3D(object):
         """Initialize."""
         self.shape = shape
         if data is None:
-            self.data = np.array([])
+            self.data: NDArray = np.array([])
         else:
             self.data = np.asarray(data)
 
     @property
-    def size(self) -> Tuple[int, int, int]:
+    def size(self) -> int:
         """Return the number of meshes in the frame."""
         return self.shape[0] * self.shape[1] * self.shape[2]
 
     @property
-    def nframe(self):
+    def nframe(self) -> int:
         """Return the number of grid frames."""
         return divmod(self.data.size, self.size)[0]
 

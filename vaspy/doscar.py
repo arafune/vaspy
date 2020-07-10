@@ -292,7 +292,7 @@ class PDOS(DOS):
             plt.plot(self.dos[0], self.dos[orbital + 1])
         plt.show()
 
-    def export_csv(self, filename: str, site=None) -> None:
+    def export_csv(self, filename: str, site: Optional[str] = None) -> None:
         """Export data to file object (or file-like object) as csv format.
 
         Parameters
@@ -312,7 +312,9 @@ class PDOS(DOS):
         header = "\t".join(tmp)
         super(PDOS, self).export_csv(filename, header=header)
 
-    def plot_dos(self, orbitals, fermi: float = 0.0):  # Not implemented yet
+    def plot_dos(
+        self, orbitals: Union[List[str], Tuple[str, ...]], fermi: float = 0.0
+    ) -> None:  # Not implemented yet
         """Plot DOS spectra with matplotlib.pyplot.
 
         Parameters
@@ -329,7 +331,7 @@ class PDOS(DOS):
         """
         pass
 
-    def __add__(self, other):
+    def __add__(self, other: "PDOS") -> "PDOS":
         """Add two DOS objects.
 
         x.__add__(y) <-> x+y
