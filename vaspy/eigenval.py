@@ -67,7 +67,7 @@ class EnergyBand(object):
     """
 
     def __init__(
-        self, kvecs=(), energies: NDArray[(Any,), float] = (), nspin=1
+        self, kvecs=(), energies: NDArray[(Any,), float] = (), nspin: int = 1
     ) -> None:
         """Initialize."""
         self.kvecs: NDArray = np.array(kvecs)
@@ -190,7 +190,7 @@ class EnergyBand(object):
             output += "\n"
         return output
 
-    def figure(self, color: str = "blue", spin_i: int = 0):
+    def figure(self, color: str = "blue", spin_i: int = 0) -> plt.Axes:
         """Return Axes object of the energy band.
 
         Parameters

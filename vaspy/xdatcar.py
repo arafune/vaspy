@@ -6,6 +6,8 @@ import numpy as np
 import vaspy.poscar
 from vaspy.tools import open_by_suffix
 
+from typing import IO
+
 
 class XDATCAR(vaspy.poscar.POSCAR_HEAD):
     """Class for XDATCAR.
@@ -16,7 +18,7 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
 
     """
 
-    def __init__(self, filename=None):
+    def __init__(self, filename: str = None):
         """Initialize.
 
         Parameters
@@ -30,7 +32,7 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
         if filename:
             self.load_file(open_by_suffix(filename))
 
-    def load_file(self, thefile):
+    def load_file(self, thefile: IO) -> None:
         """Parse PROCAR.
 
         Parameters
@@ -58,7 +60,7 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
         self.configurations.append(positions)
         thefile.close()
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return as str.
 
         Returns

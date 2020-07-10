@@ -45,7 +45,7 @@ from __future__ import print_function  # Version safety
 import copy
 import sys
 import numpy as np
-from typing import Optional
+from typing import Optional, IO
 from nptyping import NDArray
 
 try:
@@ -87,7 +87,7 @@ class DOSCAR(object):  # Version safety
         if filename:
             self.load_file(open_by_suffix(filename))
 
-    def load_file(self, thefile):
+    def load_file(self, thefile: IO) -> None:
         """Parse DOSCAR file and store it in memory.
 
         Parameters
@@ -145,17 +145,17 @@ class DOS(object):  # Version safety
 
     """
 
-    def __init__(self, array=None):
+    def __init__(self, array=None) -> None:
         """Initialize."""
         self.dos = np.array([])
         if array is not None:
             self.dos = array.transpose()
 
-    def __len__(self):
+    def __len__(self) -> str:
         """x.__len__() <=> len(x)."""
         return len(self.dos)
 
-    def fermi_correction(self, fermi):
+    def fermi_correction(self, fermi: float) -> None:
         """Correct energy by Fermi level.
 
         Parameters
@@ -186,17 +186,13 @@ class DOS(object):  # Version safety
         else:
             return self.dos[0][i]
 
-    def export_csv(self, filename, header=None):
+    def export_csv(self, filename: str, header=Optional[str]) -> None:
         """Export data to file object (or file-like object) as csv format."""
         transposed_dos = self.dos.transpose()
-        if header is None:
-            with open(filename, mode="wb") as fhandle:
-                np.savetxt(fhandle, transposed_dos, delimiter="\t", newline="\n")
-        else:
-            with open(filename, mode="wb") as fhandle:
-                np.savetxt(
-                    fhandle, transposed_dos, header=header, delimiter="\t", newline="\n"
-                )
+        with open(filename, mode="wb") as fhandle:
+            np.savetxt(
+                fhandle, transposed_dos, header=header, delimiter="\t", newline="\n"
+            )
 
 
 class TDOS(DOS):
@@ -217,16 +213,16 @@ class TDOS(DOS):
         """Initialize."""
         super(TDOS, self).__init__(array)
         if len(self.dos) == 2:
-            self.header = "Energy\tTDOS"
+            self.header: str = "Energy\tTDOS"
         else:
             self.header = "Energy\tTDOS_up\tTDOS_down"
 
-    def export_csv(self, filename):
+    def export_csv(self, filename: str) -> None:
         """Export data to file object (or file-like object) as csv format."""
         header = self.header
         super(TDOS, self).export_csv(filename, header=header)
 
-    def graphview(self):
+    def graphview(self) -> None:
         """Show graphview by matplotlib."""
         for density in self.dos[1:]:
             plt.plot(self.dos[0], density)
@@ -283,7 +279,7 @@ class PDOS(DOS):
             else:
                 raise ValueError("Check the DOS data")
 
-    def graphview(self, *orbitalnames):
+    def graphview(self, *orbitalnames) -> None:
         """Show DOS graph by using matplotlib.  For 'just seeing' use."""
         try:
             alist = [self.orbital_spin.index(orbname) for orbname in orbitalnames]
@@ -296,7 +292,7 @@ class PDOS(DOS):
             plt.plot(self.dos[0], self.dos[orbital + 1])
         plt.show()
 
-    def export_csv(self, filename, site=None):
+    def export_csv(self, filename: str, site=None) -> None:
         """Export data to file object (or file-like object) as csv format.
 
         Parameters
@@ -316,7 +312,7 @@ class PDOS(DOS):
         header = "\t".join(tmp)
         super(PDOS, self).export_csv(filename, header=header)
 
-    def plot_dos(self, orbitals, fermi=0.0):  # Not implemented yet
+    def plot_dos(self, orbitals, fermi: float = 0.0):  # Not implemented yet
         """Plot DOS spectra with matplotlib.pyplot.
 
         Parameters

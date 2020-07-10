@@ -1,6 +1,9 @@
 # -*- coding:  utf-8 -*-
 """This module provide constant data such as atom mass etc."""
-radii = {
+
+from typing import Dict, Tuple
+
+radii: Dict[str, float] = {
     "Ac": 2.15,
     "Ag": 1.45,
     "Al": 1.21,
@@ -106,7 +109,7 @@ radii = {
 # Where this reference gives a range and/or the relative abundance of
 # isotopes is unknown, a simple mean was taken
 
-masses = {
+masses: Dict[str, float] = {
     "Ac": 227.0,
     "Ag": 107.8682,
     "Al": 26.9815385,
@@ -230,7 +233,7 @@ masses = {
 }
 
 
-colors = {
+colors: Dict[str, Tuple[int, int, int]] = {
     "H": (1.0, 0.8, 0.8),
     "D": (0.8, 0.8, 1.0),
     "He": (0.98907, 0.91312, 0.81091),
@@ -331,7 +334,7 @@ colors = {
 }
 
 
-max_bond_length = {
+max_bond_length: Dict[Tuple[str, str], float] = {
     ("Ac", "O"): 2.73260,
     ("Ac", "F"): 2.58646,
     ("Ac", "Cl"): 3.08646,

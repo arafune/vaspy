@@ -177,7 +177,7 @@ class WAVECAR(object):
             )
         return self.kpath, self.bands
 
-    def gvectors(self, k_i=0):
+    def gvectors(self, k_i: float = 0):
         r"""Return G vector.
 
         G-vectors :math:`G` is determined by the following condition:
@@ -214,20 +214,22 @@ class WAVECAR(object):
         g_vec = kgrid[np.where(energy_k < self.encut)[0]]
         return np.asarray(g_vec, dtype=int)
 
-    def bandcoeff(self, spin_i=0, k_i=0, band_i=0, norm=False):
+    def bandcoeff(
+        self, spin_i: int = 0, k_i: int = 0, band_i: int = 0, norm: bool = False
+    ):
         """Read the coefficient of the planewave of the KS states.
 
         The KS states is specified by the `spin_i`, `k_i` and `band_i`.
 
         Parameters
         ----------
-        spin_i: int, optional
+        spin_i: int
             spin index :math:`s_i` (0 or 1) (default value is 0)
-        k_i: int, optional
+        k_i: int
             k index :math:`k_i`. Starts with 0 (default value is 0)
-        band_i: int, optional
+        band_i: int
             band index :math:`b_i`. starts with 0 (default value is 0)
-        norm: bool, optional
+        norm: bool
             If true the Band coeffients are normliazed (default is false)
 
         """
@@ -245,8 +247,8 @@ class WAVECAR(object):
 
     def realspace_wfc(
         self,
-        spin_i=0,
-        k_i=0,
+        spin_i: int = 0,
+        k_i: int = 0,
         band_i=0,
         gvec=None,
         ngrid=None,

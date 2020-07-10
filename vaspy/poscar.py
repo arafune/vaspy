@@ -47,7 +47,7 @@ import numpy as np
 
 from vaspy import tools
 from vaspy.tools import open_by_suffix
-from typing import List, Tuple, Any, Union, Optional, BinaryIO, TextIO
+from typing import List, Tuple, Any, Union, Optional, IO
 from nptyping import NDArray
 
 # logger
@@ -235,7 +235,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if isinstance(arg, (list, tuple)):
             self.load_array(arg)
 
-    def load_array(self, input_poscar: List[str]) -> None:
+    def load_array(
+        self, input_poscar: Union[List[Union[str, bytes]], Tuple[Any]]
+    ) -> None:
         """Parse POSCAR as list.
 
         Parameters
@@ -440,11 +442,11 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
     def rotate_atom(
         self,
-        site: List[int],
+        site: int,
         axis_name: str,
         theta_deg: float,
         center: Union[Tuple[float, float, float], List[float], NDArray[(3,), float]],
-    ):
+    ) -> None:
         """Rotate the atom.
 
         Parameters
@@ -479,7 +481,11 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         self.positions[site] = position
 
     def rotate_atoms(
-        self, site_list: List[int], axis_name: str, theta_deg: float, center
+        self,
+        site_list: List[int],
+        axis_name: str,
+        theta_deg: float,
+        center: List[float],
     ) -> None:
         """Rotate atoms.
 
@@ -543,7 +549,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if original_is_cartesian:
             self.to_cartesian()
 
-    def __add__(self, other):
+    def __add__(self, other: "POSCAR") -> "POSCAR":
         """Add two poscar objects.
 
         Parameters
@@ -572,7 +578,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
         return dest_poscar
 
-    def split(self, indexes: Union[List[int], Tuple[int, ...]]):
+    def split(
+        self, indexes: Union[List[int], Tuple[int, ...]]
+    ) -> Tuple["POSCAR", "POSCAR"]:
         """Split into two POSCAR object.
 
         Useful for differential charge distribution calculations.
@@ -615,7 +623,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         other.atomtypes, other.atomnums = tools.atoms_to_atomtypes_atomnums(other_atoms)
         return one, other
 
-    def merge(self, other):
+    def merge(self, other: "POSCAR") -> "POSCAR":
         """Return POSCAR generated from two POSCARs.
 
         Even if the cell vectors and scaling factors are different,
@@ -661,7 +669,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             a list representation of POSCAR.
 
         """
-        out_list = []
+        out_list: List[Any] = []
         out_list.append(self.system_name)
         out_list.append(self.scaling_factor)
         out_list.append(self.cell_vecs[0])
@@ -734,7 +742,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             tmp.append("".join("{0:10.6f}".format(i) for i in pos))
         return "\n".join(tmp) + "\n"
 
-    def tune_scaling_factor(self, new_scaling_factor: float = 1.0):
+    def tune_scaling_factor(self, new_scaling_factor: float = 1.0) -> None:
         """Change scaling factor to new value.
 
         Parameters
@@ -772,7 +780,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             mat = np.linalg.inv(np.transpose(self.cell_vecs))
             self.positions = [mat.dot(v) for v in self.positions]
 
-    def guess_molecule(self, site_list: List[int], center=None):
+    def guess_molecule(
+        self, site_list: List[int], center: Optional[List[float]] = None
+    ) -> None:
         """Arrange atom position to form a molecule.
 
         This method is effective to rotate a molecule.
@@ -806,7 +816,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             target_atom = self.positions[site]
             atoms27 = self.make27candidate(target_atom)
 
-            def func(pos, center):
+            def func(pos, center) -> float:
                 molecule[index] = pos
                 if center is not None:  # bool([np.ndarray]) => Error
                     center = _vectorize(center)
@@ -832,7 +842,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         self,
         vector: Union[List[float], Tuple[float, float, float], NDArray[(3,), float],],
         atomlist: List[int],
-    ) -> List[NDArray[(3,), float]]:
+    ) -> List[NDArray[(3, Any), float]]:
         """Translate the selected atom(s) by vector.
 
         Parameters
@@ -904,7 +914,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             File name for save
 
         """
-        file: Union[BinaryIO, TextIO]
+        file: IO
         try:  # Version safety
             file = open(filename, mode="w", newline="\n")
         except TypeError:
@@ -948,7 +958,7 @@ def point_in_box(
         raise TypeError
 
 
-def rotate_x(theta_deg: float) -> NDArray:
+def rotate_x(theta_deg: float) -> NDArray[(3, 3), float]:
     """Rotation matrix around X-axis.
 
     Parameters
@@ -979,7 +989,7 @@ def rotate_x(theta_deg: float) -> NDArray:
     )
 
 
-def rotate_y(theta_deg: float) -> NDArray:
+def rotate_y(theta_deg: float) -> NDArray[(3, 3), float]:
     """Rotation matrix around Y-axis.
 
     Example
@@ -1021,7 +1031,7 @@ def rotate_z(theta_deg: float) -> NDArray[(3, 3), float]:
     )
 
 
-def three_by_three(vec) -> bool:
+def three_by_three(vec: Union[List, Tuple[float, ...], NDArray]) -> bool:
     """Return True if vec can be converted into the 3x3 matrix.
 
     Parameters
@@ -1041,7 +1051,9 @@ def three_by_three(vec) -> bool:
     return [3, 3, 3] == [len(i) for i in vec]
 
 
-def _vectorize(vector) -> NDArray:
+def _vectorize(
+    vector: Union[List[float], Tuple[float, ...], NDArray[(Any,), float]]
+) -> NDArray[(Any, ...), float]:
     if not isinstance(vector, (np.ndarray, np.matrix, list, tuple)):
         raise TypeError("Cannot convert into vector.")
     return np.array(vector).flatten()
