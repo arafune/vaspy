@@ -47,7 +47,7 @@ import numpy as np
 
 from vaspy import tools
 from vaspy.tools import open_by_suffix
-from typing import List, Tuple, Any, Union, Optional, IO
+from typing import List, Tuple, Any, Union, Optional, IO, Generator
 from nptyping import NDArray
 
 # logger
@@ -95,11 +95,6 @@ class POSCAR_HEAD(object):
         """Return the matrix of the unit cell."""
         return self.__cell_vecs
 
-    @property
-    def realcell(self) -> NDArray[(3, 3), float]:
-        """Alias of cell_vecs to keep consistency with wavecar.py."""
-        return self.__cell_vecs
-
     @cell_vecs.setter
     def cell_vecs(self, vec) -> None:
         """Setter of cell matrix.
@@ -114,6 +109,11 @@ class POSCAR_HEAD(object):
             self.__cell_vecs = np.array(vec)
         else:
             raise TypeError
+
+    @property
+    def realcell(self) -> NDArray[(3, 3), float]:
+        """Alias of cell_vecs to keep consistency with wavecar.py."""
+        return self.__cell_vecs
 
     @realcell.setter
     def realcell(self, vec) -> None:
@@ -140,7 +140,7 @@ class POSCAR_HEAD(object):
         #         '#{0}:{1}{2}'.format(ii + m, elm, m + 1) for m in range(n))
         #     ii += n
         # return self.__site_label
-        self.__site_label: List[str] = []
+        self.__site_label = []
         atomnames = []
         for elm, atomnums in zip(self.atomtypes, self.atomnums):
             for j in range(1, atomnums + 1):
@@ -158,7 +158,7 @@ class POSCAR_HEAD(object):
 
     @site_label.setter
     def site_label(self, value: List[str]) -> None:
-        self.__site_label: List[str] = value
+        self.__site_label = value
 
 
 class POSCAR_POS(object):
@@ -275,7 +275,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             if self.selective:
                 self.coordinate_changeflags.append(" ".join(tmp[3:]))
 
-    def __iter__(self):
+    def __iter__(self) -> Generator:
         for each in self.positions:
             yield each
 
@@ -321,7 +321,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             + self.positions[to_site:]
         )
 
-    def supercell(self, n_x: int, n_y: int, n_z: int):
+    def supercell(self, n_x: int, n_y: int, n_z: int) -> "POSCAR":
         r"""Return the :math:`(n_x \\times n_y \\times n_z)` supercell.
 
         Parameters
