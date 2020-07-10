@@ -233,7 +233,7 @@ masses: Dict[str, float] = {
 }
 
 
-colors: Dict[str, Tuple[int, int, int]] = {
+colors: Dict[str, Tuple[float, float, float]] = {
     "H": (1.0, 0.8, 0.8),
     "D": (0.8, 0.8, 1.0),
     "He": (0.98907, 0.91312, 0.81091),

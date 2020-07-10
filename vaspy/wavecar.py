@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """Module for WAVECAR class."""
 
-from __future__ import division, print_function  # Version safety
+from __future__ import division, print_function
+from typing import Optional, Tuple
 
 import numpy as np
 from scipy.fftpack import ifftn
@@ -11,8 +12,8 @@ import vaspy.poscar as poscar
 from nptyping import NDArray
 
 
-Ry_in_eV = 13.605826
-au_in_AA = 0.529177249
+Ry_in_eV: float = 13.605826
+au_in_AA: float = 0.529177249
 
 # If parallel version vasp, set True
 # See OUTCAR file
@@ -22,7 +23,7 @@ au_in_AA = 0.529177249
 # set True.
 #   use serial FFT for wavefunctions x direction half grid
 # set False
-PARALLEL = False
+PARALLEL: bool = False
 
 
 class WAVECAR(object):
@@ -134,7 +135,7 @@ class WAVECAR(object):
         else:
             raise ValueError("Invalid TAG value: {}".format(self.rtag))
 
-    def band(self):
+    def band(self) -> Tuple[Optional[NDArray], Optional[NDArray]]:
         """Read the information about the band from WAVECAR file.
 
         The infomation obtained by this method is as follows:
@@ -177,7 +178,7 @@ class WAVECAR(object):
             )
         return self.kpath, self.bands
 
-    def gvectors(self, k_i: float = 0):
+    def gvectors(self, k_i: float = 0) -> NDArray:
         r"""Return G vector.
 
         G-vectors :math:`G` is determined by the following condition:
@@ -216,7 +217,7 @@ class WAVECAR(object):
 
     def bandcoeff(
         self, spin_i: int = 0, k_i: int = 0, band_i: int = 0, norm: bool = False
-    ):
+    ) -> NDArray:
         """Read the coefficient of the planewave of the KS states.
 
         The KS states is specified by the `spin_i`, `k_i` and `band_i`.
@@ -249,11 +250,11 @@ class WAVECAR(object):
         self,
         spin_i: int = 0,
         k_i: int = 0,
-        band_i=0,
-        gvec=None,
-        ngrid=None,
-        norm=False,
-        poscar=poscar.POSCAR(),
+        band_i: int = 0,
+        gvec: Optional[NDArray] = None,
+        ngrid: Optional[NDArray] = None,
+        norm: bool = False,
+        poscar: poscar.POSCAR = poscar.POSCAR(),
     ):
         r"""Return the pseudo-wavefunction in real space.
 
@@ -268,13 +269,13 @@ class WAVECAR(object):
 
         Parameters
         -----------
-        spin_i: int, optional
+        spin_i: int
             spin index (0 or 1). default is 0
-        k_i: int, optional
+        k_i: int
             k index :math:`k_i`. Starts with 0. default is 0
-        band_i: int, optional
+        band_i: int
             band index :math:`b_i`. starts with 0. default is 0.
-        norm: bool, optional
+        norm: bool
             If true the Band coeffients are normliazed
         gvec: numpy.array, optional
             G-vector for calculation. (default is self.gvectors(k_i))
@@ -388,7 +389,7 @@ class WAVECAR(object):
                 )
         return vaspgrid
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Print out the system parameters."""
         the1stline = "record length  =       {0}  "
         the1stline += "spins =           {1}  "
@@ -414,7 +415,7 @@ class WAVECAR(object):
         return string
 
 
-def make_kgrid(ngrid, gamma=False, para=PARALLEL):
+def make_kgrid(ngrid, gamma: bool = False, para: bool = PARALLEL):
     """Return kgrid.
 
     Parameters
@@ -480,7 +481,7 @@ def make_kgrid(ngrid, gamma=False, para=PARALLEL):
     return kgrid
 
 
-def check_symmetry(grid3d):
+def check_symmetry(grid3d) -> bool:
     """True if grid3d(G) == np.conjugate(grid3d(-G)) for all G.
 
     Parameters
@@ -511,7 +512,7 @@ def check_symmetry(grid3d):
     return True
 
 
-def restore_gamma_grid(grid3d, para=PARALLEL):
+def restore_gamma_grid(grid3d, para: bool = PARALLEL):
     """Return Grid from the size-reduced matrix for gammareal Wavecar.
 
     Parameters
