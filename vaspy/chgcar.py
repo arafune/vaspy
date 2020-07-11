@@ -46,24 +46,26 @@ class CHGCAR(mesh3d.VASPGrid):
     """
 
     def __init__(
-        self, filename: Optional[str] = None, pickleddata: Optional[str] = None
+        self, filename: Optional[str] = None, pickles: Optional[str] = None
     ) -> None:
         """Initialize."""
         super(CHGCAR, self).__init__(None)
         self.spin: List[str] = [""]
         if filename:
-            self.load_file(open_by_suffix(filename), pickleddata)
+            self.load_file(open_by_suffix(filename), pickles)
 
-    def load_file(self, thefile: IO, pickleddata: Optional[str] = None) -> None:
+    def load_file(
+        self, thefile: Union[IO[str], IO[bytes]], pickles: Optional[str] = None
+    ) -> None:
         """Parse CHGCAR file to construct CHGCAR object.
 
         Parameters
         ----------
-        thefile: StringIO
+        thefile: IO
             CHGCAR file
 
         """
-        super(CHGCAR, self).load_file(thefile, pickleddata)
+        super(CHGCAR, self).load_file(thefile, pickles)
         if self.grid.nframe == 1:
             self.spin = [""]
         elif self.grid.nframe == 2:

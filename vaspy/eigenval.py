@@ -7,7 +7,6 @@ import sys
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
-from nptyping import NDArray
 from typing import Optional, Tuple, List, Any, IO
 
 from vaspy.tools import open_by_suffix
@@ -66,18 +65,16 @@ class EnergyBand(object):
 
     """
 
-    def __init__(
-        self, kvecs=(), energies: NDArray[(Any,), float] = (), nspin: int = 1
-    ) -> None:
+    def __init__(self, kvecs=(), energies=(), nspin: int = 1) -> None:
         """Initialize."""
-        self.kvecs: NDArray = np.array(kvecs)
+        self.kvecs = np.array(kvecs)
         self.numk = len(self.kvecs)
         self.label = {}
         try:
             self.nbands = len(energies) // len(kvecs)
         except ZeroDivisionError:
             self.nbands = 0
-        self.energies: NDArray[(Any,), float] = energies
+        self.energies = energies
         self.nspin = nspin
         if self.nspin == 1:  # standard
             self.label["spin"] = [""]
@@ -91,7 +88,7 @@ class EnergyBand(object):
         self.label["k"] = ["#k"]
 
     @property
-    def kdistances(self) -> NDArray:
+    def kdistances(self):
         """Return kdistances."""
         return np.cumsum(
             np.linalg.norm(
@@ -249,10 +246,7 @@ class EnergyBand(object):
         plt.show()
 
     def to_physical_kvector(
-        self,
-        recvec: NDArray[(3, 3), float] = np.array(
-            ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)),
-        ),
+        self, recvec=np.array(((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)),),
     ) -> None:
         """Change kvec unit to inverse AA.
 

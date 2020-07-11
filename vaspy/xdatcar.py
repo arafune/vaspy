@@ -32,7 +32,7 @@ class XDATCAR(vaspy.poscar.POSCAR_HEAD):
         if filename:
             self.load_file(open_by_suffix(filename))
 
-    def load_file(self, thefile: IO) -> None:
+    def load_file(self, thefile: IO[str]) -> None:
         """Parse PROCAR.
 
         Parameters

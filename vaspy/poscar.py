@@ -47,8 +47,7 @@ import numpy as np
 
 from vaspy import tools
 from vaspy.tools import open_by_suffix
-from typing import List, Tuple, Any, Union, Optional, IO, Generator
-from nptyping import NDArray
+from typing import List, Sequence, Tuple, Any, Union, Optional, IO, Generator
 
 # logger
 LOGLEVEL = INFO
@@ -81,9 +80,7 @@ class POSCAR_HEAD(object):
 
     def __init__(self) -> None:
         """Initialization."""
-        self.__cell_vecs: NDArray[(3, 3), float] = np.array(
-            [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
-        )
+        self.__cell_vecs = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
         self.system_name: str = ""
         self.scaling_factor: float = 0.0
         self.atomtypes: List[str] = []
@@ -91,12 +88,12 @@ class POSCAR_HEAD(object):
         self.__site_label: List[str] = []
 
     @property
-    def cell_vecs(self) -> NDArray[(3, 3), float]:
+    def cell_vecs(self):
         """Return the matrix of the unit cell."""
         return self.__cell_vecs
 
     @cell_vecs.setter
-    def cell_vecs(self, vec) -> None:
+    def cell_vecs(self, vec: Sequence[float]) -> None:
         """Setter of cell matrix.
 
         Parameters
@@ -111,12 +108,12 @@ class POSCAR_HEAD(object):
             raise TypeError
 
     @property
-    def realcell(self) -> NDArray[(3, 3), float]:
+    def realcell(self):
         """Alias of cell_vecs to keep consistency with wavecar.py."""
         return self.__cell_vecs
 
     @realcell.setter
-    def realcell(self, vec) -> None:
+    def realcell(self, vec: Sequence[float]) -> None:
         """Alias of cell_vecs to keep consistency with wavecar.py.
 
         Parameters
@@ -176,8 +173,8 @@ class POSCAR_POS(object):
     def __init__(self) -> None:
         """Initialization."""
         self.coordinate_type = ""
-        self.positions: List[NDArray[(3, 3), float]] = []
-        self.coordinate_changeflags = []
+        self.positions = []
+        self.coordinate_changeflags: List[str] = []
         self.selective: bool = False
 
     def is_cartesian(self) -> bool:
@@ -230,13 +227,14 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         super(POSCAR, self).__init__()
         POSCAR_POS.__init__(self)
         if isinstance(arg, str):
-            poscar: List[bytes] = open_by_suffix(arg).readlines()
+            poscar: Union[List[bytes], List[str]] = open_by_suffix(arg).readlines()
             self.load_array(poscar)
         if isinstance(arg, (list, tuple)):
             self.load_array(arg)
 
     def load_array(
-        self, input_poscar: Union[List[Union[str, bytes]], Tuple[Any]]
+        self,
+        input_poscar: Union[Union[List[str], List[bytes], Tuple[str], Tuple[bytes]]],
     ) -> None:
         """Parse POSCAR as list.
 
@@ -387,10 +385,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
     # class method? or independent function?
     def nearest(
-        self,
-        array: Union[List[float], Tuple[float, float, float], NDArray[(3,), float]],
-        point: Union[List[float], Tuple[float, float, float], NDArray[(3,), float]],
-    ) -> NDArray[(3,), float]:
+        self, array, point,
+    ):
         """Return the nearest position in the periodic space.
 
         Parameters
@@ -406,7 +402,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return min(array, key=lambda pos: np.linalg.norm(pos - point))
 
     # class method? or independent function?
-    def make27candidate(self, position):
+    def make27candidate(self, position: Sequence[float]):
         """Return 27 vectors set correspond the neiboring.
 
         Parameters
@@ -441,11 +437,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return candidates27
 
     def rotate_atom(
-        self,
-        site: int,
-        axis_name: str,
-        theta_deg: float,
-        center: Union[Tuple[float, float, float], List[float], NDArray[(3,), float]],
+        self, site: int, axis_name: str, theta_deg: float, center: Sequence[float]
     ) -> None:
         """Rotate the atom.
 
@@ -465,19 +457,19 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                 take into account the periodic boundary.
 
         """
-        center = _vectorize(center)
+        rotate_at = _vectorize(center)
         if len(center) != 3:
             raise ValueError
-        if not point_in_box(center / self.scaling_factor, self.cell_vecs):
+        if not point_in_box(rotate_at / self.scaling_factor, self.cell_vecs):
             raise ValueError("the center must be in the Braves lattice")
         if not isinstance(site, int):
             raise ValueError("argument error in rotate_atom method")
         if not self.is_cartesian():
             self.to_cartesian()
         position = self.positions[site]
-        position -= center / self.scaling_factor
+        position -= rotate_at / self.scaling_factor
         position = globals()["rotate_" + axis_name.lower()](theta_deg).dot(position)
-        position += center / self.scaling_factor
+        position += rotate_at / self.scaling_factor
         self.positions[site] = position
 
     def rotate_atoms(
@@ -781,7 +773,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.positions = [mat.dot(v) for v in self.positions]
 
     def guess_molecule(
-        self, site_list: List[int], center: Optional[List[float]] = None
+        self, site_list: List[int], center: Optional[Sequence[float]] = None
     ) -> None:
         """Arrange atom position to form a molecule.
 
@@ -816,11 +808,11 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             target_atom = self.positions[site]
             atoms27 = self.make27candidate(target_atom)
 
-            def func(pos, center) -> float:
-                molecule[index] = pos
+            def func(pos: Sequence[float], center: Sequence[float]) -> float:
+                molecule[index] = _vectorize(pos)
                 if center is not None:  # bool([np.ndarray]) => Error
-                    center = _vectorize(center)
-                    return np.linalg.norm(pos - center)
+                    center_pos = _vectorize(center)
+                    return np.linalg.norm(_vectorize(pos) - center_pos)
                 # fixme!! when the highest symmetry point
                 # can be detemined from the position list,
                 # guess_molecule method does not require
@@ -838,11 +830,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         for site, pos in zip(site_list, newposes):
             self.positions[site] = pos
 
-    def translate(
-        self,
-        vector: Union[List[float], Tuple[float, float, float], NDArray[(3,), float],],
-        atomlist: List[int],
-    ) -> List[NDArray[(3, Any), float]]:
+    def translate(self, vector, atomlist: List[int]):
         """Translate the selected atom(s) by vector.
 
         Parameters
@@ -876,7 +864,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return self.positions
 
     @property
-    def axes_lengthes(self) -> Tuple[NDArray, NDArray, NDArray]:
+    def axes_lengthes(self):
         """Return cell axis lengthes.
 
         Returns
@@ -890,10 +878,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         cell_z = np.linalg.norm(self.cell_vecs[2] * self.scaling_factor)
         return (cell_x, cell_y, cell_z)
 
-    def translate_all(
-        self,
-        vector: Union[List[float], Tuple[float, float, float], NDArray[(3,), float]],
-    ) -> None:
+    def translate_all(self, vector,) -> None:
         """Translate **all** atoms by vector.
 
         Parameters
@@ -923,18 +908,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             file.write(str(self))
 
 
-def point_in_box(
-    point: Union[Tuple[float, float, float], List[float], NDArray[(3,), float]],
-    cell_vecs: Union[
-        Tuple[
-            Tuple[float, float, float],
-            Tuple[float, float, float],
-            Tuple[float, float, float],
-        ],
-        List[List[float]],
-        NDArray[(3, 3), float],
-    ],
-) -> bool:
+def point_in_box(point: Sequence[float], cell_vecs: Sequence[float]) -> bool:
     """Return True if point is located in the box.
 
     Parameters
@@ -950,15 +924,15 @@ def point_in_box(
 
     """
     if three_by_three(cell_vecs):
-        point = np.array(point).flatten()
-        cell_vecs = np.array(cell_vecs)
-        result = np.dot(np.linalg.inv(cell_vecs.T), point)
+        thepoint = np.array(point).flatten()
+        cell_vectors = np.array(cell_vecs)
+        result = np.dot(np.linalg.inv(cell_vectors.T), thepoint)
         return all((0 <= float(q) <= 1) for q in result)
     else:
         raise TypeError
 
 
-def rotate_x(theta_deg: float) -> NDArray[(3, 3), float]:
+def rotate_x(theta_deg: float):
     """Rotation matrix around X-axis.
 
     Parameters
@@ -989,7 +963,7 @@ def rotate_x(theta_deg: float) -> NDArray[(3, 3), float]:
     )
 
 
-def rotate_y(theta_deg: float) -> NDArray[(3, 3), float]:
+def rotate_y(theta_deg: float):
     """Rotation matrix around Y-axis.
 
     Example
@@ -1010,7 +984,7 @@ def rotate_y(theta_deg: float) -> NDArray[(3, 3), float]:
     )
 
 
-def rotate_z(theta_deg: float) -> NDArray[(3, 3), float]:
+def rotate_z(theta_deg: float):
     """Rotation matrix around Z-axis.
 
     Example
@@ -1031,7 +1005,7 @@ def rotate_z(theta_deg: float) -> NDArray[(3, 3), float]:
     )
 
 
-def three_by_three(vec: Union[List, Tuple[float, ...], NDArray]) -> bool:
+def three_by_three(vec: Sequence[float]) -> bool:
     """Return True if vec can be converted into the 3x3 matrix.
 
     Parameters
@@ -1051,9 +1025,7 @@ def three_by_three(vec: Union[List, Tuple[float, ...], NDArray]) -> bool:
     return [3, 3, 3] == [len(i) for i in vec]
 
 
-def _vectorize(
-    vector: Union[List[float], Tuple[float, ...], NDArray[(Any,), float]]
-) -> NDArray[(Any, ...), float]:
+def _vectorize(vector: Sequence[float]):
     if not isinstance(vector, (np.ndarray, np.matrix, list, tuple)):
         raise TypeError("Cannot convert into vector.")
     return np.array(vector).flatten()

@@ -45,8 +45,8 @@ from __future__ import print_function  # Version safety
 import copy
 import sys
 import numpy as np
-from typing import Optional, IO
-from nptyping import NDArray
+from typing import Iterator, Sequence, Union, Optional, IO, Tuple, List, Any
+
 
 try:
     import matplotlib.pyplot as plt
@@ -82,12 +82,12 @@ class DOSCAR(object):  # Version safety
         """Initialize."""
         self.natom: int = 0
         self.nbands: int = 0
-        self.dos_container: list = list()
+        self.dos_container = list()
 
         if filename:
             self.load_file(open_by_suffix(filename))
 
-    def load_file(self, thefile: IO) -> None:
+    def load_file(self, thefile: Union[IO[str], IO[bytes]]) -> None:
         """Parse DOSCAR file and store it in memory.
 
         Parameters
@@ -151,7 +151,7 @@ class DOS(object):  # Version safety
         if array is not None:
             self.dos = array.transpose()
 
-    def __len__(self) -> str:
+    def __len__(self) -> int:
         """x.__len__() <=> len(x)."""
         return len(self.dos)
 
@@ -186,7 +186,7 @@ class DOS(object):  # Version safety
         else:
             return self.dos[0][i]
 
-    def export_csv(self, filename: str, header=Optional[str]) -> None:
+    def export_csv(self, filename: str, header: Optional[str] = None) -> None:
         """Export data to file object (or file-like object) as csv format."""
         transposed_dos = self.dos.transpose()
         with open(filename, mode="wb") as fhandle:
@@ -251,20 +251,19 @@ class PDOS(DOS):
 
     """
 
-    def __init__(self, array=None, site=None) -> None:
+    def __init__(self, array=None, site: Optional[str] = None) -> None:
         """Initialize."""
         super(PDOS, self).__init__(array)
         self.site = "" if site is None else site
-        self.orbital_spin = list()
+        self.orbital_spin: List[str] = list()
         orbitalnames = ["s", "py", "pz", "px", "dxy", "dyz", "dz2", "dxz", "dx2"]
         # The above order is refered from sphpro.F of vasp source
         spins_soi = ("mT", "mX", "mY", "mZ")
         spins = ("up", "down")
         if array is not None:
-            flag = len(self.dos)
-            if flag == 10:
+            if len(self.dos) == 10:
                 self.orbital_spin = orbitalnames
-            elif flag == 19:  # Spin resolved
+            elif len(self.dos) == 19:  # Spin resolved
                 self.orbital_spin = [
                     orb + "_" + spin for orb in orbitalnames for spin in spins
                 ]
@@ -272,17 +271,19 @@ class PDOS(DOS):
                 # set by negative value.
                 for i in range(2, 19, 2):
                     self.dos[i] *= -1
-            elif flag == 37:  # SOI
+            elif len(self.dos) == 37:  # SOI
                 self.orbital_spin = [
                     orb + "_" + spin for orb in orbitalnames for spin in spins_soi
                 ]
             else:
                 raise ValueError("Check the DOS data")
 
-    def graphview(self, *orbitalnames) -> None:
+    def graphview(self, *orbitalnames: str) -> None:
         """Show DOS graph by using matplotlib.  For 'just seeing' use."""
         try:
-            alist = [self.orbital_spin.index(orbname) for orbname in orbitalnames]
+            alist: List[int] = [
+                self.orbital_spin.index(orbname) for orbname in orbitalnames
+            ]
         except ValueError:
             err = "Check argment of this function\n"
             err += "The following name(s) are accpted:\n"

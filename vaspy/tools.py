@@ -12,15 +12,10 @@ import os
 import re
 from collections import Iterable
 import numpy as np
-from typing import List, Iterable, Tuple, Union, IO, Any, Optional
-from nptyping import NDArray
-
-# Version safety
-# ZIPLONG = it.izip_longest if hasattr(it, "izip_longest") else it.zip_longest
-FLATTEN_IGNORE = (dict, str, bytes, bytearray)  # or (dict, basestring)
+from typing import BinaryIO, List, Iterable, TextIO, Tuple, Union, IO, Any, Optional
 
 
-def open_by_suffix(filename: str) -> IO[Any]:
+def open_by_suffix(filename: str,) -> Union[IO[bytes], IO[str]]:
     """Open file."""
     if os.path.splitext(filename)[1] == ".bz2":
         try:
@@ -144,7 +139,7 @@ def atoms_to_atomtypes_atomnums(atoms: List[str]) -> Tuple[List[str], List[int]]
     return atomtypes, atomnums
 
 
-def cuboid(crystal_axes: NDArray[(3, 3), float]) -> NDArray:
+def cuboid(crystal_axes) :
     """Return the coordinates for cuboid that includes tetrahedron represented by vectors.
     
     Parameters
