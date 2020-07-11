@@ -405,7 +405,7 @@ class Grid3D(object):
             a string representation of VASPGrid object
 
         """
-        outputstr = ""
+        outputstr: str = ""
         mesharray = self.data.reshape(self.nframe, self.size)
         for tmp in mesharray:
             output = []
@@ -446,7 +446,7 @@ class Grid3D(object):
         elif axis_name == "Z":
             data = np.average(np.average(data, axis=2), axis=1)
         else:
-            raise "Wrong axis name set"
+            raise ValueError("Wrong axis name set")
         return data
 
     def min_along_axis(self, axis_name: str, frame_i: int = 0):
@@ -476,7 +476,7 @@ class Grid3D(object):
         elif axis_name == "Z":
             data = np.min(np.min(data, axis=2), axis=1)
         else:
-            raise "Wrong axis name set"
+            raise ValueError("Wrong axis name set")
         return data
 
     def max_along_axis(self, axis_name: str, frame_i: int = 0):
@@ -506,7 +506,7 @@ class Grid3D(object):
         elif axis_name == "Z":
             data = np.max(np.max(data, axis=2), axis=1)
         else:
-            raise "Wrong axis name set"
+            raise ValueError("Wrong axis name set")
         return data
 
     def median_along_axis(self, axis_name: str, frame_i: int = 0):
@@ -536,5 +536,5 @@ class Grid3D(object):
         elif axis_name == "Z":
             data = np.median(np.median(data, axis=2), axis=1)
         else:
-            raise "Wrong axis name set"
+            raise ValueError("Wrong axis name set")
         return data

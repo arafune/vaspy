@@ -9,7 +9,6 @@ from __future__ import unicode_literals  # Version safety
 
 from vaspy.tools import open_by_suffix
 from typing import List, Optional, Union, IO, Tuple
-import bz2
 
 
 class OUTCAR(object):  # Version safety
@@ -91,7 +90,7 @@ class OUTCAR(object):  # Version safety
             for i in self.atom_names
         ]
 
-    def load_file(self, thefile: Union[IO, bz2.BZ2File]) -> None:
+    def load_file(self, thefile: Union[IO[str], IO[bytes]]) -> None:
         """Parse OUTCAR file.
 
         Parameters

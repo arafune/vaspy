@@ -16,6 +16,7 @@ from __future__ import print_function  # Version safety
 import csv
 import re
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
+from typing import IO, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
@@ -52,7 +53,7 @@ class ProjectionBand(eigenval.EnergyBand):
 
     """
 
-    def __init__(self, kvecs=(), energies=(), proj=(), phase=(), nspin=1):
+    def __init__(self, kvecs=(), energies=(), proj=(), phase=(), nspin=1) -> None:
         """Initialize."""
         super(ProjectionBand, self).__init__()
         self.natom = 0
@@ -207,7 +208,11 @@ class ProjectionBand(eigenval.EnergyBand):
                     label_list.append(label)
         return label_list
 
-    def to_3dlist(self, site_indexes=(), orbital_indexes_sets=()):
+    def to_3dlist(
+        self,
+        site_indexes: Sequence[int] = (),
+        orbital_indexes_sets: Sequence[Sequence[int]] = (),
+    ):
         """Return 3D list data that are easily converted to txt data for csv.
 
         Parameters
@@ -257,7 +262,7 @@ class ProjectionBand(eigenval.EnergyBand):
         return projband.tolist()
 
     def to_csv(
-        self, csv_file, site_indexes=(), orbital_indexes_sets=(), blankline=True
+        self, csv_file, site_indexes=(), orbital_indexes_sets=(), blankline: bool = True
     ):
         """Write data to csv file.
 
@@ -282,7 +287,11 @@ class ProjectionBand(eigenval.EnergyBand):
                 if blankline:
                     fhandle.writelines("\n")
 
-    def text_sheet(self, site_indexes=(), orbital_indexes_sets=()):
+    def text_sheet(
+        self,
+        site_indexes: Sequence[int] = (),
+        orbital_indexes_sets: Sequence[Sequence[int]] = (),
+    ):
         """Return csv-like text data.
 
         Parameters
@@ -365,13 +374,17 @@ class PROCAR(ProjectionBand):  # Version safety
 
     """
 
-    def __init__(self, filename=None, phase_read=False):
+    def __init__(
+        self, filename: Optional[str] = None, phase_read: bool = False
+    ) -> None:
         """Initialize."""
         super(PROCAR, self).__init__()
         if filename:
             self.load_file(open_by_suffix(filename), phase_read)
 
-    def load_file(self, thefile, phase_read=False):
+    def load_file(
+        self, thefile: Union[IO[str], IO[bytes]], phase_read: bool = False
+    ) -> None:
         """Parse PROCAR.
 
         Parameters
@@ -483,7 +496,7 @@ class PROCAR(ProjectionBand):  # Version safety
         del energies
         thefile.close()
 
-    def set_spin_character(self, phase_read=False):
+    def set_spin_character(self, phase_read: bool = False):
         """Set label of Energy and Spin character.
 
         Parameters
@@ -494,7 +507,7 @@ class PROCAR(ProjectionBand):  # Version safety
         """
         pass
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """__str__() <=> str(x).
 
         Show the PROCAR character, not contents.
@@ -582,7 +595,7 @@ def check_orbital_name(arg):
     raise ValueError(errmsg)
 
 
-def shortcheck(procar):
+def shortcheck(procar) -> Tuple[int, int, int, List[str], bool]:
     """Check whether PROCAR file is good.
 
     Return numk, nbands, nion, orbital_names and
