@@ -16,6 +16,7 @@ The first is absolutely required.
 import itertools
 import logging
 from logging import Formatter, StreamHandler, getLogger
+from typing import IO, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
@@ -52,9 +53,9 @@ class VSIM_ASC(object):
 
     """
 
-    def __init__(self, filename=None):
+    def __init__(self, filename: Optional[str] = None) -> None:
         """Initialize."""
-        self.system_name = ""
+        self.system_name: str = ""
         self.atoms = []
         #
         self.qpts = []
@@ -63,7 +64,7 @@ class VSIM_ASC(object):
         if filename:
             self.load_file(open_by_suffix(filename))
 
-    def load_file(self, thefile):
+    def load_file(self, thefile: Union[IO[str], IO[bytes]]):
         """Parse vsim.ascii.
 
         Parameters
@@ -119,7 +120,13 @@ class VSIM_ASC(object):
         self.freqs = np.array(self.freqs)
         thefile.close()
 
-    def build_phono_motion(self, mode=0, supercell=(2, 2, 1), n_frames=30, magnitude=1):
+    def build_phono_motion(
+        self,
+        mode: int = 0,
+        supercell: Tuple[int, int, int] = (2, 2, 1),
+        n_frames: int = 30,
+        magnitude: float = 1,
+    ):
         """Build data for creating POSCAR etc.
 
         Parameters
@@ -185,7 +192,13 @@ def supercell_lattice_vectors(lattice_vectors, cell_id):
 
 
 def animate_atom_phonon(
-    position, qpt_cart, d_vector, n_frames=30, s_frame=0, e_frame=None, magnitude=1.0
+    position: Sequence[float],
+    qpt_cart,
+    d_vector,
+    n_frames: int = 30,
+    s_frame: int = 0,
+    e_frame: Optional[int] = None,
+    magnitude: float = 1.0,
 ):
     """Return atom position series determined by d_vector and q.
 

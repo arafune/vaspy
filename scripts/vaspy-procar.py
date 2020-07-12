@@ -7,6 +7,7 @@ import functools as ft
 import re
 from itertools import chain
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
+from typing import List, Tuple, Union
 
 import vaspy.procar as procar
 from vaspy import tools
@@ -118,8 +119,9 @@ for orb in tuple(set(flat_orbitals)):
 logger.debug("label['site'] is {}".format(procar.label["site"]))
 logger.debug("label['orbital'] is {}".format(procar.label["orbital"]))
 #
-site_indexes = []
+site_indexes: List[int] = []
 orbtal_indexes_sets = []
+tmp: Union[List[str], Tuple[str, ...]]
 for site in sitenames:
     site_indexes.append(procar.label["site"].index(site))
 for orbitals in args.orbital:
@@ -128,7 +130,7 @@ for orbitals in args.orbital:
         tmp.append(procar.label["orbital"].index(orbital_in_site))
     tmp = tuple(tmp)
     orbtal_indexes_sets.append(tmp)
-site_indexes = tuple(site_indexes)
+# site_indexes = tuple(site_indexes)
 orbital_indexes_sets = tuple(orbtal_indexes_sets)
 #
 logger.debug("site_indexes: {}".format(site_indexes))

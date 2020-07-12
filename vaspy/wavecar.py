@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Module for WAVECAR class."""
 
-from __future__ import division, print_function
-
 from typing import Optional, Tuple
 
 import numpy as np
@@ -520,7 +518,7 @@ def check_symmetry(grid3d) -> bool:
     return True
 
 
-def restore_gamma_grid(grid3d, para: bool = PARALLEL):
+def restore_gamma_grid(grid3d: np.ndarray, para: bool = PARALLEL):
     """Return Grid from the size-reduced matrix for gammareal Wavecar.
 
     Parameters
@@ -530,7 +528,7 @@ def restore_gamma_grid(grid3d, para: bool = PARALLEL):
 
     para  : boolean, optional (default is global variable `PARALLEL`)
 
-"""
+    """
     assert grid3d.ndim == 3, "Must be 3D Grid"
     if para:
         #    ngrid = grid3d.shape
