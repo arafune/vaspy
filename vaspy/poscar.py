@@ -36,8 +36,6 @@ Direct
     0.00000000E+00  0.00000000E+00  0.00000000E+00
 """
 
-from __future__ import division, print_function  # Version safety
-
 import copy
 import itertools as it
 import re

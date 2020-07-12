@@ -10,9 +10,6 @@ This module provides PROCAR, ProjectionBand classes.
 * Projection class is used for storing the orbital projection data
 """
 
-from __future__ import division  # Version safety
-from __future__ import print_function  # Version safety
-
 import csv
 import re
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
