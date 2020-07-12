@@ -4,13 +4,11 @@
 Module for tools used in vaspy
 """
 
-from __future__ import division, print_function  # Version safety
-
 import bz2
 from itertools import zip_longest
 import os
 import re
-from collections import Iterable
+from collections.abc import Iterable
 import numpy as np
 from typing import BinaryIO, List, Iterable, TextIO, Tuple, Union, IO, Any, Optional
 
@@ -139,7 +137,7 @@ def atoms_to_atomtypes_atomnums(atoms: List[str]) -> Tuple[List[str], List[int]]
     return atomtypes, atomnums
 
 
-def cuboid(crystal_axes) :
+def cuboid(crystal_axes):
     """Return the coordinates for cuboid that includes tetrahedron represented by vectors.
     
     Parameters

@@ -69,8 +69,8 @@ def load(
             eigenval, wavecar (case insensitive).
 
     """
-    from . import poscar, outcar, chgcar, doscar, locpot, procar, bader
-    from . import eigenval, wavecar
+#    from . import poscar, outcar, chgcar, doscar, locpot, procar, bader
+#    from . import eigenval, wavecar
 
     filenamebase = os.path.basename(filename).lower()
     if isinstance(mode, str):

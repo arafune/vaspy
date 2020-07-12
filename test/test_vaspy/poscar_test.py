@@ -7,7 +7,7 @@ import os
 import tempfile
 
 import numpy as np
-from nose.tools import assert_equal, assert_false, eq_, ok_, raises, with_setup
+from nose.tools import assert_equal, assert_false, eq_, ok_, raises
 
 import vaspy.poscar
 
@@ -23,7 +23,6 @@ class TestPOSCAR(object):
         self.blancposcar = vaspy.poscar.POSCAR()
         os.remove(filePOSCAR[1])
 
-    @with_setup(setup=setup)
     def test_fundamentals(self):
         """Test for POSCAR class: fundamental data read"""
         # a=os.getcwd()  # return the directory where nose execute.
@@ -69,7 +68,6 @@ class TestPOSCAR(object):
             self.testposcar.site_label,
         )
 
-    @with_setup(setup=setup)
     def test_point_in_box(self):
         assert_false(
             vaspy.poscar.point_in_box((0.5, 0.5, 0.2), self.testposcar.cell_vecs)
@@ -81,24 +79,20 @@ class TestPOSCAR(object):
             )
         )
 
-    @with_setup(setup=setup)
     def test_is_cartesian(self):
         assert_false(self.testposcar.is_cartesian())
         self.testposcar.to_cartesian()
         ok_(self.testposcar.is_cartesian())
 
-    @with_setup(setup=setup)
     def test_is_direct(self):
         ok_(self.testposcar.is_direct())
         self.testposcar.to_cartesian()
         assert_false(self.testposcar.is_direct())
 
-    @with_setup(setup=setup)
     def test_is_selective(self):
         ok_(self.testposcar.selective)
         assert_false(self.blancposcar.selective)
 
-    @with_setup(setup=setup)
     def test_pos(self):
         np.testing.assert_array_equal(
             np.array([0.0, 0.5, 0.5]), self.testposcar.positions[2]
@@ -109,7 +103,6 @@ class TestPOSCAR(object):
             rtol=1e-04,
         )
 
-    @with_setup(setup=setup)
     def test_tune_scaling_factor(self):
         self.testposcar.tune_scaling_factor(1.0)
         np.testing.assert_allclose(
@@ -118,7 +111,6 @@ class TestPOSCAR(object):
             rtol=1e-07,
         )
 
-    @with_setup(setup=setup)
     def test_tune_scaling_factor_withCartesian(self):
         self.testposcar.to_cartesian()
         self.testposcar.tune_scaling_factor(1.0)
@@ -138,7 +130,6 @@ class TestPOSCAR(object):
             rtol=1e-06,
         )
 
-    @with_setup(setup=setup)
     def test_to_cartesian(self):
         self.testposcar.to_cartesian()
         np.testing.assert_allclose(
@@ -148,13 +139,11 @@ class TestPOSCAR(object):
         )
         self.testposcar.to_direct()
 
-    @with_setup(setup=setup)
     def test_to_direct(self):
         tmp = self.testposcar.positions[5]
         self.testposcar.to_direct()
         np.testing.assert_array_equal(tmp, self.testposcar.positions[5])
 
-    @with_setup(setup=setup)
     def test_to_list(self):
         tmp = self.testposcar.to_list()
         assert_equal("NiC4S4", tmp[0])
@@ -180,7 +169,6 @@ class TestPOSCAR(object):
         assert_equal("#2:Ni3", tmp[11][2])
         assert_equal("#3:C1", tmp[11][3])
 
-    @with_setup(setup=setup)
     def test_to_str(self):
         global tmpstr_original
         global tmpstr_after_rotate
@@ -188,7 +176,6 @@ class TestPOSCAR(object):
         self.testposcar.rotate_atom(0, "z", 90, (0, 0, 0))
         self.testposcar.to_direct()
 
-    @with_setup(setup=setup)
     def test_poscar_supercell1(self):
         """Tests for poscar supercell method."""
         supercell = self.testposcar.supercell(3, 2, 1)
@@ -230,7 +217,6 @@ class TestPOSCAR(object):
         supercell = self.testposcar.supercell(3, 2, 1)
         assert_equal(6 * len(self.testposcar.positions), len(supercell.positions))
 
-    @with_setup(setup=setup)
     def test_poscar_split(self):
         """Test for POSCAR.split."""
         one, other = self.testposcar.split([2, 3, 4, 5, 6])

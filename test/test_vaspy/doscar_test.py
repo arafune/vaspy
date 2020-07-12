@@ -4,14 +4,14 @@
 import os
 
 import numpy as np
-from nose.tools import assert_equal, assert_false, eq_, ok_, raises, with_setup
+from nose.tools import assert_equal, assert_false, eq_, ok_, raises
 
 from vaspy.doscar import DOS, DOSCAR, PDOS, TDOS
 
 
 class TestDOSCAR(object):
     def setUp(self):
-        currentpath = (os.path.abspath(os.path.dirname(__file__)))
+        currentpath = os.path.abspath(os.path.dirname(__file__))
         testDOS = currentpath + "/DOSCAR_dummy"
         self.testDOSCAR = DOSCAR(testDOS)
 
