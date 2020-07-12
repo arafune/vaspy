@@ -50,14 +50,16 @@ class LOCPOT(mesh3d.VASPGrid):
             horizontal_axis = np.linspace(0, axes_length[0], self.grid.shape[0])
             plt.clf()
             plt.xlim(xmax=axes_length[0])
-        if axis_name == "Y":
+        elif axis_name == "Y":
             horizontal_axis = np.linspace(0, axes_length[1], self.grid.shape[1])
             plt.clf()
             plt.xlim(xmax=axes_length[1])
-        if axis_name == "Z":
+        elif axis_name == "Z":
             horizontal_axis = np.linspace(0, axes_length[2], self.grid.shape[2])
             plt.clf()
             plt.xlim(xmax=axes_length[2])
+        else:
+            raise ValueError("Wrong axis name")
         y_average = self.grid.average_along_axis(axis_name, frame)
         y_max = self.grid.max_along_axis(axis_name, frame)
         y_min = self.grid.min_along_axis(axis_name, frame)

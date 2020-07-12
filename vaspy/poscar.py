@@ -390,6 +390,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         Parameters
         -----------
         array: list
+            
         point: numpy.ndarray
 
         Returns
@@ -918,7 +919,8 @@ def point_in_box(point: Sequence[float], cell_vecs: Sequence[float]) -> bool:
 
     Returns
     ---------
-    boolean
+    bool
+        True if the point is interior in the "box" defined the cell_vecs.
 
     """
     if three_by_three(cell_vecs):
@@ -936,12 +938,12 @@ def rotate_x(theta_deg: float):
     Parameters
     ----------
     theta_deg: float
-        angle of rotation (Degrees)
+        Rotation angle (Degrees)
 
     Returns
     -------
     numpy.ndarray
-        rotation matrix
+        rotation matrix (Around X)
 
     Example
     ---------
@@ -964,6 +966,16 @@ def rotate_x(theta_deg: float):
 def rotate_y(theta_deg: float):
     """Rotation matrix around Y-axis.
 
+    Parameters
+    ------------
+    theta_deg: float
+        Rotation angle
+
+    Returns
+    ----------
+    np.ndarray
+        Rotation matrix (around Y)
+
     Example
     --------
     >>> rotate_y(60)
@@ -984,6 +996,16 @@ def rotate_y(theta_deg: float):
 
 def rotate_z(theta_deg: float):
     """Rotation matrix around Z-axis.
+
+    Parameters
+    ------------
+    theta_deg: float
+        Rotation angle
+
+    Returns
+    ----------
+    np.ndarray
+        Rotation matrix (around Z)
 
     Example
     --------
@@ -1008,12 +1030,13 @@ def three_by_three(vec: Sequence[float]) -> bool:
 
     Parameters
     ----------
-    vec: numpy.ndarray, numpy.matrix, list, tuple
-    list like object
+    vec: list-like
+        Vector like object to check whether can be written by the 3x3 matrix
 
     Returns
     --------
-    boolean
+    bool
+        True if the vec can be written by 3x3 matrix
 
     """
     if not isinstance(vec, (np.ndarray, np.matrix, list, tuple)):
@@ -1024,6 +1047,19 @@ def three_by_three(vec: Sequence[float]) -> bool:
 
 
 def _vectorize(vector: Sequence[float]):
+    """Return np.ndarray object
+
+    Parameters
+    -----------
+    vector: array-like
+        array-like object to be wanted as the vector.
+
+    Returns
+    ----------
+    np.ndarray
+        Numpy array (flatten) 
+    """
+
     if not isinstance(vector, (np.ndarray, np.matrix, list, tuple)):
         raise TypeError("Cannot convert into vector.")
     return np.array(vector).flatten()
