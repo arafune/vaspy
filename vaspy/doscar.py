@@ -45,7 +45,7 @@ from __future__ import print_function  # Version safety
 import copy
 import sys
 import numpy as np
-from typing import Optional, IO
+from typing import Optional, IO, Union, List, Tuple
 from nptyping import NDArray
 
 try:

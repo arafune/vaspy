@@ -8,7 +8,7 @@ from __future__ import print_function  # Version safety
 from __future__ import unicode_literals  # Version safety
 
 from vaspy.tools import open_by_suffix
-from typing import List, Union, TextIO, BinaryIO
+from typing import Tuple, List, Union, IO
 import bz2
 
 
@@ -50,8 +50,8 @@ class OUTCAR(object):  # Version safety
     def __init__(self, filename: str = None) -> None:
         """Initialize."""
         self.natom = 0
-        self.atomtypes = []
-        self.atomnums = []
+        self.atomtypes: List[str] = []
+        self.atomnums: List[int] = []
         self.posforce = []
         self.posforce_title = []
         self.atom_names = []
@@ -91,7 +91,7 @@ class OUTCAR(object):  # Version safety
             for i in self.atom_names
         ]
 
-    def load_file(self, thefile: Union[TextIO, BinaryIO, bz2.BZ2File]) -> None:
+    def load_file(self, thefile: Union[IO, bz2.BZ2File]) -> None:
         """Parse OUTCAR file.
 
         Parameters
@@ -216,7 +216,9 @@ class OUTCAR(object):  # Version safety
     # if boolian==True for ithAtom in self.posforce_title  ] #which is
     # correct?
 
-    def select_posforce(self, posforce_flag, *sites) -> List[bool]:
+    def select_posforce(
+        self, posforce_flag, *sites: Union[List[int], Tuple[int, ...]]
+    ) -> List[bool]:
         """Return the position and force selected by posforce_flag.
 
         Notes
