@@ -7,6 +7,7 @@ from __future__ import division, print_function
 import sys
 from typing import Optional
 
+
 import numpy as np
 
 from vaspy import mesh3d
@@ -25,13 +26,13 @@ class LOCPOT(mesh3d.VASPGrid):
     """
 
     def __init__(
-        self, filename: Optional[str] = None, pickleddata: Optional[str] = None
+        self, filename: Optional[str] = None, pickles: Optional[str] = None
     ) -> None:
         """Initialize."""
-        super(LOCPOT, self).__init__(filename, pickleddata)
+        super(LOCPOT, self).__init__(filename, pickles)
 
     def plot_potential_along_axis(
-        self, axis_name: str, frame: Optional[int] = 0, save: Optional[str] = None
+        self, axis_name: str, frame: int = 0, save: Optional[str] = None
     ) -> None:  # FIXME!!
         """Plot potential curve along the axis.
 
@@ -49,14 +50,16 @@ class LOCPOT(mesh3d.VASPGrid):
             horizontal_axis = np.linspace(0, axes_length[0], self.grid.shape[0])
             plt.clf()
             plt.xlim(xmax=axes_length[0])
-        if axis_name == "Y":
+        elif axis_name == "Y":
             horizontal_axis = np.linspace(0, axes_length[1], self.grid.shape[1])
             plt.clf()
             plt.xlim(xmax=axes_length[1])
-        if axis_name == "Z":
+        elif axis_name == "Z":
             horizontal_axis = np.linspace(0, axes_length[2], self.grid.shape[2])
             plt.clf()
             plt.xlim(xmax=axes_length[2])
+        else:
+            raise ValueError("Wrong axis name")
         y_average = self.grid.average_along_axis(axis_name, frame)
         y_max = self.grid.max_along_axis(axis_name, frame)
         y_min = self.grid.min_along_axis(axis_name, frame)
@@ -83,5 +86,5 @@ class LOCPOT(mesh3d.VASPGrid):
 # in VASP.5.2.12, the default is to write the entire local potential,
 # including the exchange correlation potential.
 #
-# Memo: I (RA) don't know why the potential data are  stored twice
+# Memo: I (RA) don't know why the potential data are stored twice
 # (exactly same data), when LVHAR = .TRUE. and LVTOT is not set.

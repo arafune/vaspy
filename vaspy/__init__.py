@@ -6,7 +6,22 @@ modules for VASP pre/post-process
 import os.path
 import re
 
-from vaspy import *
+from vaspy import (
+    bader,
+    chgcar,
+    doscar,
+    outcar,
+    poscar,
+    procar,
+    locpot,
+    eigenval,
+    wavecar,
+    mesh3d,
+    const,
+    vsim_asc,
+    tools,
+    utility,
+)
 from typing import Optional, Union, List, Any
 
 __all__: List[str] = [
@@ -54,8 +69,8 @@ def load(
             eigenval, wavecar (case insensitive).
 
     """
-    from . import poscar, outcar, chgcar, doscar, locpot, procar, bader
-    from . import eigenval, wavecar
+#    from . import poscar, outcar, chgcar, doscar, locpot, procar, bader
+#    from . import eigenval, wavecar
 
     filenamebase = os.path.basename(filename).lower()
     if isinstance(mode, str):

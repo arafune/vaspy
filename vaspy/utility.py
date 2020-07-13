@@ -8,6 +8,8 @@ difficult to make a series of figures of the model structure.
 import argparse
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 import itertools
+from re import T
+from typing import Optional, Tuple
 import numpy as np
 from mayavi import mlab
 
@@ -28,18 +30,18 @@ logger.propagate = False
 
 
 def view3d(
-    vaspy_poscar,
-    repeat=(1, 1, 1),
-    output=None,
-    figsize=(800, 800),
-    fgcolor=(0, 0, 0),
-    bgcolor=(1, 1, 1),
-    line_thickness=0.05,
-    line_color=(0, 0, 0),
-    is_parallel=True,
-    scale=20.0,
-    theta=90,
-    phi=0,
+    vaspy_poscar: POSCAR,
+    repeat: Tuple[int, int, int] = (1, 1, 1),
+    output: Optional[str] = None,
+    figsize: Tuple[float, float] = (800.0, 800.0),
+    fgcolor: Tuple[int, int, int] = (0, 0, 0),
+    bgcolor: Tuple[int, int, int] = (1, 1, 1),
+    line_thickness: float = 0.05,
+    line_color: Tuple[int, int, int] = (0, 0, 0),
+    is_parallel: bool = True,
+    scale: float = 20.0,
+    theta: float = 90,
+    phi: float = 0,
 ):
     """Drow 3D view by using mayavi.
 
@@ -181,19 +183,19 @@ def view3d(
 
 
 def view_atom_with_surface(
-    vaspy_chgcar,
-    repeat=(1, 1, 1),
-    output=None,
-    figsize=(800, 800),
-    fgcolor=(0, 0, 0),
-    bgcolor=(1, 1, 1),
-    line_thickness=0.05,
-    line_color=(0, 0, 0),
-    is_parallel=True,
-    volume_iso_color=(1, 1, 1),
-    scale=20.0,
-    theta=90,
-    phi=0,
+    vaspy_chgcar: vaspy.chgcar.CHGCAR,
+    repeat: Tuple[int, int, int] = (1, 1, 1),
+    output: Optional[str] = None,
+    figsize: Tuple[float, float] = (800, 800),
+    fgcolor: Tuple[int, int, int] = (0, 0, 0),
+    bgcolor: Tuple[int, int, int] = (1, 1, 1),
+    line_thickness: float = 0.05,
+    line_color: Tuple[int, int, int] = (0, 0, 0),
+    is_parallel: bool = True,
+    volume_iso_color: Tuple[int, int, int] = (1, 1, 1),
+    scale: float = 20.0,
+    theta: float = 90.0,
+    phi: float = 0,
 ):
     """Draw contour surface from CHGCAR, LOCPOT, etc.
 

@@ -15,3 +15,8 @@ WaveTrans
 .coverage
 test/vaspy/htmlcov
 nosetests.xml
+vaspy/typings
+.ropeproject
+typings/nptyping
+typings
+typing

@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 """Module for WAVECAR class."""
 
-from __future__ import division, print_function
-from typing import Optional, Tuple
+from typing import IO, Optional, Tuple, Union
 
 import numpy as np
 from scipy.fftpack import ifftn
 
 import vaspy.mesh3d as mesh3d
+from vaspy.mesh3d import VASPGrid
 import vaspy.poscar as poscar
-from nptyping import NDArray
-
 
 Ry_in_eV: float = 13.605826
 au_in_AA: float = 0.529177249
@@ -23,6 +21,7 @@ au_in_AA: float = 0.529177249
 # set True.
 #   use serial FFT for wavefunctions x direction half grid
 # set False
+
 PARALLEL: bool = False
 
 
@@ -69,8 +68,15 @@ class WAVECAR(object):
     """
 
     def __init__(self, filename: str = "WAVECAR") -> None:
-        """Ideanitialize WAVECAR class."""
-        self.wfc = open(filename, "rb")
+        """Ideanitialize WAVECAR class.
+
+        Parameters
+        ------------
+        filname: str (Default: "WAVECAR")
+            File name of the 'WAVECAR'
+        """
+
+        self.wfc: IO[bytes] = open(filename, "rb")
         self.gamma: bool = False
         #
         self.header()
@@ -95,25 +101,25 @@ class WAVECAR(object):
         self.wfc.seek(self.recl)
         #        print(self.wfc.tell())
         #
-        dump = np.fromfile(self.wfc, dtype=np.float, count=13)
+        dump: np.ndarray = np.fromfile(self.wfc, dtype=np.float, count=13)
         #
-        self.numk = int(dump[0])
-        self.nbands = int(dump[1])
-        self.encut = dump[2]
-        self.realcell = dump[3:12].reshape((3, 3))
-        self.efermi = dump[12]
+        self.numk: int = int(dump[0])
+        self.nbands: int = int(dump[1])
+        self.encut: float = dump[2]
+        self.realcell: np.ndarray = dump[3:12].reshape((3, 3))
+        self.efermi: float = dump[12]
         #        print(self.wfc.tell())
-        self.volume = np.linalg.det(self.realcell)
+        self.volume: float = np.linalg.det(self.realcell)
         self.rcpcell = np.linalg.inv(self.realcell).T
-        unit_cell_vector_magnitude = np.linalg.norm(self.realcell, axis=1)
-        cutoff = np.ceil(
+        unit_cell_vector_magnitude: np.ndarray = np.linalg.norm(self.realcell, axis=1)
+        cutoff: Union[np.ndarray, np.generic] = np.ceil(
             np.sqrt(self.encut / Ry_in_eV)
             / (2 * np.pi / (unit_cell_vector_magnitude / au_in_AA))
         )
         # FFT Minimum grid size. Always odd!!
-        self.ngrid = np.array(2 * cutoff + 1, dtype=int)
+        self.ngrid: np.ndarray = np.array(2 * cutoff + 1, dtype=int)
 
-    def check_DwNGZHalf(self):
+    def check_DwNGZHalf(self) -> Optional[bool]:
         r"""self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
         about half of the number of gvectors equals number of plane waves."""
         if self.gamma:
@@ -135,7 +141,7 @@ class WAVECAR(object):
         else:
             raise ValueError("Invalid TAG value: {}".format(self.rtag))
 
-    def band(self) -> Tuple[Optional[NDArray], Optional[NDArray]]:
+    def band(self) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
         """Read the information about the band from WAVECAR file.
 
         The infomation obtained by this method is as follows:
@@ -146,10 +152,14 @@ class WAVECAR(object):
         * occupation  (as a function of spin-, k-, and band index)
 
         """
-        self.kvecs = np.zeros((self.numk, 3), dtype=float)
-        self.bands = np.zeros((self.nspin, self.numk, self.nbands), dtype=float)
-        self.nplwvs = np.zeros(self.numk, dtype=int)
-        self.occs = np.zeros((self.nspin, self.numk, self.nbands), dtype=float)
+        self.kvecs: np.ndarray = np.zeros((self.numk, 3), dtype=float)
+        self.bands: np.ndarray = np.zeros(
+            (self.nspin, self.numk, self.nbands), dtype=float
+        )
+        self.nplwvs: np.ndarray = np.zeros(self.numk, dtype=int)
+        self.occs: np.ndarray = np.zeros(
+            (self.nspin, self.numk, self.nbands), dtype=float
+        )
         for spin_i in range(self.nspin):
             for k_i in range(self.numk):
                 pos = 2 + spin_i * self.numk * (self.nbands + 1)
@@ -178,7 +188,7 @@ class WAVECAR(object):
             )
         return self.kpath, self.bands
 
-    def gvectors(self, k_i: float = 0) -> NDArray:
+    def gvectors(self, k_i: float = 0) -> np.ndarray:
         r"""Return G vector.
 
         G-vectors :math:`G` is determined by the following condition:
@@ -217,7 +227,7 @@ class WAVECAR(object):
 
     def bandcoeff(
         self, spin_i: int = 0, k_i: int = 0, band_i: int = 0, norm: bool = False
-    ) -> NDArray:
+    ):
         """Read the coefficient of the planewave of the KS states.
 
         The KS states is specified by the `spin_i`, `k_i` and `band_i`.
@@ -251,11 +261,11 @@ class WAVECAR(object):
         spin_i: int = 0,
         k_i: int = 0,
         band_i: int = 0,
-        gvec: Optional[NDArray] = None,
-        ngrid: Optional[NDArray] = None,
+        gvec: Optional[np.ndarray] = None,
+        ngrid: Optional[np.ndarray] = None,
         norm: bool = False,
         poscar: poscar.POSCAR = poscar.POSCAR(),
-    ):
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray], VASPGrid]:
         r"""Return the pseudo-wavefunction in real space.
 
         Calculate the pseudo-wavefunction of the KS states in
@@ -307,6 +317,7 @@ class WAVECAR(object):
             gvectors(k_i).shape[0] :math:`\neq` bandcoeff(k_i).size)
 
         """
+
         if ngrid is None:
             ngrid = self.ngrid.copy()
         else:
@@ -512,7 +523,7 @@ def check_symmetry(grid3d) -> bool:
     return True
 
 
-def restore_gamma_grid(grid3d, para: bool = PARALLEL):
+def restore_gamma_grid(grid3d: np.ndarray, para: bool = PARALLEL):
     """Return Grid from the size-reduced matrix for gammareal Wavecar.
 
     Parameters
@@ -522,7 +533,7 @@ def restore_gamma_grid(grid3d, para: bool = PARALLEL):
 
     para  : boolean, optional (default is global variable `PARALLEL`)
 
-"""
+    """
     assert grid3d.ndim == 3, "Must be 3D Grid"
     if para:
         #    ngrid = grid3d.shape

@@ -7,7 +7,7 @@ script to use(demonstrate) vaspy.poscar functions.
 import argparse
 import functools as ft
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
-
+from typing import List
 from vaspy import tools
 from vaspy.poscar import POSCAR
 
@@ -23,7 +23,7 @@ logger.addHandler(handler)
 logger.propagate = False
 
 
-def split_to_float(string, n, name):
+def split_to_float(string: str, n: int, name: str) -> List[float]:
     lis = string.split(",")
     if len(lis) != n:
         message = "--{0} option requires {1} numbers".format(name, n)

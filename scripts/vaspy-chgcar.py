@@ -72,7 +72,7 @@ parser.add_argument("CHGCAR_file_2", type=CHGCAR, nargs="?")
 args = parser.parse_args()
 
 
-def check_position_axes(chgcar1, chgcar2):
+def check_position_axes(chgcar1: CHGCAR, chgcar2: CHGCAR) -> bool:
     """Check the cell vectors and atom positions are same in two CHGCAR.
 
     Parameters
