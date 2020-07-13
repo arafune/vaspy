@@ -193,8 +193,8 @@ def supercell_lattice_vectors(lattice_vectors, cell_id):
 
 def animate_atom_phonon(
     position: Sequence[float],
-    qpt_cart,
-    d_vector,
+    qpt_cart: np.ndarray,
+    d_vector: np.ndarray,
     n_frames: int = 30,
     s_frame: int = 0,
     e_frame: Optional[int] = None,

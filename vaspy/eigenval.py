@@ -7,7 +7,7 @@ import sys
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
-from typing import Optional, Tuple, List, Any, IO
+from typing import Optional, Tuple, List, Any, IO, Union
 
 from vaspy.tools import open_by_suffix
 
@@ -291,7 +291,7 @@ class EIGENVAL(EnergyBand):
         if filename:
             self.load_file(open_by_suffix(filename))
 
-    def load_file(self, thefile: IO) -> None:
+    def load_file(self, thefile: Union[IO[bytes], IO[str]]) -> None:
         """Parse EIGENVAL."""
         self.natom, _, _, self.nspin = [int(i) for i in next(thefile).split()]
         if self.nspin == 2:

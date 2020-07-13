@@ -69,8 +69,6 @@ def load(
             eigenval, wavecar (case insensitive).
 
     """
-#    from . import poscar, outcar, chgcar, doscar, locpot, procar, bader
-#    from . import eigenval, wavecar
 
     filenamebase = os.path.basename(filename).lower()
     if isinstance(mode, str):
@@ -80,11 +78,11 @@ def load(
     elif re.search(r"outcar", filenamebase) or mode == "outcar":
         return outcar.OUTCAR(filename)
     elif re.search(r"chgcar|parchg", filenamebase) or mode == "chgcar":
-        return chgcar.CHGCAR(filename, pickleddata=additional)
+        return chgcar.CHGCAR(filename, pickles=additional)
     elif re.search(r"procar", filenamebase) or mode == "procar":
         return procar.PROCAR(filename)
     elif re.search(r"locpot", filenamebase) or mode == "locpot":
-        return locpot.LOCPOT(filename, pickleddata=additional)
+        return locpot.LOCPOT(filename, pickles=additional)
     elif re.search(r"doscar", filenamebase) or mode == "doscar":
         return doscar.DOSCAR(filename)
     elif re.search(r"vasp", filenamebase):

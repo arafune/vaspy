@@ -10,7 +10,7 @@ import os
 import re
 from collections.abc import Iterable
 import numpy as np
-from typing import BinaryIO, List, Iterable, TextIO, Tuple, Union, IO, Any, Optional
+from typing import List, Iterable, Tuple, Union, IO, Any, Optional
 
 
 def open_by_suffix(filename: str,) -> Union[IO[bytes], IO[str]]:

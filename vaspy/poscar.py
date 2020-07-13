@@ -78,7 +78,9 @@ class POSCAR_HEAD(object):
 
     def __init__(self) -> None:
         """Initialization."""
-        self.__cell_vecs = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
+        self.__cell_vecs: np.ndarray = np.array(
+            [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+        )
         self.system_name: str = ""
         self.scaling_factor: float = 0.0
         self.atomtypes: List[str] = []
@@ -86,7 +88,7 @@ class POSCAR_HEAD(object):
         self.__site_label: List[str] = []
 
     @property
-    def cell_vecs(self):
+    def cell_vecs(self) -> np.ndarray:
         """Return the matrix of the unit cell."""
         return self.__cell_vecs
 
@@ -106,7 +108,7 @@ class POSCAR_HEAD(object):
             raise TypeError
 
     @property
-    def realcell(self):
+    def realcell(self) -> np.ndarray:
         """Alias of cell_vecs to keep consistency with wavecar.py."""
         return self.__cell_vecs
 
@@ -171,7 +173,7 @@ class POSCAR_POS(object):
     def __init__(self) -> None:
         """Initialization."""
         self.coordinate_type = ""
-        self.positions = []
+        self.positions: List[np.ndarray] = []
         self.coordinate_changeflags: List[str] = []
         self.selective: bool = False
 
@@ -829,7 +831,9 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         for site, pos in zip(site_list, newposes):
             self.positions[site] = pos
 
-    def translate(self, vector, atomlist: List[int]):
+    def translate(
+        self, vector: Sequence[float], atomlist: List[int]
+    ) -> List[np.ndarray]:
         """Translate the selected atom(s) by vector.
 
         Parameters
@@ -863,7 +867,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return self.positions
 
     @property
-    def axes_lengthes(self):
+    def axes_lengthes(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Return cell axis lengthes.
 
         Returns
@@ -877,7 +881,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         cell_z = np.linalg.norm(self.cell_vecs[2] * self.scaling_factor)
         return (cell_x, cell_y, cell_z)
 
-    def translate_all(self, vector,) -> None:
+    def translate_all(self, vector: Sequence[float]) -> None:
         """Translate **all** atoms by vector.
 
         Parameters
@@ -932,7 +936,7 @@ def point_in_box(point: Sequence[float], cell_vecs: Sequence[float]) -> bool:
         raise TypeError
 
 
-def rotate_x(theta_deg: float):
+def rotate_x(theta_deg: float) -> np.ndarray:
     """Rotation matrix around X-axis.
 
     Parameters
@@ -963,7 +967,7 @@ def rotate_x(theta_deg: float):
     )
 
 
-def rotate_y(theta_deg: float):
+def rotate_y(theta_deg: float) -> np.ndarray:
     """Rotation matrix around Y-axis.
 
     Parameters
@@ -994,7 +998,7 @@ def rotate_y(theta_deg: float):
     )
 
 
-def rotate_z(theta_deg: float):
+def rotate_z(theta_deg: float) -> np.ndarray:
     """Rotation matrix around Z-axis.
 
     Parameters
@@ -1046,7 +1050,7 @@ def three_by_three(vec: Sequence[float]) -> bool:
     return [3, 3, 3] == [len(i) for i in vec]
 
 
-def _vectorize(vector: Sequence[float]):
+def _vectorize(vector: Sequence[float]) -> np.ndarray:
     """Return np.ndarray object
 
     Parameters
