@@ -7,7 +7,7 @@ import sys
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
-from typing import Optional, Tuple, List, Any, IO, Union
+from typing import Dict, Optional, Sequence, Tuple, List, Any, IO, Union
 
 from vaspy.tools import open_by_suffix
 
@@ -65,16 +65,21 @@ class EnergyBand(object):
 
     """
 
-    def __init__(self, kvecs=(), energies=(), nspin: int = 1) -> None:
+    def __init__(
+        self,
+        kvecs: Sequence[float] = (),
+        energies: Sequence[float] = (),
+        nspin: int = 1,
+    ) -> None:
         """Initialize."""
-        self.kvecs = np.array(kvecs)
-        self.numk = len(self.kvecs)
-        self.label = {}
+        self.kvecs: np.ndarray = np.array(kvecs)
+        self.numk: int = len(self.kvecs)
+        self.label: Dict["str", List["str"]] = {}
         try:
-            self.nbands = len(energies) // len(kvecs)
+            self.nbands: int = len(energies) // len(kvecs)
         except ZeroDivisionError:
             self.nbands = 0
-        self.energies = energies
+        self.energies: np.ndarray = np.array(energies)
         self.nspin = nspin
         if self.nspin == 1:  # standard
             self.label["spin"] = [""]
@@ -88,7 +93,7 @@ class EnergyBand(object):
         self.label["k"] = ["#k"]
 
     @property
-    def kdistances(self):
+    def kdistances(self) -> np.ndarray:
         """Return kdistances."""
         return np.cumsum(
             np.linalg.norm(
@@ -123,7 +128,7 @@ class EnergyBand(object):
                 label_list.append(tmp)
         return label_list
 
-    def to_3dlist(self, **kwargs):
+    def to_3dlist(self, **kwargs) -> List[List[List[float]]]:
         """Return 3D mentional list.
 
         list[band_i, [k_i, energy, (energy_down)]]
@@ -246,7 +251,10 @@ class EnergyBand(object):
         plt.show()
 
     def to_physical_kvector(
-        self, recvec=np.array(((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)),),
+        self,
+        recvec: np.ndarray = np.array(
+            ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)),
+        ),
     ) -> None:
         """Change kvec unit to inverse AA.
 

@@ -58,11 +58,11 @@ parser.add_argument(
 args = parser.parse_args()
 
 try:
-    pos = poscar(args.poscar)
+    pos: poscar.POSCAR = poscar.POSCAR.(args.poscar)
 except NameError:
     print("'POSCAR' file not exist")
 
-wav = wavecar(args.WAVECAR)
+wav: wavecar.WAVECAR = wavecar.WAVECAR(args.WAVECAR)
 grid = wav.realspace_wfc(
     spin_i=args.spin, k_i=args.k - 1, band_i=args.band - 1, poscar=pos
 )

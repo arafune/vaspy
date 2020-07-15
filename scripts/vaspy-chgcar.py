@@ -44,17 +44,17 @@ when this option is set --add, -diff are ignored,
 and CHGCAR_file_2 must not be set.
 spin operation is one of the followings:
 mag : show the magnetization
-      density (for spin resolved calculations)
+        density (for spin resolved calculations)
 magX : show the magnetization density in
-       the X direction (for non collinear calc.)
+        the X direction (for non collinear calc.)
 magY : show the magnetization density in
-       the Y direction (for non collinear calc.)
+        the Y direction (for non collinear calc.)
 magZ : show the magnetization density in
-       the Z direction (for non collinear calc.)
+        the Z direction (for non collinear calc.)
 majority : extract the part for the
-           majority spin (for spin resolved calc.)
+            majority spin (for spin resolved calc.)
 minority : extract the part for the
-           minority spin (for spin resolved calc.)""",
+            minority spin (for spin resolved calc.)""",
 )
 
 parser.add_argument(
