@@ -385,13 +385,13 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
     # class method? or independent function?
     def nearest(
-        self, array, point,
+        self, array, point: np.ndarray,
     ):
         """Return the nearest position in the periodic space.
 
         Parameters
         -----------
-        array: list
+        array: list of float  # << Check
             
         point: numpy.ndarray
 
@@ -458,7 +458,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                 take into account the periodic boundary.
 
         """
-        rotate_at = _vectorize(center)
+        rotate_at: np.ndarray = _vectorize(center)
         if len(center) != 3:
             raise ValueError
         if not point_in_box(rotate_at / self.scaling_factor, self.cell_vecs):
@@ -803,7 +803,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         option is highly recommended to form a molecule.
 
         """
-        molecule = [self.positions[j] for j in site_list]
+        molecule: List[np.ndarray] = [self.positions[j] for j in site_list]
         newposes = []
         for index, site in enumerate(site_list):
             target_atom = self.positions[site]
@@ -855,14 +855,18 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
         """
         if self.is_cartesian():
-            vector = _vectorize(vector)
+            vector_array: np.ndarray = _vectorize(vector)
             for i in atomlist:
-                self.positions[i] = self.positions[i] + vector / self.scaling_factor
+                self.positions[i] = (
+                    self.positions[i] + vector_array / self.scaling_factor
+                )
         else:
-            vector = _vectorize(vector)
+            vector_array: np.ndarray = _vectorize(vector)
             self.to_cartesian()
             for i in atomlist:
-                self.positions[i] = self.positions[i] + vector / self.scaling_factor
+                self.positions[i] = (
+                    self.positions[i] + vector_array / self.scaling_factor
+                )
             self.to_direct()
         return self.positions
 

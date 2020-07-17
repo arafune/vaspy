@@ -13,15 +13,12 @@ import numpy as np
 from typing import List, Iterable, Tuple, Union, IO, Any, Optional
 
 
-def open_by_suffix(filename: str,) -> Union[IO[bytes], IO[str]]:
+def open_by_suffix(filename: str,) -> Union[IO[str], IO[bytes]]:
     """Open file."""
     if os.path.splitext(filename)[1] == ".bz2":
-        try:
-            thefile = bz2.open(filename, mode="rt")
-        except AttributeError:
-            thefile = bz2.BZ2File(filename, mode="r")
+        thefile = bz2.open(filename, mode="rt")
     else:
-        thefile = open(filename)
+        thefile = open(filename, mode="rt")
     return thefile
 
 

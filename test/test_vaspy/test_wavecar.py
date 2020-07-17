@@ -5,8 +5,7 @@ import os
 
 import numpy as np
 
-# import tempfile
-from nose.tools import assert_almost_equal, eq_, ok_
+from numpy.testing import assert_almost_equal
 
 import vaspy.poscar as poscar
 import vaspy.wavecar as wavecar
@@ -56,13 +55,13 @@ class TestCOWavecar(object):
         rtag, wfprec
         """
         assert 711680 == self.co.recl  # record length
-        eq_(2, self.co.nspin)  # spin
-        eq_(45200, self.co.rtag)  # precision flag
-        eq_(np.complex64, self.co.prec)
+        assert 2 == self.co.nspin  # spin
+        assert 45200 == self.co.rtag  # precision flag
+        assert np.complex64 == self.co.prec
 
-        eq_(1, self.co.numk)
-        eq_(54, self.co.nbands)
-        eq_(400, self.co.encut)
+        assert 1 == self.co.numk
+        assert 54 == self.co.nbands
+        assert 400 == self.co.encut
         assert_almost_equal(-8.05748789, self.co.efermi)
         np.testing.assert_array_equal(
             [[17.0, 0.0, 0.0], [0.0, 17.0, 0.0], [0.0, 0.0, 17.0]], self.co.realcell
@@ -73,8 +72,8 @@ class TestCOWavecar(object):
     def test_wavecar_band(self):
         """test for CO WAVECAR band"""
         kpath, kbands = self.co.band()
-        eq_(None, kpath)
-        eq_((self.co.nspin, self.co.numk, self.co.nbands), kbands.shape)
+        assert None == kpath
+        assert (self.co.nspin, self.co.numk, self.co.nbands) == kbands.shape
         np.testing.assert_array_almost_equal(
             [-29.49120151, -14.03737717, -11.88106463, -11.88106223, -9.00976389],
             kbands[0, 0, 0:5],
@@ -92,7 +91,7 @@ class TestCOWavecar(object):
         teststr += "b1 = 0.058823529411764705    0.0    0.0"
         teststr += "\nb2 = 0.0    0.058823529411764705"
         teststr += "    0.0\nb3 = 0.0    0.0    0.058823529411764705"
-        eq_(teststr, output)
+        assert teststr == output
 
 
 class TestGrapheneWavecar(object):
@@ -106,14 +105,13 @@ class TestGrapheneWavecar(object):
 
     def test_wavecar_header(self):
         """Test for Graphene WAVECAR property"""
-        eq_(30864, self.gr.recl)  # record length
-        eq_(1, self.gr.nspin)  # spin
-        eq_(45200, self.gr.rtag)  # precision flag
-        eq_(np.complex64, self.gr.prec)
-        #
-        eq_(240, self.gr.numk)
-        eq_(27, self.gr.nbands)
-        eq_(550, self.gr.encut)
+        assert 30864 == self.gr.recl  # record length
+        assert 1 == self.gr.nspin  # spin
+        assert 45200 == self.gr.rtag  # precision flag
+        assert np.complex64 == self.gr.prec
+        assert 240 == self.gr.numk
+        assert 27 == self.gr.nbands
+        assert 550 == self.gr.encut
         assert_almost_equal(-2.9500542715, self.gr.efermi)
         np.testing.assert_array_almost_equal(
             [
@@ -133,10 +131,10 @@ class TestGrapheneWavecar(object):
         kpath, kbands = self.gr.band()
         # from OUTCAR
         # maximum and minimum number of plane-waves per node :  3857  3785
-        eq_(3857, self.gr.nplwvs.max())
-        eq_(3785, self.gr.nplwvs.min())
-        eq_((self.gr.numk,), kpath.shape)  # gr.numk = 240
-        eq_((self.gr.nspin, self.gr.numk, self.gr.nbands), kbands.shape)
+        assert 3857 == self.gr.nplwvs.max()
+        assert 3785 == self.gr.nplwvs.min()
+        assert (self.gr.numk,) == kpath.shape  # gr.numk = 240
+        assert (self.gr.nspin, self.gr.numk, self.gr.nbands) == kbands.shape
         np.testing.assert_array_almost_equal(
             [-22.516876, -10.623282, -6.106901, -6.094072, 0.245639, 1.006991],
             kbands[0, 0, 0:6],
@@ -159,14 +157,14 @@ class TestGrapheneWavecar(object):
             [0.00013770, 0.00014605, 0.00017262, 0.00021561, 0.00026360],
             vaspgrid.grid.data[:5],
         )
-        eq_(2, vaspgrid.grid.nframe)
+        assert 2 == vaspgrid.grid.nframe
 
 
 class test_RestoreGammaGrid(object):
     #
     def test_check_symmetry(self):
         """Test for check_symmetry"""
-        ok_(not wavecar.check_symmetry(np.arange(3 * 3 * 3).reshape((3, 3, 3))))
+        assert not wavecar.check_symmetry(np.arange(3 * 3 * 3).reshape((3, 3, 3)))
         okgrid = np.array(
             [
                 [[0, 1, 1], [3, 4, 7], [3, 7, 4]],
@@ -174,7 +172,7 @@ class test_RestoreGammaGrid(object):
                 [[9, 11, 10], [15, 17, 16], [12, 14, 13]],
             ]
         )
-        ok_(wavecar.check_symmetry(okgrid))
+        assert wavecar.check_symmetry(okgrid)
 
     def test_RestorGammaGrid(self):
         """Test for RestoreGammaGrid function"""
@@ -184,7 +182,7 @@ class test_RestoreGammaGrid(object):
         grid332[1][2][0] = np.conjugate(grid332[2][1][0])
         grid332[0][2][0] = np.conjugate(grid332[0][1][0])
         result = wavecar.restore_gamma_grid(grid332, para=True)
-        ok_(wavecar.check_symmetry(result))
+        assert wavecar.check_symmetry(result)
         #
         grid553 = np.arange(5 * 5 * 5).reshape((5, 5, 5))[:, :, :3]
         #
@@ -203,7 +201,7 @@ class test_RestoreGammaGrid(object):
         grid553[3, 4, 0] = np.conjugate(grid553[2, 1, 0])
         grid553[4, 4, 0] = np.conjugate(grid553[1, 1, 0])
         result = wavecar.restore_gamma_grid(grid553, para=True)
-        ok_(wavecar.check_symmetry(result))
+        assert wavecar.check_symmetry(result)
         #
         grid355 = np.arange(5 * 5 * 5).reshape((5, 5, 5))[:3, :, :]
         #
@@ -222,7 +220,7 @@ class test_RestoreGammaGrid(object):
         grid355[0, 4, 3] = np.conjugate(grid355[0, 1, 2])
         grid355[0, 4, 4] = np.conjugate(grid355[0, 1, 1])
         result = wavecar.restore_gamma_grid(grid355, para=False)
-        ok_(wavecar.check_symmetry(result))
+        assert wavecar.check_symmetry(result)
 
 
 class TestCobaltWavecar(object):
@@ -236,14 +234,13 @@ class TestCobaltWavecar(object):
 
     def test_wavecar_header(self):
         """Test for Cobalt property"""
-        eq_(7968, self.co.recl)  # record length
-        eq_(1, self.co.nspin)  # spin
-        eq_(45200, self.co.rtag)  # precision flag
-        eq_(np.complex64, self.co.prec)
-        #
-        eq_(9, self.co.numk)
-        eq_(54, self.co.nbands)
-        eq_(400, self.co.encut)
+        assert 7968 == self.co.recl  # record length
+        assert 1 == self.co.nspin  # spin
+        assert 45200 == self.co.rtag  # precision flag
+        assert np.complex64 == self.co.prec
+        assert 9 == self.co.numk
+        assert 54 == self.co.nbands
+        assert 400 == self.co.encut
         assert_almost_equal(-0.84118407515959326, self.co.efermi)
         np.testing.assert_array_almost_equal(
             np.array([[1.0, 0.0, 0.0], [0.5, 0.8660254, 0.0], [0.0, 0.0, 2.0]]) * 2.501,
@@ -259,10 +256,10 @@ class TestCobaltWavecar(object):
         """Test for Co wavecar band"""
         kpath, kbands = self.co.band()
         # from OUTCAR
-        eq_(996, self.co.nplwvs.max())
-        eq_(958, self.co.nplwvs.min())
-        eq_((self.co.numk,), kpath.shape)  # co.numk = 240
-        eq_((self.co.nspin, self.co.numk, self.co.nbands), kbands.shape)
+        assert 996 == self.co.nplwvs.max()
+        assert 958 == self.co.nplwvs.min()
+        assert (self.co.numk,) == kpath.shape  # co.numk = 240
+        assert (self.co.nspin, self.co.numk, self.co.nbands) == kbands.shape
         np.testing.assert_array_almost_equal(
             [-6.532492, -5.858599, -4.037263, -3.418892, -3.265558, -2.642231],
             kbands[0, 0, 0:6],
@@ -291,4 +288,4 @@ class TestCobaltWavecar(object):
             ],
             vaspgrid.grid.data[:5],
         )
-        eq_(4, vaspgrid.grid.nframe)
+        assert 4 == vaspgrid.grid.nframe

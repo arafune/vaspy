@@ -3,7 +3,6 @@
 import os
 
 import numpy as np
-from nose.tools import assert_equal, eq_, ok_, raises
 
 import vaspy.mesh3d as mesh3d
 

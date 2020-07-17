@@ -3,7 +3,6 @@
 import os
 
 import numpy as np
-from nose.tools import eq_
 
 import vaspy.outcar
 
@@ -20,8 +19,8 @@ class TestOUTCAR(object):
 
     def test_read_basic_properties(self):
         """Test for OUTCAR reading basic properties"""
-        eq_(-0.7681, self.outcar.fermi)
-        eq_(54, self.outcar.nbands)
+        assert -0.7681 == self.outcar.fermi
+        assert 54 == self.outcar.nbands
         #
         # reciprocal vectors
         np.testing.assert_almost_equal(
@@ -34,8 +33,8 @@ class TestOUTCAR(object):
             np.array([0.000000000, 0.000000000, 0.023484312]), self.outcar.recvec[2]
         )
         # kvecs and weights
-        eq_(33, len(self.outcar.kvecs))
-        eq_(33, len(self.outcar.weights))
+        assert 33 == len(self.outcar.kvecs)
+        assert 33 == len(self.outcar.weights)
         np.testing.assert_array_almost_equal(
             [
                 [0.000000, 0.000000, 0.000000],
@@ -65,6 +64,6 @@ class TestOUTCAR(object):
             ],
             self.outcar.total_charges[-1],
         )
-        eq_(11, len(self.outcar.total_charges))
-        eq_(7, len(self.outcar.total_charges[0]))
-        eq_(3, len(self.outcar.total_charges[0][0]))
+        assert 11 == len(self.outcar.total_charges)
+        assert 7 == len(self.outcar.total_charges[0])
+        assert 3 == len(self.outcar.total_charges[0][0])

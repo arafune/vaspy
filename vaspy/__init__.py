@@ -20,7 +20,7 @@ from vaspy import (
     const,
     vsim_asc,
     tools,
-    utility,
+#    utility,
 )
 from typing import Optional, Union, List, Any
 

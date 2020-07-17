@@ -3,9 +3,7 @@
 import os
 
 import numpy as np
-from nose.tools import assert_equal, assert_false, eq_, ok_, raises
-from nose.tools import assert_raises
-
+import pytest
 from vaspy.locpot import LOCPOT
 
 
@@ -20,26 +18,27 @@ class TestLOCPOT(object):
 
     def test_locpot_poscar_part(self):
         """Test whether LOCPOT correctly treats POSCAR."""
-        assert_equal("hBN-Cu", self.testlocpot1.poscar.system_name)
+        assert "hBN-Cu" == self.testlocpot1.poscar.system_name
         len_x, len_y, len_z = self.testlocpot2.poscar.axes_lengthes
-        assert_equal(
-            (len_x, len_y, len_z),
-            (6.7395854049999997, 6.7395858129882784, 36.271284721999997),
+        assert (len_x, len_y, len_z) == (
+            6.7395854049999997,
+            6.7395858129882784,
+            36.271284721999997,
         )
 
     def test__str__(self):
         """Test for __str__() special method."""
         output = self.testlocpot2.__str__()
         teststr = "hBN-Cu\n  0.99700000000000\n    6.759865    0.000000"
-        ok_(teststr in output)
-        eq_(3363, len(output))
+        assert teststr in output
+        assert 3363 == len(output)
 
     def test___str__grid(self):
         """Test for __str__() special method in grid object."""
         output = self.testlocpot2.grid.__str__()
         teststr = "\n  3  4  6\n   0.00000000000E+00"
-        ok_(teststr in output)
-        eq_(1466, len(output))
+        assert teststr in output
+        assert 1466 == len(output)
 
     def test_grid_slice_z(self):
         """Test for grid slice (z)"""
@@ -183,11 +182,12 @@ class TestLOCPOT(object):
             self.testlocpot2.grid.median_along_axis("z"),
         )
 
-    @raises(TypeError, AssertionError, ValueError)
+    #    @raises(TypeError, AssertionError, ValueError)
     def test_exception_in_locpot(self):
         """Test for Exception."""
-        self.testlocpot2.grid.median_along_axis("k")
-        self.testlocpot2.grid.max_along_axis("k")
-        self.testlocpot2.grid.min_along_axis("k")
-        self.testlocpot2.grid.average_along_axis("k")
+        with pytest.raises((ValueError, ValueError, AssertionError)):
+            self.testlocpot2.grid.median_along_axis("k")
+            self.testlocpot2.grid.max_along_axis("k")
+            self.testlocpot2.grid.min_along_axis("k")
+            self.testlocpot2.grid.average_along_axis("k")
 

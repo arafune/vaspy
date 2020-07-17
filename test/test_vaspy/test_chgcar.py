@@ -3,7 +3,6 @@
 import os
 
 import numpy as np
-from nose.tools import assert_equal, eq_, ok_, raises
 
 import vaspy.chgcar
 
@@ -53,7 +52,7 @@ class TestCHGCAR(object):
     def test_mag_spin(self):
         """Test for CHGCAR magnetization."""
         magCHG = self.chgcar_spin.magnetization()
-        eq_(4 * 4 * 6, magCHG.grid.data.size)
+        assert 4 * 4 * 6 == magCHG.grid.data.size
         np.testing.assert_array_almost_equal(
             [
                 2.57589571650e00,
@@ -64,12 +63,12 @@ class TestCHGCAR(object):
             ],
             magCHG.grid.data[0:5],
         )
-        eq_(["up-down"], magCHG.spin)
+        assert ["up-down"] == magCHG.spin
 
     def test_mag_majority(self):
         """Test for CHGCAR majority spin."""
         majorspin = self.chgcar_spin.majorityspin()
-        eq_(4 * 4 * 6, majorspin.grid.data.size)
+        assert 4 * 4 * 6 == majorspin.grid.data.size
         np.testing.assert_array_almost_equal(
             [2.51569334, 2.02652039, 0.95344186, 0.08366529, -0.12515836],
             majorspin.grid.data[0:5],
@@ -78,7 +77,7 @@ class TestCHGCAR(object):
     def test_mag_minority(self):
         """Test for CHGCAR minority spin."""
         minorspin = self.chgcar_spin.minorityspin()
-        eq_(4 * 4 * 6, minorspin.grid.data.size)
+        assert 4 * 4 * 6 == minorspin.grid.data.size
         np.testing.assert_array_almost_equal(
             [-0.06020238, -0.06595251, -0.07922876, -0.09126546, -0.09525268],
             minorspin.grid.data[0:5],

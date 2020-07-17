@@ -4,7 +4,6 @@
 import os
 
 import numpy as np
-from nose.tools import assert_equal, assert_false, eq_, ok_, raises
 
 from vaspy.doscar import DOS, DOSCAR, PDOS, TDOS
 

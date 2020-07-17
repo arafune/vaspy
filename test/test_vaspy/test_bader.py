@@ -3,7 +3,6 @@
 import os
 
 import numpy as np
-from nose.tools import eq_
 
 import vaspy.bader
 
@@ -24,13 +23,13 @@ class TestBader(object):
         VACUUM VOLUME:             157.7708
         NUMBER OF ELECTRONS:      2828.0000
         """
-        eq_(1.2829, self.acf.vaccharge)
-        eq_(157.7708, self.acf.vacvol)
-        eq_(2828.000, self.acf.nelectron)
-        eq_(344, self.acf.natom)
+        assert 1.2829 == self.acf.vaccharge
+        assert 157.7708 == self.acf.vacvol
+        assert 2828.000 == self.acf.nelectron
+        assert 344, self.acf.natom
         np.testing.assert_array_almost_equal(
             [6.745000, -37.491966, 11.674620], self.acf.positions[0]
         )
-        eq_(3.526327, self.acf.charges[0])
-        eq_(0.423581, self.acf.mindists[0])
-        eq_(17.540723, self.acf.vols[0])
+        assert 3.526327 == self.acf.charges[0]
+        assert 0.423581 == self.acf.mindists[0]
+        assert 17.540723 == self.acf.vols[0]

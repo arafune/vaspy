@@ -479,7 +479,7 @@ class Grid3D(object):
             raise ValueError("Wrong axis name set")
         return data
 
-    def max_along_axis(self, axis_name: str, frame_i: int = 0):
+    def max_along_axis(self, axis_name: str, frame_i: int = 0) -> np.ndarray:
         """Calculate maximum value of potential along 'axis'.
 
         Parameters

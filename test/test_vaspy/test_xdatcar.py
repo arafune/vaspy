@@ -5,7 +5,6 @@ import os
 import numpy as np
 
 # import tempfile
-from nose.tools import assert_equal, assert_false, eq_, ok_, raises
 
 import vaspy.xdatcar as xdatcar
 
@@ -22,8 +21,8 @@ class TestXDATCAR(object):
         self.xdatcar_test = xdatcar.XDATCAR(datafile)
 
     def test_(self):
-        eq_("MoS2", self.xdatcar_test.system_name)
-        eq_(1.0, self.xdatcar_test.scaling_factor)
+        assert "MoS2" == self.xdatcar_test.system_name
+        assert 1.0 == self.xdatcar_test.scaling_factor
         np.testing.assert_allclose(
             [3.184000, 0.000000, 0.000000], self.xdatcar_test.cell_vecs[0]
         )
@@ -31,9 +30,9 @@ class TestXDATCAR(object):
             [1.592000, 2.757425, 0.000000], self.xdatcar_test.cell_vecs[1]
         )
         np.testing.assert_allclose([0, 0, 38.0], self.xdatcar_test.cell_vecs[2])
-        eq_(["Mo", "S"], self.xdatcar_test.atomtypes)
-        eq_([1, 2], self.xdatcar_test.atomnums)
-        eq_(5, len(self.xdatcar_test.configurations))
+        assert ["Mo", "S"]== self.xdatcar_test.atomtypes
+        assert [1, 2] == self.xdatcar_test.atomnums
+        assert 5 == len(self.xdatcar_test.configurations)
         #
         np.testing.assert_allclose(
             [
