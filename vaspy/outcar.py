@@ -4,8 +4,9 @@
 This module provides OUTCAR class
 """
 
-from __future__ import print_function  # Version safety
+
 from __future__ import unicode_literals  # Version safety
+from __future__ import annotations
 
 from vaspy.tools import open_by_suffix
 from typing import List, Optional, Union, IO, Tuple
@@ -49,20 +50,20 @@ class OUTCAR(object):  # Version safety
     def __init__(self, filename: Optional[str] = None) -> None:
         """Initialize."""
         self.natom = 0
-        self.atomtypes = []
-        self.atomnums = []
-        self.posforce = []
-        self.posforce_title = []
-        self.atom_names = []
+        self.atomtypes: List[str] = []
+        self.atomnums: List[int] = []
+        self.posforce: List[List[float]] = []
+        self.posforce_title: List[List[str]] = []
+        self.atom_names: List[str] = []
         self.fermi = 0.0
-        self.site_label = []
+        self.site_label: List[str] = []
         self.numk = 0
         self.nkdim = 0
         self.nbands = 0
-        self.magnetizations = []
-        self.total_charges = []
-        self.kvecs = []
-        self.weights = []
+        self.magnetizations: List[List[List[float]]] = []
+        self.total_charges: List[List[List[float]]] = []
+        self.kvecs: List[List[float]] = []
+        self.weights: List[float] = []
         if filename:
             self.load_file(open_by_suffix(filename))
 
@@ -100,10 +101,10 @@ class OUTCAR(object):  # Version safety
 
         """
         # local variables
-        section = []
+        section: List[str] = []
         posforce = []
-        magnetizations = []
-        total_charges = []
+        magnetizations: List[List[float]] = []
+        total_charges: List[List[float]] = []
         kvec_weight = []
         # parse
         for line in thefile:

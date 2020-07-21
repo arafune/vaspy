@@ -10,12 +10,12 @@ import vaspy.eigenval as eigenval
 class TestEIGENVAL(object):
     """Class for EIGENVAL class test."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         self.eigenval_spin = eigenval.EIGENVAL(datadir + "EIGENVAL.spin")
         self.eigenval_soi = eigenval.EIGENVAL(datadir + "EIGENVAL.soi")
 
-    def test_check_basic_parameters(self):
+    def test_check_basic_parameters(self) -> None:
         """Check the basic parameters stored."""
         assert 344 == self.eigenval_spin.natom
         assert 2 == self.eigenval_spin.nspin
@@ -42,7 +42,7 @@ class TestEIGENVAL(object):
             26.193038, self.eigenval_soi.energies[0, :, -1][-1]
         )
 
-    def test_to_physical_kvector(self):
+    def test_to_physical_kvector(self) -> None:
         """Test for to_physical_kvector."""
         np.testing.assert_array_almost_equal(
             [[0.0, 0.0, 0.0]], self.eigenval_spin.kvecs
@@ -59,7 +59,7 @@ class TestEIGENVAL(object):
             self.eigenval_soi.kvecs[0:3],
         )
 
-    def test_make_label(self):
+    def test_make_label(self) -> None:
         """Test for make_label function."""
         labels_soi = self.eigenval_soi.make_label("k", "energy")
         assert "#k" == labels_soi[0]

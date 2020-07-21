@@ -36,13 +36,15 @@ Direct
     0.00000000E+00  0.00000000E+00  0.00000000E+00
 """
 
+from __future__ import annotations
+
 import copy
 import itertools as it
 import re
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
-
+from pathlib import Path
 from vaspy import tools
 from vaspy.tools import open_by_suffix
 from typing import List, Sequence, Tuple, Any, Union, Optional, IO, Generator
@@ -199,6 +201,9 @@ class POSCAR_POS(object):
         """
         return not self.is_cartesian()
 
+    def __getitem__(self, item: Union[int]) -> List[np.ndarray]:
+        return self.positions[item]
+
 
 class POSCAR(POSCAR_HEAD, POSCAR_POS):
     """Class for POSCAR (CONTCAR) format.
@@ -226,7 +231,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         """
         super(POSCAR, self).__init__()
         POSCAR_POS.__init__(self)
-        if isinstance(arg, str):
+        if isinstance(arg, (str, Path)):
             poscar: Union[List[bytes], List[str]] = open_by_suffix(arg).readlines()
             self.load_array(poscar)
         if isinstance(arg, (list, tuple)):
@@ -319,7 +324,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             + self.positions[to_site:]
         )
 
-    def supercell(self, n_x: int, n_y: int, n_z: int) -> "POSCAR":
+    def supercell(self, n_x: int, n_y: int, n_z: int) -> POSCAR:
         r"""Return the :math:`(n_x \\times n_y \\times n_z)` supercell.
 
         Parameters
@@ -542,7 +547,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         if original_is_cartesian:
             self.to_cartesian()
 
-    def __add__(self, other: "POSCAR") -> "POSCAR":
+    def __add__(self, other: POSCAR) -> POSCAR:
         """Add two poscar objects.
 
         Parameters
@@ -573,7 +578,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
     def split(
         self, indexes: Union[List[int], Tuple[int, ...]]
-    ) -> Tuple["POSCAR", "POSCAR"]:
+    ) -> Tuple[POSCAR, POSCAR]:
         """Split into two POSCAR object.
 
         Useful for differential charge distribution calculations.
@@ -616,7 +621,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         other.atomtypes, other.atomnums = tools.atoms_to_atomtypes_atomnums(other_atoms)
         return one, other
 
-    def merge(self, other: "POSCAR") -> "POSCAR":
+    def merge(self, other: POSCAR) -> POSCAR:
         """Return POSCAR generated from two POSCARs.
 
         Even if the cell vectors and scaling factors are different,

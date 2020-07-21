@@ -8,7 +8,6 @@ from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
 from typing import Dict, Optional, Sequence, Tuple, List, Any, IO, Union
-
 from vaspy.tools import open_by_suffix
 
 try:
@@ -111,6 +110,7 @@ class EnergyBand(object):
             value of the Fermi level.
 
         """
+        self.energies: np.ndarray
         self.energies -= fermi
 
     def make_label(self, *keys) -> List[str]:
@@ -120,7 +120,7 @@ class EnergyBand(object):
         ----------
         keys: tuple
             key tuple used for label
-
+s
         """
         label_list = []
         for key in keys:

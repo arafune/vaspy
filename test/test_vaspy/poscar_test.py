@@ -4,15 +4,17 @@
 from __future__ import division, print_function  # Version safety
 
 import os
+from pathlib import Path
 import tempfile
 
 import numpy as np
+from numpy.testing import assert_array_equal
 
 import vaspy.poscar
 
 
 class TestPOSCAR(object):
-    def setup(self):
+    def setup_method(self) -> None:
         global test_poscar_string
         filePOSCAR = tempfile.mkstemp()
         f = open(filePOSCAR[1], "w")
@@ -21,6 +23,8 @@ class TestPOSCAR(object):
         self.testposcar = vaspy.poscar.POSCAR(filePOSCAR[1])
         self.blancposcar = vaspy.poscar.POSCAR()
         os.remove(filePOSCAR[1])
+        datadir = Path(__file__).parent / "data"
+        self.fepc = vaspy.poscar.POSCAR(str(datadir / "POSCAR.FePc"))
 
     def test_fundamentals(self):
         """Test for POSCAR class: fundamental data read"""
@@ -234,6 +238,21 @@ class TestPOSCAR(object):
 
     def test_plus(self):
         pass
+
+    def test__getitem(self) -> None:
+        print(self.fepc)
+        assert_array_equal(
+            self.fepc[0], [0.1362036989956494, 0.0552692292217493, 0.0000000000000000]
+        )
+        assert self.fepc[0][1] == 0.0552692292217493
+        assert_array_equal(
+            self.fepc[0:3],
+            [
+                [0.1362036989956494, 0.0552692292217493, 0.0000000000000000],
+                [0.2050800706767476, 0.0348757867600226, 0.0000000000000000],
+                [0.2642020159712474, 0.0709072792541197, 0.0000000000000000],
+            ],
+        )
 
 
 test_poscar_string = """NiC4S4
