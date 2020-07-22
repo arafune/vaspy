@@ -4,6 +4,7 @@ from __future__ import division, print_function
 
 import csv
 import sys
+from pathlib import Path
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
@@ -281,7 +282,7 @@ class EIGENVAL(EnergyBand):
 
     Parameters
     -----------
-    filename: str
+    filename: str, Path
         File name of 'EIGENVAL'
 
     Attributes
@@ -291,7 +292,7 @@ class EIGENVAL(EnergyBand):
 
     """
 
-    def __init__(self, filename: Optional[str] = None) -> None:
+    def __init__(self, filename: Union[str, Path, None] = None) -> None:
         """Initialize."""
         super(EIGENVAL, self).__init__()
         self.natom = 0
@@ -299,7 +300,7 @@ class EIGENVAL(EnergyBand):
         if filename:
             self.load_file(open_by_suffix(filename))
 
-    def __getitem__(self, item: int) -> Tuple[List[float], List[float]]:
+    def __getitem__(self, item: int) -> Tuple[List[float], List[List[float]]]:
         """
         
         Parameters
@@ -311,16 +312,9 @@ class EIGENVAL(EnergyBand):
         -------
         Tuple of list of float and list of float  
         """
-        if self.nspin != 2:
-            return (
-                self.kvecs[item],
-                np.stack((self.energies[0][item],), axis=2).tolist(),
-            )
-        return (
-            self.kvecs[item],
-            self.energies[0][item].tolist(),
-            self.energies[1][item].tolist(),
-        )
+        energies: List[List[List[float]]] = self.energies.transpose(1, 2, 0).tolist()
+        kvec: List[List[float]] = self.kvecs.tolist()
+        return list(zip(kvec, energies))[item]
 
     def load_file(self, thefile: Union[IO[bytes], IO[str]]) -> None:
         """Parse EIGENVAL."""
