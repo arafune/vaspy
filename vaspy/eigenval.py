@@ -299,6 +299,29 @@ class EIGENVAL(EnergyBand):
         if filename:
             self.load_file(open_by_suffix(filename))
 
+    def __getitem__(self, item: int) -> Tuple[List[float], List[float]]:
+        """
+        
+        Parameters
+        ----------
+        item: int
+            index of k-vector
+        
+        Returns
+        -------
+        Tuple of list of float and list of float  
+        """
+        if self.nspin != 2:
+            return (
+                self.kvecs[item],
+                np.stack((self.energies[0][item],), axis=2).tolist(),
+            )
+        return (
+            self.kvecs[item],
+            self.energies[0][item].tolist(),
+            self.energies[1][item].tolist(),
+        )
+
     def load_file(self, thefile: Union[IO[bytes], IO[str]]) -> None:
         """Parse EIGENVAL."""
         self.natom, _, _, self.nspin = [int(i) for i in next(thefile).split()]
