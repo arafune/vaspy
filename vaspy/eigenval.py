@@ -316,6 +316,10 @@ class EIGENVAL(EnergyBand):
         kvec: List[List[float]] = self.kvecs.tolist()
         return list(zip(kvec, energies))[item]
 
+    def __len__(self) -> int:
+        """Return numk as the result of len()"""
+        return self.numk
+
     def load_file(self, thefile: Union[IO[bytes], IO[str]]) -> None:
         """Parse EIGENVAL."""
         self.natom, _, _, self.nspin = [int(i) for i in next(thefile).split()]
