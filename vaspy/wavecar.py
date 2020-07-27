@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Module for WAVECAR class."""
 
-from typing import IO, Optional, Tuple, Union
+from typing import IO, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from scipy.fftpack import ifftn
@@ -134,7 +134,7 @@ class WAVECAR(object):
         return False
 
     @property
-    def prec(self):
+    def prec(self) -> np.dtype:
         """Return precision determined from self.rtag."""
         if self.rtag == 45200:
             return np.complex64
@@ -428,7 +428,7 @@ class WAVECAR(object):
         return string
 
 
-def make_kgrid(ngrid, gamma: bool = False, para: bool = PARALLEL) -> np.ndarray:
+def make_kgrid(ngrid: Sequence[int], gamma: bool = False, para: bool = PARALLEL) -> np.ndarray:
     """Return kgrid.
 
     Parameters

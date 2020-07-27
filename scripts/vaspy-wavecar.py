@@ -58,7 +58,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 try:
-    pos: poscar.POSCAR = poscar.POSCAR.(args.poscar)
+    pos: poscar.POSCAR = poscar.POSCAR(args.poscar)
 except NameError:
     print("'POSCAR' file not exist")
 

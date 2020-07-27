@@ -11,7 +11,6 @@ from __future__ import division  # Version safety
 from __future__ import print_function
 from typing import Optional, IO, Any, List
 
-import numpy as np
 from vaspy.tools import open_by_suffix
 
 

@@ -47,7 +47,7 @@ import numpy as np
 from pathlib import Path
 from vaspy import tools
 from vaspy.tools import open_by_suffix
-from typing import List, Sequence, Tuple, Any, Union, Optional, IO, Generator
+from typing import List, Sequence, Tuple, Any, Union, Optional, IO, Generator, Dict, Callable
 
 # logger
 LOGLEVEL = INFO
@@ -474,7 +474,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.to_cartesian()
         position = self.positions[site]
         position -= rotate_at / self.scaling_factor
-        position = globals()["rotate_" + axis_name.lower()](theta_deg).dot(position)
+        rotate: Dict[str, Callable[float, np.ndarray]] = {"x": rotate_x, "y": rotate_y, "z": rotate_z}
+        position = rotate[axis_name.lower()](theta_deg).dot(position)
         position += rotate_at / self.scaling_factor
         self.positions[site] = position
 
@@ -518,13 +519,8 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             original_is_cartesian = True
             self.to_direct()
         axis_name = axis_name.capitalize()
-
-        if axis_name == "X":
-            self.cell_vecs = np.dot(rotate_x(theta_deg), self.cell_vecs.T).T
-        elif axis_name == "Y":
-            self.cell_vecs = np.dot(rotate_y(theta_deg), self.cell_vecs.T).T
-        elif axis_name == "Z":
-            self.cell_vecs = np.dot(rotate_z(theta_deg), self.cell_vecs.T).T
+        rotate: Dict["str", Callable[float, np.ndarray]]={"X":rotate_x, "Y":rotate_y, "Z":rotat_z}
+        self.cell_vecs = np.dot(rotate[axis_anme](theta_deg), self.cell_vecs.T).T
         if original_is_cartesian:
             self.to_cartesian()
 

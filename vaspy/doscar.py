@@ -331,7 +331,7 @@ class PDOS(DOS):
         """
         pass
 
-    def __add__(self, other: "PDOS") -> "PDOS":
+    def __add__(self, other: PDOS) -> PDOS:
         """Add two DOS objects.
 
         x.__add__(y) <-> x+y

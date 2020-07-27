@@ -131,7 +131,7 @@ args.site = [i - 1 for i in args.site[0]]
 #
 if args.translate:
     if len(args.site) != len(args.translate):
-        parser.error()
+        parser.error("The number of the site sets is not consistent with the number of translations")
     for v, a in zip(args.translate, args.site):
         args.poscar.translate(v, a)
 #

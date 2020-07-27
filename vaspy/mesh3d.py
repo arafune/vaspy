@@ -4,7 +4,7 @@ That is this is class VASPGRID is the parent class of CHGCAR,
 LOCPOT, and ELFCAR.  The ELFCAR class has not yet implemented yet, though.
 """
 
-from __future__ import division, print_function
+from __future__ import annotations
 
 import copy
 import os
@@ -161,7 +161,7 @@ class VASPGrid(object):
         with thefile:
             thefile.write(str(self))
 
-    def frame(self, frame_i: int) -> "VASPGrid":
+    def frame(self, frame_i: int) -> VASPGrid:
         """Return VASPGrid object for only frame_i th frame.
 
         Parameters
@@ -175,7 +175,7 @@ class VASPGrid(object):
         output_vaspgrid.grid = self.grid.frame(frame_i)
         return output_vaspgrid
 
-    def merge(self, other: "VASPGrid") -> "VASPGrid":
+    def merge(self, other: VASPGrid) -> VASPGrid:
         """Add density data.
 
         Add two VASPGrid object, but POSCAR part remains same as original.
@@ -199,7 +199,7 @@ class VASPGrid(object):
             raise RuntimeError("The mesh shapes are different each other")
         return add_grid
 
-    def __add__(self, other: "VASPGrid") -> "VASPGrid":
+    def __add__(self, other: VASPGrid) -> VASPGrid:
         """Add both density and atom position.
 
         x.__add__(y) <=> x + y
