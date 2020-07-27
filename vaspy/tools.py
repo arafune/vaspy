@@ -10,7 +10,7 @@ import os
 import re
 from collections.abc import Iterable
 import numpy as np
-from typing import List, Iterable, Tuple, Union, IO, Any, Optional
+from typing import List, Iterable, Sequence, Tuple, Union, IO, Any, Optional
 
 
 def open_by_suffix(filename: str,) -> IO[str]:
@@ -134,7 +134,7 @@ def atoms_to_atomtypes_atomnums(atoms: List[str]) -> Tuple[List[str], List[int]]
     return atomtypes, atomnums
 
 
-def cuboid(crystal_axes) -> np.ndarray:
+def cuboid(crystal_axes: Union[Sequence[List[float]], np.ndarray]) -> np.ndarray:
     """Return the coordinates for cuboid that includes tetrahedron represented by vectors.
     
     Parameters

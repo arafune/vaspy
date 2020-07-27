@@ -5,16 +5,17 @@ import os
 import numpy as np
 import pytest
 from vaspy.locpot import LOCPOT
+import vaspy
 
+datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
 
 class TestLOCPOT(object):
     def setup_method(self, method):
         """Setup: load data."""
-        currentpath = os.path.abspath(os.path.dirname(__file__))
-        fullpath_1 = currentpath + "/data/LOCPOT.dummy"
-        fullpath_2 = currentpath + "/data/LOCPOT.dummy2"
-        self.testlocpot1 = LOCPOT(fullpath_1)
-        self.testlocpot2 = LOCPOT(fullpath_2)
+        locpot_1 = datadir + "LOCPOT.dummy"
+        locpot_2 = datadir + "LOCPOT.dummy2"
+        self.testlocpot1 = LOCPOT(locpot_1)
+        self.testlocpot2 = vaspy.load(locpot_2)
 
     def test_locpot_poscar_part(self):
         """Test whether LOCPOT correctly treats POSCAR."""

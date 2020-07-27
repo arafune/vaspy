@@ -17,7 +17,7 @@ from typing import IO, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
-from vaspy import eigenval
+from vaspy.eigenval import EnergyBand
 from vaspy.tools import open_by_suffix
 
 # logger
@@ -33,7 +33,7 @@ logger.addHandler(handler)
 logger.propagate = False
 
 
-class ProjectionBand(eigenval.EnergyBand):
+class ProjectionBand(EnergyBand):
     """Class for band structure including orbital projection.
 
     This is the child class of eigenval.EnergyBand which represents

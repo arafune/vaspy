@@ -4,7 +4,7 @@ import os
 
 import numpy as np
 
-import vaspy.bader
+import vaspy
 
 
 class TestBader(object):
@@ -14,7 +14,7 @@ class TestBader(object):
         """Reading ACF.chg.dat for test"""
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         datafile = datadir + "ACF.chg.dat"
-        self.acf = vaspy.bader.BaderACF(datafile)
+        self.acf = vaspy.load(datafile)
 
     def test_read_basic_properties(self):
         """Test for reading basic properties."""

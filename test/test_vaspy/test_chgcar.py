@@ -4,8 +4,10 @@ import os
 
 import numpy as np
 
+import vaspy
 import vaspy.chgcar
 
+datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
 
 class TestCHGCAR(object):
     """Class for test of CHGCAR module.
@@ -13,10 +15,9 @@ class TestCHGCAR(object):
     Use CHGCAR for test data."""
 
     def setup_method(self):
-        datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         data_file_spin = datadir + "CHGCAR_spin"
         data_file_spin_2 = datadir + "CHGCAR_spin_2"
-        self.chgcar_spin = vaspy.chgcar.CHGCAR(data_file_spin)
+        self.chgcar_spin = vaspy.load(data_file_spin)
         self.chgcar_spin_2 = vaspy.chgcar.CHGCAR(data_file_spin_2)
 
     def test_CHGsum(self):

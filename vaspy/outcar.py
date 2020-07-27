@@ -199,7 +199,7 @@ class OUTCAR(object):  # Version safety
             self.weights.append(i[3])
         thefile.close()
 
-    def select_posforce_header(self, posforce_flag: List[bool], *sites) -> List[str]:
+    def select_posforce_header(self, posforce_flag: List[bool], *sites: int) -> List[str]:
         """Return the position and force header selected."""
         if sites == () or sites[0] == []:
             sites = range(1, self.natom + 1)
@@ -216,7 +216,7 @@ class OUTCAR(object):  # Version safety
     # if boolian==True for ithAtom in self.posforce_title  ] #which is
     # correct?
 
-    def select_posforce(self, posforce_flag: List[bool], *sites) -> List[List[float]]:
+    def select_posforce(self, posforce_flag: List[bool], *sites: int) -> List[List[float]]:
         """Return the position and force selected by posforce_flag.
 
         Notes

@@ -9,8 +9,16 @@ import tempfile
 
 import numpy as np
 from numpy.testing import assert_array_equal
-
+import pytest
+import vaspy
 import vaspy.poscar
+
+
+datadir = Path(__file__).parent / "data"
+
+@pytest.fixture
+def fepc()->vaspy.poscar.POSCAR:
+    return vaspy.load(str(datadir/"FePc.vasp"))
 
 
 class TestPOSCAR(object):
@@ -23,8 +31,7 @@ class TestPOSCAR(object):
         self.testposcar = vaspy.poscar.POSCAR(filePOSCAR[1])
         self.blancposcar = vaspy.poscar.POSCAR()
         os.remove(filePOSCAR[1])
-        datadir = Path(__file__).parent / "data"
-        self.fepc = vaspy.poscar.POSCAR(str(datadir / "POSCAR.FePc"))
+
 
     def test_fundamentals(self):
         """Test for POSCAR class: fundamental data read"""
@@ -239,14 +246,14 @@ class TestPOSCAR(object):
     def test_plus(self):
         pass
 
-    def test__getitem(self) -> None:
-        print(self.fepc)
+    def test__getitem(self, fepc) -> None:
+        print(fepc)
         assert_array_equal(
-            self.fepc[0], [0.1362036989956494, 0.0552692292217493, 0.0000000000000000]
+            fepc[0], [0.1362036989956494, 0.0552692292217493, 0.0000000000000000]
         )
-        assert self.fepc[0][1] == 0.0552692292217493
+        assert fepc[0][1] == 0.0552692292217493
         assert_array_equal(
-            self.fepc[0:3],
+            fepc[0:3],
             [
                 [0.1362036989956494, 0.0552692292217493, 0.0000000000000000],
                 [0.2050800706767476, 0.0348757867600226, 0.0000000000000000],

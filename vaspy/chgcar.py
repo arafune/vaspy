@@ -3,16 +3,16 @@
 
 translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 """
-from __future__ import division, print_function  # Version safety
+from __future__ import annotations
 
 import copy
 from typing import Optional, IO, Union, List
 
-from vaspy import mesh3d
+from vaspy.mesh3d import VASPGrid
 from vaspy.tools import open_by_suffix
 
 
-class CHGCAR(mesh3d.VASPGrid):
+class CHGCAR(VASPGrid):
     """Class for CHGCAR.
 
     An example of the first few lines of CHGCAR. ::
@@ -76,7 +76,7 @@ class CHGCAR(mesh3d.VASPGrid):
             raise RuntimeError("CHGCAR is correct?")
         thefile.close()
 
-    def magnetization(self, direction: Optional[str] = None) -> "CHGCAR":
+    def magnetization(self, direction: Optional[str] = None) -> CHGCAR:
         """Return CHGCAR for magnetization.
 
         For collinear spin-polarized calculations
@@ -128,7 +128,7 @@ class CHGCAR(mesh3d.VASPGrid):
         dest.grid.data = dest.grid.data.flatten()
         return dest
 
-    def majorityspin(self) -> "CHGCAR":
+    def majorityspin(self) -> CHGCAR:
         """Return CHGCAR for majority spin.
 
         This method is for CHGCAR given by ``ISPIN=2`` but not-SOI
@@ -147,7 +147,7 @@ class CHGCAR(mesh3d.VASPGrid):
         dest.spin = ["up"]
         return dest
 
-    def minorityspin(self) -> "CHGCAR":
+    def minorityspin(self) -> CHGCAR:
         """Return CHGCAR for minority spin.
 
         This method is for CHGCAR given by ``ISPIN=2`` but not-SOI

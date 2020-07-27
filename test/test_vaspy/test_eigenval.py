@@ -1,20 +1,29 @@
 # -*- coding: utf-8 -*-
 """Test for EIGENVAL class."""
 import os
+from typing import Callable
 
+import pytest
 import numpy as np
 from numpy.testing import assert_array_equal, assert_array_almost_equal
+import vaspy
 import vaspy.eigenval as eigenval
 
+
+datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
+
+@pytest.fixture
+def cobalt() -> eigenval.EIGENVAL:
+    cobalt = vaspy.load(datadir + "EIGENVAL.Co-collinear", mode="EIGENVAL")
+    return cobalt
 
 class TestEIGENVAL(object):
     """Class for EIGENVAL class test."""
 
+
     def setup_method(self) -> None:
-        datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         self.eigenval_spin = eigenval.EIGENVAL(datadir + "EIGENVAL.spin")
         self.eigenval_soi = eigenval.EIGENVAL(datadir + "EIGENVAL.soi")
-        self.cobalt_col = eigenval.EIGENVAL(datadir + "EIGENVAL.Co-collinear")
 
     def test_check_basic_parameters(self) -> None:
         """Check the basic parameters stored."""
@@ -91,6 +100,14 @@ class TestEIGENVAL(object):
                 [-22.761726, -22.760568],
             ],
         )
-        assert_array_equal(self.cobalt_col[0][0], [0, 0, 0])
-        assert_array_equal(self.cobalt_col[0][1][0], [-10.128206, -9.857677])
-        assert_array_equal(self.cobalt_col[1][1][0], [-10.071635, -9.799951])
+
+    def test_cobalt(self, cobalt: eigenval.EIGENVAL):
+        """Test EIGENVAL by using EIGENVAL.Co-collinear
+
+        Collinear magnetism
+
+        """
+
+        assert_array_equal(cobalt[0][0], [0, 0, 0])
+        assert_array_equal(cobalt[0][1][0], [-10.128206, -9.857677])
+        assert_array_equal(cobalt[1][1][0], [-10.071635, -9.799951])

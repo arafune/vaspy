@@ -7,6 +7,7 @@ import numpy as np
 
 from numpy.testing import assert_almost_equal
 
+import vaspy
 import vaspy.poscar as poscar
 import vaspy.wavecar as wavecar
 
@@ -17,7 +18,7 @@ class TestHatomWavecar(object):
     def setup_method(self, method):
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         data_file = datadir + "H_gamma.wavecar"
-        self.h = wavecar.WAVECAR(data_file)
+        self.h = vaspy.load(data_file)
 
     def test_wavecar_header_and_band(self):
         """Test for H atom WAVECAR header"""

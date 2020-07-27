@@ -66,7 +66,7 @@ class VASPGrid(object):
             self.load_file(open_by_suffix(filename), pickles)
 
     def load_file(
-        self, thefile: Union[IO[str], IO[bytes]], pickles: Optional[str] = None
+        self, thefile: Union[IO[str]], pickles: Optional[str] = None
     ) -> None:
         """Construct the object from the file.
 
