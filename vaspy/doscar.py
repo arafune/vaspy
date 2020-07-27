@@ -39,8 +39,7 @@ From VASP webpage::
 |  calculation.
 """
 
-from __future__ import division  # Version safety
-from __future__ import print_function  # Version safety
+from __future__ import annotations
 
 import copy
 import sys
@@ -82,12 +81,12 @@ class DOSCAR(object):  # Version safety
         """Initialize."""
         self.natom: int = 0
         self.nbands: int = 0
-        self.dos_container = list()
+        self.dos_container: List = list()
 
         if filename:
             self.load_file(open_by_suffix(filename))
 
-    def load_file(self, thefile: Union[IO[str], IO[bytes]]) -> None:
+    def load_file(self, thefile: Union[IO[str]]) -> None:
         """Parse DOSCAR file and store it in memory.
 
         Parameters
@@ -101,7 +100,7 @@ class DOSCAR(object):  # Version safety
         [thefile.readline() for i in range(4)]
         header = thefile.readline()
         self.nbands = int(header[32:37])
-        tdos = np.array(
+        tdos: np.ndarray = np.array(
             [next(thefile).split() for i in range(self.nbands)], dtype=np.float64
         )
         if tdos.shape[1] == 3:
@@ -147,7 +146,7 @@ class DOS(object):  # Version safety
 
     def __init__(self, array=None) -> None:
         """Initialize."""
-        self.dos = np.array([])
+        self.dos: np.ndarray = np.array([])
         if array is not None:
             self.dos = array.transpose()
 

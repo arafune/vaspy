@@ -119,7 +119,7 @@ class WAVECAR(object):
         # FFT Minimum grid size. Always odd!!
         self.ngrid: np.ndarray = np.array(2 * cutoff + 1, dtype=int)
 
-    def check_DwNGZHalf(self) -> Optional[bool]:
+    def check_DwNGZHalf(self) -> bool:
         r"""self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
         about half of the number of gvectors equals number of plane waves."""
         if self.gamma:
@@ -130,6 +130,8 @@ class WAVECAR(object):
             or self.gvectors(0).shape[0] // 2 - 1 == self.nplwvs[0]
         ):
             self.gamma = True
+            return True
+        return False
 
     @property
     def prec(self):
@@ -227,7 +229,7 @@ class WAVECAR(object):
 
     def bandcoeff(
         self, spin_i: int = 0, k_i: int = 0, band_i: int = 0, norm: bool = False
-    ):
+    ) -> np.ndarray:
         """Read the coefficient of the planewave of the KS states.
 
         The KS states is specified by the `spin_i`, `k_i` and `band_i`.
@@ -426,7 +428,7 @@ class WAVECAR(object):
         return string
 
 
-def make_kgrid(ngrid, gamma: bool = False, para: bool = PARALLEL):
+def make_kgrid(ngrid, gamma: bool = False, para: bool = PARALLEL) -> np.ndarray:
     """Return kgrid.
 
     Parameters
@@ -492,7 +494,7 @@ def make_kgrid(ngrid, gamma: bool = False, para: bool = PARALLEL):
     return kgrid
 
 
-def check_symmetry(grid3d) -> bool:
+def check_symmetry(grid3d: np.ndarray) -> bool:
     """True if grid3d(G) == np.conjugate(grid3d(-G)) for all G.
 
     Parameters
@@ -523,7 +525,7 @@ def check_symmetry(grid3d) -> bool:
     return True
 
 
-def restore_gamma_grid(grid3d: np.ndarray, para: bool = PARALLEL):
+def restore_gamma_grid(grid3d: np.ndarray, para: bool = PARALLEL) -> np.ndarray:
     """Return Grid from the size-reduced matrix for gammareal Wavecar.
 
     Parameters

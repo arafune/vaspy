@@ -52,7 +52,7 @@ class OUTCAR(object):  # Version safety
         self.natom = 0
         self.atomtypes: List[str] = []
         self.atomnums: List[int] = []
-        self.posforce: List[List[float]] = []
+        self.posforce: List[List[List[float]]] = []
         self.posforce_title: List[List[str]] = []
         self.atom_names: List[str] = []
         self.fermi = 0.0
@@ -91,7 +91,7 @@ class OUTCAR(object):  # Version safety
             for i in self.atom_names
         ]
 
-    def load_file(self, thefile: Union[IO[str], IO[bytes]]) -> None:
+    def load_file(self, thefile: Union[IO[str]]) -> None:
         """Parse OUTCAR file.
 
         Parameters
@@ -199,7 +199,7 @@ class OUTCAR(object):  # Version safety
             self.weights.append(i[3])
         thefile.close()
 
-    def select_posforce_header(self, posforce_flag, *sites) -> List[str]:
+    def select_posforce_header(self, posforce_flag: List[bool], *sites) -> List[str]:
         """Return the position and force header selected."""
         if sites == () or sites[0] == []:
             sites = range(1, self.natom + 1)
@@ -216,7 +216,7 @@ class OUTCAR(object):  # Version safety
     # if boolian==True for ithAtom in self.posforce_title  ] #which is
     # correct?
 
-    def select_posforce(self, posforce_flag, *sites) -> List[bool]:
+    def select_posforce(self, posforce_flag: List[bool], *sites) -> List[List[float]]:
         """Return the position and force selected by posforce_flag.
 
         Notes

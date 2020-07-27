@@ -111,10 +111,9 @@ class EnergyBand(object):
             value of the Fermi level.
 
         """
-        self.energies: np.ndarray
         self.energies -= fermi
 
-    def make_label(self, *keys) -> List[str]:
+    def make_label(self, *keys: str) -> List[str]:
         """Return array the used for label for CSV-like data.
 
         Parameters
@@ -129,7 +128,7 @@ s
                 label_list.append(tmp)
         return label_list
 
-    def to_3dlist(self, **kwargs) -> List[List[List[float]]]:
+    def to_3dlist(self) -> List[List[List[float]]]:
         """Return 3D mentional list.
 
         list[band_i, [k_i, energy, (energy_down)]]
@@ -320,7 +319,7 @@ class EIGENVAL(EnergyBand):
         """Return numk as the result of len()"""
         return self.numk
 
-    def load_file(self, thefile: Union[IO[bytes], IO[str]]) -> None:
+    def load_file(self, thefile: Union[IO[str]]) -> None:
         """Parse EIGENVAL."""
         self.natom, _, _, self.nspin = [int(i) for i in next(thefile).split()]
         if self.nspin == 2:

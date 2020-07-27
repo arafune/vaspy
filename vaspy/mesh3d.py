@@ -295,7 +295,7 @@ class Grid3D(object):
         """Return the number of grid frames."""
         return divmod(self.data.size, self.size)[0]
 
-    def frame(self, frame_i: int):
+    def frame(self, frame_i: int) -> np.ndarray:
         """Return the i-th frame.
 
         Parameters
@@ -309,7 +309,7 @@ class Grid3D(object):
         dest.data = self.data.reshape(self.nframe, self.size)[frame_i]
         return dest
 
-    def slice(self, position, axis: str = "z", frame_i: int = 0):
+    def slice(self, position: int, axis: str = "z", frame_i: int = 0) -> np.ndarray:
         """
         Parameters
         ----------
@@ -347,7 +347,7 @@ class Grid3D(object):
         from_coor: Optional[int] = None,
         to_coor: Optional[int] = None,
         frame_i: int = 0,
-    ):
+    ) -> np.ndarray:
         """Return 2D data integrated occupacy along the 'axis'.
 
         Integration range can be specified by from_coor and to_coor.
@@ -419,7 +419,7 @@ class Grid3D(object):
             outputstr += "\n".join(output)
         return outputstr + "\n"
 
-    def average_along_axis(self, axis_name: str, frame_i: int = 0):
+    def average_along_axis(self, axis_name: str, frame_i: int = 0) -> np.ndarray:
         """Calculate average value of potential along 'axis'.
 
         Parameters
@@ -449,7 +449,7 @@ class Grid3D(object):
             raise ValueError("Wrong axis name set")
         return data
 
-    def min_along_axis(self, axis_name: str, frame_i: int = 0):
+    def min_along_axis(self, axis_name: str, frame_i: int = 0) -> np.ndarray:
         """Calculate minimum value of potential along 'axis'.
 
         Parameters
@@ -509,7 +509,7 @@ class Grid3D(object):
             raise ValueError("Wrong axis name set")
         return data
 
-    def median_along_axis(self, axis_name: str, frame_i: int = 0):
+    def median_along_axis(self, axis_name: str, frame_i: int = 0) -> np.ndarray:
         """Calculate median value of potential along 'axis'.
 
         Parameters

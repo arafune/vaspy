@@ -13,7 +13,7 @@ import numpy as np
 from typing import List, Iterable, Tuple, Union, IO, Any, Optional
 
 
-def open_by_suffix(filename: str,) -> Union[IO[str], IO[bytes]]:
+def open_by_suffix(filename: str,) -> IO[str]:
     """Open file."""
     if os.path.splitext(filename)[1] == ".bz2":
         thefile = bz2.open(filename, mode="rt")
@@ -134,7 +134,7 @@ def atoms_to_atomtypes_atomnums(atoms: List[str]) -> Tuple[List[str], List[int]]
     return atomtypes, atomnums
 
 
-def cuboid(crystal_axes):
+def cuboid(crystal_axes) -> np.ndarray:
     """Return the coordinates for cuboid that includes tetrahedron represented by vectors.
     
     Parameters
