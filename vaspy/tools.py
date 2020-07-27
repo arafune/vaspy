@@ -13,7 +13,7 @@ import numpy as np
 from typing import List, Iterable, Sequence, Tuple, Union, IO, Any, Optional
 
 
-def open_by_suffix(filename: str,) -> IO[str]:
+def open_by_suffix(filename: str) -> IO[str]:
     """Open file."""
     if os.path.splitext(filename)[1] == ".bz2":
         thefile = bz2.open(filename, mode="rt")
@@ -163,7 +163,7 @@ def cuboid(crystal_axes: Union[Sequence[List[float]], np.ndarray]) -> np.ndarray
 if __name__ == "__main__":
     import argparse
 
-    def EACH_SLICE_DEMO(L: List[Any], n: int) -> List[Any]:
+    def EACH_SLICE_DEMO(L: Sequence[Any], n: int) -> List[Any]:
         return list(each_slice(L, n))
 
     demo = {

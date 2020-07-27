@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import copy
 import os
-from typing import Optional, IO, Tuple, List, Union
+from typing import Optional, IO, Sequence, Tuple, Union
 
 
 import numpy as np
@@ -65,9 +65,7 @@ class VASPGrid(object):
         if filename:
             self.load_file(open_by_suffix(filename), pickles)
 
-    def load_file(
-        self, thefile: Union[IO[str]], pickles: Optional[str] = None
-    ) -> None:
+    def load_file(self, thefile: IO[str], pickles: Optional[str] = None) -> None:
         """Construct the object from the file.
 
         Parameters
@@ -83,7 +81,7 @@ class VASPGrid(object):
         tmp = []
         griddata = ""
         # read POSCAR part
-        line: Union[str, bytes] = thefile.readline()
+        line: str = thefile.readline()
         while not line.isspace():
             tmp.append(line.strip("\n"))
             line = thefile.readline()
@@ -275,8 +273,8 @@ class Grid3D(object):
 
     def __init__(
         self,
-        shape: Tuple[int, int, int] = (0, 0, 0),
-        data: Optional[List[float]] = None,
+        shape: Tuple[int, ...] = (0, 0, 0),
+        data: Optional[Sequence[float]] = None,
     ) -> None:
         """Initialize."""
         self.shape = shape

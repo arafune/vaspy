@@ -16,7 +16,7 @@ The first is absolutely required.
 import itertools
 import logging
 from logging import Formatter, StreamHandler, getLogger
-from typing import IO, Optional, Sequence, Tuple, Union
+from typing import IO, Optional, Sequence, Tuple, Union, List
 
 import numpy as np
 
@@ -56,15 +56,15 @@ class VSIM_ASC(object):
     def __init__(self, filename: Optional[str] = None) -> None:
         """Initialize."""
         self.system_name: str = ""
-        self.atoms = []
+        self.atoms: List[str] = []
         #
-        self.qpts = []
-        self.freqs = []
+        self.qpts: List[np.ndarray] = []
+        self.freqs: List[float] = []
         #
         if filename:
             self.load_file(open_by_suffix(filename))
 
-    def load_file(self, thefile: Union[IO[str], IO[bytes]]):
+    def load_file(self, thefile: Union[IO[str], IO[bytes]]) -> None:
         """Parse vsim.ascii.
 
         Parameters
@@ -126,7 +126,7 @@ class VSIM_ASC(object):
         supercell: Tuple[int, int, int] = (2, 2, 1),
         n_frames: int = 30,
         magnitude: float = 1,
-    ):
+    ) -> List[np.ndarray]:
         """Build data for creating POSCAR etc.
 
         Parameters
@@ -171,7 +171,7 @@ class VSIM_ASC(object):
         return animation_positions
 
 
-def supercell_lattice_vectors(lattice_vectors, cell_id):
+def supercell_lattice_vectors(lattice_vectors, cell_id) -> np.ndarray:
     """Return lattice vectors of supercell.
 
     Parameters

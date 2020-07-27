@@ -9,7 +9,7 @@ import argparse
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 import itertools
 from re import T
-from typing import Optional, Tuple
+from typing import Optional, Sequence, Tuple
 import numpy as np
 from mayavi import mlab
 
@@ -254,7 +254,7 @@ def view_atom_with_surface(
     return mlab.gcf()
 
 
-def draw_cell_box(unit_cell, line_thickness, line_color):
+def draw_cell_box(unit_cell, line_thickness, line_color) -> mlab.plot3d:
     """Return mlab.plot3d object of cell box
 
     unit_cell: three vector
@@ -317,10 +317,10 @@ def _grid_nums(n_grids, crystal_axes, lab_axes):
                 )
             )
         )
-    return new_grids
+    return tuple(new_grids)
 
 
-def grid_nums(n_grids, crystal_axes):
+def grid_nums(n_grids, crystal_axes) -> Tuple[int, ...]:
     """Return the number of gris of the Laboratory frame.
 
     Parameters
@@ -375,7 +375,10 @@ def _find_diagonal_indexes(n_grids, crystal_axes):
 
 
 def reallocate_to_labframe(
-    mesh_in_direct_coor, crystal_axes, volume_data, no_roll=False
+    mesh_in_direct_coor: Tuple[int, ...],
+    crystal_axes: np.ndarray,
+    volume_data: np.ndarray,
+    no_roll: bool = False,
 ):
     """Return the volume mesh data in lab frame (Cartesian coordinate).
 

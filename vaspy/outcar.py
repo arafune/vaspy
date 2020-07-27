@@ -9,7 +9,7 @@ from __future__ import unicode_literals  # Version safety
 from __future__ import annotations
 
 from vaspy.tools import open_by_suffix
-from typing import List, Optional, Union, IO, Tuple
+from typing import List, Optional, Sequence, Union, IO
 
 
 class OUTCAR(object):  # Version safety
@@ -199,24 +199,29 @@ class OUTCAR(object):  # Version safety
             self.weights.append(i[3])
         thefile.close()
 
-    def select_posforce_header(self, posforce_flag: List[bool], *sites: int) -> List[str]:
+    def select_posforce_header(
+        self, posforce_flag: Sequence[bool], *sites: int
+    ) -> List[str]:
         """Return the position and force header selected."""
+        selected_sites: Sequence[int]
         if sites == () or sites[0] == []:
-            sites = range(1, self.natom + 1)
+            selected_sites = range(1, self.natom + 1)
         if isinstance(sites[0], (list, tuple)):
-            sites = [n for n in sites[0]]
+            selected_sites = [n for n in sites[0]]
         return [
             posforce
             for (index, site) in enumerate(self.posforce_title)
             for (posforce, boolian) in zip(site, posforce_flag)
-            if boolian and (index + 1 in sites)
+            if boolian and (index + 1 in selected_sites)
         ]
 
     # return [posforce for (posforce, boolian) in zip(ithAtom, poforce_flag)
     # if boolian==True for ithAtom in self.posforce_title  ] #which is
     # correct?
 
-    def select_posforce(self, posforce_flag: List[bool], *sites: int) -> List[List[float]]:
+    def select_posforce(
+        self, posforce_flag: Sequence[bool], *sites: int
+    ) -> List[List[float]]:
         """Return the position and force selected by posforce_flag.
 
         Notes
@@ -226,16 +231,16 @@ class OUTCAR(object):  # Version safety
 
         """
         if sites == () or sites[0] == []:
-            sites = range(1, self.natom + 1)
+            selected_sites = range(1, self.natom + 1)
         if isinstance(sites[0], (list, tuple)):
-            sites = [n for n in sites[0]]
+            selected_sites = [n for n in sites[0]]
         return [
             [
                 posforce
                 for (index, site) in enumerate(one_cycle)
                 for (posforce, boolian) in zip(site, posforce_flag)
                 if boolian
-                if index + 1 in sites
+                if index + 1 in selected_sites
             ]
             for one_cycle in self.posforce
         ]

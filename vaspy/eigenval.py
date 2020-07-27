@@ -319,7 +319,7 @@ class EIGENVAL(EnergyBand):
         """Return numk as the result of len()"""
         return self.numk
 
-    def load_file(self, thefile: Union[IO[str]]) -> None:
+    def load_file(self, thefile: IO[str]) -> None:
         """Parse EIGENVAL."""
         self.natom, _, _, self.nspin = [int(i) for i in next(thefile).split()]
         if self.nspin == 2:

@@ -47,7 +47,18 @@ import numpy as np
 from pathlib import Path
 from vaspy import tools
 from vaspy.tools import open_by_suffix
-from typing import List, Sequence, Tuple, Any, Union, Optional, IO, Generator, Dict, Callable
+from typing import (
+    List,
+    Sequence,
+    Tuple,
+    Any,
+    Union,
+    Optional,
+    IO,
+    Generator,
+    Dict,
+    Callable,
+)
 
 # logger
 LOGLEVEL = INFO
@@ -201,7 +212,7 @@ class POSCAR_POS(object):
         """
         return not self.is_cartesian()
 
-    def __getitem__(self, item: Union[int]) -> List[np.ndarray]:
+    def __getitem__(self, item: Union[int]) -> Union[np.ndarray, List[np.ndarray]]:
         return self.positions[item]
 
 
@@ -220,7 +231,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
     """
 
-    def __init__(self, arg: Union[str, List[Any], Tuple[Any], None] = None) -> None:
+    def __init__(self, arg: Optional[Sequence[str]] = None) -> None:
         """Initialization.
 
         Parameters
@@ -232,15 +243,12 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         super(POSCAR, self).__init__()
         POSCAR_POS.__init__(self)
         if isinstance(arg, (str, Path)):
-            poscar: Union[List[bytes], List[str]] = open_by_suffix(arg).readlines()
+            poscar: Union[Tuple[str, ...], List[str]] = open_by_suffix(arg).readlines()
             self.load_array(poscar)
         if isinstance(arg, (list, tuple)):
             self.load_array(arg)
 
-    def load_array(
-        self,
-        input_poscar: Union[Union[List[str], List[bytes], Tuple[str], Tuple[bytes]]],
-    ) -> None:
+    def load_array(self, input_poscar: Union[List[str], Tuple[str, ...]]) -> None:
         """Parse POSCAR as list.
 
         Parameters
@@ -249,7 +257,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             POSCAR data
 
         """
-        poscar = iter(map(str.rstrip, input_poscar))  # Version safety
+        poscar = iter(map(str.rstrip, input_poscar))
         self.system_name = next(poscar)
         self.scaling_factor = float(next(poscar))
         self.cell_vecs[0] = [float(x) for x in next(poscar).split()]
@@ -389,9 +397,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return sposcar
 
     # class method? or independent function?
-    def nearest(
-        self, array, point: np.ndarray,
-    ):
+    def nearest(self, array: Sequence[float], point: np.ndarray,) -> np.ndarray:
         """Return the nearest position in the periodic space.
 
         Parameters
@@ -408,7 +414,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         return min(array, key=lambda pos: np.linalg.norm(pos - point))
 
     # class method? or independent function?
-    def make27candidate(self, position: Sequence[float]):
+    def make27candidate(self, position: Sequence[float]) -> List[np.ndarray]:
         """Return 27 vectors set correspond the neiboring.
 
         Parameters
@@ -472,19 +478,23 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             raise ValueError("argument error in rotate_atom method")
         if not self.is_cartesian():
             self.to_cartesian()
-        position = self.positions[site]
+        position: np.ndarray = self.positions[site]
         position -= rotate_at / self.scaling_factor
-        rotate: Dict[str, Callable[float, np.ndarray]] = {"x": rotate_x, "y": rotate_y, "z": rotate_z}
+        rotate: Dict[str, Callable[[float], np.ndarray]] = {
+            "x": rotate_x,
+            "y": rotate_y,
+            "z": rotate_z,
+        }
         position = rotate[axis_name.lower()](theta_deg).dot(position)
         position += rotate_at / self.scaling_factor
         self.positions[site] = position
 
     def rotate_atoms(
         self,
-        site_list: List[int],
+        site_list: Sequence[int],
         axis_name: str,
         theta_deg: float,
-        center: List[float],
+        center: Sequence[float],
     ) -> None:
         """Rotate atoms.
 
@@ -519,8 +529,12 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             original_is_cartesian = True
             self.to_direct()
         axis_name = axis_name.capitalize()
-        rotate: Dict["str", Callable[float, np.ndarray]]={"X":rotate_x, "Y":rotate_y, "Z":rotat_z}
-        self.cell_vecs = np.dot(rotate[axis_anme](theta_deg), self.cell_vecs.T).T
+        rotate: Dict["str", Callable[[float], np.ndarray]] = {
+            "X": rotate_x,
+            "Y": rotate_y,
+            "Z": rotate_z,
+        }
+        self.cell_vecs = np.dot(rotate[axis_name](theta_deg), self.cell_vecs.T).T
         if original_is_cartesian:
             self.to_cartesian()
 
@@ -572,9 +586,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
         return dest_poscar
 
-    def split(
-        self, indexes: Union[List[int], Tuple[int, ...]]
-    ) -> Tuple[POSCAR, POSCAR]:
+    def split(self, indexes: Sequence[int]) -> Tuple[POSCAR, POSCAR]:
         """Split into two POSCAR object.
 
         Useful for differential charge distribution calculations.
@@ -775,7 +787,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.positions = [mat.dot(v) for v in self.positions]
 
     def guess_molecule(
-        self, site_list: List[int], center: Optional[Sequence[float]] = None
+        self, site_list: Sequence[int], center: Optional[Sequence[float]] = None
     ) -> None:
         """Arrange atom position to form a molecule.
 
@@ -810,10 +822,10 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             target_atom = self.positions[site]
             atoms27 = self.make27candidate(target_atom)
 
-            def func(pos: Sequence[float], center: Sequence[float]) -> float:
+            def func(pos: Sequence[float], center: Optional[Sequence[float]]) -> float:
                 molecule[index] = _vectorize(pos)
                 if center is not None:  # bool([np.ndarray]) => Error
-                    center_pos = _vectorize(center)
+                    center_pos: np.ndarray = _vectorize(center)
                     return np.linalg.norm(_vectorize(pos) - center_pos)
                 # fixme!! when the highest symmetry point
                 # can be detemined from the position list,
@@ -822,7 +834,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                 # (molecule.
                 #     product(molecule)).inject(0.0) do | s, vectors |
                 # s+ (vectors[0]-vectors[1]).magnitude
-                s = 0.0
+                s: float = 0.0
                 for vectors in it.product(molecule, molecule):
                     s += np.linalg.norm(vectors[0] - vectors[1])
                 return s
@@ -833,7 +845,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
             self.positions[site] = pos
 
     def translate(
-        self, vector: Sequence[float], atomlist: List[int]
+        self, vector: Sequence[float], atomlist: Sequence[int]
     ) -> List[np.ndarray]:
         """Translate the selected atom(s) by vector.
 
@@ -862,7 +874,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
                     self.positions[i] + vector_array / self.scaling_factor
                 )
         else:
-            vector_array: np.ndarray = _vectorize(vector)
+            vector_array = _vectorize(vector)
             self.to_cartesian()
             for i in atomlist:
                 self.positions[i] = (

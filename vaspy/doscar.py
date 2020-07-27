@@ -144,7 +144,7 @@ class DOS(object):  # Version safety
 
     """
 
-    def __init__(self, array=None) -> None:
+    def __init__(self, array: Optional[np.ndarray] = None) -> None:
         """Initialize."""
         self.dos: np.ndarray = np.array([])
         if array is not None:
@@ -250,7 +250,9 @@ class PDOS(DOS):
 
     """
 
-    def __init__(self, array=None, site: Optional[str] = None) -> None:
+    def __init__(
+        self, array: Optional[Sequence[float]] = None, site: Optional[str] = None
+    ) -> None:
         """Initialize."""
         super(PDOS, self).__init__(array)
         self.site = "" if site is None else site
@@ -313,7 +315,7 @@ class PDOS(DOS):
         super(PDOS, self).export_csv(filename, header=header)
 
     def plot_dos(
-        self, orbitals: Union[List[str], Tuple[str, ...]], fermi: float = 0.0
+        self, orbitals: Sequence[str], fermi: float = 0.0
     ) -> None:  # Not implemented yet
         """Plot DOS spectra with matplotlib.pyplot.
 
