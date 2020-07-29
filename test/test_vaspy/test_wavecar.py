@@ -72,12 +72,12 @@ class TestCOWavecar(object):
 
     def test_wavecar_band(self):
         """test for CO WAVECAR band"""
-        kpath, kbands = self.co.band()
-        assert None == kpath
-        assert (self.co.nspin, self.co.numk, self.co.nbands) == kbands.shape
+        self.co.band()
+        #assert None == self.kpath
+        assert (self.co.nspin, self.co.numk, self.co.nbands) == self.co.bands.shape
         np.testing.assert_array_almost_equal(
             [-29.49120151, -14.03737717, -11.88106463, -11.88106223, -9.00976389],
-            kbands[0, 0, 0:5],
+            self.co.bands[0, 0, 0:5],
         )  # The value can be taken from EIGENVAL
 
     def test_wavecar_str(self):
@@ -129,16 +129,16 @@ class TestGrapheneWavecar(object):
 
     def test_wavecar_band(self):
         """Test for Graphene wavecar band"""
-        kpath, kbands = self.gr.band()
+        self.gr.band()
         # from OUTCAR
         # maximum and minimum number of plane-waves per node :  3857  3785
         assert 3857 == self.gr.nplwvs.max()
         assert 3785 == self.gr.nplwvs.min()
-        assert (self.gr.numk,) == kpath.shape  # gr.numk = 240
-        assert (self.gr.nspin, self.gr.numk, self.gr.nbands) == kbands.shape
+        assert (self.gr.numk,) == self.gr.kpath.shape  # gr.numk = 240
+        assert (self.gr.nspin, self.gr.numk, self.gr.nbands) == self.gr.bands.shape
         np.testing.assert_array_almost_equal(
             [-22.516876, -10.623282, -6.106901, -6.094072, 0.245639, 1.006991],
-            kbands[0, 0, 0:6],
+            self.gr.bands[0, 0, 0:6],
         )  # The value can be taken from EIGENVAL
 
     def test_realsapece_wfc(self):
@@ -255,15 +255,15 @@ class TestCobaltWavecar(object):
 
     def test_wavecar_band(self):
         """Test for Co wavecar band"""
-        kpath, kbands = self.co.band()
+        self.co.band()
         # from OUTCAR
         assert 996 == self.co.nplwvs.max()
         assert 958 == self.co.nplwvs.min()
-        assert (self.co.numk,) == kpath.shape  # co.numk = 240
-        assert (self.co.nspin, self.co.numk, self.co.nbands) == kbands.shape
+        assert (self.co.numk,) == self.co.kpath.shape  # co.numk = 240
+        assert (self.co.nspin, self.co.numk, self.co.nbands) == self.co.bands.shape
         np.testing.assert_array_almost_equal(
             [-6.532492, -5.858599, -4.037263, -3.418892, -3.265558, -2.642231],
-            kbands[0, 0, 0:6],
+            self.co.bands[0, 0, 0:6],
         )  # The value can be taken from EIGENVAL
 
     def test_realsapece_wfc(self):
