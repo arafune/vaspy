@@ -143,7 +143,7 @@ class WAVECAR(object):
         else:
             raise ValueError("Invalid TAG value: {}".format(self.rtag))
 
-    def band(self) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+    def band(self):
         """Read the information about the band from WAVECAR file.
 
         The infomation obtained by this method is as follows:
@@ -188,7 +188,6 @@ class WAVECAR(object):
                     ),
                 )
             )
-        return self.kpath, self.bands
 
     def gvectors(self, k_i: float = 0) -> np.ndarray:
         r"""Return G vector.
@@ -428,7 +427,9 @@ class WAVECAR(object):
         return string
 
 
-def make_kgrid(ngrid: Sequence[int], gamma: bool = False, para: bool = PARALLEL) -> np.ndarray:
+def make_kgrid(
+    ngrid: Sequence[int], gamma: bool = False, para: bool = PARALLEL
+) -> np.ndarray:
     """Return kgrid.
 
     Parameters

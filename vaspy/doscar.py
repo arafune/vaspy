@@ -44,8 +44,8 @@ from __future__ import annotations
 import copy
 import sys
 import numpy as np
-from typing import Iterator, Sequence, Union, Optional, IO, Tuple, List, Any
-
+from typing import Sequence, Union, Optional, IO, List
+# sfrom numpy.typing import ArrayLike, DtypeLike
 
 try:
     import matplotlib.pyplot as plt
@@ -86,7 +86,7 @@ class DOSCAR(object):  # Version safety
         if filename:
             self.load_file(open_by_suffix(filename))
 
-    def load_file(self, thefile: Union[IO[str]]) -> None:
+    def load_file(self, thefile: IO[str]) -> None:
         """Parse DOSCAR file and store it in memory.
 
         Parameters

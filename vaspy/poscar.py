@@ -42,9 +42,10 @@ import copy
 import itertools as it
 import re
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
-
-import numpy as np
 from pathlib import Path
+import numpy as np
+from numpy.typing import ArrayLike, DtypeLike
+
 from vaspy import tools
 from vaspy.tools import open_by_suffix
 from typing import (
@@ -91,7 +92,7 @@ class POSCAR_HEAD(object):
 
     def __init__(self) -> None:
         """Initialization."""
-        self.__cell_vecs: np.ndarray = np.array(
+        self.__cell_vecs: ArrayLike = np.array(
             [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
         )
         self.system_name: str = ""
@@ -121,7 +122,7 @@ class POSCAR_HEAD(object):
             raise TypeError
 
     @property
-    def realcell(self) -> np.ndarray:
+    def realcell(self) -> ArrayLike:
         """Alias of cell_vecs to keep consistency with wavecar.py."""
         return self.__cell_vecs
 
