@@ -12,14 +12,15 @@ import vaspy.eigenval as eigenval
 
 datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
 
+
 @pytest.fixture
 def cobalt() -> eigenval.EIGENVAL:
     cobalt = vaspy.load(datadir + "EIGENVAL.Co-collinear", mode="EIGENVAL")
     return cobalt
 
+
 class TestEIGENVAL(object):
     """Class for EIGENVAL class test."""
-
 
     def setup_method(self) -> None:
         self.eigenval_spin = eigenval.EIGENVAL(datadir + "EIGENVAL.spin")
@@ -60,7 +61,7 @@ class TestEIGENVAL(object):
         self.eigenval_soi.to_physical_kvector(
             recvec=np.array(((2, 0, 0), (0, 2, 0), (0, 0, 2)))
         )
-        np.testing.assert_array_almost_equal(
+        assert_array_almost_equal(
             [[0.0, 0.0, 0.0], [8.0e-02, 0, 0.0], [16.0e-02, 0, 0]],
             self.eigenval_soi.kvecs[0:3],
         )

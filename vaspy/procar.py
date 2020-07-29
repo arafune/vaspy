@@ -19,6 +19,8 @@ import numpy as np
 
 from vaspy.eigenval import EnergyBand
 from vaspy.tools import open_by_suffix
+from numpy import ndarray
+from typing import Iterator
 
 # logger
 LOGLEVEL = INFO
@@ -50,7 +52,7 @@ class ProjectionBand(EnergyBand):
 
     """
 
-    def __init__(self, kvecs=(), energies=(), proj=(), phase=(), nspin=1) -> None:
+    def __init__(self, kvecs: Sequence[float]=(), energies: Sequence[float]=(), proj: Sequence[float]=(), phase: Sequence[float]=(), nspin: int=1) -> None:
         """Initialize."""
         super(ProjectionBand, self).__init__()
         self.natom = 0
@@ -58,7 +60,7 @@ class ProjectionBand(EnergyBand):
         self.phase = phase
         self.kvecs = []
 
-    def append_sumsite(self, sites, site_name):
+    def append_sumsite(self, sites: Tuple[int, int], site_name: str) -> ndarray:
         """Append site-sum results.
 
         After this method, shape changes as following
@@ -89,7 +91,9 @@ class ProjectionBand(EnergyBand):
         self.proj = np.concatenate((self.proj, sumsite), axis=-2)
         return sumsite
 
-    def append_sumorbital(self, orbitals, orbital_name):
+    def append_sumorbital(
+        self, orbitals: Union[Tuple[int, ...], int], orbital_name: str
+    ) -> Optional[ndarray]:
         """Append orbital-sum results.
 
         After this method, shape changes as following
@@ -111,7 +115,7 @@ class ProjectionBand(EnergyBand):
         self.proj = np.concatenate((self.proj, sumorbital), axis=-1)
         return sumorbital
 
-    def orbital_index(self, arg):
+    def orbital_index(self, arg: str) -> Tuple[int, ...]:
         """Return the indexes corresponding orbital names.
 
         This method returns the tuple of orbital number in
@@ -171,7 +175,11 @@ class ProjectionBand(EnergyBand):
             err = str(orbital_name) + " is not a proper (composed) orbital name."
         raise RuntimeError(err)
 
-    def make_label(self, site_indexes=None, orbital_indexes_sets=None):
+    def make_label(
+        self,
+        site_indexes: Optional[Tuple[int, ...]] = None,
+        orbital_indexes_sets: Optional[Tuple[Tuple[int, ...]]] = None,
+    ) -> List[str]:
         """Return array the used for **label** for CSV-like data.
 
         Parameters
@@ -259,8 +267,12 @@ class ProjectionBand(EnergyBand):
         return projband.tolist()
 
     def to_csv(
-        self, csv_file, site_indexes=(), orbital_indexes_sets=(), blankline: bool = True
-    ):
+        self,
+        csv_file: str,
+        site_indexes=(),
+        orbital_indexes_sets=(),
+        blankline: bool = True,
+    ) -> str:
         """Write data to csv file.
 
         Parameters
@@ -379,9 +391,7 @@ class PROCAR(ProjectionBand):  # Version safety
         if filename:
             self.load_file(open_by_suffix(filename), phase_read)
 
-    def load_file(
-        self, thefile: Union[IO[str], IO[bytes]], phase_read: bool = False
-    ) -> None:
+    def load_file(self, thefile: IO[str], phase_read: bool = False) -> None:
         """Parse PROCAR.
 
         Parameters
@@ -543,7 +553,7 @@ class PROCAR(ProjectionBand):  # Version safety
         )
 
 
-def check_orbital_name(arg):
+def check_orbital_name(arg: str) -> str:
     """Return arg without change if arg is a member of the 'orbital name'.
 
     If arg is an alias of the (more appropriate) orbital

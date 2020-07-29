@@ -8,7 +8,6 @@ import bz2
 from itertools import zip_longest
 import os
 import re
-from collections.abc import Iterable
 import numpy as np
 from typing import List, Iterable, Sequence, Tuple, Union, IO, Any, Optional
 
