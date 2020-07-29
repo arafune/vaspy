@@ -45,7 +45,6 @@ import copy
 import sys
 import numpy as np
 from typing import Sequence, Union, Optional, IO, List
-# sfrom numpy.typing import ArrayLike, DtypeLike
 
 try:
     import matplotlib.pyplot as plt

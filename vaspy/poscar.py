@@ -44,7 +44,6 @@ import re
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 from pathlib import Path
 import numpy as np
-from numpy.typing import ArrayLike, DtypeLike
 
 from vaspy import tools
 from vaspy.tools import open_by_suffix
@@ -92,7 +91,7 @@ class POSCAR_HEAD(object):
 
     def __init__(self) -> None:
         """Initialization."""
-        self.__cell_vecs: ArrayLike = np.array(
+        self.__cell_vecs = np.array(
             [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
         )
         self.system_name: str = ""
@@ -122,7 +121,7 @@ class POSCAR_HEAD(object):
             raise TypeError
 
     @property
-    def realcell(self) -> ArrayLike:
+    def realcell(self):
         """Alias of cell_vecs to keep consistency with wavecar.py."""
         return self.__cell_vecs
 
