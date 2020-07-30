@@ -151,12 +151,8 @@ class VASPGrid(object):
             file name
 
         """
-        thefile: IO
-        try:  # Version safety
-            thefile = open(filename, mode="w", newline="\n")
-        except TypeError:
-            thefile = open(filename, mode="wb")
-        with thefile:
+        thefile: IO[str]
+        with open(filename, mode="w", newline="\n") as thefile:
             thefile.write(str(self))
 
     def frame(self, frame_i: int) -> VASPGrid:
@@ -221,7 +217,7 @@ class VASPGrid(object):
             raise RuntimeError("The mesh shapes are different each other")
         return add_grid
 
-    def __sub__(self, other: "VASPGrid") -> "VASPGrid":
+    def __sub__(self, other: VASPGrid) -> VASPGrid:
         """Subtract the density.
 
         x.__sub__(y) <=> x - y
