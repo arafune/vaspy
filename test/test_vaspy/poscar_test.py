@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import division, print_function  # Version safety
-
 import os
 from pathlib import Path
 import tempfile
@@ -16,9 +14,10 @@ import vaspy.poscar
 
 datadir = Path(__file__).parent / "data"
 
+
 @pytest.fixture
-def fepc()->vaspy.poscar.POSCAR:
-    return vaspy.load(str(datadir/"FePc.vasp"))
+def fepc() -> vaspy.poscar.POSCAR:
+    return vaspy.load(str(datadir / "FePc.vasp"))
 
 
 class TestPOSCAR(object):
@@ -31,7 +30,6 @@ class TestPOSCAR(object):
         self.testposcar = vaspy.poscar.POSCAR(filePOSCAR[1])
         self.blancposcar = vaspy.poscar.POSCAR()
         os.remove(filePOSCAR[1])
-
 
     def test_fundamentals(self):
         """Test for POSCAR class: fundamental data read"""
