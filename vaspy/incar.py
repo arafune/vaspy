@@ -6,7 +6,7 @@ from __future__ import annotations
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 import re
 from pathlib import Path
-from typing import Dict, IO, Tuple, Union
+from typing import Dict, IO, List, Tuple, Union
 from vaspy.tools import open_by_suffix
 
 # logger
@@ -22,7 +22,8 @@ logger.addHandler(handler)
 logger.propagate = False
 
 
-generic = [
+tags: Dict[str, List[str]] = {}
+tags["generic"] = [
     "SYSTEM",
     "ISTART",
     "ICHARG",
@@ -33,15 +34,14 @@ generic = [
     "LREAL",
     "ENCUT",
 ]
-calc = ["NCORE", "NPAR"]
-dipole = ["IDIPOL", "LDIPOL"]
-core = ["IBRION", "POTIM", "NSW", "EDIFFG"]
-electron = ["EDIFF", "NELMIN", "NELM"]
-output = ["LWAVE", "LCHARG", "LVHAR", "LELF", "LORBIT", "NEDOS"]
-soi = ["LSORBIT", "LMAXMIX", "SAXIS", "NBANDS", "ISYM"]
-vdw = ["LUSE_VDW", "GGA", "AGGAC", "PARAM1", "PARAM2", "ZAB_VDW"]
-stm = ["LPARD", "EINT", "NBMOD"]
-
+tags["electron"] = ["EDIFF", "NELMIN", "NELM"]
+tags["core"] = ["IBRION", "POTIM", "NSW", "EDIFFG"]
+tags["dipole"] = ["IDIPOL", "LDIPOL"]
+tags["calc"] = ["NCORE", "NPAR"]
+tags["output"] = ["LWAVE", "LCHARG", "LVHAR", "LELF", "LORBIT", "NEDOS"]
+tags["soi"] = ["LSORBIT", "LMAXMIX", "SAXIS", "NBANDS", "ISYM"]
+tags["vdw"] = ["LUSE_VDW", "GGA", "AGGAC", "PARAM1", "PARAM2", "ZAB_VDW"]
+tags["stm"] = ["LPARD", "EINT", "NBMOD"]
 
 float_ = [
     "ENCUT",
@@ -112,24 +112,23 @@ class Incar:
         pass
 
     def __str__(self) -> str:
-        output = ""
+        output: str = ""
         incar = self._incar
-        # generic part
-
-        # electron part
-
-        # spin
-
-        # core part
-
-        # tuning
-
-        # LSORBIT
-
-        # VDW
-        for tag in vdw:
-            pass
-        # check whether all tag is used.
+        for tag_type in tags.keys():
+            if len(set(tags[tag_type]) & set(incar.keys())) > 0:
+                output += tag_type + ":\n"
+                for tag in tags[tag_type]:
+                    if tag in incar:
+                        if tag in ["EDIFF"]:
+                            output += "{} = {:.5E}\n".format(tag, incar[tag])
+                        else:
+                            output += "{} = {}\n".format(tag, incar[tag])
+                        del incar[tag]
+        if len(incar) != 0:
+            print(incar)
+            raise RuntimeError(
+                "Unkonwn tags are used!!! Check your INCAR, or the script"
+            )
         return output
 
 
