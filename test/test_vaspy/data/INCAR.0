@@ -1,0 +1,38 @@
+  generic:
+   SYSTEM = Ir111
+   ISTART = 0
+#   ICHARG = 0
+   ISMEAR = 1
+   SIGMA = 0.2
+#   IDIPOL = 3
+#   LDIPOL = .TRUE.
+   ENCUT = 400
+   PREC = Accurate 
+#   RWIGS=   1.503 
+  core:
+   NSW = 0
+   EDIFFG = -0.01
+   IBRION = -1
+#   POTIM = 0.3
+  spin:
+#   ISPIN = 2
+#   NPAR = 2
+   NCORE = 32
+#   EDIFF = 5E-06
+   LREAL= AUTO
+#   NELMIN = 8
+   NELM = 300
+#   LORBIT = 12
+   tuning:
+#   AMIX = 0.001
+#   BMIX = 0.00001
+#   AMIX_MAG = 0.8
+#   BMIX_MAG = 0.00001
+   LVHAR = .TRUE.
+#   ADDGRID = .TRUE.
+   NBANDS = 3000
+#LSORBIT = .TRUE.
+#LMAXMIX = 4
+#SAXIS = 0 0 1
+#NBANDS = 648
+#ISYM = -1
