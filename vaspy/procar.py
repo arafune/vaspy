@@ -20,7 +20,6 @@ import numpy as np
 from vaspy.eigenval import EnergyBand
 from vaspy.tools import open_by_suffix
 from numpy import ndarray
-from typing import Iterator
 
 # logger
 LOGLEVEL = INFO
@@ -52,7 +51,14 @@ class ProjectionBand(EnergyBand):
 
     """
 
-    def __init__(self, kvecs: Sequence[float]=(), energies: Sequence[float]=(), proj: Sequence[float]=(), phase: Sequence[float]=(), nspin: int=1) -> None:
+    def __init__(
+        self,
+        kvecs: Sequence[float] = (),
+        energies: Sequence[float] = (),
+        proj: Optional[ndarray] = None,
+        phase: Optional[ndarray] = None,
+        nspin: int = 1,
+    ) -> None:
         """Initialize."""
         super(ProjectionBand, self).__init__()
         self.natom = 0
@@ -60,7 +66,7 @@ class ProjectionBand(EnergyBand):
         self.phase = phase
         self.kvecs = []
 
-    def append_sumsite(self, sites: Tuple[int, int], site_name: str) -> ndarray:
+    def append_sumsite(self, sites: Tuple[int, int], site_name: str) -> np.ndarray:
         """Append site-sum results.
 
         After this method, shape changes as following
@@ -232,7 +238,7 @@ class ProjectionBand(EnergyBand):
         Returns
         --------
         list:
-            3D list, the first dimenstion corresponds to the data for band_i
+            3D list, the first dimension corresponds to the data for band_i
             and each band_i contains kdistances, energy (or energies), and
             orbital data.
 
@@ -272,7 +278,7 @@ class ProjectionBand(EnergyBand):
         site_indexes=(),
         orbital_indexes_sets=(),
         blankline: bool = True,
-    ) -> str:
+    ) -> None:
         """Write data to csv file.
 
         Parameters
