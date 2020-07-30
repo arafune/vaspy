@@ -27,21 +27,38 @@ tags["generic"] = [
     "SYSTEM",
     "ISTART",
     "ICHARG",
+    "ENCUT",
+    "ISMEAR",
     "SIGMA",
     "PREC",
     "ADDGRID",
     "NBANDS",
     "LREAL",
-    "ENCUT",
+    "ALGO",
 ]
-tags["electron"] = ["EDIFF", "NELMIN", "NELM"]
-tags["core"] = ["IBRION", "POTIM", "NSW", "EDIFFG"]
+tags["electron"] = ["NELMIN", "NELM", "EDIFF", "NELMDL", "RWIGS", "LASPH", "LEPSILON"]
+tags["spin"] = ["ISPIN", "MAGMOM"]
+tags["core"] = ["IBRION", "NSW", "EDIFFG", "POTIM", "NFREE"]
 tags["dipole"] = ["IDIPOL", "LDIPOL"]
 tags["calc"] = ["NCORE", "NPAR"]
-tags["output"] = ["LWAVE", "LCHARG", "LVHAR", "LELF", "LORBIT", "NEDOS"]
+tags["tuning"] = ["AMIX", "BMIX", "AMIX_MAG", "BMIX_MAG", "MAXMIX"]
+tags["grid"] = ["NGXF", "NGYF", "NGZF", "NGX", "NGY", "NGZ"]
+tags["lda+u"] = ["LDAU", "LDATYPE", "LDAUL", "LDAUU", "LDAUJ", "LDAUPRINT"]
+tags["output"] = [
+    "LWAVE",
+    "LCHARG",
+    "LVHAR",
+    "LELF",
+    "LORBIT",
+    "NEDOS",
+    "EMIN",
+    "EMAX",
+    "LAECHG",
+    "LVTOT",
+]
 tags["soi"] = ["LSORBIT", "LMAXMIX", "SAXIS", "NBANDS", "ISYM"]
 tags["vdw"] = ["LUSE_VDW", "GGA", "AGGAC", "PARAM1", "PARAM2", "ZAB_VDW"]
-tags["stm"] = ["LPARD", "EINT", "NBMOD"]
+tags["stm"] = ["LPARD", "EINT", "NBMOD", "IBAND"]
 
 float_ = [
     "ENCUT",
@@ -57,11 +74,27 @@ float_ = [
     "PARAM1",
     "PARAM2",
     "ZAB_VDW",
+    "NMIN",
+    "NMAX",
 ]
-bool_ = ["LDIPOL", "LSORBIT", "LVHAR", "LWAVE", "LCHARG", "ADDGRID", "LUSE_VDW"]
-str_ = ["SYSTEM", "PREC", "LREAL"]
+bool_ = [
+    "LDIPOL",
+    "LSORBIT",
+    "LVHAR",
+    "LWAVE",
+    "LCHARG",
+    "ADDGRID",
+    "LUSE_VDW",
+    "LPARD",
+    "LDAU",
+    "LVTOT",
+    "LAECHG",
+    "LASPH",
+    "LEPSILON",
+]
+str_ = ["SYSTEM", "PREC", "LREAL", "GGA", "ALGO"]
 # RWIGS and EINT are Tuple of float, SAXIS is Tuple of int
-str_2 = ["RWIGS", "SAXIS", "EINT", "MAGMON"]
+str_2 = ["RWIGS", "SAXIS", "EINT", "LDATYPE", "LDAUL", "LDAUU", "LDAUJ", "MAGMOM"]
 
 
 class Incar:
@@ -77,7 +110,6 @@ class Incar:
             filename of INCAR
         """
         self._incar = {}
-        self.section = ["generic:", "core:", "spin:", "tuning:", "SOI:", "VDW:"]
 
         if filename:
             self.load_file(open_by_suffix(str(filename)))
@@ -113,16 +145,22 @@ class Incar:
 
     def __str__(self) -> str:
         output: str = ""
-        incar = self._incar
+        incar = self._incar.copy()
         for tag_type in tags.keys():
             if len(set(tags[tag_type]) & set(incar.keys())) > 0:
-                output += tag_type + ":\n"
+                output += " {}:\n".format(tag_type)
                 for tag in tags[tag_type]:
                     if tag in incar:
                         if tag in ["EDIFF"]:
-                            output += "{} = {:.5E}\n".format(tag, incar[tag])
+                            if incar[tag][1]:
+                                output += "    {} = {:.2E}\n".format(tag, incar[tag][0])
+                            else:
+                                output += "#   {} = {:.2E}\n".format(tag, incar[tag][0])
                         else:
-                            output += "{} = {}\n".format(tag, incar[tag])
+                            if incar[tag][1]:
+                                output += "    {} = {}\n".format(tag, incar[tag][0])
+                            else:
+                                output += "#   {} = {}\n".format(tag, incar[tag][0])
                         del incar[tag]
         if len(incar) != 0:
             print(incar)
