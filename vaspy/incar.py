@@ -4,9 +4,10 @@
 from __future__ import annotations
 
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
+from collections.abc import Mapping
 import re
 from pathlib import Path
-from typing import Dict, IO, List, Tuple, Union
+from typing import Any, Dict, Generator, IO, List, Tuple, Union
 from vaspy.tools import open_by_suffix
 
 # logger
@@ -97,7 +98,7 @@ str_ = ["SYSTEM", "PREC", "LREAL", "GGA", "ALGO"]
 str_2 = ["RWIGS", "SAXIS", "EINT", "LDATYPE", "LDAUL", "LDAUU", "LDAUJ", "MAGMOM"]
 
 
-class Incar:
+class Incar(Mapping):
     """General class for INCAR file
     
     """
@@ -139,6 +140,16 @@ class Incar:
                 self._incar[tag] = (float(value[0]), value[1])
             else:  # Default value is int
                 self._incar[tag] = (int(value[0]), value[1])
+
+    def __iter__(self) -> Generator:
+        for key in self._incar:
+            yield key
+
+    def __getitem__(self, key_item: str) -> Any:
+        return self._incar.__getitem__(key_item)
+
+    def __len__(self):
+        return len(self._incar)
 
     def repr(self) -> str:
         pass
