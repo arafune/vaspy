@@ -8,7 +8,7 @@ from pathlib import Path
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
-from typing import Dict, Optional, Sequence, Tuple, List, Any, IO, Union
+from typing import Dict, Optional, Sequence, Tuple, List, IO, Union
 from vaspy.tools import open_by_suffix
 
 try:

@@ -12,12 +12,12 @@ datadir = Path(__file__).parent / "data"
 
 
 @pytest.fixture
-def incar0() -> vaspy.incar.INCAR:
+def incar0() -> vaspy.incar.Incar:
     return vaspy.load(str(datadir / "INCAR.0"))
 
 
 class TestPOSCAR(object):
     def test_incar0(self, incar0):
-        assert incar0.istart == (0, True)
-        assert incar0.icharg is None
-        assert incar0.ismear == (1, True)
+        assert incar0["ISTART"] == (0, True)
+        assert incar0["ICHARG"][1] is False
+        assert incar0["ISMER"] == (1, True)

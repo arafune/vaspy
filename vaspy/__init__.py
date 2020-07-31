@@ -20,7 +20,7 @@ from vaspy import (
     const,
     vsim_asc,
     tools,
-#    utility,
+    incar,
 )
 from typing import Optional, Union, List, Any
 
@@ -40,6 +40,7 @@ __all__: List[str] = [
     "tools",
     "load",
     "utility",
+    "incar",
 ]
 
 __version__: str = "0.5.4"
@@ -75,6 +76,8 @@ def load(
         mode = mode.lower()
     if re.search(r"poscar|contcar", filenamebase) or mode == "poscar":
         return poscar.POSCAR(filename)
+    elif re.search(r"incar", filenamebase) or mode == "incar":
+        return incar.Incar(filename)
     elif re.search(r"outcar", filenamebase) or mode == "outcar":
         return outcar.OUTCAR(filename)
     elif re.search(r"chgcar|parchg", filenamebase) or mode == "chgcar":
