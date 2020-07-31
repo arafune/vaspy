@@ -109,8 +109,7 @@ class Incar:
         filename: str, pathlib.Path
             filename of INCAR
         """
-        self._incar = {}
-
+        self._incar: Dict[str, Tuple[Union[str, int, float], bool]] = {}
         if filename:
             self.load_file(open_by_suffix(str(filename)))
 
@@ -130,15 +129,15 @@ class Incar:
                 incar[tag.upper().strip()] = value.strip(), active
         for tag, value in incar.items():
             if tag in str_:
-                self._incar[tag] = value
+                self[tag] = value
             elif tag in bool_:
-                self._incar[tag] = value
+                self[tag] = value
             elif tag in str_2:
-                self._incar[tag] = value
+                self[tag] = value
             elif tag in float_:
-                self._incar[tag] = (float(value[0]), value[1])
+                self[tag] = (float(value[0]), value[1])
             else:  # Default value is int
-                self._incar[tag] = (int(value[0]), value[1])
+                self[tag] = (int(value[0]), value[1])
 
     def repr(self) -> str:
         pass
