@@ -99,6 +99,22 @@ str_ = ["SYSTEM", "PREC", "LREAL", "GGA", "ALGO"]
 str_2 = ["RWIGS", "SAXIS", "EINT", "LDATYPE", "LDAUL", "LDAUU", "LDAUJ", "MAGMOM"]
 
 
+def remove_sharp(str_: str) -> Tuple[str, bool]:
+    """ Remvoe # / ! from the string head.
+    
+    Parameters
+    ----------
+        str_: str
+    """
+    active: bool = True
+    str_ = str_.strip()
+    if re.search("!|#", str_):
+        str_ = re.sub(r"^[!|#|\s]+", "", str_).strip()
+        active = False
+    logger.debug(str_)
+    return str_, active
+
+
 class Incar(Mapping):
     """General class for INCAR file
     
@@ -223,66 +239,50 @@ class Incar(Mapping):
         return False
 
     def lint_all(self) -> str:
+        """Tyny lint for vasp
+        
+        Returns
+        -------
+        str
+            Check messages
+        """
+        check: Dict[str, bool] = {
+            #
+            'When ICHARG = 11, Recommend "LWAVE = .FALSE, LCHARG = .FALSE"\n': (
+                self["ICHARG"] == (11, True)
+                and (
+                    self["LWAVE"] == (".TRUE.", True)
+                    or self["LCHARG"] == (".TRUE.", True)
+                )
+            ),
+            #
+            'if IBRION > 4 (to DFPT), Remove "NPAR/NCORE" keyword\n': (
+                (self["IBRION"][0] > 4 and self["IBRION"][0])
+                and (self.active("NPAR") or self.active("NCORE"))
+            ),
+            #
+            "DIPOLE correction is hard for not ISTART=2.": (
+                self["ISTART"] != (2, True) and self.active("LDIPOL")
+            ),
+            #
+            'For dipoloe correction, need both "LDIPOL" and "IDIPOL"\n': self.active(
+                "LDIPOL"
+            )
+            ^ self.active("IDIPOL"),
+            #
+            'For LPARD to get partial charge densities, ISTART must be "2"': (
+                self.active("LPARD") and self["ISTART"] != (2, True)
+            ),
+            #
+            "For SOI calculation, ISYM = -1 is recommended.": (
+                self["LSORBIT"] == (".TRUE.", True) and self["ISYM"] != (-1, True)
+            ),
+            #
+            '"NPAR" is not recommend. Consider to use "NCORE"\n': self.active("NPAR"),
+            #
+        }
         msg_lint = ""
-        msg_lint += self.lint0()
-        msg_lint += self.lint1()
-        msg_lint += self.lint2()
-        msg_lint += self.lint3()
-        msg_lint += self.lint4()
+        for mesg, check_point in check.items():
+            if check_point:
+                msg_lint += mesg
         return msg_lint
-
-    def lint0(self) -> str:
-        """Check WAVECAR/CHGCAR should be written or not"""
-        msg: str = ""
-        if self["ICHARG"] == (11, True) and (
-            self["LWAVE"] == (".TRUE.", True) or self["LCHARG"] == (".TRUE.", True)
-        ):
-            msg = "Want to draw the band ?.\n"
-            msg += 'Recommend "LWAVE = .FALSE, LCHARG = .FALSE"\n'
-        return msg
-
-    def lint1(self) -> str:
-        """if IBRION = 7, 8, switch off NCORE / NPAR"""
-        msg: str = ""
-        if (self["IBRION"][0] > 4 and self["IBRION"][0]) and (
-            self.active("NPAR") or self.active("NCORE")
-        ):
-            msg = 'if IBRION > 4 (to DFPT), Remove "NPAR/NCORE" keyword\n'
-        return msg
-
-    def lint2(self) -> str:
-        """dipole correction should be start with ISTART=2"""
-        msg = ""
-        if self["ISTART"] != (2, True) and self.active("LDIPOL"):
-            msg = "DIPOLE correction is hard for not ISTART=2."
-        return msg
-
-    def lint3(self) -> str:
-        """when LDIPOL is set, IDIPOL must be set, too"""
-        msg = ""
-        if self.active("LDIPOL") ^ self.active("IDIPOL"):
-            msg = 'For dipoloe correction, need both "LDIPOL" and "IDIPOL"'
-        return msg
-
-    def lint4(self) -> str:
-        """To draw the simulated stm image, ISTART must be 2"""
-        msg = ""
-        if self.active("LPARD") and self["ISTART"] != (2, True):
-            msg = 'For LPARD to get partial charge densities, ISTART must be "2"'
-        return msg
-
-
-def remove_sharp(str_: str) -> Tuple[str, bool]:
-    """ Remvoe # / ! from the string head.
-    
-    Parameters
-    ----------
-        str_: str
-    """
-    active: bool = True
-    str_ = str_.strip()
-    if re.search("!|#", str_):
-        str_ = re.sub(r"^[!|#|\s]+", "", str_).strip()
-        active = False
-    logger.debug(str_)
-    return str_, active
