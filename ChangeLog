@@ -1,3 +1,9 @@
+2020-08-19  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
+  * Version 0.5.5
+  * Bug fix
+  * Type annotation
+  * vaspy/incar.py
+
 2019-08-19  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
   * Version 0.5.4
   * Bug fix
