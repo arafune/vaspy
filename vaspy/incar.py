@@ -226,7 +226,7 @@ class Incar(Mapping):
             )
         return output
 
-    def active(self, keyword: str) -> bool:
+    def active(self, keyword: str) -> Union[str, int, float, bool]:
         """Return True if keyword is active.  False if keyword is not set or comment out
 
         Parameters
@@ -235,7 +235,7 @@ class Incar(Mapping):
             INCAR keyword
         """
         if (keyword in self) and self[keyword][1]:
-            return True
+            return self[keyword][0]
         return False
 
     def lint_all(self) -> str:
@@ -246,43 +246,35 @@ class Incar(Mapping):
         str
             Check messages
         """
-        check: Dict[str, bool] = {
-            #
-            'When ICHARG = 11, Recommend "LWAVE = .FALSE, LCHARG = .FALSE"\n': (
-                self["ICHARG"] == (11, True)
+        checks: Dict[str, Union[bool, int, float, str] = {'When ICHARG = 11, Recommend "LWAVE = .FALSE, LCHARG = .FALSE"\n': (
+                self.active("ICHARG") == 11
                 and (
-                    self["LWAVE"] == (".TRUE.", True)
-                    or self["LCHARG"] == (".TRUE.", True)
+                    self.active("LWAVE") == ".TRUE."
+                    or self.active("LCHARG") == ".TRUE."
                 )
-            ),
-            #
-            'if IBRION > 4 (to DFPT), Remove "NPAR/NCORE" keyword\n': (
-                (self["IBRION"][0] > 4 and self["IBRION"][0])
-                and (self.active("NPAR") or self.active("NCORE"))
-            ),
-            #
-            "DIPOLE correction is hard for not ISTART=2.": (
-                self["ISTART"] != (2, True) and self.active("LDIPOL")
-            ),
-            #
-            'For dipoloe correction, need both "LDIPOL" and "IDIPOL"\n': self.active(
-                "LDIPOL"
             )
-            ^ self.active("IDIPOL"),
-            #
-            'For LPARD to get partial charge densities, ISTART must be "2"': (
-                self.active("LPARD") and self["ISTART"] != (2, True)
-            ),
-            #
-            "For SOI calculation, ISYM = -1 is recommended.": (
-                self["LSORBIT"] == (".TRUE.", True) and self["ISYM"] != (-1, True)
-            ),
-            #
-            '"NPAR" is not recommend. Consider to use "NCORE"\n': self.active("NPAR"),
-            #
         }
+        checks["DIPOLE correction is hard for not ISTART=2."] = (
+            self.active("ISTART") != 2 and self.active("LDIPOL") == ".TRUE."
+        )
+        checks['For dipoloe correction, need both "LDIPOL" and "IDIPOL"\n'] = (
+            self.active("LDIPOL") == ".TRUE."
+        ) ^ self.active("IDIPOL")
+        checks['For LPARD to get partial charge densities, ISTART must be "2"'] = (
+            self.active("LPARD") == ".TRUE." and self.active("ISTART") != 2
+        )
+        checks["For SOI calculation, ISYM = -1 is recommended."] = (
+            self.active("LSORBIT") == ".TRUE." and self.active("ISYM") != -1
+        )
+        checks['"NPAR" is not recommend. Consider to use "NCORE"\n'] = self.active(
+            "NPAR"
+        )
+        checks['if IBRION > 4 (to DFPT), Remove "NPAR/NCORE" keyword\n'] = (
+            self.active("IBRION") > 4
+        ) and (self.active("NPAR") or self.active("NCORE"))
+
         msg_lint = ""
-        for mesg, check_point in check.items():
+        for mesg, check_point in checks.items():
             if check_point:
                 msg_lint += mesg
         return msg_lint

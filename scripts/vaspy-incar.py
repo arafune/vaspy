@@ -36,7 +36,7 @@ parser.add_argument(
     action="store_true",
 )
 parser.add_argument("incar_file", metavar="INCAR_file", nargs=1)
-args = parser.parse_args(
+args = parser.parse_args()
 assert not (
     args.lint and (args.i or args.r)
 ), "Lint option and re-format option (-i, -r) is exclusive."
