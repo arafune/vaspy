@@ -836,13 +836,13 @@ class TestSOIPROCAR(object):
 
 
 class test_functions_in_procarpy(object):
-    def test_shortcheck_function(self):
+    def test_tiny_check_function(self):
         """Test for shortfunction"""
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         data_single = open(datadir + "PROCAR_single")
         data_spin = open(datadir + "PROCAR_spin_dummy")
 
-        result_single = procar.shortcheck(data_single)
+        result_single = procar.tiny_check(data_single)
         assert 1 == result_single[0]  # numk
         assert 1 == result_single[1]  # nbands
         assert 3 == result_single[2]  # natom
@@ -859,7 +859,7 @@ class test_functions_in_procarpy(object):
             "tot",
         ] == result_single[3]
         assert result_single[4]  # collinear
-        result_spin = procar.shortcheck(data_spin)
+        result_spin = procar.tiny_check(data_spin)
         assert 3 == result_spin[0]  # numk
         assert 4 == result_spin[1]  # nbands
         assert 3 == result_spin[2]  # natom
@@ -878,7 +878,7 @@ class test_functions_in_procarpy(object):
 
         assert result_spin[4]  # collinear
         data_soi = open(datadir + "PROCAR_SOI_dummy")
-        result_soi = procar.shortcheck(data_soi)
+        result_soi = procar.tiny_check(data_soi)
         assert 3 == result_soi[0]  # numk
         assert 2 == result_soi[1]  # nbands
         assert 3 == result_soi[2]  # natom

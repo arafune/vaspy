@@ -44,6 +44,8 @@ class EnergyBand(object):
         number of kpoints
     nbands: int
         number of bands
+    nsping: int
+        spin character
     energies: numpy.ndarray
         energies[spin_i, k_i, band_i], where spin_i, k_i, and band_i are spin-,
         k- and band-index, respectively.

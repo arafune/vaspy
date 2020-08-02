@@ -64,7 +64,6 @@ class ProjectionBand(EnergyBand):
         self.natom = 0
         self.proj = proj
         self.phase = phase
-        self.kvecs = []
 
     def append_sumsite(self, sites: Tuple[int, int], site_name: str) -> np.ndarray:
         """Append site-sum results.
@@ -147,7 +146,7 @@ class ProjectionBand(EnergyBand):
 
         """
         orbital_names = self.label["orbital"]
-        orbital_name = check_orbital_name(arg)
+        orbital_name = _check_orbital_name(arg)
         if orbital_name in orbital_names:
             return (orbital_names.index(orbital_name),)
         elif orbital_name == "p":
@@ -266,7 +265,7 @@ class ProjectionBand(EnergyBand):
             .transpose(2, 1, 3, 0)
             .reshape(self.nbands, self.numk, -1)
         )
-        kvalues = np.asarray((self.kdistances.tolist()) * self.nbands)[
+        kvalues = np.array((self.kdistances.tolist()) * self.nbands)[
             :, np.newaxis
         ].reshape(self.nbands, self.numk, 1)
         projband = np.concatenate((kvalues, self.energies.T, output_proj), axis=-1)
@@ -459,7 +458,7 @@ class PROCAR(ProjectionBand):  # Version safety
                         except StopIteration:
                             continue
         #
-        self.kvecs = np.asarray(self.kvecs[: self.numk])
+        self.kvecs = np.array(self.kvecs[: self.numk])
         self.proj = np.fromstring(orbitals, dtype=float, sep=" ")
         del orbitals
         norbital = len(self.label["orbital"])
@@ -474,7 +473,7 @@ class PROCAR(ProjectionBand):  # Version safety
         if self.nspin == 1:  # standard
             self.label["spin"] = [""]
             self.label["energy"] = ["Energy"]
-            self.energies = np.asarray(energies).reshape(1, self.numk, self.nbands)
+            self.energies = np.array(energies).reshape(1, self.numk, self.nbands)
             self.proj = self.proj.reshape(
                 (self.nspin, self.numk, self.nbands, self.natom, norbital)
             )
@@ -485,7 +484,7 @@ class PROCAR(ProjectionBand):  # Version safety
         elif self.nspin == 2:  # collinear
             self.label["spin"] = ["_up", "_down"]
             self.label["energy"] = ["Energy_up", "Energy_down"]
-            self.energies = np.asarray(energies).reshape(2, self.numk, self.nbands)
+            self.energies = np.array(energies).reshape(2, self.numk, self.nbands)
             self.proj = self.proj.reshape(
                 (self.nspin, self.numk, self.nbands, self.natom, norbital)
             )
@@ -496,10 +495,12 @@ class PROCAR(ProjectionBand):  # Version safety
         elif self.nspin == 4:  # non-collinear
             self.label["spin"] = ["_mT", "_mX", "_mY", "_mZ"]
             self.label["energy"] = ["Energy"]
-            self.energies = np.asarray(energies).reshape(1, self.numk, self.nbands)
+            self.energies = np.array(energies).reshape(1, self.numk, self.nbands)
             self.proj = self.proj.reshape(
                 self.numk, self.nbands, self.nspin, self.natom, norbital
-            ).transpose((2, 0, 1, 3, 4))
+            ).transpose(
+                (2, 0, 1, 3, 4)
+            )  # The order is spin, k, band, atom, orbital
             if phase_read:
                 self.phase = self.phase.reshape(
                     (1, self.numk, self.nbands, self.natom, norbital - 1)
@@ -559,7 +560,7 @@ class PROCAR(ProjectionBand):  # Version safety
         )
 
 
-def check_orbital_name(arg: str) -> str:
+def _check_orbital_name(arg: str) -> str:
     """Return arg without change if arg is a member of the 'orbital name'.
 
     If arg is an alias of the (more appropriate) orbital
@@ -608,7 +609,7 @@ def check_orbital_name(arg: str) -> str:
     raise ValueError(errmsg)
 
 
-def shortcheck(procar) -> Tuple[int, int, int, List[str], bool]:
+def tyny_check(procar: IO[str]) -> Tuple[int, int, int, List[str], bool]:
     """Check whether PROCAR file is good.
 
     Return numk, nbands, nion, orbital_names and
@@ -618,7 +619,7 @@ def shortcheck(procar) -> Tuple[int, int, int, List[str], bool]:
     if "PROCAR lm decomposed + phase" not in next(procar):
         procar.close()
         raise RuntimeError(
-            "This PROCAR is not a proper format\n \
+            "This PROCAR is not a proper format (Not phase data included.)\n \
                             Check your INCAR the calculations.\n"
         )
     tmp = next(procar)
@@ -627,6 +628,7 @@ def shortcheck(procar) -> Tuple[int, int, int, List[str], bool]:
     section = []
     orbitals = []
     phases = []
+    orbitalnames: List[str] = []
     for line in procar:
         if line.isspace():
             break

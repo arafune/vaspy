@@ -117,7 +117,7 @@ def remove_sharp(str_: str) -> Tuple[str, bool]:
 
 class Incar(Mapping):
     """General class for INCAR file
-    
+
     """
 
     def __init__(self, filename: Union[Path, str, None] = None) -> None:
@@ -246,7 +246,8 @@ class Incar(Mapping):
         str
             Check messages
         """
-        checks: Dict[str, Union[bool, int, float, str] = {'When ICHARG = 11, Recommend "LWAVE = .FALSE, LCHARG = .FALSE"\n': (
+        checks: Dict[str, Union[bool, int, float, str]] = {
+            'When ICHARG = 11, Recommend "LWAVE = .FALSE, LCHARG = .FALSE"\n': (
                 self.active("ICHARG") == 11
                 and (
                     self.active("LWAVE") == ".TRUE."

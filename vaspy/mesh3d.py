@@ -277,7 +277,7 @@ class Grid3D(object):
         if data is None:
             self.data: np.ndarray = np.array([])
         else:
-            self.data = np.asarray(data)
+            self.data = np.array(data)
 
     @property
     def size(self) -> int:

@@ -224,7 +224,7 @@ class WAVECAR(object):
             ** 2
         )
         g_vec = kgrid[np.where(energy_k < self.encut)[0]]
-        return np.asarray(g_vec, dtype=int)
+        return np.array(g_vec, dtype=int)
 
     def bandcoeff(
         self, spin_i: int = 0, k_i: int = 0, band_i: int = 0, norm: bool = False
