@@ -45,6 +45,7 @@ import copy
 import sys
 import numpy as np
 from typing import Sequence, Union, Optional, IO, List
+from pathlib import Path
 
 try:
     import matplotlib.pyplot as plt
@@ -76,14 +77,14 @@ class DOSCAR(object):  # Version safety
 
     """
 
-    def __init__(self, filename: Optional[str] = None) -> None:
+    def __init__(self, filename: Union[str, Path, None] = None) -> None:
         """Initialize."""
         self.natom: int = 0
         self.nbands: int = 0
         self.dos_container: List = list()
 
         if filename:
-            self.load_file(open_by_suffix(filename))
+            self.load_file(open_by_suffix(str(filename)))
 
     def load_file(self, thefile: IO[str]) -> None:
         """Parse DOSCAR file and store it in memory.

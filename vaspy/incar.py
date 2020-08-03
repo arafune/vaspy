@@ -129,7 +129,7 @@ class Incar(Mapping):
         """
         self._incar: Dict[str, Tuple[Union[str, int, float], bool]] = {}
         self.additional_comments: Dict[str, str] = {}
-
+        #
         if filename:
             self.load_file(open_by_suffix(str(filename)))
 
@@ -182,7 +182,7 @@ class Incar(Mapping):
         for key in self._incar:
             yield key
 
-    def __getitem__(self, key_item: str) -> Any:
+    def __getitem__(self, key_item: str) -> Tuple[Union[str, int, float], bool]:
         return self._incar.__getitem__(key_item)
 
     def __setitem__(

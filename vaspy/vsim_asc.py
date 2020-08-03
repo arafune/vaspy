@@ -17,7 +17,7 @@ import itertools
 import logging
 from logging import Formatter, StreamHandler, getLogger
 from typing import IO, Optional, Sequence, Tuple, Union, List
-
+from pathlib import Path
 import numpy as np
 
 # import vaspy.const as const
@@ -53,18 +53,18 @@ class VSIM_ASC(object):
 
     """
 
-    def __init__(self, filename: Optional[str] = None) -> None:
+    def __init__(self, filename: Union[str, Path, None] = None) -> None:
         """Initialize."""
         self.system_name: str = ""
         self.atoms: List[str] = []
         #
         self.qpts: List[np.ndarray] = []
-        self.freqs: List[float] = []
+        self.freqs: Union[List[float], np.ndarray] = []
         #
         if filename:
-            self.load_file(open_by_suffix(filename))
+            self.load_file(open_by_suffix(str(filename)))
 
-    def load_file(self, thefile: Union[IO[str], IO[bytes]]) -> None:
+    def load_file(self, thefile: IO[str]) -> None:
         """Parse vsim.ascii.
 
         Parameters
@@ -75,7 +75,7 @@ class VSIM_ASC(object):
         """
         phonon_lines = []
         # the first line is system name
-        self.system_name = next(thefile)[1:].strip()
+        self.system_name: str = next(thefile)[1:].strip()
         # the 2nd line represents dxx, dyx, dyy
         dxx, dyx, dyy = [float(x) for x in next(thefile).split()]
         # the 3rd line represents dzx, dzy, dzz

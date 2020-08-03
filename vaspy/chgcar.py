@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import copy
 from typing import Optional, IO, Union, List
-
+from pathlib import Path
 from vaspy.mesh3d import VASPGrid
 from vaspy.tools import open_by_suffix
 
@@ -46,13 +46,13 @@ class CHGCAR(VASPGrid):
     """
 
     def __init__(
-        self, filename: Optional[str] = None, pickles: Optional[str] = None
+        self, filename: Union[str, Path, None], pickles: Optional[str] = None
     ) -> None:
         """Initialize."""
         super(CHGCAR, self).__init__(None)
         self.spin: List[str] = [""]
         if filename:
-            self.load_file(open_by_suffix(filename), pickles)
+            self.load_file(open_by_suffix(str(filename)), pickles)
 
     def load_file(
         self, thefile: Union[IO[str], IO[bytes]], pickles: Optional[str] = None

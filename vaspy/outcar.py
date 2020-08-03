@@ -9,7 +9,8 @@ from __future__ import unicode_literals  # Version safety
 from __future__ import annotations
 
 from vaspy.tools import open_by_suffix
-from typing import List, Optional, Sequence, Union, IO
+from typing import List, Sequence, Union, IO
+from pathlib import Path
 
 
 class OUTCAR(object):  # Version safety
@@ -47,7 +48,7 @@ class OUTCAR(object):  # Version safety
 
     """
 
-    def __init__(self, filename: Optional[str] = None) -> None:
+    def __init__(self, filename: Union[str, Path, None] = None) -> None:
         """Initialize."""
         self.natom = 0
         self.atomtypes: List[str] = []
@@ -65,7 +66,7 @@ class OUTCAR(object):  # Version safety
         self.kvecs: List[List[float]] = []
         self.weights: List[float] = []
         if filename:
-            self.load_file(open_by_suffix(filename))
+            self.load_file(open_by_suffix(str(filename)))
 
     def set_atom_names(self) -> List[str]:
         """Build atom_names (the list of atomname_with_index)."""

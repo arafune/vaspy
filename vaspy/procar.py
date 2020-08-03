@@ -14,6 +14,7 @@ import csv
 import re
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 from typing import IO, List, Optional, Sequence, Tuple, Union
+from pathlib import Path
 
 import numpy as np
 
@@ -389,12 +390,12 @@ class PROCAR(ProjectionBand):  # Version safety
     """
 
     def __init__(
-        self, filename: Optional[str] = None, phase_read: bool = False
+        self, filename: Union[str, Path, None] = None, phase_read: bool = False
     ) -> None:
         """Initialize."""
         super(PROCAR, self).__init__()
         if filename:
-            self.load_file(open_by_suffix(filename), phase_read)
+            self.load_file(open_by_suffix(str(filename)), phase_read)
 
     def load_file(self, thefile: IO[str], phase_read: bool = False) -> None:
         """Parse PROCAR.

@@ -7,7 +7,6 @@ from __future__ import division, print_function
 import sys
 from typing import Optional
 
-
 import numpy as np
 
 from vaspy import mesh3d
