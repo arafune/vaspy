@@ -6,7 +6,7 @@ translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 from __future__ import annotations
 
 import copy
-from typing import Optional, IO, Union, List
+from typing import Optional, IO, List
 
 from vaspy.mesh3d import VASPGrid
 from vaspy.tools import open_by_suffix
@@ -54,9 +54,7 @@ class CHGCAR(VASPGrid):
         if filename:
             self.load_file(open_by_suffix(filename), pickles)
 
-    def load_file(
-        self, thefile: Union[IO[str], IO[bytes]], pickles: Optional[str] = None
-    ) -> None:
+    def load_file(self, thefile: IO[str], pickles: Optional[str] = None) -> None:
         """Parse CHGCAR file to construct CHGCAR object.
 
         Parameters
