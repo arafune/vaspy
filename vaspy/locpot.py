@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 """This module provides LOCPOT class."""
 #
-from __future__ import division, print_function
-
 import sys
 from typing import Optional
 

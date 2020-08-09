@@ -73,7 +73,7 @@ logger.addHandler(handler)
 logger.propagate = False
 
 
-class POSCAR_HEAD(object):
+class POSCAR_Head(object):
     """One of the parent classes of POSCAR class.
 
     Attributes
@@ -91,9 +91,7 @@ class POSCAR_HEAD(object):
 
     def __init__(self) -> None:
         """Initialization."""
-        self.__cell_vecs = np.array(
-            [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
-        )
+        self.__cell_vecs = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
         self.system_name: str = ""
         self.scaling_factor: float = 0.0
         self.atomtypes: List[str] = []
@@ -171,7 +169,7 @@ class POSCAR_HEAD(object):
         self.__site_label = value
 
 
-class POSCAR_POS(object):
+class POSCAR_Pos(object):
     """POSCAR_DOS Class.
 
     Attributes
@@ -216,7 +214,7 @@ class POSCAR_POS(object):
         return self.positions[item]
 
 
-class POSCAR(POSCAR_HEAD, POSCAR_POS):
+class POSCAR(POSCAR_Head, POSCAR_Pos):
     """Class for POSCAR (CONTCAR) format.
 
     This script does *NOT* support for constructing POSCAR
@@ -241,7 +239,7 @@ class POSCAR(POSCAR_HEAD, POSCAR_POS):
 
         """
         super(POSCAR, self).__init__()
-        POSCAR_POS.__init__(self)
+        POSCAR_Pos.__init__(self)
         if isinstance(arg, (str, Path)):
             poscar: Union[Tuple[str, ...], List[str]] = open_by_suffix(arg).readlines()
             self.load_array(poscar)
