@@ -9,8 +9,8 @@ This program is not a part of vasp but it deeply connects with the vasp.
 
 from __future__ import division  # Version safety
 from __future__ import print_function
-from typing import Optional, IO, Any, List
-
+from typing import Optional, IO, Any, List, Union
+from pathlib import Path
 from vaspy.tools import open_by_suffix
 
 
@@ -43,7 +43,7 @@ class BaderACF(object):
 
     """
 
-    def __init__(self, filename: Optional[str] = None) -> None:
+    def __init__(self, filename: Union[str, Path, None] = None) -> None:
         """Initialize."""
         self.natom = 0
         self.positions: List[List[float]] = []
@@ -54,7 +54,7 @@ class BaderACF(object):
         self.vacvol: float = 0.0
         self.nelectron: float = 0.0
         if filename:
-            self.parse(open_by_suffix(filename))
+            self.parse(open_by_suffix(str(filename)))
 
     def parse(self, thefile: IO[Any]) -> None:
         """Parse AFC.dat.

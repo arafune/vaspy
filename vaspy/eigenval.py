@@ -299,7 +299,7 @@ class EIGENVAL(EnergyBand):
         self.natom = 0
         #
         if filename:
-            self.load_file(open_by_suffix(filename))
+            self.load_file(open_by_suffix(str(filename)))
 
     def __getitem__(self, item: int) -> Tuple[List[float], List[List[float]]]:
         """

@@ -9,7 +9,7 @@ from __future__ import annotations
 import copy
 import os
 from typing import Optional, IO, Sequence, Tuple, Union
-
+from pathlib import Path
 
 import numpy as np
 
@@ -56,14 +56,14 @@ class VASPGrid(object):
     """
 
     def __init__(
-        self, filename: Optional[str] = None, pickles: Optional[str] = None
+        self, filename: Union[str, Path, None], pickles: Optional[str] = None
     ) -> None:
         """Initialize."""
         self.poscar = poscar.POSCAR()
         self.grid = Grid3D()
         self.additional = []
         if filename:
-            self.load_file(open_by_suffix(filename), pickles)
+            self.load_file(open_by_suffix(str(filename)), pickles)
 
     def load_file(self, thefile: IO[str], pickles: Optional[str] = None) -> None:
         """Construct the object from the file.
