@@ -92,7 +92,7 @@ class ProjectionBand(EnergyBand):
         self.label["site"].append(site_name)
         logger.debug("self.label: {}".format(self.label))
         #    spin, k, band, atom
-        sumsite = self.proj[:, :, :, sites, :].sum(axis=-2, keepdims=True)
+        sumsite: np.ndarray = self.proj[:, :, :, sites, :].sum(axis=-2, keepdims=True)
         self.proj = np.concatenate((self.proj, sumsite), axis=-2)
         return sumsite
 
@@ -222,7 +222,7 @@ class ProjectionBand(EnergyBand):
         self,
         site_indexes: Sequence[int] = (),
         orbital_indexes_sets: Sequence[Sequence[int]] = (),
-    ):
+    ) -> List[float]:
         """Return 3D list data that are easily converted to txt data for csv.
 
         Parameters
