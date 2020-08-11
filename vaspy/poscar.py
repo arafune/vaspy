@@ -73,7 +73,7 @@ logger.addHandler(handler)
 logger.propagate = False
 
 
-class POSCAR_Head(object):
+class PosCarHead:
     """One of the parent classes of POSCAR class.
 
     Attributes
@@ -169,7 +169,7 @@ class POSCAR_Head(object):
         self.__site_label = value
 
 
-class POSCAR_Pos(object):
+class PosCarPos(object):
     """POSCAR_DOS Class.
 
     Attributes
@@ -214,7 +214,7 @@ class POSCAR_Pos(object):
         return self.positions[item]
 
 
-class POSCAR(POSCAR_Head, POSCAR_Pos):
+class POSCAR(PosCarHead, PosCarPos):
     """Class for POSCAR (CONTCAR) format.
 
     This script does *NOT* support for constructing POSCAR
@@ -239,7 +239,7 @@ class POSCAR(POSCAR_Head, POSCAR_Pos):
 
         """
         super(POSCAR, self).__init__()
-        POSCAR_Pos.__init__(self)
+        PosCarPos.__init__(self)
         if isinstance(arg, (str, Path)):
             poscar: Union[Tuple[str, ...], List[str]] = open_by_suffix(arg).readlines()
             self.load_array(poscar)

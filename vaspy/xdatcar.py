@@ -3,13 +3,13 @@
 
 import numpy as np
 
-from vaspy.poscar import POSCAR_Head
+from vaspy.poscar import PosCarHead
 from vaspy.tools import open_by_suffix
 
 from typing import IO, Optional
 
 
-class XdatCar(POSCAR_Head):
+class XDATCAR(PosCarHead):
     """Class for XDATCAR.
 
     Attributes
