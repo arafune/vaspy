@@ -62,7 +62,7 @@ try:
 except NameError:
     print("'POSCAR' file not exist")
 
-wav: wavecar.WAVECAR = wavecar.WAVECAR(args.WAVECAR)
+wav: wavecar.WAVECAR = wavecar.WAVECAR(args.wavecar)
 grid = wav.realspace_wfc(
     spin_i=args.spin, k_i=args.k - 1, band_i=args.band - 1, poscar=pos
 )
