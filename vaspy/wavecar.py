@@ -95,8 +95,11 @@ class WAVECAR(object):
 
         """
         self.wfc.seek(0)
+        self.recl: int
+        self.nspin: int
+        self.rtag: int
         self.recl, self.nspin, self.rtag = np.array(
-            np.fromfile(self.wfc, dtype=np.float, count=3), dtype=int
+            np.fromfile(self.wfc, dtype=float, count=3), dtype=int
         )
         self.wfc.seek(self.recl)
         #        print(self.wfc.tell())
@@ -143,7 +146,7 @@ class WAVECAR(object):
         else:
             raise ValueError("Invalid TAG value: {}".format(self.rtag))
 
-    def band(self):
+    def band(self) -> None:
         """Read the information about the band from WAVECAR file.
 
         The infomation obtained by this method is as follows:
@@ -301,7 +304,7 @@ class WAVECAR(object):
             If poscar is not specified, for Collinear-wavecar file.
             data for the wavefunction in the real space.
             .T is due to the original data is made by fortran program
-            (i.e. 'VASP', of course.
+            (i.e. 'VASP', of course).
 
         tuple
             If poscar is not specified, for SOI-wavecar file.
@@ -313,8 +316,8 @@ class WAVECAR(object):
             represents the real part of the wavefunction at :math:`k_i` and
             :math:`b_i` in the real space, the latter frame the imaginary
             part. For the SOI wavecar, 4 frames.
-            The first and second are for the "up" wavefunction, and the third
-            and fourth are "down" wavefunction. (Judging SOI by
+            The first and second are for the "up" wavefunction (Real, Imaginary), and the third
+            and fourth are "down" wavefunction(Real, Imaginary). (Judging SOI by
             gvectors(k_i).shape[0] :math:`\neq` bandcoeff(k_i).size)
 
         """
@@ -373,7 +376,7 @@ class WAVECAR(object):
         #
         self.phi_k = phi_k  # For debug
         phi_r = ifftn(phi_k)
-        if poscar.scaling_factor == 0.0:
+        if poscar.scaling_factor == 0.0:  # poscar is not given.
             if phi_r.ndim == 3:
                 return phi_r.T
             else:  # SOI

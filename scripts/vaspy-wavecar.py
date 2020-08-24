@@ -29,7 +29,7 @@ parser.add_argument(
     metavar="k_index",
     type=int,
     default=1,
-    help="""k index (>1)  (default is 1)""",
+    help="""k index (>=1)  (default is 1)""",
 )
 parser.add_argument(
     "--band",
@@ -37,7 +37,7 @@ parser.add_argument(
     metavar="band_index",
     type=int,
     default=1,
-    help="""band index (>1)""",
+    help="""band index (>=1)""",
 )
 parser.add_argument(
     "--output",
