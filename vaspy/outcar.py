@@ -65,6 +65,7 @@ class OUTCAR(object):  # Version safety
         self.total_charges: List[List[List[float]]] = []
         self.kvecs: List[List[float]] = []
         self.weights: List[float] = []
+        self.totens: List[float] = []
         if filename:
             self.load_file(open_by_suffix(str(filename)))
 
@@ -164,6 +165,8 @@ class OUTCAR(object):  # Version safety
                     self.numk = int(line.split()[3])
                     self.nkdim = int(line.split()[9])
                     self.nbands = int(line.split()[14])
+                elif "free energy    TOTEN  =" in line:
+                    self.totens.append(float(line.split("=")[-1].split()[0]))
                 elif "reciprocal lattice vectors" in line:
                     self.recvec = [
                         [float(i) for i in next(thefile)[43:].split()] for i in range(3)

@@ -68,3 +68,4 @@ class TestOUTCAR(object):
         assert 11 == len(outcar0.total_charges)
         assert 7 == len(outcar0.total_charges[0])
         assert 3 == len(outcar0.total_charges[0][0])
+        np.testing.assert_almost_equal(-7.39238998, outcar0.totens[-1])
