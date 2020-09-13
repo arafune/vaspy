@@ -143,7 +143,7 @@ class WAVECAR(object):
         else:
             raise ValueError("Invalid TAG value: {}".format(self.rtag))
 
-    def band(self):
+    def band(self) -> None:
         """Read the information about the band from WAVECAR file.
 
         The infomation obtained by this method is as follows:
@@ -180,7 +180,9 @@ class WAVECAR(object):
         else:
             self.kpath = np.concatenate(
                 (
-                    [0,],
+                    [
+                        0,
+                    ],
                     np.cumsum(
                         np.linalg.norm(
                             np.dot(np.diff(self.kvecs, axis=0), self.rcpcell), axis=1
@@ -443,8 +445,7 @@ def make_kgrid(
     Returns
     --------
     numpy.array
-
-"""
+    """
     fx = [
         ii if ii < ngrid[0] // 2 + 1 else ii - ngrid[0]  # <<< // or / (?)
         for ii in range(ngrid[0])

@@ -100,8 +100,8 @@ str_2 = ["RWIGS", "SAXIS", "EINT", "LDATYPE", "LDAUL", "LDAUU", "LDAUJ", "MAGMOM
 
 
 def remove_sharp(str_: str) -> Tuple[str, bool]:
-    """ Remvoe # / ! from the string head.
-    
+    """Remvoe # / ! from the string head.
+
     Parameters
     ----------
         str_: str
@@ -116,9 +116,7 @@ def remove_sharp(str_: str) -> Tuple[str, bool]:
 
 
 class Incar(Mapping):
-    """General class for INCAR file
-
-    """
+    """General class for INCAR file"""
 
     def __init__(self, filename: Union[Path, str, None] = None) -> None:
         """
@@ -240,7 +238,7 @@ class Incar(Mapping):
 
     def lint_all(self) -> str:
         """Tyny lint for vasp
-        
+
         Returns
         -------
         str

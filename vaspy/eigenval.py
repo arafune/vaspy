@@ -122,7 +122,6 @@ class EnergyBand(object):
         ----------
         keys: tuple
             key tuple used for label
-s
         """
         label_list = []
         for key in keys:
@@ -303,15 +302,15 @@ class EIGENVAL(EnergyBand):
 
     def __getitem__(self, item: int) -> Tuple[List[float], List[List[float]]]:
         """
-        
+
         Parameters
         ----------
         item: int
             index of k-vector
-        
+
         Returns
         -------
-        Tuple of list of float and list of float  
+        Tuple of list of float and list of float
         """
         energies: List[List[List[float]]] = self.energies.transpose(1, 2, 0).tolist()
         kvec: List[List[float]] = self.kvecs.tolist()
