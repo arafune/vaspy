@@ -64,7 +64,7 @@ class BaderACF(object):
         thefile: StringIO
             'ACF.dat' file
 
-    """
+        """
         # the first line is like:
         #     X     Y     Z     CHARGE      MIN DIST   ATOMIC VOL
         next(thefile)

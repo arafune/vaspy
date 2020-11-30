@@ -395,13 +395,17 @@ class POSCAR(PosCarHead, PosCarPos):
         return sposcar
 
     # class method? or independent function?
-    def nearest(self, array: Sequence[float], point: np.ndarray,) -> np.ndarray:
+    def nearest(
+        self,
+        array: Sequence[float],
+        point: np.ndarray,
+    ) -> np.ndarray:
         """Return the nearest position in the periodic space.
 
         Parameters
         -----------
         array: list of float  # << Check
-            
+
         point: numpy.ndarray
 
         Returns
@@ -1076,7 +1080,7 @@ def _vectorize(vector: Sequence[float]) -> np.ndarray:
     Returns
     ----------
     np.ndarray
-        Numpy array (flatten) 
+        Numpy array (flatten)
     """
 
     if not isinstance(vector, (np.ndarray, np.matrix, list, tuple)):

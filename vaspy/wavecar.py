@@ -183,7 +183,9 @@ class WAVECAR(object):
         else:
             self.kpath = np.concatenate(
                 (
-                    [0,],
+                    [
+                        0,
+                    ],
                     np.cumsum(
                         np.linalg.norm(
                             np.dot(np.diff(self.kvecs, axis=0), self.rcpcell), axis=1
@@ -446,8 +448,7 @@ def make_kgrid(
     Returns
     --------
     numpy.array
-
-"""
+    """
     fx = [
         ii if ii < ngrid[0] // 2 + 1 else ii - ngrid[0]  # <<< // or / (?)
         for ii in range(ngrid[0])
