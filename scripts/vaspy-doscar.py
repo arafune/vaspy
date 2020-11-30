@@ -5,6 +5,7 @@
 import argparse
 import os
 import sys
+from typing import List
 
 from vaspy import tools
 from vaspy.doscar import DOSCAR, PDOS, TDOS
@@ -65,7 +66,7 @@ the name is used in the output filename.""",
 args = parser.parse_args()
 
 doscar = DOSCAR(args.doscar)
-atomlist = list()
+atomlist: List[str] = list()
 if args.outcar is not NotImplemented:
     if args.outcar is None:
         args.outcar = os.path.join(os.path.dirname(args.doscar), "OUTCAR")
