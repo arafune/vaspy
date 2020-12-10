@@ -261,6 +261,7 @@ class PDOS(DOS):
         super().__init__(array)
         self.site = "" if site is None else site
         self.orbital_spin: List[str] = list()
+        self.total: List[float] = []
         if array is not None:
             if len(self.dos[0]) == 9:
                 self.orbital_spin = self.orbitalnames
