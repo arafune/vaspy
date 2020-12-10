@@ -43,8 +43,8 @@ from __future__ import annotations
 
 import copy
 import sys
-import numpy as np
-from typing import Sequence, Union, Optional, IO, List
+from collections.abc import Sequence
+from typing import Union, Optional, IO, List, Tuple
 from pathlib import Path
 
 try:
@@ -64,25 +64,20 @@ class DOSCAR(object):  # Version safety
     natom: int
         number of atoms
 
-    nbands: int
-        number of bands
+    tdos:
 
-        Notes
-        -----
-        VASP defaults is 301
+    pdoses:
 
-    dos_container: list
-        stores the DOS object. By default, the first item is the TDOS, and the
-        latter items are PDOS.
+    energies: Tuple[float]
 
     """
 
     def __init__(self, filename: Union[str, Path, None] = None) -> None:
         """Initialize."""
         self.natom: int = 0
-        self.nbands: int = 0
-        self.dos_container: List = list()
-
+        self.tdos: Optional[TDOS] = None
+        self.pdoses: List[PDOS] = []
+        self.energies: Tuple[float, ...] = tuple()
         if filename:
             self.load_file(open_by_suffix(str(filename)))
 
@@ -99,17 +94,22 @@ class DOSCAR(object):  # Version safety
         self.natom = int(firstline[0:4])
         [thefile.readline() for i in range(4)]
         header = thefile.readline()
-        self.nbands = int(header[32:37])
-        tdos: np.ndarray = np.array(
-            [next(thefile).split() for i in range(self.nbands)], dtype=np.float64
-        )
-        if tdos.shape[1] == 3:
-            tdos = tdos[:, 0:2]
-        elif tdos.shape[1] == 5:
-            tdos = tdos[:, 0:3]
+
+        nedos: int = int(header[32:37])
+        tmp: List[List[float]] = [
+            [float(i) for i in next(thefile).split()] for _ in range(nedos)
+        ]
+        tmp_dos: List[Tuple[float]] = [*zip(*tmp)]
+        #
+        self.energies = tmp_dos[0]
+        if len(tmp_dos) == 3:
+            self.tdos = TDOS((tmp_dos[1],))
+        elif len(tmp_dos) == 5:
+            self.tdos = TDOS((tmp_dos[1], tmp_dos[2]))
         else:
-            raise RuntimeError
-        self.dos_container = [tdos]
+            raise RuntimeError("Runtime Error: Check DOS file")
+        #
+        """
         try:
             line = next(thefile)
         except StopIteration:
@@ -125,10 +125,22 @@ class DOSCAR(object):  # Version safety
                 line = next(thefile)
             except StopIteration:
                 line = ""
+        """
         thefile.close()
 
+    def fermi_correction(self, fermi: float) -> None:
+        """Correct energy by Fermi level.
 
-class DOS(object):  # Version safety
+        Parameters
+        ----------
+        fermi: float
+            fermi level
+
+        """
+        self.energies = tuple([energy - fermi for energy in self.energies])
+
+
+class DOS(Sequence):  # Version safety
     """Class for DOS.
 
     List object consisting two elements.
@@ -144,54 +156,30 @@ class DOS(object):  # Version safety
 
     """
 
-    def __init__(self, array: Optional[np.ndarray] = None) -> None:
+    def __init__(self, array: Optional[Tuple[float]] = None) -> None:
         """Initialize."""
-        self.dos: np.ndarray = np.array([])
-        if array is not None:
-            self.dos = array.transpose()
+        self.dos: List[Union[Tuple[float, ...], List[float]]] = []
+        self.header: str = ""
+        if array:
+            self.dos = [*zip(*array)]
 
     def __len__(self) -> int:
         """x.__len__() <=> len(x)."""
         return len(self.dos)
 
-    def fermi_correction(self, fermi: float) -> None:
-        """Correct energy by Fermi level.
+    def __getitem__(
+        self, idx: Union[int, slice]
+    ) -> Union[Tuple[float, ...], List[Tuple[float]]]:
+        return self.dos[idx]
 
-        Parameters
-        ----------
-        fermi: float
-            fermi level
 
-        """
-        self.dos[0] -= fermi
-
-    def energies(self, i: Optional[str] = None):
-        r"""Return the *i*-th energy of the object.
-
-        Parameters
-        ----------
-        i : int, optional (default is all energy)
-            index #
-
-        Returns
-        --------
-        np.ndarray
-            the energy value of the i-th point when i set. \
-            If arg is null, return the all energies in DOS object.
-
-        """
-        if i is None:
-            return self.dos[0]
-        else:
-            return self.dos[0][i]
-
-    def export_csv(self, filename: str, header: Optional[str] = None) -> None:
-        """Export data to file object (or file-like object) as csv format."""
-        transposed_dos = self.dos.transpose()
-        with open(filename, mode="wb") as fhandle:
-            np.savetxt(
-                fhandle, transposed_dos, header=header, delimiter="\t", newline="\n"
-            )
+#     def export_csv(self, filename: str, header: Optional[str] = None) -> None:
+#         """Export data to file object (or file-like object) as csv format."""
+#         transposed_dos = self.dos.transpose()
+#         with open(filename, mode="wb") as fhandle:
+#             np.savetxt(
+#                 fhandle, transposed_dos, header=header, delimiter="\t", newline="\n"
+#             )
 
 
 class TDOS(DOS):
@@ -208,13 +196,14 @@ class TDOS(DOS):
 
     """
 
-    def __init__(self, array) -> None:
+    def __init__(self, array: Optional[Tuple[float]]) -> None:
         """Initialize."""
-        super(TDOS, self).__init__(array)
-        if len(self.dos) == 2:
+        super().__init__(array)
+        if len(self.dos[0]) == 1:
             self.header: str = "Energy\tTDOS"
-        else:
+        elif len(self.dos[0]) == 2:  # collinear spin
             self.header = "Energy\tTDOS_up\tTDOS_down"
+            self.dos = [(d[0], -d[1]) for d in self.dos]
 
     def export_csv(self, filename: str) -> None:
         """Export data to file object (or file-like object) as csv format."""
@@ -250,23 +239,34 @@ class PDOS(DOS):
 
     """
 
+    orbitalnames = [
+        "s",
+        "py",
+        "pz",
+        "px",
+        "dxy",
+        "dyz",
+        "dz2",
+        "dxz",
+        "dx2",
+    ]  # << see sphpro.F of vasp sourcev
+    spins_soi = ("mT", "mX", "mY", "mZ")
+    spins = ("up", "down")
+
     def __init__(
-        self, array: Optional[Sequence[float]] = None, site: Optional[str] = None
+        self, array: Optional[Tuple[float]] = None, site: Optional[str] = None
     ) -> None:
         """Initialize."""
-        super(PDOS, self).__init__(array)
+        super().__init__(array)
         self.site = "" if site is None else site
         self.orbital_spin: List[str] = list()
-        orbitalnames = ["s", "py", "pz", "px", "dxy", "dyz", "dz2", "dxz", "dx2"]
-        # The above order is refered from sphpro.F of vasp source
-        spins_soi = ("mT", "mX", "mY", "mZ")
-        spins = ("up", "down")
+
         if array is not None:
             if len(self.dos) == 10:
-                self.orbital_spin = orbitalnames
+                self.orbital_spin = self.orbitalnames
             elif len(self.dos) == 19:  # Spin resolved
                 self.orbital_spin = [
-                    orb + "_" + spin for orb in orbitalnames for spin in spins
+                    orb + "_" + spin for orb in self.orbitalnames for spin in self.spins
                 ]
                 # In collinear spin calculation, DOS of down-spin is
                 # set by negative value.
@@ -274,10 +274,12 @@ class PDOS(DOS):
                     self.dos[i] *= -1
             elif len(self.dos) == 37:  # SOI
                 self.orbital_spin = [
-                    orb + "_" + spin for orb in orbitalnames for spin in spins_soi
+                    orb + "_" + spin
+                    for orb in self.orbitalnames
+                    for spin in self.spins_soi
                 ]
             else:
-                raise ValueError("Check the DOS data")
+                raise RuntimeError("Check the DOSCAR file")
 
     def graphview(self, *orbitalnames: str) -> None:
         """Show DOS graph by using matplotlib.  For 'just seeing' use."""
