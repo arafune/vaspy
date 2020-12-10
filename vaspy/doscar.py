@@ -169,6 +169,10 @@ class DOS(Sequence):  # Version safety
     ) -> Union[Tuple[float, ...], List[Tuple[float]]]:
         return self.dos[idx]
 
+    @property
+    def T(self):
+        return [*zip(*self.dos)]
+
 
 #     def export_csv(self, filename: str, header: Optional[str] = None) -> None:
 #         """Export data to file object (or file-like object) as csv format."""
