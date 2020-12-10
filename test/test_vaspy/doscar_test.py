@@ -54,8 +54,28 @@ class Test_ispin2_TDOS:
         assert ispin2.tdos.header == "Energy\tTDOS_up\tTDOS_down"
 
 
-class TestDOS(object):
-    pass
+class Test_ispin2_PDOS(object):
+    def test_pdos_sign(self, ispin2: DOSCAR):
+        assert ispin2.pdoses[0][-2] == [
+            0.3502e-04,
+            -0.3458e-04,
+            0.2131e-04,
+            -0.2032e-04,
+            0.3049e-03,
+            -0.3362e-03,
+            0.5880e-04,
+            -0.5700e-04,
+            0.0000e00,
+            -0.0000e00,
+            0.0000e00,
+            -0.0000e00,
+            0.0000e00,
+            -0.0000e00,
+            0.0000e00,
+            -0.0000e00,
+            0.0000e00,
+            -0.0000e00,
+        ]
 
 
 class TestTDOS(object):

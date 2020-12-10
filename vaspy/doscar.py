@@ -109,23 +109,19 @@ class DOSCAR(object):  # Version safety
         else:
             raise RuntimeError("Runtime Error: Check DOS file")
         #
-        """
+
         try:
             line = next(thefile)
         except StopIteration:
             line = ""
         while line == header:
-            self.dos_container.append(
-                np.array(
-                    [next(thefile).split() for i in range(self.nbands)],
-                    dtype=np.float64,
-                )
-            )
+            tmp = [[float(i) for i in next(thefile).split()] for _ in range(nedos)]
+            self.pdoses.append(PDOS([*zip(*tmp)][1:]))
             try:
                 line = next(thefile)
             except StopIteration:
                 line = ""
-        """
+
         thefile.close()
 
     def fermi_correction(self, fermi: float) -> None:
@@ -260,25 +256,31 @@ class PDOS(DOS):
         super().__init__(array)
         self.site = "" if site is None else site
         self.orbital_spin: List[str] = list()
-
         if array is not None:
-            if len(self.dos) == 10:
+            if len(self.dos[0]) == 9:
                 self.orbital_spin = self.orbitalnames
-            elif len(self.dos) == 19:  # Spin resolved
+            elif len(self.dos[0]) == 18:  # Spin resolved
                 self.orbital_spin = [
                     orb + "_" + spin for orb in self.orbitalnames for spin in self.spins
                 ]
                 # In collinear spin calculation, DOS of down-spin is
                 # set by negative value.
-                for i in range(2, 19, 2):
-                    self.dos[i] *= -1
-            elif len(self.dos) == 37:  # SOI
+                for i, dos_at_energy in enumerate(self.dos):
+                    tmp = []
+                    for j, energy in enumerate(dos_at_energy):
+                        if j % 2 == 0:
+                            tmp.append(energy)
+                        else:
+                            tmp.append(-energy)
+                    self.dos[i] = tmp
+            elif len(self.dos[0]) == 36:  # SOI
                 self.orbital_spin = [
                     orb + "_" + spin
                     for orb in self.orbitalnames
                     for spin in self.spins_soi
                 ]
             else:
+                print(len(self.dos[0]))
                 raise RuntimeError("Check the DOSCAR file")
 
     def graphview(self, *orbitalnames: str) -> None:
