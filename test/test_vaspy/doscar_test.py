@@ -117,6 +117,9 @@ class Test_ispin2_PDOS(object):
             -0.0,
         ]
 
+    def test_pdos_total(self, ispin2: DOSCAR):
+        pass
+
 
 class TestTDOS(object):
     pass

@@ -261,10 +261,12 @@ class PDOS(DOS):
         super().__init__(array)
         self.site = "" if site is None else site
         self.orbital_spin: List[str] = list()
-        self.total: List[float] = []
+        self.total: List[Tuple[float, ...]] = []
         if array is not None:
             if len(self.dos[0]) == 9:
                 self.orbital_spin = self.orbitalnames
+                for dos_at_energy in self.dos:
+                    self.total.append((sum(dos_at_energy),))
             elif len(self.dos[0]) == 18:  # Spin resolved
                 self.orbital_spin = [
                     orb + "_" + spin for orb in self.orbitalnames for spin in self.spins
@@ -272,19 +274,26 @@ class PDOS(DOS):
                 # In collinear spin calculation, DOS of down-spin is
                 # set by negative value.
                 for i, dos_at_energy in enumerate(self.dos):
+                    self.total.append(
+                        (sum(dos_at_energy[0::2]), -sum(dos_at_energy[1::2]))
+                    )
                     tmp = []
                     for j, energy in enumerate(dos_at_energy):
+
                         if j % 2 == 0:
                             tmp.append(energy)
                         else:
                             tmp.append(-energy)
                     self.dos[i] = tmp
+
             elif len(self.dos[0]) == 36:  # SOI
                 self.orbital_spin = [
                     orb + "_" + spin
                     for orb in self.orbitalnames
                     for spin in self.spins_soi
                 ]
+                for dos_at_energy in self.dos:
+                    self.total.append((sum(dos_at_energy),))
             else:
                 print(len(self.dos[0]))
                 raise RuntimeError("Check the DOSCAR file")
