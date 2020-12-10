@@ -43,6 +43,7 @@ from __future__ import annotations
 
 import copy
 import sys
+from operator import add
 from collections.abc import Sequence
 from typing import Union, Optional, IO, List, Tuple
 from pathlib import Path
@@ -283,6 +284,13 @@ class PDOS(DOS):
                 print(len(self.dos[0]))
                 raise RuntimeError("Check the DOSCAR file")
 
+    def projected(self, orbital: Union[str, int]) -> Union[Tuple[float], List[float]]:
+        if isinstance(orbital, int):
+            idx = orbital
+        else:
+            idx = self.orbital_spin.index(orbital)
+        return [d[idx] for d in self.dos]
+
     def graphview(self, *orbitalnames: str) -> None:
         """Show DOS graph by using matplotlib.  For 'just seeing' use."""
         try:
@@ -358,9 +366,7 @@ class PDOS(DOS):
             return copy.deepcopy(other)
         else:
             sum_pdos = PDOS()
-            energies = copy.deepcopy(self.dos[0])
-            sum_pdos.dos = self.dos + other.dos
-            sum_pdos.dos[0] = energies
             sum_pdos.site = self.site + other.site
             sum_pdos.orbital_spin = self.orbital_spin
+            sum_pdos.dos = [list(map(add, x, y)) for x, y, in zip(self.dos, other.dos)]
             return sum_pdos

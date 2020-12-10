@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 import vaspy
-from vaspy.doscar import DOSCAR
+from vaspy.doscar import DOSCAR, PDOS
 
 
 class TestDOSCAR(object):
@@ -75,6 +75,46 @@ class Test_ispin2_PDOS(object):
             -0.0000e00,
             0.0000e00,
             -0.0000e00,
+        ]
+
+    def test_pdos_add(self, ispin2: DOSCAR):
+        twicedos: PDOS = ispin2.pdoses[0] + ispin2.pdoses[0]
+        assert twicedos[-2] == [i * 2 for i in ispin2.pdoses[0][-2]]
+
+    def test_pdos_projected(self, ispin2: DOSCAR):
+        assert ispin2.pdoses[0].projected("s_down") == ispin2.pdoses[0].projected(1)
+        assert ispin2.pdoses[0].projected("s_down") == [
+            -0.0,
+            -0.0,
+            -0.0698,
+            -0.02912,
+            -1.173e-13,
+            -4.605e-06,
+            -0.00121,
+            -0.0,
+            -0.02841,
+            -0.0,
+            -0.0581,
+            -8.137e-12,
+            -0.01212,
+            -0.004887,
+            -0.01728,
+            -0.0006637,
+            -0.00955,
+            -0.00152,
+            -4.348e-07,
+            -0.008619,
+            -0.0009346,
+            -0.0005141,
+            -0.0,
+            -5.045e-22,
+            -0.001406,
+            -0.0,
+            -2.951e-18,
+            -0.0,
+            -0.0002834,
+            -3.458e-05,
+            -0.0,
         ]
 
 
