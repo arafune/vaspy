@@ -44,7 +44,8 @@ from __future__ import annotations
 import copy
 import sys
 from operator import add
-from collections.abc import Sequence
+import csv
+from collections.abc import Iterable
 from typing import Union, Optional, IO, List, Tuple
 from pathlib import Path
 
@@ -137,7 +138,7 @@ class DOSCAR(object):  # Version safety
         self.energies = tuple([energy - fermi for energy in self.energies])
 
 
-class DOS(Sequence):  # Version safety
+class DOS(Iterable):  # Version safety
     """Class for DOS.
 
     List object consisting two elements.
@@ -169,18 +170,28 @@ class DOS(Sequence):  # Version safety
     ) -> Union[Tuple[float, ...], List[Tuple[float]]]:
         return self.dos[idx]
 
+    def __iter__(self):
+        for d in self.dos:
+            yield d
+
     @property
     def T(self):
         return [*zip(*self.dos)]
 
-
-#     def export_csv(self, filename: str, header: Optional[str] = None) -> None:
-#         """Export data to file object (or file-like object) as csv format."""
-#         transposed_dos = self.dos.transpose()
-#         with open(filename, mode="wb") as fhandle:
-#             np.savetxt(
-#                 fhandle, transposed_dos, header=header, delimiter="\t", newline="\n"
-#             )
+    def export_csv(
+        self,
+        filename: str,
+        header: List[str],
+        energy: Union[List[float], Tuple[float, ...]],
+    ) -> None:
+        """Export data to csv file"""
+        assert len(energy) == len(self)
+        assert len(header) == len(self[0]) + 1
+        with open(filename, mode="w") as csvfile:
+            writer = csv.writer(csvfile, delimiter="\t")
+            writer.writerow(header)
+            for e, d in zip(energy, self.dos):
+                writer.writerow([e] + list(d))
 
 
 class TDOS(DOS):
@@ -201,15 +212,10 @@ class TDOS(DOS):
         """Initialize."""
         super().__init__(array)
         if len(self.dos[0]) == 1:
-            self.header: str = "Energy\tTDOS"
+            self.header: List[str] = ["Energy", "TDOS"]
         elif len(self.dos[0]) == 2:  # collinear spin
-            self.header = "Energy\tTDOS_up\tTDOS_down"
+            self.header = ["Energy", "TDOS_up", "TDOS_down"]
             self.dos = [(d[0], -d[1]) for d in self.dos]
-
-    def export_csv(self, filename: str) -> None:
-        """Export data to file object (or file-like object) as csv format."""
-        header = self.header
-        super(TDOS, self).export_csv(filename, header=header)
 
     def graphview(self) -> None:
         """Show graphview by matplotlib."""
@@ -295,7 +301,6 @@ class PDOS(DOS):
                 for dos_at_energy in self.dos:
                     self.total.append((sum(dos_at_energy),))
             else:
-                print(len(self.dos[0]))
                 raise RuntimeError("Check the DOSCAR file")
 
     def projected(self, orbital: Union[str, int]) -> Union[Tuple[float], List[float]]:
@@ -320,7 +325,9 @@ class PDOS(DOS):
             plt.plot(self.dos[0], self.dos[orbital + 1])
         plt.show()
 
-    def export_csv(self, filename: str, site: Optional[str] = None) -> None:
+    def export_csv(
+        self, filename: str, energy: Union[List[float], Tuple[float, ...]]
+    ) -> None:
         """Export data to file object (or file-like object) as csv format.
 
         Parameters
@@ -329,16 +336,13 @@ class PDOS(DOS):
             filename for output
 
         """
-        tmp = ["Energy"]
+        header = ["#Energy"]
         for i in self.orbital_spin:
-            if site is not None:
-                tmp.append(site + "_" + i)
-            elif self.site == "":
-                tmp.append(i)
+            if self.site:
+                header.append(self.site + "_" + i)
             else:
-                tmp.append(self.site + "_" + i)
-        header = "\t".join(tmp)
-        super(PDOS, self).export_csv(filename, header=header)
+                header.append(i)
+        super(PDOS, self).export_csv(filename, header=header, energy=energy)
 
     def plot_dos(
         self, orbitals: Sequence[str], fermi: float = 0.0
