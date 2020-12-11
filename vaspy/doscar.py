@@ -46,7 +46,7 @@ import sys
 from operator import add
 import csv
 from collections.abc import Iterable
-from typing import Union, Optional, IO, List, Tuple
+from typing import Sequence, Union, Optional, IO, List, Tuple
 from pathlib import Path
 
 try:
@@ -74,8 +74,14 @@ class DOSCAR(object):  # Version safety
 
     """
 
-    def __init__(self, filename: Union[str, Path, None] = None) -> None:
-        """Initialize."""
+    def __init__(self, filename: Union[str, Path] = "") -> None:
+        """Initialize
+
+        Parameters
+        ----------
+        filename : Union[str, Path, None], optional
+            file name of "DOSCAR"
+        """
         self.natom: int = 0
         self.tdos: Optional[TDOS] = None
         self.pdoses: List[PDOS] = []
@@ -138,7 +144,7 @@ class DOSCAR(object):  # Version safety
         self.energies = tuple([energy - fermi for energy in self.energies])
 
 
-class DOS(Iterable):  # Version safety
+class DOS(Sequence):  # Version safety
     """Class for DOS.
 
     List object consisting two elements.
@@ -170,10 +176,6 @@ class DOS(Iterable):  # Version safety
     ) -> Union[Tuple[float, ...], List[Tuple[float]]]:
         return self.dos[idx]
 
-    def __iter__(self):
-        for d in self.dos:
-            yield d
-
     @property
     def T(self):
         return [*zip(*self.dos)]
@@ -181,8 +183,8 @@ class DOS(Iterable):  # Version safety
     def export_csv(
         self,
         filename: str,
-        header: List[str],
         energy: Union[List[float], Tuple[float, ...]],
+        header: List[str],
     ) -> None:
         """Export data to csv file"""
         assert len(energy) == len(self)
@@ -197,19 +199,21 @@ class DOS(Iterable):  # Version safety
 class TDOS(DOS):
     """Class for total DOS.
 
-    Parameters
-    ----------
-    array: np.array
-        DOS data
-
     Attributes
     ----------
-    header
+    header : List[str]
 
+    dos:
     """
 
     def __init__(self, array: Optional[Tuple[float]]) -> None:
-        """Initialize."""
+        """Initialize
+
+        Parameters
+        ----------
+        array : Optional[Tuple[float]]
+            DOS data
+        """
         super().__init__(array)
         if len(self.dos[0]) == 1:
             self.header: List[str] = ["Energy", "TDOS"]
@@ -222,6 +226,13 @@ class TDOS(DOS):
         for density in self.dos[1:]:
             plt.plot(self.dos[0], density)
         plt.show()
+
+    def export_csv(
+        self,
+        filename: str,
+        energy: Union[List[float], Tuple[float, ...]],
+    ) -> None:
+        return super().export_csv(filename, header=self.header, energy=energy)
 
 
 class PDOS(DOS):
@@ -291,7 +302,6 @@ class PDOS(DOS):
                         else:
                             tmp.append(-energy)
                     self.dos[i] = tmp
-
             elif len(self.dos[0]) == 36:  # SOI
                 self.orbital_spin = [
                     orb + "_" + spin
@@ -332,17 +342,18 @@ class PDOS(DOS):
 
         Parameters
         ----------
-        filename: str
+        filename : str
             filename for output
-
+        energy : Union[List[float], Tuple[float, ...]]
+            Energy data
         """
-        header = ["#Energy"]
+        header = ["Energy"]
         for i in self.orbital_spin:
             if self.site:
                 header.append(self.site + "_" + i)
             else:
                 header.append(i)
-        super(PDOS, self).export_csv(filename, header=header, energy=energy)
+        super().export_csv(filename, energy=energy, header=header)
 
     def plot_dos(
         self, orbitals: Sequence[str], fermi: float = 0.0

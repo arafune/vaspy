@@ -40,7 +40,7 @@ class Test_ispin1_TDOS:
         assert ispin1.tdos[0] == (0.0,)
         assert ispin1.tdos[-1][0] == 0.0
         assert ispin1.tdos[-13][0] == -0.2781e-16
-        assert ispin1.tdos.header == "Energy\tTDOS"
+        assert ispin1.tdos.header == ["Energy", "TDOS"]
 
 
 class Test_ispin2_TDOS:
@@ -51,7 +51,7 @@ class Test_ispin2_TDOS:
         assert ispin2.tdos[0][0] == 0.0
         assert ispin2.tdos[0][0] == 0.0
         assert ispin2.tdos[-3] == (0.6508e01, -0.6492e01)
-        assert ispin2.tdos.header == "Energy\tTDOS_up\tTDOS_down"
+        assert ispin2.tdos.header == ["Energy", "TDOS_up", "TDOS_down"]
 
 
 class Test_ispin2_PDOS(object):
