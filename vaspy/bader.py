@@ -43,7 +43,7 @@ class BaderACF(object):
 
     """
 
-    def __init__(self, filename: Union[str, Path, None] = None) -> None:
+    def __init__(self, filename: Union[str, Path] = "") -> None:
         """Initialize."""
         self.natom = 0
         self.positions: List[List[float]] = []

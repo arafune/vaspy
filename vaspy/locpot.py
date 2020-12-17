@@ -22,9 +22,7 @@ class LOCPOT(mesh3d.VASPGrid):
 
     """
 
-    def __init__(
-        self, filename: Optional[str] = None, pickles: Optional[str] = None
-    ) -> None:
+    def __init__(self, filename: str = "", pickles: Optional[str] = None) -> None:
         """Initialize."""
         super(LOCPOT, self).__init__(filename, pickles)
 

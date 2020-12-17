@@ -18,7 +18,7 @@ class XDATCAR(PosCarHead):
 
     """
 
-    def __init__(self, filename: Union[str, Path, None] = None) -> None:
+    def __init__(self, filename: Union[str, Path] = "") -> None:
         """Initialize.
 
         Parameters

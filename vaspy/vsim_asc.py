@@ -53,7 +53,7 @@ class VSIM_ASC(object):
 
     """
 
-    def __init__(self, filename: Union[str, Path, None] = None) -> None:
+    def __init__(self, filename: Union[str, Path] = "") -> None:
         """Initialize."""
         self.system_name: str = ""
         self.atoms: List[str] = []

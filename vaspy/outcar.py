@@ -48,7 +48,7 @@ class OUTCAR(object):  # Version safety
 
     """
 
-    def __init__(self, filename: Union[str, Path, None] = None) -> None:
+    def __init__(self, filename: Union[str, Path] = "") -> None:
         """Initialize."""
         self.natom = 0
         self.atomtypes: List[str] = []
