@@ -75,7 +75,7 @@ class VSIM_ASC(object):
         """
         phonon_lines = []
         # the first line is system name
-        self.system_name: str = next(thefile)[1:].strip()
+        self.system_name = next(thefile)[1:].strip()
         # the 2nd line represents dxx, dyx, dyy
         dxx, dyx, dyy = [float(x) for x in next(thefile).split()]
         # the 3rd line represents dzx, dzy, dzz
