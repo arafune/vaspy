@@ -161,7 +161,7 @@ class OUTCAR(object):  # Version safety
                     section.append("force")
                 elif "E-fermi" in line:
                     self.fermi = float(line.split()[2])
-                elif "NBANDS" in line:
+                elif "NBANDS=" in line:
                     self.numk = int(line.split()[3])
                     self.nkdim = int(line.split()[9])
                     self.nbands = int(line.split()[14])

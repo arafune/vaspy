@@ -267,6 +267,13 @@ class PDOS(DOS):
         "dz2",
         "dxz",
         "dx2",
+        "f-3",
+        "f-2",
+        "f-1",
+        "f0",
+        "f1",
+        "f2",
+        "f3",
     ]  # << see sphpro.F of vasp sourcev
     spins_soi = ("mT", "mX", "mY", "mZ")
     spins = ("up", "down")
@@ -280,11 +287,11 @@ class PDOS(DOS):
         self.orbital_spin: List[str] = list()
         self.total: List[Tuple[float, ...]] = []
         if array is not None:
-            if len(self.dos[0]) == 9:
+            if len(self.dos[0]) == 9 or len(self.dos[0]) == 16:
                 self.orbital_spin = self.orbitalnames
                 for dos_at_energy in self.dos:
                     self.total.append((sum(dos_at_energy),))
-            elif len(self.dos[0]) == 18:  # Spin resolved
+            elif len(self.dos[0]) == 18 or len(self.dos[0]) == 32:  # Spin resolved
                 self.orbital_spin = [
                     orb + "_" + spin for orb in self.orbitalnames for spin in self.spins
                 ]
@@ -311,6 +318,7 @@ class PDOS(DOS):
                 for dos_at_energy in self.dos:
                     self.total.append((sum(dos_at_energy),))
             else:
+                print(len(self.dos[0]))
                 raise RuntimeError("Check the DOSCAR file")
 
     def projected(self, orbital: Union[str, int]) -> Union[Tuple[float], List[float]]:
