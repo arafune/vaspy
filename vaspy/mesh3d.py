@@ -56,7 +56,7 @@ class VASPGrid(object):
     """
 
     def __init__(
-        self, filename: Union[str, Path, None] = None, pickles: Optional[str] = None
+        self, filename: Union[str, Path] = "", pickles: Optional[str] = None
     ) -> None:
         """Initialize."""
         self.poscar = poscar.POSCAR()

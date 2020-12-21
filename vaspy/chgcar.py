@@ -46,7 +46,7 @@ class CHGCAR(VASPGrid):
     """
 
     def __init__(
-        self, filename: Union[str, Path, None], pickles: Optional[str] = None
+        self, filename: Union[str, Path] = "", pickles: Optional[str] = None
     ) -> None:
         """Initialize."""
         super(CHGCAR, self).__init__(None)

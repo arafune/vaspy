@@ -43,8 +43,14 @@ class BaderACF(object):
 
     """
 
-    def __init__(self, filename: Union[str, Path, None] = None) -> None:
-        """Initialize."""
+    def __init__(self, filename: Union[str, Path] = "") -> None:
+        """Initialize
+
+        Parameters
+        ----------
+        filename : Union[str, Path], optional
+            filename, by default ""
+        """
         self.natom = 0
         self.positions: List[List[float]] = []
         self.charges: List[float] = []
@@ -61,9 +67,8 @@ class BaderACF(object):
 
         Parameters
         ----------
-        thefile: StringIO
+        thefile : IO[Any]
             'ACF.dat' file
-
         """
         # the first line is like:
         #     X     Y     Z     CHARGE      MIN DIST   ATOMIC VOL
