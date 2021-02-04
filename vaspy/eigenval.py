@@ -8,6 +8,7 @@ from pathlib import Path
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
+from numpy.typing import ArrayLike
 from typing import Dict, Optional, Sequence, Tuple, List, IO, Union
 from vaspy.tools import open_by_suffix
 
@@ -36,9 +37,9 @@ class EnergyBand(object):
 
     Attributes
     ----------
-    kvecs: numpy.ndarray
+    kvecs: ArrayLike
         kvectors
-    kdistances: numpy.ndarray
+    kdistances: ArrayLike
         kdisance
     numk: int
         number of kpoints
@@ -46,7 +47,7 @@ class EnergyBand(object):
         number of bands
     nsping: int
         spin character
-    energies: numpy.ndarray
+    energies: ArrayLike
         energies[spin_i, k_i, band_i], where spin_i, k_i, and band_i are spin-,
         k- and band-index, respectively.
     label: dict
@@ -55,9 +56,9 @@ class EnergyBand(object):
 
     Parameters
     ----------
-    kvecs: numpy.ndarray
+    kvecs: ArrayLike
             1D array data of k-vectors.
-    energies: numpy.ndarray
+    energies: ArrayLike
             1D array data of energies
     nspin: int
             number of spin: '1' means No-spin.  '2' means collinear spin,
@@ -74,14 +75,14 @@ class EnergyBand(object):
         nspin: int = 1,
     ) -> None:
         """Initialize."""
-        self.kvecs: np.ndarray = np.array(kvecs)
+        self.kvecs: ArrayLike = np.array(kvecs)
         self.numk: int = len(self.kvecs)
         self.label: Dict["str", List["str"]] = {}
         try:
             self.nbands: int = len(energies) // len(kvecs)
         except ZeroDivisionError:
             self.nbands = 0
-        self.energies: np.ndarray = np.array(energies)
+        self.energies: ArrayLike = np.array(energies)
         self.nspin = nspin
         if self.nspin == 1:  # standard
             self.label["spin"] = [""]
@@ -95,7 +96,7 @@ class EnergyBand(object):
         self.label["k"] = ["#k"]
 
     @property
-    def kdistances(self) -> np.ndarray:
+    def kdistances(self) -> ArrayLike:
         """Return kdistances."""
         return np.cumsum(
             np.linalg.norm(
@@ -253,7 +254,7 @@ class EnergyBand(object):
 
     def to_physical_kvector(
         self,
-        recvec: np.ndarray = np.array(
+        recvec: ArrayLike = np.array(
             ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)),
         ),
     ) -> None:
@@ -261,7 +262,7 @@ class EnergyBand(object):
 
         Parameters
         -----------
-        recvec: array, numpy.ndarray, optional (default is the unit vector)
+        recvec: array, ArrayLike, optional (default is the unit vector)
             reciprocal vector
 
         Notes
@@ -273,8 +274,8 @@ class EnergyBand(object):
         """
         logger.debug("recvec: {}".format(recvec))
         logger.debug("self.kvecs: {}".format(self.kvecs))
-        recvec = np.array(recvec)
-        self.kvecs = np.array([recvec.dot(kvecs) for kvecs in self.kvecs])
+        recvec: ArrayLike = np.array(recvec)
+        self.kvecs: ArrayLike = np.array([recvec.dot(kvecs) for kvecs in self.kvecs])
 
 
 class EIGENVAL(EnergyBand):
@@ -342,8 +343,8 @@ class EIGENVAL(EnergyBand):
                 self.energies.append(
                     [float(i) for i in next(thefile).split()[1 : self.nspin + 1]]
                 )
-        self.kvecs = np.array(self.kvecs)
-        self.energies = np.array(self.energies).T.reshape(
+        self.kvecs: ArrayLike = np.array(self.kvecs)
+        self.energies: ArrayLike = np.array(self.energies).T.reshape(
             self.nspin, self.numk, self.nbands
         )
         thefile.close()

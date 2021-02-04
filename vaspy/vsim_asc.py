@@ -19,6 +19,7 @@ from logging import Formatter, StreamHandler, getLogger
 from typing import IO, Optional, Sequence, Tuple, Union, List
 from pathlib import Path
 import numpy as np
+from numpy.typing import ArrayLike, DTypeLike
 
 # import vaspy.const as const
 from vaspy.tools import open_by_suffix
@@ -58,8 +59,8 @@ class VSIM_ASC(object):
         self.system_name: str = ""
         self.atoms: List[str] = []
         #
-        self.qpts: List[np.ndarray] = []
-        self.freqs: Union[List[float], np.ndarray] = []
+        self.qpts: List[ArrayLike] = []
+        self.freqs: ArrayLike = []
         #
         if filename:
             self.load_file(open_by_suffix(str(filename)))
@@ -126,7 +127,7 @@ class VSIM_ASC(object):
         supercell: Tuple[int, int, int] = (2, 2, 1),
         n_frames: int = 30,
         magnitude: float = 1,
-    ) -> List[np.ndarray]:
+    ) -> List[ArrayLike]:
         """Build data for creating POSCAR etc.
 
         Parameters
@@ -171,7 +172,7 @@ class VSIM_ASC(object):
         return animation_positions
 
 
-def supercell_lattice_vectors(lattice_vectors, cell_id) -> np.ndarray:
+def supercell_lattice_vectors(lattice_vectors, cell_id) -> ArrayLike:
     """Return lattice vectors of supercell.
 
     Parameters
@@ -193,8 +194,8 @@ def supercell_lattice_vectors(lattice_vectors, cell_id) -> np.ndarray:
 
 def animate_atom_phonon(
     position: Sequence[float],
-    qpt_cart: np.ndarray,
-    d_vector: np.ndarray,
+    qpt_cart: ArrayLike,
+    d_vector: ArrayLike,
     n_frames: int = 30,
     s_frame: int = 0,
     e_frame: Optional[int] = None,

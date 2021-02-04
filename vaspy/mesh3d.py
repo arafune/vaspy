@@ -12,6 +12,7 @@ from typing import Optional, IO, Sequence, Tuple, Union
 from pathlib import Path
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 from vaspy import poscar, tools
 from vaspy.tools import open_by_suffix
@@ -261,7 +262,7 @@ class Grid3D(object):
         number of frames
     shape: tuple
         shape[0], shape[1], shape[2]
-    data: list or numpy.ndarray
+    data: ArrayLike
         1D-list or 1D-numpy array.
         The length of grid is shape[0] * shape[1] * shape[2]
 
@@ -275,7 +276,7 @@ class Grid3D(object):
         """Initialize."""
         self.shape = shape
         if data is None:
-            self.data: np.ndarray = np.array([])
+            self.data: ArrayLike = np.array([])
         else:
             self.data = np.array(data)
 
@@ -289,7 +290,7 @@ class Grid3D(object):
         """Return the number of grid frames."""
         return divmod(self.data.size, self.size)[0]
 
-    def frame(self, frame_i: int) -> np.ndarray:
+    def frame(self, frame_i: int) -> ArrayLike:
         """Return the i-th frame.
 
         Parameters
@@ -303,7 +304,7 @@ class Grid3D(object):
         dest.data = self.data.reshape(self.nframe, self.size)[frame_i]
         return dest
 
-    def slice(self, position: int, axis: str = "z", frame_i: int = 0) -> np.ndarray:
+    def slice(self, position: int, axis: str = "z", frame_i: int = 0) -> ArrayLike:
         """
         Parameters
         ----------
@@ -314,7 +315,7 @@ class Grid3D(object):
 
         Return
         ------
-        numpy.ndarray
+        ArrayLike
             2D numpy array that sliced from 3D mesh data.
 
         """
@@ -341,7 +342,7 @@ class Grid3D(object):
         from_coor: Optional[int] = None,
         to_coor: Optional[int] = None,
         frame_i: int = 0,
-    ) -> np.ndarray:
+    ) -> ArrayLike:
         """Return 2D data integrated occupacy along the 'axis'.
 
         Integration range can be specified by from_coor and to_coor.
@@ -358,7 +359,7 @@ class Grid3D(object):
 
         Return
         ------
-        numpy.ndarray
+        ArrayLike
             2D numpy array that integrated from 3D mesh data
 
         """
@@ -413,7 +414,7 @@ class Grid3D(object):
             outputstr += "\n".join(output)
         return outputstr + "\n"
 
-    def average_along_axis(self, axis_name: str, frame_i: int = 0) -> np.ndarray:
+    def average_along_axis(self, axis_name: str, frame_i: int = 0) -> ArrayLike:
         """Calculate average value of potential along 'axis'.
 
         Parameters
@@ -425,7 +426,7 @@ class Grid3D(object):
 
         Returns
         -------
-        numpy.ndarray
+        ArrayLike
             average value along the axis
 
         """
@@ -443,7 +444,7 @@ class Grid3D(object):
             raise ValueError("Wrong axis name set")
         return data
 
-    def min_along_axis(self, axis_name: str, frame_i: int = 0) -> np.ndarray:
+    def min_along_axis(self, axis_name: str, frame_i: int = 0) -> ArrayLike:
         """Calculate minimum value of potential along 'axis'.
 
         Parameters
@@ -455,7 +456,7 @@ class Grid3D(object):
 
         Returns
         -------
-        numpy.ndarray
+        ArrayLike
             minimum value along the axis
 
         """
@@ -473,7 +474,7 @@ class Grid3D(object):
             raise ValueError("Wrong axis name set")
         return data
 
-    def max_along_axis(self, axis_name: str, frame_i: int = 0) -> np.ndarray:
+    def max_along_axis(self, axis_name: str, frame_i: int = 0) -> ArrayLike:
         """Calculate maximum value of potential along 'axis'.
 
         Parameters
@@ -485,7 +486,7 @@ class Grid3D(object):
 
         Returns
         -------
-        numpy.ndarray
+        ArrayLike
             maximum value along the axis
 
         """
@@ -503,7 +504,7 @@ class Grid3D(object):
             raise ValueError("Wrong axis name set")
         return data
 
-    def median_along_axis(self, axis_name: str, frame_i: int = 0) -> np.ndarray:
+    def median_along_axis(self, axis_name: str, frame_i: int = 0) -> ArrayLike:
         """Calculate median value of potential along 'axis'.
 
         Parameters
@@ -515,7 +516,7 @@ class Grid3D(object):
 
         Returns
         -------
-        numpy.ndarray
+        ArrayLike
             median value along the axis
 
         """

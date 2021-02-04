@@ -44,6 +44,7 @@ import re
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 from pathlib import Path
 import numpy as np
+from numpy.typing import ArrayLike
 
 from vaspy import tools
 from vaspy.tools import open_by_suffix
@@ -91,7 +92,9 @@ class PosCarHead:
 
     def __init__(self) -> None:
         """Initialization."""
-        self.__cell_vecs = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
+        self.__cell_vecs: ArrayLike = np.array(
+            [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+        )
         self.system_name: str = ""
         self.scaling_factor: float = 0.0
         self.atomtypes: List[str] = []
@@ -99,7 +102,7 @@ class PosCarHead:
         self.__site_label: List[str] = []
 
     @property
-    def cell_vecs(self) -> np.ndarray:
+    def cell_vecs(self) -> ArrayLike:
         """Return the matrix of the unit cell."""
         return self.__cell_vecs
 
@@ -184,7 +187,7 @@ class PosCarPos(object):
     def __init__(self) -> None:
         """Initialization."""
         self.coordinate_type = ""
-        self.positions: List[np.ndarray] = []
+        self.positions: List[ArrayLike] = []
         self.coordinate_changeflags: List[str] = []
         self.selective: bool = False
 
@@ -210,7 +213,7 @@ class PosCarPos(object):
         """
         return not self.is_cartesian()
 
-    def __getitem__(self, item: Union[int]) -> Union[np.ndarray, List[np.ndarray]]:
+    def __getitem__(self, item: Union[int]) -> ArrayLike:
         return self.positions[item]
 
 
@@ -398,8 +401,8 @@ class POSCAR(PosCarHead, PosCarPos):
     def nearest(
         self,
         array: Sequence[float],
-        point: np.ndarray,
-    ) -> np.ndarray:
+        point: ArrayLike,
+    ) -> ArrayLike:
         """Return the nearest position in the periodic space.
 
         Parameters
@@ -416,7 +419,7 @@ class POSCAR(PosCarHead, PosCarPos):
         return min(array, key=lambda pos: np.linalg.norm(pos - point))
 
     # class method? or independent function?
-    def make27candidate(self, position: Sequence[float]) -> List[np.ndarray]:
+    def make27candidate(self, position: Sequence[float]) -> List[ArrayLike]:
         """Return 27 vectors set correspond the neiboring.
 
         Parameters
@@ -471,7 +474,7 @@ class POSCAR(PosCarHead, PosCarPos):
                 take into account the periodic boundary.
 
         """
-        rotate_at: np.ndarray = _vectorize(center)
+        rotate_at: ArrayLike = _vectorize(center)
         if len(center) != 3:
             raise ValueError
         if not point_in_box(rotate_at / self.scaling_factor, self.cell_vecs):
@@ -480,9 +483,9 @@ class POSCAR(PosCarHead, PosCarPos):
             raise ValueError("argument error in rotate_atom method")
         if not self.is_cartesian():
             self.to_cartesian()
-        position: np.ndarray = self.positions[site]
+        position: ArrayLike = self.positions[site]
         position -= rotate_at / self.scaling_factor
-        rotate: Dict[str, Callable[[float], np.ndarray]] = {
+        rotate: Dict[str, Callable[[float], ArrayLike]] = {
             "x": rotate_x,
             "y": rotate_y,
             "z": rotate_z,
@@ -531,7 +534,7 @@ class POSCAR(PosCarHead, PosCarPos):
             original_is_cartesian = True
             self.to_direct()
         axis_name = axis_name.capitalize()
-        rotate: Dict["str", Callable[[float], np.ndarray]] = {
+        rotate: Dict["str", Callable[[float], ArrayLike]] = {
             "X": rotate_x,
             "Y": rotate_y,
             "Z": rotate_z,
@@ -804,7 +807,7 @@ class POSCAR(PosCarHead, PosCarPos):
 
         Returns
         ---------
-        numpy.ndarray
+        ArrayLike
             Array of Vector that represents "molecule".
 
         Note
@@ -818,7 +821,7 @@ class POSCAR(PosCarHead, PosCarPos):
         option is highly recommended to form a molecule.
 
         """
-        molecule: List[np.ndarray] = [self.positions[j] for j in site_list]
+        molecule: List[ArrayLike] = [self.positions[j] for j in site_list]
         newposes = []
         for index, site in enumerate(site_list):
             target_atom = self.positions[site]
@@ -827,7 +830,7 @@ class POSCAR(PosCarHead, PosCarPos):
             def func(pos: Sequence[float], center: Optional[Sequence[float]]) -> float:
                 molecule[index] = _vectorize(pos)
                 if center is not None:  # bool([np.ndarray]) => Error
-                    center_pos: np.ndarray = _vectorize(center)
+                    center_pos: ArrayLike = _vectorize(center)
                     return np.linalg.norm(_vectorize(pos) - center_pos)
                 # fixme!! when the highest symmetry point
                 # can be detemined from the position list,
@@ -848,7 +851,7 @@ class POSCAR(PosCarHead, PosCarPos):
 
     def translate(
         self, vector: Sequence[float], atomlist: Sequence[int]
-    ) -> List[np.ndarray]:
+    ) -> List[ArrayLike]:
         """Translate the selected atom(s) by vector.
 
         Parameters
@@ -865,12 +868,12 @@ class POSCAR(PosCarHead, PosCarPos):
 
         Returns
         --------
-        numpy.ndarray
+        ArrayLike
                 position
 
         """
         if self.is_cartesian():
-            vector_array: np.ndarray = _vectorize(vector)
+            vector_array: ArrayLike = _vectorize(vector)
             for i in atomlist:
                 self.positions[i] = (
                     self.positions[i] + vector_array / self.scaling_factor
@@ -886,7 +889,7 @@ class POSCAR(PosCarHead, PosCarPos):
         return self.positions
 
     @property
-    def axes_lengthes(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def axes_lengthes(self) -> Tuple[ArrayLike, ArrayLike, ArrayLike]:
         """Return cell axis lengthes.
 
         Returns
@@ -895,9 +898,9 @@ class POSCAR(PosCarHead, PosCarPos):
             cell axis length of x, y, and z
 
         """
-        cell_x = np.linalg.norm(self.cell_vecs[0] * self.scaling_factor)
-        cell_y = np.linalg.norm(self.cell_vecs[1] * self.scaling_factor)
-        cell_z = np.linalg.norm(self.cell_vecs[2] * self.scaling_factor)
+        cell_x: ArrayLike = np.linalg.norm(self.cell_vecs[0] * self.scaling_factor)
+        cell_y: ArrayLike = np.linalg.norm(self.cell_vecs[1] * self.scaling_factor)
+        cell_z: ArrayLike = np.linalg.norm(self.cell_vecs[2] * self.scaling_factor)
         return (cell_x, cell_y, cell_z)
 
     def translate_all(self, vector: Sequence[float]) -> None:
@@ -947,15 +950,15 @@ def point_in_box(point: Sequence[float], cell_vecs: Sequence[float]) -> bool:
 
     """
     if three_by_three(cell_vecs):
-        thepoint = np.array(point).flatten()
-        cell_vectors = np.array(cell_vecs)
-        result = np.dot(np.linalg.inv(cell_vectors.T), thepoint)
+        thepoint: ArrayLike = np.array(point).flatten()
+        cell_vectors: ArrayLike = np.array(cell_vecs)
+        result: float = np.dot(np.linalg.inv(cell_vectors.T), thepoint)
         return all((0 <= float(q) <= 1) for q in result)
     else:
         raise TypeError
 
 
-def rotate_x(theta_deg: float) -> np.ndarray:
+def rotate_x(theta_deg: float) -> ArrayLike:
     """Rotation matrix around X-axis.
 
     Parameters
@@ -965,7 +968,7 @@ def rotate_x(theta_deg: float) -> np.ndarray:
 
     Returns
     -------
-    numpy.ndarray
+    ArrayLike
         rotation matrix (Around X)
 
     Example
@@ -986,7 +989,7 @@ def rotate_x(theta_deg: float) -> np.ndarray:
     )
 
 
-def rotate_y(theta_deg: float) -> np.ndarray:
+def rotate_y(theta_deg: float) -> ArrayLike:
     """Rotation matrix around Y-axis.
 
     Parameters
@@ -1017,7 +1020,7 @@ def rotate_y(theta_deg: float) -> np.ndarray:
     )
 
 
-def rotate_z(theta_deg: float) -> np.ndarray:
+def rotate_z(theta_deg: float) -> ArrayLike:
     """Rotation matrix around Z-axis.
 
     Parameters
@@ -1066,10 +1069,10 @@ def three_by_three(vec: Sequence[float]) -> bool:
         return False
     if len(vec) != 3:
         return False
-    return [3, 3, 3] == [len(i) for i in vec]
+    return [3, 3, 3] == [len(_) for _ in vec]
 
 
-def _vectorize(vector: Sequence[float]) -> np.ndarray:
+def _vectorize(vector: Sequence[float]) -> ArrayLike:
     """Return np.ndarray object
 
     Parameters
@@ -1079,7 +1082,7 @@ def _vectorize(vector: Sequence[float]) -> np.ndarray:
 
     Returns
     ----------
-    np.ndarray
+    ArrayLike
         Numpy array (flatten)
     """
 

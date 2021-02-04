@@ -11,6 +11,7 @@ import itertools
 from re import T
 from typing import Optional, Sequence, Tuple
 import numpy as np
+from numpy.typing import ArrayLike
 from mayavi import mlab
 
 from vaspy import tools, const
@@ -376,8 +377,8 @@ def _find_diagonal_indexes(n_grids, crystal_axes):
 
 def reallocate_to_labframe(
     mesh_in_direct_coor: Tuple[int, ...],
-    crystal_axes: np.ndarray,
-    volume_data: np.ndarray,
+    crystal_axes: ArrayLike,
+    volume_data: ArrayLike,
     no_roll: bool = False,
 ):
     """Return the volume mesh data in lab frame (Cartesian coordinate).

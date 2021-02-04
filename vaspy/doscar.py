@@ -250,7 +250,7 @@ class PDOS(DOS):
 
     Parameters
     -----------
-    array: numpy.ndarray
+    array: List[Tuple[float, ...]]
         DOS data
     site: str
         site name
