@@ -17,10 +17,10 @@ from typing import IO, List, Optional, Sequence, Tuple, Union
 from pathlib import Path
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 from vaspy.eigenval import EnergyBand
 from vaspy.tools import open_by_suffix
-from numpy import ndarray
 
 # logger
 LOGLEVEL = INFO
@@ -45,9 +45,9 @@ class ProjectionBand(EnergyBand):
     -----------
     natom: int
         number of atoms
-    proj: numpy.ndarray
+    proj: ArrayLike
         Orbital projection. proj[spin_i, k_i, band_i, site_i, orbital_i]
-    phase: numpy.ndarray
+    phase: ArrayLike
         Phase data.  phase[spin_i, k_i, band_i, site_i, orbital_i]
 
     """
@@ -56,8 +56,8 @@ class ProjectionBand(EnergyBand):
         self,
         kvecs: Sequence[float] = (),
         energies: Sequence[float] = (),
-        proj: Optional[ndarray] = None,
-        phase: Optional[ndarray] = None,
+        proj: Optional[ArrayLike] = None,
+        phase: Optional[ArrayLike] = None,
         nspin: int = 1,
     ) -> None:
         """Initialize."""
@@ -66,7 +66,7 @@ class ProjectionBand(EnergyBand):
         self.proj = proj
         self.phase = phase
 
-    def append_sumsite(self, sites: Tuple[int, int], site_name: str) -> np.ndarray:
+    def append_sumsite(self, sites: Tuple[int, int], site_name: str) -> ArrayLike:
         """Append site-sum results.
 
         After this method, shape changes as following
@@ -93,13 +93,13 @@ class ProjectionBand(EnergyBand):
         self.label["site"].append(site_name)
         logger.debug("self.label: {}".format(self.label))
         #    spin, k, band, atom
-        sumsite: np.ndarray = self.proj[:, :, :, sites, :].sum(axis=-2, keepdims=True)
+        sumsite: ArrayLike = self.proj[:, :, :, sites, :].sum(axis=-2, keepdims=True)
         self.proj = np.concatenate((self.proj, sumsite), axis=-2)
         return sumsite
 
     def append_sumorbital(
         self, orbitals: Union[Tuple[int, ...], int], orbital_name: str
-    ) -> Optional[ndarray]:
+    ) -> Optional[ArrayLike]:
         """Append orbital-sum results.
 
         After this method, shape changes as following
