@@ -1,3 +1,8 @@
+2021-02-04 Ryuichi Arafune <ryuchi.arafune@gmail.com>
+  * Version 0.6.0
+  * Bug fix
+  * Type annotation of numpy (Numpy 1.20 or higher)
+
 2020-08-19  Ryuichi Arafune  <ryuichi.arafune@gmail.com>
   * Version 0.5.5
   * Bug fix

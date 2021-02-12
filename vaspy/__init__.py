@@ -43,7 +43,7 @@ __all__: List[str] = [
     "incar",
 ]
 
-__version__: str = "0.5.5"
+__version__: str = "0.6.0"
 
 
 def load(

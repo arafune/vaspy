@@ -117,7 +117,7 @@ class PosCarHead:
 
         """
         if three_by_three(vec):
-            self.__cell_vecs = np.array(vec)
+            self.__cell_vecs: ArrayLike = np.array(vec)
         else:
             raise TypeError
 
