@@ -104,7 +104,7 @@ class OUTCAR(object):  # Version safety
         """
         # local variables
         section: List[str] = []
-        posforce = []
+        posforce: List[str] = []
         magnetizations: List[List[float]] = []
         total_charges: List[List[float]] = []
         kvec_weight = []
@@ -235,7 +235,7 @@ class OUTCAR(object):  # Version safety
 
         """
         if sites == () or sites[0] == []:
-            selected_sites = range(1, self.natom + 1)
+            selected_sites: Sequence[int] = range(1, self.natom + 1)
         if isinstance(sites[0], (list, tuple)):
             selected_sites = [n for n in sites[0]]
         return [

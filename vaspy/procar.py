@@ -117,7 +117,9 @@ class ProjectionBand(EnergyBand):
             return None
         self.label["orbital"].append(orbital_name)
         #    spin, k, band, atom
-        sumorbital = self.proj[:, :, :, :, orbitals].sum(axis=-1, keepdims=True)
+        sumorbital: ArrayLike = self.proj[:, :, :, :, orbitals].sum(
+            axis=-1, keepdims=True
+        )
         self.proj = np.concatenate((self.proj, sumorbital), axis=-1)
         return sumorbital
 

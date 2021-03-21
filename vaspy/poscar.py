@@ -117,7 +117,7 @@ class PosCarHead:
 
         """
         if three_by_three(vec):
-            self.__cell_vecs: ArrayLike = np.array(vec)
+            self.__cell_vecs = np.array(vec)
         else:
             raise TypeError
 
@@ -152,7 +152,7 @@ class PosCarHead:
         #     ii += n
         # return self.__site_label
         self.__site_label = []
-        atomnames = []
+        atomnames: List[str] = []
         for elm, atomnums in zip(self.atomtypes, self.atomnums):
             for j in range(1, atomnums + 1):
                 elem_num = elm + str(j)
@@ -898,9 +898,9 @@ class POSCAR(PosCarHead, PosCarPos):
             cell axis length of x, y, and z
 
         """
-        cell_x: ArrayLike = np.linalg.norm(self.cell_vecs[0] * self.scaling_factor)
-        cell_y: ArrayLike = np.linalg.norm(self.cell_vecs[1] * self.scaling_factor)
-        cell_z: ArrayLike = np.linalg.norm(self.cell_vecs[2] * self.scaling_factor)
+        cell_x: float = np.linalg.norm(self.cell_vecs[0] * self.scaling_factor)
+        cell_y: float = np.linalg.norm(self.cell_vecs[1] * self.scaling_factor)
+        cell_z: float = np.linalg.norm(self.cell_vecs[2] * self.scaling_factor)
         return (cell_x, cell_y, cell_z)
 
     def translate_all(self, vector: Sequence[float]) -> None:

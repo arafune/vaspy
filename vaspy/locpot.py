@@ -6,6 +6,7 @@ import sys
 from typing import Optional
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 from vaspy import mesh3d
 
@@ -42,7 +43,9 @@ class LOCPOT(mesh3d.VASPGrid):
         axis_name = axis_name.capitalize()
         axes_length = self.poscar.axes_lengthes
         if axis_name == "X":
-            horizontal_axis = np.linspace(0, axes_length[0], self.grid.shape[0])
+            horizontal_axis: ArrayLike = np.linspace(
+                0, axes_length[0], self.grid.shape[0]
+            )
             plt.clf()
             plt.xlim(xmax=axes_length[0])
         elif axis_name == "Y":

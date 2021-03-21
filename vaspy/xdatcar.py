@@ -6,7 +6,7 @@ import numpy as np
 from vaspy.poscar import PosCarHead
 from vaspy.tools import open_by_suffix
 from pathlib import Path
-from typing import IO, Optional, Union
+from typing import IO, Union
 
 
 class XDATCAR(PosCarHead):
