@@ -417,7 +417,7 @@ class PROCAR(ProjectionBand):  # Version safety
             Check your INCAR the calculations.\n"
 
         self.kvecs = []
-        energies = []
+        energies: List[float] = []
         orbitals = ""
         phase_r = ""
         phase_i = ""
