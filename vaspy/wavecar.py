@@ -219,8 +219,8 @@ class WAVECAR(object):
         """
 
         kvec = self.kvecs[k_i]
-        kgrid = []
-        kgrid = make_kgrid(self.ngrid, self.gamma, para=PARALLEL)
+        # kgrid = []
+        kgrid: ArrayLike = make_kgrid(self.ngrid, self.gamma, para=PARALLEL)
         hbar2over2m = 13.605826 * 0.529177249 * 0.529177249
         energy_k = (
             hbar2over2m
@@ -457,7 +457,7 @@ def make_kgrid(
     fy = [ii if ii < ngrid[1] // 2 + 1 else ii - ngrid[1] for ii in range(ngrid[1])]
     fz = [ii if ii < ngrid[2] // 2 + 1 else ii - ngrid[2] for ii in range(ngrid[2])]
     if gamma and para:
-        kgrid = np.array(
+        kgrid: ArrayLike = np.array(
             [
                 (fx[ix], fy[iy], fz[iz])
                 for iz in range(ngrid[2])
