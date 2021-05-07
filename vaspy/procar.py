@@ -392,7 +392,7 @@ class PROCAR(ProjectionBand):  # Version safety
     """
 
     def __init__(
-        self, filename: Union[str, Path, None] = None, phase_read: bool = False
+        self, filename: Union[str, Path] = "", phase_read: bool = False
     ) -> None:
         """Initialize."""
         super(PROCAR, self).__init__()
