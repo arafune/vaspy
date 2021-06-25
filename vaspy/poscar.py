@@ -49,15 +49,12 @@ from numpy.typing import NDArray
 from vaspy import tools
 from vaspy.tools import open_by_suffix
 from typing import (
-    List,
     Sequence,
-    Tuple,
     Any,
     Union,
     Optional,
     IO,
     Generator,
-    Dict,
     Callable,
 )
 
@@ -97,9 +94,9 @@ class PosCarHead:
         )
         self.system_name: str = ""
         self.scaling_factor: float = 0.0
-        self.atomtypes: List[str] = []
-        self.atomnums: List[int] = []
-        self.__site_label: List[str] = []
+        self.atomtypes: list[str] = []
+        self.atomnums: list[int] = []
+        self.__site_label: list[str] = []
 
     @property
     def cell_vecs(self) -> NDArray[np.float64]:
@@ -142,7 +139,7 @@ class PosCarHead:
             raise TypeError
 
     @property
-    def site_label(self) -> List[str]:
+    def site_label(self) -> list[str]:
         """Return list style of "site_label" (e.g.  "#0:Ag1")."""
         # self.__site_label = []
         # ii = 1
@@ -152,7 +149,7 @@ class PosCarHead:
         #     ii += n
         # return self.__site_label
         self.__site_label = []
-        atomnames: List[str] = []
+        atomnames: list[str] = []
         for elm, atomnums in zip(self.atomtypes, self.atomnums):
             for j in range(1, atomnums + 1):
                 elem_num = elm + str(j)
@@ -168,7 +165,7 @@ class PosCarHead:
         return self.__site_label
 
     @site_label.setter
-    def site_label(self, value: List[str]) -> None:
+    def site_label(self, value: list[str]) -> None:
         self.__site_label = value
 
 
@@ -187,8 +184,8 @@ class PosCarPos(object):
     def __init__(self) -> None:
         """Initialization."""
         self.coordinate_type = ""
-        self.positions: List[NDArray[np.float64]] = []
-        self.coordinate_changeflags: List[str] = []
+        self.positions: list[NDArray[np.float64]] = []
+        self.coordinate_changeflags: list[str] = []
         self.selective: bool = False
 
     def is_cartesian(self) -> bool:
@@ -244,12 +241,12 @@ class POSCAR(PosCarHead, PosCarPos):
         super(POSCAR, self).__init__()
         PosCarPos.__init__(self)
         if isinstance(arg, (str, Path)):
-            poscar: Union[Tuple[str, ...], List[str]] = open_by_suffix(arg).readlines()
+            poscar: Union[tuple[str, ...], list[str]] = open_by_suffix(arg).readlines()
             self.load_array(poscar)
         if isinstance(arg, (list, tuple)):
             self.load_array(arg)
 
-    def load_array(self, input_poscar: Union[List[str], Tuple[str, ...]]) -> None:
+    def load_array(self, input_poscar: Union[list[str], tuple[str, ...]]) -> None:
         """Parse POSCAR as list.
 
         Parameters
@@ -264,7 +261,7 @@ class POSCAR(PosCarHead, PosCarPos):
         self.cell_vecs[0] = [float(x) for x in next(poscar).split()]
         self.cell_vecs[1] = [float(x) for x in next(poscar).split()]
         self.cell_vecs[2] = [float(x) for x in next(poscar).split()]
-        self.atomtypes: List[str] = next(poscar).split()
+        self.atomtypes: list[str] = next(poscar).split()
         # parse POSCAR evenif the element names are not set.
         # At present, the String representation number
         #   are used for the  dummy name.
@@ -419,7 +416,7 @@ class POSCAR(PosCarHead, PosCarPos):
         return min(array, key=lambda pos: np.linalg.norm(pos - point))
 
     # class method? or independent function?
-    def make27candidate(self, position: Sequence[float]) -> List[NDArray[np.float64]]:
+    def make27candidate(self, position: Sequence[float]) -> list[NDArray[np.float64]]:
         """Return 27 vectors set correspond the neiboring.
 
         Parameters
@@ -485,7 +482,7 @@ class POSCAR(PosCarHead, PosCarPos):
             self.to_cartesian()
         position: NDArray[np.float64] = self.positions[site]
         position -= rotate_at / self.scaling_factor
-        rotate: Dict[str, Callable[[float], NDArray[np.float64]]] = {
+        rotate: dict[str, Callable[[float], NDArray[np.float64]]] = {
             "x": rotate_x,
             "y": rotate_y,
             "z": rotate_z,
@@ -534,7 +531,7 @@ class POSCAR(PosCarHead, PosCarPos):
             original_is_cartesian = True
             self.to_direct()
         axis_name = axis_name.capitalize()
-        rotate: Dict["str", Callable[[float], NDArray[np.float64]]] = {
+        rotate: dict["str", Callable[[float], NDArray[np.float64]]] = {
             "X": rotate_x,
             "Y": rotate_y,
             "Z": rotate_z,
@@ -591,7 +588,7 @@ class POSCAR(PosCarHead, PosCarPos):
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
         return dest_poscar
 
-    def split(self, indexes: Sequence[int]) -> Tuple[POSCAR, POSCAR]:
+    def split(self, indexes: Sequence[int]) -> tuple[POSCAR, POSCAR]:
         """Split into two POSCAR object.
 
         Useful for differential charge distribution calculations.
@@ -671,7 +668,7 @@ class POSCAR(PosCarHead, PosCarPos):
             dest_poscar.to_direct()
         return dest_poscar
 
-    def to_list(self) -> List[Any]:
+    def to_list(self) -> list[Any]:
         """Return POSCAR as list.
 
         Returns
@@ -680,7 +677,7 @@ class POSCAR(PosCarHead, PosCarPos):
             a list representation of POSCAR.
 
         """
-        out_list: List[Any] = []
+        out_list: list[Any] = []
         out_list.append(self.system_name)
         out_list.append(self.scaling_factor)
         out_list.append(self.cell_vecs[0])
@@ -821,7 +818,7 @@ class POSCAR(PosCarHead, PosCarPos):
         option is highly recommended to form a molecule.
 
         """
-        molecule: List[NDArray[np.float64]] = [self.positions[j] for j in site_list]
+        molecule: list[NDArray[np.float64]] = [self.positions[j] for j in site_list]
         newposes = []
         for index, site in enumerate(site_list):
             target_atom = self.positions[site]
@@ -851,7 +848,7 @@ class POSCAR(PosCarHead, PosCarPos):
 
     def translate(
         self, vector: Sequence[float], atomlist: Sequence[int]
-    ) -> List[NDArray[np.float64]]:
+    ) -> list[NDArray[np.float64]]:
         """Translate the selected atom(s) by vector.
 
         Parameters
@@ -889,7 +886,7 @@ class POSCAR(PosCarHead, PosCarPos):
         return self.positions
 
     @property
-    def axes_lengthes(self) -> Tuple[float, float, float]:
+    def axes_lengthes(self) -> tuple[float, float, float]:
         """Return cell axis lengthes.
 
         Returns

@@ -9,7 +9,7 @@ This program is not a part of vasp but it deeply connects with the vasp.
 
 from __future__ import division  # Version safety
 from __future__ import print_function
-from typing import IO, Any, List, Union
+from typing import IO, Any, Union
 from pathlib import Path
 from vaspy.tools import open_by_suffix
 
@@ -52,10 +52,10 @@ class BaderACF(object):
             filename, by default ""
         """
         self.natom = 0
-        self.positions: List[List[float]] = []
-        self.charges: List[float] = []
-        self.mindists: List[float] = []
-        self.vols: List[float] = []
+        self.positions: list[list[float]] = []
+        self.charges: list[float] = []
+        self.mindists: list[float] = []
+        self.vols: list[float] = []
         self.vaccharge: float = 0.0
         self.vacvol: float = 0.0
         self.nelectron: float = 0.0

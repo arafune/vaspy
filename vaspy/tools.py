@@ -10,7 +10,7 @@ import os
 import re
 import numpy as np
 from numpy.typing import NDArray
-from typing import List, Iterable, Sequence, Tuple, Union, IO, Any, Optional
+from typing import Iterable, Sequence, Union, IO, Any, Optional
 
 
 def open_by_suffix(filename: str) -> IO[str]:
@@ -39,7 +39,7 @@ _RESINGLE = re.compile(r"\d+")
 
 def atom_selection_to_list(
     input_str: str, number: bool = True
-) -> List[Union[int, str]]:
+) -> list[Union[int, str]]:
     """Return list of ordered "String" represents the number.
 
     Parameters
@@ -77,7 +77,7 @@ def atom_selection_to_list(
 
 def atomtypes_atomnums_to_atoms(
     atomtypes: Iterable[str], atomnums: Iterable[int]
-) -> Tuple[str, ...]:
+) -> tuple[str, ...]:
     """Return list representation for atom in use.
 
     Parameters
@@ -102,7 +102,7 @@ def atomtypes_atomnums_to_atoms(
     return tuple(atoms)
 
 
-def atoms_to_atomtypes_atomnums(atoms: List[str]) -> Tuple[List[str], List[int]]:
+def atoms_to_atomtypes_atomnums(atoms: list[str]) -> tuple[list[str], list[int]]:
     r"""Return atomnums and atomtypes list.
 
     Returns
@@ -121,8 +121,8 @@ def atoms_to_atomtypes_atomnums(atoms: List[str]) -> Tuple[List[str], List[int]]
 
     """
     thelast = ""
-    atomnums: List[int] = []
-    atomtypes: List[str] = []
+    atomnums: list[int] = []
+    atomtypes: list[str] = []
     while atoms:
         atom = atoms.pop(0)
         if thelast == atom:
@@ -165,7 +165,7 @@ def cuboid(crystal_axes: Sequence[float]) -> NDArray[np.float64]:
 if __name__ == "__main__":
     import argparse
 
-    def EACH_SLICE_DEMO(L: Sequence[Any], n: int) -> List[Any]:
+    def EACH_SLICE_DEMO(L: Sequence[Any], n: int) -> list[Any]:
         return list(each_slice(L, n))
 
     demo = {

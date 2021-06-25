@@ -6,7 +6,7 @@ translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 from __future__ import annotations
 
 import copy
-from typing import Optional, IO, Union, List
+from typing import Optional, IO, Union
 from pathlib import Path
 from vaspy.mesh3d import VASPGrid
 from vaspy.tools import open_by_suffix
@@ -50,7 +50,7 @@ class CHGCAR(VASPGrid):
     ) -> None:
         """Initialize."""
         super(CHGCAR, self).__init__(None)
-        self.spin: List[str] = [""]
+        self.spin: list[str] = [""]
         if filename:
             self.load_file(open_by_suffix(str(filename)), pickles)
 

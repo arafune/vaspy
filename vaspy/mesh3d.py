@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import copy
 import os
-from typing import Optional, IO, Sequence, Tuple, Union, List
+from typing import Optional, IO, Sequence, Union
 from pathlib import Path
 
 import numpy as np
@@ -62,7 +62,7 @@ class VASPGrid(object):
         """Initialize."""
         self.poscar = poscar.POSCAR()
         self.grid = Grid3D()
-        self.additional: List[Optional[str]] = []
+        self.additional: list[Optional[str]] = []
         if filename:
             self.load_file(open_by_suffix(str(filename)), pickles)
 
@@ -79,7 +79,7 @@ class VASPGrid(object):
 
         """
         separator: str = ""
-        tmp: List[str] = []
+        tmp: list[str] = []
         griddata = ""
         # read POSCAR part
         line: str = thefile.readline()
@@ -270,7 +270,7 @@ class Grid3D(object):
 
     def __init__(
         self,
-        shape: Tuple[int, ...] = (0, 0, 0),
+        shape: tuple[int, ...] = (0, 0, 0),
         data: Optional[Sequence[float]] = None,
     ) -> None:
         """Initialize."""

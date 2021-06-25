@@ -8,7 +8,7 @@ from collections.abc import Mapping
 import pprint
 import re
 from pathlib import Path
-from typing import Any, Dict, Generator, IO, List, Tuple, Union
+from typing import Any, Generator, IO, Union
 from vaspy.tools import open_by_suffix
 
 # logger
@@ -24,7 +24,7 @@ logger.addHandler(handler)
 logger.propagate = False
 
 
-tags: Dict[str, List[str]] = {}
+tags: dict[str, list[str]] = {}
 tags["generic"] = [
     "SYSTEM",
     "ISTART",
@@ -95,11 +95,11 @@ bool_ = [
     "LEPSILON",
 ]
 str_ = ["SYSTEM", "PREC", "LREAL", "GGA", "ALGO"]
-# RWIGS and EINT are Tuple of float, SAXIS is Tuple of int
+# RWIGS and EINT are tuple of float, SAXIS is tuple of int
 str_2 = ["RWIGS", "SAXIS", "EINT", "LDATYPE", "LDAUL", "LDAUU", "LDAUJ", "MAGMOM"]
 
 
-def remove_sharp(str_: str) -> Tuple[str, bool]:
+def remove_sharp(str_: str) -> tuple[str, bool]:
     """Remvoe # / ! from the string head.
 
     Parameters
@@ -125,8 +125,8 @@ class Incar(Mapping):
         filename: str, pathlib.Path
             filename of INCAR
         """
-        self._incar: Dict[str, Tuple[Union[str, int, float], bool]] = {}
-        self.additional_comments: Dict[str, str] = {}
+        self._incar: dict[str, tuple[Union[str, int, float], bool]] = {}
+        self.additional_comments: dict[str, str] = {}
         #
         if filename:
             self.load_file(open_by_suffix(str(filename)))
@@ -139,7 +139,7 @@ class Incar(Mapping):
         thefile: StringIO
             "INCAR" file
         """
-        incar: Dict[str, Tuple[str, bool]] = {}
+        incar: dict[str, tuple[str, bool]] = {}
         for line in thefile:
             line, active = remove_sharp(line)
             if "=" in line:
@@ -180,11 +180,11 @@ class Incar(Mapping):
         for key in self._incar:
             yield key
 
-    def __getitem__(self, key_item: str) -> Tuple[Union[str, int, float], bool]:
+    def __getitem__(self, key_item: str) -> tuple[Union[str, int, float], bool]:
         return self._incar.__getitem__(key_item)
 
     def __setitem__(
-        self, key_item: str, value_item: Tuple[Union[str, int, float], bool]
+        self, key_item: str, value_item: tuple[Union[str, int, float], bool]
     ) -> None:
         self._incar.__setitem__(key_item, value_item)
 
@@ -244,7 +244,7 @@ class Incar(Mapping):
         str
             Check messages
         """
-        checks: Dict[str, Union[bool, int, float, str]] = {
+        checks: dict[str, Union[bool, int, float, str]] = {
             'When ICHARG = 11, Recommend "LWAVE = .FALSE, LCHARG = .FALSE"\n': (
                 self.active("ICHARG") == 11
                 and (

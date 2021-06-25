@@ -9,7 +9,7 @@ from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
 from numpy.typing import NDArray
-from typing import Dict, Optional, Sequence, Tuple, List, IO, Union
+from typing import Optional, Sequence, IO, Union
 from vaspy.tools import open_by_suffix
 
 try:
@@ -77,7 +77,7 @@ class EnergyBand(object):
         """Initialize."""
         self.kvecs: NDArray[np.float64] = np.array(kvecs)
         self.numk: int = len(self.kvecs)
-        self.label: Dict["str", List["str"]] = {}
+        self.label: dict["str", list["str"]] = {}
         try:
             self.nbands: int = len(energies) // len(kvecs)
         except ZeroDivisionError:
@@ -118,7 +118,7 @@ class EnergyBand(object):
         """
         self.energies -= fermi
 
-    def make_label(self, *keys: str) -> List[str]:
+    def make_label(self, *keys: str) -> list[str]:
         """Return array the used for label for CSV-like data.
 
         Parameters
@@ -126,13 +126,13 @@ class EnergyBand(object):
         keys: tuple
             key tuple used for label
         """
-        label_list: List[str] = []
+        label_list: list[str] = []
         for key in keys:
             for tmp in self.label[key]:
                 label_list.append(tmp)
         return label_list
 
-    def to_3dlist(self) -> List[List[List[float]]]:
+    def to_3dlist(self) -> list[list[list[float]]]:
         """Return 3D mentional list.
 
         list[band_i, [k_i, energy, (energy_down)]]
@@ -140,9 +140,9 @@ class EnergyBand(object):
         This list format would be useful for str output
 
         """
-        bandstructure: List[List[float]] = []
+        bandstructure: list[list[float]] = []
         for energies in self.energies.T.tolist():
-            band: List[float] = []
+            band: list[float] = []
             for k, energy in zip(self.kdistances[:, np.newaxis].tolist(), energies):
                 k.extend(energy)
                 band.append(k)
@@ -230,7 +230,7 @@ class EnergyBand(object):
         return plt.gca()
 
     def show(
-        self, yrange: Optional[Tuple[float, float]] = None, spin_i: int = 0
+        self, yrange: Optional[tuple[float, float]] = None, spin_i: int = 0
     ) -> None:  # How to set default value?
         """Draw band structure by using maptlotlib.
 
@@ -305,7 +305,7 @@ class EIGENVAL(EnergyBand):
         if filename:
             self.load_file(open_by_suffix(str(filename)))
 
-    def __getitem__(self, item: int) -> Tuple[List[float], List[List[float]]]:
+    def __getitem__(self, item: int) -> tuple[list[float], list[list[float]]]:
         """
 
         Parameters
@@ -315,10 +315,10 @@ class EIGENVAL(EnergyBand):
 
         Returns
         -------
-        Tuple of list of float and list of float
+        tuple of list of float and list of float
         """
-        energies: List[List[List[float]]] = self.energies.transpose(1, 2, 0).tolist()
-        kvec: List[List[float]] = self.kvecs.tolist()
+        energies: list[list[list[float]]] = self.energies.transpose(1, 2, 0).tolist()
+        kvec: list[list[float]] = self.kvecs.tolist()
         return list(zip(kvec, energies))[item]
 
     def __len__(self) -> int:
@@ -337,8 +337,8 @@ class EIGENVAL(EnergyBand):
         next(thefile)
         next(thefile)
         _, self.numk, self.nbands = [int(i) for i in next(thefile).split()]
-        kvecs: List[List[float]] = []
-        energies: List[List[float]] = []
+        kvecs: list[list[float]] = []
+        energies: list[list[float]] = []
         for _ in range(self.numk):
             # the first line in the sigleset begins with the blank
             next(thefile)

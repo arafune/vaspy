@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Module for WAVECAR class."""
 
-from typing import IO, Optional, Sequence, Tuple, Union
+from typing import IO, Optional, Sequence, Union
 
 import numpy as np
 from numpy.typing import DTypeLike, NDArray
@@ -272,7 +272,7 @@ class WAVECAR(object):
         ngrid: Optional[NDArray[np.float64]] = None,
         norm: bool = False,
         poscar: poscar.POSCAR = poscar.POSCAR(),
-    ) -> Union[NDArray[np.float64], Tuple[NDArray, NDArray], VASPGrid]:
+    ) -> Union[NDArray[np.float64], tuple[NDArray, NDArray], VASPGrid]:
         r"""Return the pseudo-wavefunction in real space.
 
         Calculate the pseudo-wavefunction of the KS states in

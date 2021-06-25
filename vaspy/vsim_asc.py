@@ -16,7 +16,7 @@ The first is absolutely required.
 import itertools
 import logging
 from logging import Formatter, StreamHandler, getLogger
-from typing import IO, Optional, Sequence, Tuple, Union, List
+from typing import IO, Optional, Sequence, Union
 from pathlib import Path
 import numpy as np
 from numpy.typing import DTypeLike, NDArray
@@ -43,11 +43,11 @@ class VSIM_ASC(object):
     atoms: list
         Atoms used
     positions: list
-        List of atom position in static
+        list of atom position in static
     qpts: list
-        List of qvectors
+        list of qvectors
     freqs: list
-        List of phonon frequencies
+        list of phonon frequencies
     d_vectors: np.array
         d_vectors[mode#][atom#] returns the displacement (complex) vector
     lattice.vectors: np.array
@@ -57,10 +57,10 @@ class VSIM_ASC(object):
     def __init__(self, filename: Union[str, Path] = "") -> None:
         """Initialize."""
         self.system_name: str = ""
-        self.atoms: List[str] = []
+        self.atoms: list[str] = []
         #
-        self.qpts: List[NDArray[np.float64]] = []
-        self.freqs: List[float] = []
+        self.qpts: list[NDArray[np.float64]] = []
+        self.freqs: list[float] = []
         #
         if filename:
             self.load_file(open_by_suffix(str(filename)))
@@ -128,10 +128,10 @@ class VSIM_ASC(object):
     def build_phono_motion(
         self,
         mode: int = 0,
-        supercell: Tuple[int, int, int] = (2, 2, 1),
+        supercell: tuple[int, int, int] = (2, 2, 1),
         n_frames: int = 30,
         magnitude: float = 1,
-    ) -> List[NDArray[np.float64]]:
+    ) -> list[NDArray[np.float64]]:
         """Build data for creating POSCAR etc.
 
         Parameters
@@ -227,7 +227,7 @@ def animate_atom_phonon(
     Returns
     ---------
     positions: list
-        List of atom position representing animation
+        list of atom position representing animation
 
     """
     position0: NDArray[np.array64] = np.array(position)  # for safe

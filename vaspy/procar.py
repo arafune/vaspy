@@ -13,7 +13,7 @@ This module provides PROCAR, ProjectionBand classes.
 import csv
 import re
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
-from typing import IO, List, Optional, Sequence, Tuple, Union
+from typing import IO, Optional, Sequence, Union
 from pathlib import Path
 
 import numpy as np
@@ -67,7 +67,7 @@ class ProjectionBand(EnergyBand):
         self.phase = phase
 
     def append_sumsite(
-        self, sites: Tuple[int, int], site_name: str
+        self, sites: tuple[int, int], site_name: str
     ) -> NDArray[np.float64]:
         """Append site-sum results.
 
@@ -102,7 +102,7 @@ class ProjectionBand(EnergyBand):
         return sumsite
 
     def append_sumorbital(
-        self, orbitals: Union[Tuple[int, ...], int], orbital_name: str
+        self, orbitals: Union[tuple[int, ...], int], orbital_name: str
     ) -> Optional[NDArray[np.float64]]:
         """Append orbital-sum results.
 
@@ -129,7 +129,7 @@ class ProjectionBand(EnergyBand):
         )
         return sumorbital
 
-    def orbital_index(self, arg: str) -> Tuple[int, ...]:
+    def orbital_index(self, arg: str) -> tuple[int, ...]:
         """Return the indexes corresponding orbital names.
 
         This method returns the tuple of orbital number in
@@ -191,9 +191,9 @@ class ProjectionBand(EnergyBand):
 
     def make_label(
         self,
-        site_indexes: Optional[Tuple[int, ...]] = None,
-        orbital_indexes_sets: Optional[Tuple[Tuple[int, ...]]] = None,
-    ) -> List[str]:
+        site_indexes: Optional[tuple[int, ...]] = None,
+        orbital_indexes_sets: Optional[tuple[tuple[int, ...]]] = None,
+    ) -> list[str]:
         """Return array the used for **label** for CSV-like data.
 
         Parameters
@@ -231,7 +231,7 @@ class ProjectionBand(EnergyBand):
         self,
         site_indexes: Sequence[int] = (),
         orbital_indexes_sets: Sequence[Sequence[int]] = (),
-    ) -> List[float]:
+    ) -> list[float]:
         """Return 3D list data that are easily converted to txt data for csv.
 
         Parameters
@@ -423,7 +423,7 @@ class PROCAR(ProjectionBand):  # Version safety
             Check your INCAR the calculations.\n"
 
         self.kvecs = []
-        energies: List[float] = []
+        energies: list[float] = []
         orbitals = ""
         phase_r = ""
         phase_i = ""
@@ -618,7 +618,7 @@ def _check_orbital_name(arg: str) -> str:
     raise ValueError(errmsg)
 
 
-def tyny_check(procar: IO[str]) -> Tuple[int, int, int, List[str], bool]:
+def tyny_check(procar: IO[str]) -> tuple[int, int, int, list[str], bool]:
     """Check whether PROCAR file is good.
 
     Return numk, nbands, nion, orbital_names and
@@ -637,7 +637,7 @@ def tyny_check(procar: IO[str]) -> Tuple[int, int, int, List[str], bool]:
     section = []
     orbitals = []
     phases = []
-    orbitalnames: List[str] = []
+    orbitalnames: list[str] = []
     for line in procar:
         if line.isspace():
             break
