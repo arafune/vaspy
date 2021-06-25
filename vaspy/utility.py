@@ -2,7 +2,7 @@
 
 """Script to generate 3D view with mlab (Mayavi).
 
-In generarl, VESTA is pretty nice. However, due to GUI, it is
+In general, VESTA is pretty nice. However, due to GUI, it is
 difficult to make a series of figures of the model structure.
 """
 import argparse
@@ -11,7 +11,7 @@ import itertools
 from re import T
 from typing import Optional, Sequence, Tuple
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import NDArray
 from mayavi import mlab
 
 from vaspy import tools, const
@@ -377,8 +377,8 @@ def _find_diagonal_indexes(n_grids, crystal_axes):
 
 def reallocate_to_labframe(
     mesh_in_direct_coor: Tuple[int, ...],
-    crystal_axes: ArrayLike,
-    volume_data: ArrayLike,
+    crystal_axes: NDArray[np.float64],
+    volume_data: NDArray[np.float64],
     no_roll: bool = False,
 ):
     """Return the volume mesh data in lab frame (Cartesian coordinate).

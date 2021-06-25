@@ -6,7 +6,7 @@ import sys
 from typing import Optional
 
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import NDArray
 
 from vaspy import mesh3d
 
@@ -43,7 +43,7 @@ class LOCPOT(mesh3d.VASPGrid):
         axis_name = axis_name.capitalize()
         axes_length = self.poscar.axes_lengthes
         if axis_name == "X":
-            horizontal_axis: ArrayLike = np.linspace(
+            horizontal_axis: NDArray[np.float64] = np.linspace(
                 0, axes_length[0], self.grid.shape[0]
             )
             plt.clf()

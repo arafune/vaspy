@@ -9,7 +9,7 @@ from itertools import zip_longest
 import os
 import re
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import NDArray
 from typing import List, Iterable, Sequence, Tuple, Union, IO, Any, Optional
 
 
@@ -134,7 +134,7 @@ def atoms_to_atomtypes_atomnums(atoms: List[str]) -> Tuple[List[str], List[int]]
     return atomtypes, atomnums
 
 
-def cuboid(crystal_axes: Union[Sequence[List[float]], ArrayLike]) -> ArrayLike:
+def cuboid(crystal_axes: Sequence[float]) -> NDArray[np.float64]:
     """Return the coordinates for cuboid that includes tetrahedron represented by vectors.
 
     Parameters
@@ -144,12 +144,14 @@ def cuboid(crystal_axes: Union[Sequence[List[float]], ArrayLike]) -> ArrayLike:
 
     Return
     """
-    a: ArrayLike = np.array(crystal_axes[0])
-    b: ArrayLike = np.array(crystal_axes[1])
-    c: ArrayLike = np.array(crystal_axes[2])
-    o: ArrayLike = np.array((0, 0, 0))
-    points: ArrayLike = np.array((o, a, b, c, a + b, a + c, b + c, a + b + c))
-    box: ArrayLike = np.array((np.min(points.T, axis=1), np.max(points.T, axis=1))).T
+    a: NDArray[np.float64] = np.array(crystal_axes[0])
+    b: NDArray[np.float64] = np.array(crystal_axes[1])
+    c: NDArray[np.float64] = np.array(crystal_axes[2])
+    o: NDArray[np.float64] = np.array((0.0, 0.0, 0.0))
+    points: NDArray[np.float64] = np.array((o, a, b, c, a + b, a + c, b + c, a + b + c))
+    box: NDArray[np.float64] = np.array(
+        (np.min(points.T, axis=1), np.max(points.T, axis=1))
+    ).T
     return box
     """return np.array(
         (

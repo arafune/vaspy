@@ -4,7 +4,7 @@
 from typing import IO, Optional, Sequence, Tuple, Union
 
 import numpy as np
-from numpy.typing import ArrayLike, DTypeLike
+from numpy.typing import DTypeLike, NDArray
 from scipy.fftpack import ifftn
 
 import vaspy.mesh3d as mesh3d
@@ -105,23 +105,23 @@ class WAVECAR(object):
         self.wfc.seek(self.recl)
         #        print(self.wfc.tell())
         #
-        dump: ArrayLike = np.fromfile(self.wfc, dtype=float, count=13)
+        dump: NDArray[np.float64] = np.fromfile(self.wfc, dtype=float, count=13)
         #
         self.numk: int = int(dump[0])
         self.nbands: int = int(dump[1])
         self.encut: float = dump[2]
-        self.realcell: ArrayLike = dump[3:12].reshape((3, 3))
+        self.realcell: NDArray[np.float64] = dump[3:12].reshape((3, 3))
         self.efermi: float = dump[12]
         #        print(self.wfc.tell())
         self.volume: float = np.linalg.det(self.realcell)
         self.rcpcell = np.linalg.inv(self.realcell).T
-        unit_cell_vector_magnitude: ArrayLike = np.linalg.norm(self.realcell, axis=1)
-        cutoff: Union[ArrayLike, np.generic] = np.ceil(
+        unit_cell_vector_magnitude: float = np.linalg.norm(self.realcell, axis=1)
+        cutoff: Union[NDArray[np.float64], np.generic] = np.ceil(
             np.sqrt(self.encut / Ry_in_eV)
             / (2 * np.pi / (unit_cell_vector_magnitude / au_in_AA))
         )
         # FFT Minimum grid size. Always odd!!
-        self.ngrid: ArrayLike = np.array(2 * cutoff + 1, dtype=int)
+        self.ngrid: NDArray[np.int64] = np.array(2 * cutoff + 1, dtype=int)
 
     def check_DwNGZHalf(self) -> bool:
         r"""self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
@@ -158,12 +158,12 @@ class WAVECAR(object):
         * occupation  (as a function of spin-, k-, and band index)
 
         """
-        self.kvecs: ArrayLike = np.zeros((self.numk, 3), dtype=float)
-        self.bands: ArrayLike = np.zeros(
+        self.kvecs: NDArray[np.float64] = np.zeros((self.numk, 3), dtype=float)
+        self.bands: NDArray[np.float64] = np.zeros(
             (self.nspin, self.numk, self.nbands), dtype=float
         )
-        self.nplwvs: ArrayLike = np.zeros(self.numk, dtype=int)
-        self.occs: ArrayLike = np.zeros(
+        self.nplwvs: NDArray[np.int64] = np.zeros(self.numk, dtype=int)
+        self.occs: NDArray[np.float64] = np.zeros(
             (self.nspin, self.numk, self.nbands), dtype=float
         )
         for spin_i in range(self.nspin):
@@ -195,7 +195,7 @@ class WAVECAR(object):
                 )
             )
 
-    def gvectors(self, k_i: float = 0) -> ArrayLike:
+    def gvectors(self, k_i: float = 0) -> NDArray[np.float64]:
         r"""Return G vector.
 
         G-vectors :math:`G` is determined by the following condition:
@@ -213,14 +213,14 @@ class WAVECAR(object):
 
         Returns
         ---------
-        ArrayLike
+        NDArray
             G vectors
 
         """
 
         kvec = self.kvecs[k_i]
         # kgrid = []
-        kgrid: ArrayLike = make_kgrid(self.ngrid, self.gamma, para=PARALLEL)
+        kgrid: NDArray[np.float64] = make_kgrid(self.ngrid, self.gamma, para=PARALLEL)
         hbar2over2m = 13.605826 * 0.529177249 * 0.529177249
         energy_k = (
             hbar2over2m
@@ -234,7 +234,7 @@ class WAVECAR(object):
 
     def bandcoeff(
         self, spin_i: int = 0, k_i: int = 0, band_i: int = 0, norm: bool = False
-    ) -> ArrayLike:
+    ) -> NDArray[np.float64]:
         """Read the coefficient of the planewave of the KS states.
 
         The KS states is specified by the `spin_i`, `k_i` and `band_i`.
@@ -268,11 +268,11 @@ class WAVECAR(object):
         spin_i: int = 0,
         k_i: int = 0,
         band_i: int = 0,
-        gvec: Optional[ArrayLike] = None,
-        ngrid: Optional[ArrayLike] = None,
+        gvec: Optional[NDArray[np.float64]] = None,
+        ngrid: Optional[NDArray[np.float64]] = None,
         norm: bool = False,
         poscar: poscar.POSCAR = poscar.POSCAR(),
-    ) -> Union[ArrayLike, Tuple[ArrayLike, ArrayLike], VASPGrid]:
+    ) -> Union[NDArray[np.float64], Tuple[NDArray, NDArray], VASPGrid]:
         r"""Return the pseudo-wavefunction in real space.
 
         Calculate the pseudo-wavefunction of the KS states in
@@ -435,7 +435,7 @@ class WAVECAR(object):
 
 def make_kgrid(
     ngrid: Sequence[int], gamma: bool = False, para: bool = PARALLEL
-) -> ArrayLike:
+) -> NDArray[np.float64]:
     """Return kgrid.
 
     Parameters
@@ -457,7 +457,7 @@ def make_kgrid(
     fy = [ii if ii < ngrid[1] // 2 + 1 else ii - ngrid[1] for ii in range(ngrid[1])]
     fz = [ii if ii < ngrid[2] // 2 + 1 else ii - ngrid[2] for ii in range(ngrid[2])]
     if gamma and para:
-        kgrid: ArrayLike = np.array(
+        kgrid: NDArray[np.float64] = np.array(
             [
                 (fx[ix], fy[iy], fz[iz])
                 for iz in range(ngrid[2])
@@ -500,7 +500,7 @@ def make_kgrid(
     return kgrid
 
 
-def check_symmetry(grid3d: ArrayLike) -> bool:
+def check_symmetry(grid3d: NDArray[np.float64]) -> bool:
     """True if grid3d(G) == np.conjugate(grid3d(-G)) for all G.
 
     Parameters
@@ -531,7 +531,9 @@ def check_symmetry(grid3d: ArrayLike) -> bool:
     return True
 
 
-def restore_gamma_grid(grid3d: ArrayLike, para: bool = PARALLEL) -> ArrayLike:
+def restore_gamma_grid(
+    grid3d: NDArray[np.float64], para: bool = PARALLEL
+) -> NDArray[np.float64]:
     """Return Grid from the size-reduced matrix for gammareal Wavecar.
 
     Parameters

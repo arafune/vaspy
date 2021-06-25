@@ -17,7 +17,7 @@ from typing import IO, List, Optional, Sequence, Tuple, Union
 from pathlib import Path
 
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import NDArray
 
 from vaspy.eigenval import EnergyBand
 from vaspy.tools import open_by_suffix
@@ -45,9 +45,9 @@ class ProjectionBand(EnergyBand):
     -----------
     natom: int
         number of atoms
-    proj: ArrayLike
+    proj: NDArray
         Orbital projection. proj[spin_i, k_i, band_i, site_i, orbital_i]
-    phase: ArrayLike
+    phase: NDArray
         Phase data.  phase[spin_i, k_i, band_i, site_i, orbital_i]
 
     """
@@ -56,8 +56,8 @@ class ProjectionBand(EnergyBand):
         self,
         kvecs: Sequence[float] = (),
         energies: Sequence[float] = (),
-        proj: Optional[ArrayLike] = None,
-        phase: Optional[ArrayLike] = None,
+        proj: Optional[NDArray[np.float64]] = None,
+        phase: Optional[NDArray[np.float64]] = None,
         nspin: int = 1,
     ) -> None:
         """Initialize."""
@@ -66,7 +66,9 @@ class ProjectionBand(EnergyBand):
         self.proj = proj
         self.phase = phase
 
-    def append_sumsite(self, sites: Tuple[int, int], site_name: str) -> ArrayLike:
+    def append_sumsite(
+        self, sites: Tuple[int, int], site_name: str
+    ) -> NDArray[np.float64]:
         """Append site-sum results.
 
         After this method, shape changes as following
@@ -93,13 +95,15 @@ class ProjectionBand(EnergyBand):
         self.label["site"].append(site_name)
         logger.debug("self.label: {}".format(self.label))
         #    spin, k, band, atom
-        sumsite: ArrayLike = self.proj[:, :, :, sites, :].sum(axis=-2, keepdims=True)
+        sumsite: NDArray[np.float64] = self.proj[:, :, :, sites, :].sum(
+            axis=-2, keepdims=True
+        )
         self.proj = np.concatenate((self.proj, sumsite), axis=-2)
         return sumsite
 
     def append_sumorbital(
         self, orbitals: Union[Tuple[int, ...], int], orbital_name: str
-    ) -> Optional[ArrayLike]:
+    ) -> Optional[NDArray[np.float64]]:
         """Append orbital-sum results.
 
         After this method, shape changes as following
@@ -117,10 +121,12 @@ class ProjectionBand(EnergyBand):
             return None
         self.label["orbital"].append(orbital_name)
         #    spin, k, band, atom
-        sumorbital: ArrayLike = self.proj[:, :, :, :, orbitals].sum(
+        sumorbital: NDArray[np.float64] = self.proj[:, :, :, :, orbitals].sum(
             axis=-1, keepdims=True
         )
-        self.proj = np.concatenate((self.proj, sumorbital), axis=-1)
+        self.proj: NDArray[np.float64] = np.concatenate(
+            (self.proj, sumorbital), axis=-1
+        )
         return sumorbital
 
     def orbital_index(self, arg: str) -> Tuple[int, ...]:

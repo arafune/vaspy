@@ -8,7 +8,7 @@ from pathlib import Path
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import NDArray
 from typing import Dict, Optional, Sequence, Tuple, List, IO, Union
 from vaspy.tools import open_by_suffix
 
@@ -37,9 +37,9 @@ class EnergyBand(object):
 
     Attributes
     ----------
-    kvecs: ArrayLike
+    kvecs: NDArray
         kvectors
-    kdistances: ArrayLike
+    kdistances: NDArray
         kdisance
     numk: int
         number of kpoints
@@ -47,7 +47,7 @@ class EnergyBand(object):
         number of bands
     nsping: int
         spin character
-    energies: ArrayLike
+    energies: NDArray
         energies[spin_i, k_i, band_i], where spin_i, k_i, and band_i are spin-,
         k- and band-index, respectively.
     label: dict
@@ -56,9 +56,9 @@ class EnergyBand(object):
 
     Parameters
     ----------
-    kvecs: ArrayLike
+    kvecs: NDArray
             1D array data of k-vectors.
-    energies: ArrayLike
+    energies: NDArray
             1D array data of energies
     nspin: int
             number of spin: '1' means No-spin.  '2' means collinear spin,
@@ -75,15 +75,15 @@ class EnergyBand(object):
         nspin: int = 1,
     ) -> None:
         """Initialize."""
-        self.kvecs: ArrayLike = np.array(kvecs)
+        self.kvecs: NDArray[np.float64] = np.array(kvecs)
         self.numk: int = len(self.kvecs)
         self.label: Dict["str", List["str"]] = {}
         try:
             self.nbands: int = len(energies) // len(kvecs)
         except ZeroDivisionError:
             self.nbands = 0
-        self.energies: ArrayLike = np.array(energies)
-        self.nspin = nspin
+        self.energies: NDArray[np.float64] = np.array(energies)
+        self.nspin: int = nspin
         if self.nspin == 1:  # standard
             self.label["spin"] = [""]
             self.label["energy"] = ["Energy"]
@@ -96,11 +96,13 @@ class EnergyBand(object):
         self.label["k"] = ["#k"]
 
     @property
-    def kdistances(self) -> ArrayLike:
+    def kdistances(self) -> NDArray[np.float64]:
         """Return kdistances."""
         return np.cumsum(
             np.linalg.norm(
-                np.concatenate((np.array([[0, 0, 0]]), np.diff(self.kvecs, axis=0))),
+                np.concatenate(
+                    (np.array([[0.0, 0.0, 0.0]]), np.diff(self.kvecs, axis=0))
+                ),
                 axis=1,
             )
         )
@@ -124,7 +126,7 @@ class EnergyBand(object):
         keys: tuple
             key tuple used for label
         """
-        label_list = []
+        label_list: List[str] = []
         for key in keys:
             for tmp in self.label[key]:
                 label_list.append(tmp)
@@ -138,9 +140,9 @@ class EnergyBand(object):
         This list format would be useful for str output
 
         """
-        bandstructure = []
+        bandstructure: List[List[float]] = []
         for energies in self.energies.T.tolist():
-            band = []
+            band: List[float] = []
             for k, energy in zip(self.kdistances[:, np.newaxis].tolist(), energies):
                 k.extend(energy)
                 band.append(k)
@@ -175,7 +177,7 @@ class EnergyBand(object):
         Returns
         --------
         str
-            a string represntation of EnergyBand.
+            a string representation of EnergyBand.
             **Useful for gnuplot and Igor**.
 
         """
@@ -254,7 +256,7 @@ class EnergyBand(object):
 
     def to_physical_kvector(
         self,
-        recvec: ArrayLike = np.array(
+        recvec: NDArray[np.float64] = np.array(
             ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)),
         ),
     ) -> None:
@@ -262,7 +264,7 @@ class EnergyBand(object):
 
         Parameters
         -----------
-        recvec: array, ArrayLike, optional (default is the unit vector)
+        recvec: NDArray, optional (default is the unit vector)
             reciprocal vector
 
         Notes
@@ -274,8 +276,10 @@ class EnergyBand(object):
         """
         logger.debug("recvec: {}".format(recvec))
         logger.debug("self.kvecs: {}".format(self.kvecs))
-        recvec: ArrayLike = np.array(recvec)
-        self.kvecs: ArrayLike = np.array([recvec.dot(kvecs) for kvecs in self.kvecs])
+        recvec: NDArray[np.float64] = np.array(recvec)
+        self.kvecs: NDArray[np.float64] = np.array(
+            [recvec.dot(kvecs) for kvecs in self.kvecs]
+        )
 
 
 class EIGENVAL(EnergyBand):
@@ -296,7 +300,7 @@ class EIGENVAL(EnergyBand):
     def __init__(self, filename: Union[str, Path, None] = None) -> None:
         """Initialize."""
         super(EIGENVAL, self).__init__()
-        self.natom = 0
+        self.natom: int = 0
         #
         if filename:
             self.load_file(open_by_suffix(str(filename)))
@@ -333,18 +337,18 @@ class EIGENVAL(EnergyBand):
         next(thefile)
         next(thefile)
         _, self.numk, self.nbands = [int(i) for i in next(thefile).split()]
-        self.kvecs = []
-        self.energies = []
+        kvecs: List[List[float]] = []
+        energies: List[List[float]] = []
         for _ in range(self.numk):
             # the first line in the sigleset begins with the blank
             next(thefile)
-            self.kvecs.append([float(i) for i in next(thefile).split()[0:3]])
+            kvecs.append([float(i) for i in next(thefile).split()[0:3]])
             for _ in range(self.nbands):
-                self.energies.append(
+                energies.append(
                     [float(i) for i in next(thefile).split()[1 : self.nspin + 1]]
                 )
-        self.kvecs: ArrayLike = np.array(self.kvecs)
-        self.energies: ArrayLike = np.array(self.energies).T.reshape(
+        self.kvecs: NDArray[np.float64] = np.array(kvecs)
+        self.energies: NDArray[np.float64] = np.array(energies).T.reshape(
             self.nspin, self.numk, self.nbands
         )
         thefile.close()
