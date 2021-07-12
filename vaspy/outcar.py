@@ -104,7 +104,7 @@ class OUTCAR(object):  # Version safety
         """
         # local variables
         section: list[str] = []
-        posforce: list[str] = []
+        posforce: list[list[float]] = []
         magnetizations: list[list[float]] = []
         total_charges: list[list[float]] = []
         kvec_weight = []

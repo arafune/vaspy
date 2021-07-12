@@ -270,8 +270,8 @@ class WAVECAR(object):
         spin_i: int = 0,
         k_i: int = 0,
         band_i: int = 0,
-        gvec: Optional[NDArray] = None,
-        ngrid: Optional[NDArray] = None,
+        gvec: Optional[NDArray[np.float_]] = None,
+        ngrid: Optional[NDArray[np.int_]] = None,
         norm: bool = False,
         poscar: poscar.POSCAR = poscar.POSCAR(),
     ) -> Union[
@@ -283,7 +283,7 @@ class WAVECAR(object):
         the real space by using FFT transformation of the reciprocal
         space planewave coefficients.
 
-        The 3D FE grid size is detemined by ngrid, which defaults
+        The 3D FE grid size is determined by ngrid, which defaults
         to self.ngrid if it is not provided.  GVectors of the KS
         states is used to put 1D plane wave coefficient back to 3D
         grid.
@@ -297,13 +297,13 @@ class WAVECAR(object):
         band_i: int
             band index :math:`b_i`. starts with 0. default is 0.
         norm: bool
-            If true the Band coeffients are normliazed
+            If true the Band coefficients are normalized
         gvec: numpy.array, optional
             G-vector for calculation. (default is self.gvectors(k_i))
         ngrid: numpy.array, optional
             Ngrid for calculation. (default is self.ngrid).
         poscar: vaspy.poscar.POSCAR, optional
-            POSCAR object (defalut is blank POSCAR object)
+            POSCAR object (default is blank POSCAR object)
 
         Returns
         -----------
@@ -337,7 +337,7 @@ class WAVECAR(object):
             gvec = self.gvectors(k_i)
         gvec %= ngrid[np.newaxis, :]
         if self.gamma and PARALLEL:
-            phi_k = np.zeros(
+            phi_k: NDArray[np.complex_] = np.zeros(
                 (ngrid[0], ngrid[1], ngrid[2] // 2 + 1), dtype=np.complex128
             )
         elif self.gamma and not PARALLEL:
@@ -345,16 +345,14 @@ class WAVECAR(object):
                 (ngrid[0] // 2 + 1, ngrid[1], ngrid[2]), dtype=np.complex128
             )
         else:
-            phi_k = np.zeros(ngrid, dtype=np.complex128)
+            phi_k = np.zeros(ngrid, dtype=np.complex_)
         try:  # Collininear
             phi_k[gvec[:, 0], gvec[:, 1], gvec[:, 2]] = self.bandcoeff(
                 spin_i, k_i, band_i, norm
             )
         except ValueError:  # SOI:
             bandcoeff = self.bandcoeff(spin_i, k_i, band_i, norm)
-            phi_k: NDArray[np.complex128] = np.zeros(
-                (2, ngrid[0], ngrid[1], ngrid[2]), dtype=np.complex128
-            )
+            phi_k = np.zeros((2, ngrid[0], ngrid[1], ngrid[2]), dtype=np.complex128)
             phi_k[0][gvec[:, 0], gvec[:, 1], gvec[:, 2]] = bandcoeff[
                 : bandcoeff.size // 2
             ]
@@ -398,8 +396,8 @@ class WAVECAR(object):
             np.testing.assert_array_almost_equal(
                 poscar.scaling_factor * poscar.cell_vecs, self.realcell
             )
-            re = np.real(phi_r)
-            im = np.imag(phi_r)
+            re: NDArray[np.float_] = np.real(phi_r)
+            im: NDArray[np.float_] = np.imag(phi_r)
             if phi_r.ndim == 3:
                 vaspgrid.grid.data = np.concatenate((re.flatten("F"), im.flatten("F")))
             else:  # SOI
@@ -440,13 +438,15 @@ class WAVECAR(object):
 
 
 def make_kgrid(
-    ngrid: Sequence[int], gamma: bool = False, para: bool = PARALLEL
+    ngrid: tuple[int, ...] | NDArray[np.int_],
+    gamma: bool = False,
+    para: bool = PARALLEL,
 ) -> NDArray[np.float_]:
     """Return kgrid.
 
     Parameters
     -----------
-    ngrid: tuple or array-like
+    ngrid: tuple or NDArray
         Grid size
     gamma: boolean, default, false
         Set true if only gamma calculations (use vasp with -DwNGZHalf)
@@ -538,7 +538,7 @@ def check_symmetry(grid3d: NDArray[np.float_]) -> bool:
 
 
 def restore_gamma_grid(
-    grid3d: NDArray[np.float_], para: bool = PARALLEL
+    grid3d: NDArray[np.complex_], para: bool = PARALLEL
 ) -> NDArray[np.float_]:
     """Return Grid from the size-reduced matrix for gammareal Wavecar.
 

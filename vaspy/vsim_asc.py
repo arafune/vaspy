@@ -204,7 +204,7 @@ def animate_atom_phonon(
     s_frame: int = 0,
     e_frame: Optional[int] = None,
     magnitude: float = 1.0,
-):
+) -> list[NDarray[np.float_]]:
     """Return atom position series determined by d_vector and q.
 
     Parameters
@@ -230,8 +230,8 @@ def animate_atom_phonon(
         list of atom position representing animation
 
     """
-    position0: NDArray[np.array64] = np.array(position)  # for safe
-    positions = []
+    position0: NDArray[np.float_] = np.array(position)  # for safe
+    positions: list[NDArray[np.float_]] = []
     if not e_frame:
         e_frame = s_frame + n_frames - 1
     for frame in range(s_frame, e_frame + 1):

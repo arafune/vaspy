@@ -6,7 +6,7 @@ translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 from __future__ import annotations
 
 import copy
-from typing import Optional, IO, Union
+from typing import IO, Union
 from pathlib import Path
 from vaspy.mesh3d import VASPGrid
 from vaspy.tools import open_by_suffix
