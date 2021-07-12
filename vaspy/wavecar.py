@@ -345,7 +345,7 @@ class WAVECAR(object):
                 (ngrid[0] // 2 + 1, ngrid[1], ngrid[2]), dtype=np.complex128
             )
         else:
-            phi_k = np.zeros(ngrid, dtype=np.complex128)
+            phi_k = np.zeros(ngrid, dtype=np.complex_)
         try:  # Collininear
             phi_k[gvec[:, 0], gvec[:, 1], gvec[:, 2]] = self.bandcoeff(
                 spin_i, k_i, band_i, norm
@@ -538,7 +538,7 @@ def check_symmetry(grid3d: NDArray[np.float_]) -> bool:
 
 
 def restore_gamma_grid(
-    grid3d: NDArray[np.float_], para: bool = PARALLEL
+    grid3d: NDArray[np.complex_], para: bool = PARALLEL
 ) -> NDArray[np.float_]:
     """Return Grid from the size-reduced matrix for gammareal Wavecar.
 

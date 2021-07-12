@@ -6,7 +6,7 @@ translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 from __future__ import annotations
 
 import copy
-from typing import Optional, IO, Union
+from typing import IO, Union
 from pathlib import Path
 from vaspy.mesh3d import VASPGrid
 from vaspy.tools import open_by_suffix
@@ -45,16 +45,14 @@ class CHGCAR(VASPGrid):
 
     """
 
-    def __init__(
-        self, filename: Union[str, Path] = "", pickles: Optional[str] = None
-    ) -> None:
+    def __init__(self, filename: Union[str, Path] = "", pickles: str = "") -> None:
         """Initialize."""
         super(CHGCAR, self).__init__(None)
         self.spin: list[str] = [""]
         if filename:
             self.load_file(open_by_suffix(str(filename)), pickles)
 
-    def load_file(self, thefile: IO[str], pickles: Optional[str] = None) -> None:
+    def load_file(self, thefile: IO[str], pickles: str = "") -> None:
         """Parse CHGCAR file to construct CHGCAR object.
 
         Parameters
@@ -74,7 +72,7 @@ class CHGCAR(VASPGrid):
             raise RuntimeError("CHGCAR is correct?")
         thefile.close()
 
-    def magnetization(self, direction: Optional[str] = None) -> CHGCAR:
+    def magnetization(self, direction: str = "") -> CHGCAR:
         """Return CHGCAR for magnetization.
 
         For collinear spin-polarized calculations
@@ -111,7 +109,7 @@ class CHGCAR(VASPGrid):
             dest.grid = dest.grid.frame(1)
             dest.spin = ["up-down"]
         elif len(self.spin) == 4:
-            if direction is None or direction == "t":
+            if direction == "t":
                 dest.grid = dest.grid.frame(0)
                 dest.spin = ["mT"]
             if direction == "x":

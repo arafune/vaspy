@@ -13,7 +13,7 @@ This module provides PROCAR, ProjectionBand classes.
 import csv
 import re
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
-from typing import IO, Optional, Sequence, Union
+from typing import IO, Optional, Sequence, Union, Any
 from pathlib import Path
 
 import numpy as np
@@ -95,7 +95,7 @@ class ProjectionBand(EnergyBand):
         self.label["site"].append(site_name)
         logger.debug("self.label: {}".format(self.label))
         #    spin, k, band, atom
-        sumsite: NDArray[np.float_] = self.proj[:, :, :, sites, :].sum(
+        sumsite: NDArray[Any, np.float_] = self.proj[:, :, :, sites, :].sum(
             axis=-2, keepdims=True
         )
         self.proj = np.concatenate((self.proj, sumsite), axis=-2)

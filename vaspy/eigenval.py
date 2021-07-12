@@ -9,7 +9,7 @@ from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
 from numpy.typing import NDArray
-from typing import Optional, Sequence, IO, Union
+from typing import Sequence, IO, Union
 from vaspy.tools import open_by_suffix
 
 try:
@@ -132,7 +132,7 @@ class EnergyBand(object):
                 label_list.append(tmp)
         return label_list
 
-    def to_3dlist(self) -> list[list[list[float]]]:
+    def to_3dlist(self) -> list[list[float]]:
         """Return 3D mentional list.
 
         list[band_i, [k_i, energy, (energy_down)]]
@@ -275,9 +275,7 @@ class EnergyBand(object):
         logger.debug("recvec: {}".format(recvec))
         logger.debug("self.kvecs: {}".format(self.kvecs))
         recvec: NDArray[np.float64] = np.array(recvec)
-        self.kvecs: NDArray[np.float64] = np.array(
-            [recvec.dot(kvecs) for kvecs in self.kvecs]
-        )
+        self.kvecs = np.array([recvec.dot(kvecs) for kvecs in self.kvecs])
 
 
 class EIGENVAL(EnergyBand):
