@@ -337,7 +337,7 @@ class WAVECAR(object):
             gvec = self.gvectors(k_i)
         gvec %= ngrid[np.newaxis, :]
         if self.gamma and PARALLEL:
-            phi_k = np.zeros(
+            phi_k: NDArray[np.complex_] = np.zeros(
                 (ngrid[0], ngrid[1], ngrid[2] // 2 + 1), dtype=np.complex128
             )
         elif self.gamma and not PARALLEL:
@@ -352,9 +352,7 @@ class WAVECAR(object):
             )
         except ValueError:  # SOI:
             bandcoeff = self.bandcoeff(spin_i, k_i, band_i, norm)
-            phi_k: NDArray[np.complex128] = np.zeros(
-                (2, ngrid[0], ngrid[1], ngrid[2]), dtype=np.complex128
-            )
+            phi_k = np.zeros((2, ngrid[0], ngrid[1], ngrid[2]), dtype=np.complex128)
             phi_k[0][gvec[:, 0], gvec[:, 1], gvec[:, 2]] = bandcoeff[
                 : bandcoeff.size // 2
             ]
