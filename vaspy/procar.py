@@ -124,7 +124,9 @@ class ProjectionBand(EnergyBand):
         sumorbital: NDArray[np.float_] = self.proj[:, :, :, :, orbitals].sum(
             axis=-1, keepdims=True
         )
-        self.proj = np.concatenate((self.proj, sumorbital), axis=-1)
+        self.proj: NDArray[np.float64] = np.concatenate(
+            (self.proj, sumorbital), axis=-1
+        )
         return sumorbital
 
     def orbital_index(self, arg: str) -> tuple[int, ...]:

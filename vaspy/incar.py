@@ -244,7 +244,7 @@ class Incar(Mapping):
         str
             Check messages
         """
-        checks: Dict[str, Union[bool, int, float, str]] = {
+        checks: dict[str, Union[bool, int, float, str]] = {
             'When ICHARG = 11, Recommend "LWAVE = .FALSE, LCHARG = .FALSE"\n': (
                 self.active("ICHARG") == 11
                 and (

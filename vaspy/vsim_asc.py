@@ -19,7 +19,7 @@ from logging import Formatter, StreamHandler, getLogger
 from typing import IO, Optional, Sequence, Union
 from pathlib import Path
 import numpy as np
-from numpy.typing import ArrayLike, DTypeLike, NDArray
+from numpy.typing import DTypeLike, NDArray
 
 # import vaspy.const as const
 from vaspy.tools import open_by_suffix
@@ -43,11 +43,11 @@ class VSIM_ASC(object):
     atoms: list
         Atoms used
     positions: list
-        List of atom position in static
+        list of atom position in static
     qpts: list
-        List of qvectors
+        list of qvectors
     freqs: list
-        List of phonon frequencies
+        list of phonon frequencies
     d_vectors: np.array
         d_vectors[mode#][atom#] returns the displacement (complex) vector
     lattice.vectors: np.array
@@ -59,8 +59,8 @@ class VSIM_ASC(object):
         self.system_name: str = ""
         self.atoms: list[str] = []
         #
-        self.qpts: list[ArrayLike] = []
-        self.freqs: ArrayLike = []
+        self.qpts: list[NDArray[np.float64]] = []
+        self.freqs: list[float] = []
         #
         if filename:
             self.load_file(open_by_suffix(str(filename)))
@@ -119,8 +119,10 @@ class VSIM_ASC(object):
                     ]
                 )
         n_phonons = len(self.freqs)
-        self.d_vectors = np.array(self.d_vectors).reshape(n_phonons, len(self.atoms), 3)
-        self.freqs = np.array(self.freqs)
+        self.d_vectors: NDArray[np.float64] = np.array(self.d_vectors).reshape(
+            n_phonons, len(self.atoms), 3
+        )
+        self.freqs: NDArray[np.float64] = np.array(self.freqs)
         thefile.close()
 
     def build_phono_motion(
@@ -129,7 +131,7 @@ class VSIM_ASC(object):
         supercell: tuple[int, int, int] = (2, 2, 1),
         n_frames: int = 30,
         magnitude: float = 1,
-    ) -> list:
+    ) -> list[NDArray[np.float_]]:
         """Build data for creating POSCAR etc.
 
         Parameters
@@ -174,7 +176,7 @@ class VSIM_ASC(object):
         return animation_positions
 
 
-def supercell_lattice_vectors(lattice_vectors, cell_id) -> ArrayLike:
+def supercell_lattice_vectors(lattice_vectors, cell_id) -> NDArray[np.float64]:
     """Return lattice vectors of supercell.
 
     Parameters
@@ -225,10 +227,10 @@ def animate_atom_phonon(
     Returns
     ---------
     positions: list
-        List of atom position representing animation
+        list of atom position representing animation
 
     """
-    position0 = np.array(position)  # for safe
+    position0: NDArray[np.array64] = np.array(position)  # for safe
     positions = []
     if not e_frame:
         e_frame = s_frame + n_frames - 1
@@ -247,7 +249,7 @@ def animate_atom_phonon(
             )
         )
         logger.debug("exponent:{}".format(exponent))
-        normal_displ = np.array(
+        normal_displ: NDArray[np.float64] = np.array(
             list(map((lambda y: (y.real)), [x * exponent for x in d_vector]))
         )
         logger.debug("normal_displ:{}".format(normal_displ))

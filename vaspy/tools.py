@@ -134,7 +134,7 @@ def atoms_to_atomtypes_atomnums(atoms: list[str]) -> tuple[list[str], list[int]]
     return atomtypes, atomnums
 
 
-def cuboid(crystal_axes: Union[list[float], NDArray[np.float_]]) -> NDArray[np.float_]:
+def cuboid(crystal_axes: Sequence[float]) -> NDArray[np.float64]:
     """Return the coordinates for cuboid that includes tetrahedron represented by vectors.
 
     Parameters

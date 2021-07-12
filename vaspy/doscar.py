@@ -147,7 +147,7 @@ class DOSCAR(object):  # Version safety
 class DOS(Sequence):  # Version safety
     """Class for DOS.
 
-    List object consisting two elements.
+    list object consisting two elements.
     The first element is the the energy.
     The latter element is list for the density.
 
@@ -180,7 +180,7 @@ class DOS(Sequence):  # Version safety
     def T(self):
         return [*zip(*self.dos)]
 
-    def export_csv(
+    def _export_csv(
         self,
         filename: str,
         energy: Union[list[float], tuple[float, ...]],
@@ -232,7 +232,7 @@ class TDOS(DOS):
         filename: str,
         energy: Union[list[float], tuple[float, ...]],
     ) -> None:
-        return super().export_csv(filename, header=self.header, energy=energy)
+        return super()._export_csv(filename, header=self.header, energy=energy)
 
 
 class PDOS(DOS):
@@ -336,7 +336,7 @@ class PDOS(DOS):
             ]
         except ValueError:
             err = "Check argment of this function\n"
-            err += "The following name(s) are accpted:\n"
+            err += "The following name(s) are accepted:\n"
             err += ", ".join(self.orbital_spin)
             raise ValueError(err)
         for orbital in alist:
@@ -361,12 +361,12 @@ class PDOS(DOS):
                 header.append(self.site + "_" + i)
             else:
                 header.append(i)
-        super().export_csv(filename, energy=energy, header=header)
+        super()._export_csv(filename, energy=energy, header=header)
 
     def plot_dos(
         self, orbitals: Sequence[str], fermi: float = 0.0
     ) -> None:  # Not implemented yet
-        """Plot DOS spectra with matplotlib.pyplot.
+        """Plot DOS spectra by matplotlib.pyplot.
 
         Parameters
         ----------

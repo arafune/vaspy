@@ -75,7 +75,7 @@ class EnergyBand(object):
         nspin: int = 1,
     ) -> None:
         """Initialize."""
-        self.kvecs: NDArray = np.array(kvecs)
+        self.kvecs: NDArray[np.float_] = np.array(kvecs)
         self.numk: int = len(self.kvecs)
         self.label: dict[str, list[str]] = {}
         try:
@@ -83,7 +83,7 @@ class EnergyBand(object):
         except ZeroDivisionError:
             self.nbands = 0
         self.energies: NDArray[np.float_] = np.array(energies)
-        self.nspin = nspin
+        self.nspin: int = nspin
         if self.nspin == 1:  # standard
             self.label["spin"] = [""]
             self.label["energy"] = ["Energy"]
@@ -100,7 +100,9 @@ class EnergyBand(object):
         """Return kdistances."""
         return np.cumsum(
             np.linalg.norm(
-                np.concatenate((np.array([[0, 0, 0]]), np.diff(self.kvecs, axis=0))),
+                np.concatenate(
+                    (np.array([[0.0, 0.0, 0.0]]), np.diff(self.kvecs, axis=0))
+                ),
                 axis=1,
             )
         )
@@ -138,9 +140,9 @@ class EnergyBand(object):
         This list format would be useful for str output
 
         """
-        bandstructure: list[list[list[float]]] = []
+        bandstructure: list[list[float]] = []
         for energies in self.energies.T.tolist():
-            band = []
+            band: list[float] = []
             for k, energy in zip(self.kdistances[:, np.newaxis].tolist(), energies):
                 k.extend(energy)
                 band.append(k)
@@ -175,7 +177,7 @@ class EnergyBand(object):
         Returns
         --------
         str
-            a string represntation of EnergyBand.
+            a string representation of EnergyBand.
             **Useful for gnuplot and Igor**.
 
         """
@@ -252,7 +254,7 @@ class EnergyBand(object):
 
     def to_physical_kvector(
         self,
-        recvec: NDArray = np.array(
+        recvec: NDArray[np.float_] = np.array(
             ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)),
         ),
     ) -> None:
@@ -260,7 +262,7 @@ class EnergyBand(object):
 
         Parameters
         -----------
-        recvec: array, NDArray, optional (default is the unit vector)
+        recvec: NDArray, optional (default is the unit vector)
             reciprocal vector
 
         Notes
@@ -272,8 +274,10 @@ class EnergyBand(object):
         """
         logger.debug("recvec: {}".format(recvec))
         logger.debug("self.kvecs: {}".format(self.kvecs))
-        recvec: NDArray = np.array(recvec)
-        self.kvecs: NDArray = np.array([recvec.dot(kvecs) for kvecs in self.kvecs])
+        recvec: NDArray[np.float64] = np.array(recvec)
+        self.kvecs: NDArray[np.float64] = np.array(
+            [recvec.dot(kvecs) for kvecs in self.kvecs]
+        )
 
 
 class EIGENVAL(EnergyBand):
@@ -294,7 +298,7 @@ class EIGENVAL(EnergyBand):
     def __init__(self, filename: Union[str, Path, None] = None) -> None:
         """Initialize."""
         super(EIGENVAL, self).__init__()
-        self.natom = 0
+        self.natom: int = 0
         #
         if filename:
             self.load_file(open_by_suffix(str(filename)))
@@ -309,7 +313,7 @@ class EIGENVAL(EnergyBand):
 
         Returns
         -------
-        tuple[ of list of float and list of float
+        tuple of list of float and list of float
         """
         energies: list[list[list[float]]] = self.energies.transpose(1, 2, 0).tolist()
         kvec: list[list[float]] = self.kvecs.tolist()
@@ -331,18 +335,18 @@ class EIGENVAL(EnergyBand):
         next(thefile)
         next(thefile)
         _, self.numk, self.nbands = [int(i) for i in next(thefile).split()]
-        self.kvecs = []
-        self.energies = []
+        kvecs: list[list[float]] = []
+        energies: list[list[float]] = []
         for _ in range(self.numk):
             # the first line in the sigleset begins with the blank
             next(thefile)
-            self.kvecs.append([float(i) for i in next(thefile).split()[0:3]])
+            kvecs.append([float(i) for i in next(thefile).split()[0:3]])
             for _ in range(self.nbands):
-                self.energies.append(
+                energies.append(
                     [float(i) for i in next(thefile).split()[1 : self.nspin + 1]]
                 )
-        self.kvecs: NDArray = np.array(self.kvecs)
-        self.energies: NDArray = np.array(self.energies).T.reshape(
+        self.kvecs: NDArray[np.float_] = np.array(kvecs)
+        self.energies: NDArray[np.float_] = np.array(energies).T.reshape(
             self.nspin, self.numk, self.nbands
         )
         thefile.close()

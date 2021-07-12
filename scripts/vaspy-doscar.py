@@ -101,7 +101,7 @@ if args.atomset is not None:  # atomset and atomsetname are given by
             filename = a_pdos.site + ".dat"
             a_pdos.export_csv(filename)
     else:
-        raise ValueError("Checke your command.")
+        raise ValueError("Check your command.")
 #
 doses[0].export_csv("total.dat")
 for thedos, atom_index in zip(doses[1:], atomlist):
