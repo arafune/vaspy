@@ -3,7 +3,6 @@
 """This module provides LOCPOT class."""
 #
 import sys
-from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray
@@ -23,12 +22,12 @@ class LOCPOT(mesh3d.VASPGrid):
 
     """
 
-    def __init__(self, filename: str = "", pickles: Optional[str] = None) -> None:
+    def __init__(self, filename: str = "", pickles: str = "") -> None:
         """Initialize."""
         super(LOCPOT, self).__init__(filename, pickles)
 
     def plot_potential_along_axis(
-        self, axis_name: str, frame: int = 0, save: Optional[str] = None
+        self, axis_name: str, frame: int = 0, save: str = ""
     ) -> None:  # FIXME!!
         """Plot potential curve along the axis.
 

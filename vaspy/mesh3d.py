@@ -56,9 +56,7 @@ class VASPGrid(object):
 
     """
 
-    def __init__(
-        self, filename: Union[str, Path] = "", pickles: Optional[str] = None
-    ) -> None:
+    def __init__(self, filename: Union[str, Path] = "", pickles: str = "") -> None:
         """Initialize."""
         self.poscar = poscar.POSCAR()
         self.grid = Grid3D()
@@ -66,7 +64,7 @@ class VASPGrid(object):
         if filename:
             self.load_file(open_by_suffix(str(filename)), pickles)
 
-    def load_file(self, thefile: IO[str], pickles: Optional[str] = None) -> None:
+    def load_file(self, thefile: IO[str], pickles: str = "") -> None:
         """Construct the object from the file.
 
         Parameters

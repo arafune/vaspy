@@ -47,7 +47,7 @@ __version__: str = "0.6.0"
 
 
 def load(
-    filename: str, mode: Optional[str] = None, additional: Union[bool, str, None] = None
+    filename: str, mode: str = "", additional: Union[bool, str, None] = None
 ) -> Any:
     """Load files.
 
@@ -72,8 +72,7 @@ def load(
     """
 
     filenamebase = os.path.basename(filename).lower()
-    if isinstance(mode, str):
-        mode = mode.lower()
+    mode = mode.lower()
     if re.search(r"poscar|contcar", filenamebase) or mode == "poscar":
         return poscar.POSCAR(filename)
     elif re.search(r"incar", filenamebase) or mode == "incar":
