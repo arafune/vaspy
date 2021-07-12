@@ -62,7 +62,7 @@ class ProjectionBand(EnergyBand):
     ) -> None:
         """Initialize."""
         super(ProjectionBand, self).__init__()
-        self.natom = 0
+        self.natom: int = 0
         self.proj = proj
         self.phase = phase
 
@@ -422,7 +422,7 @@ class PROCAR(ProjectionBand):  # Version safety
         ), "This PROCAR is not a proper format\n \
             Check your INCAR the calculations.\n"
 
-        self.kvecs = []
+        kvecs: list[list[float]] = []
         energies: list[float] = []
         orbitals = ""
         phase_r = ""
@@ -437,13 +437,13 @@ class PROCAR(ProjectionBand):  # Version safety
                 ]
             elif "k-point " in line:
                 try:
-                    self.kvecs.append([float(i) for i in line.split()[3:6]])
+                    kvecs.append([float(i) for i in line.split()[3:6]])
                 except ValueError:
-                    self.kvecs.append(
+                    kvecs.append(
                         [
-                            np.float_(line[18:29]),
-                            np.float_(line[29:40]),
-                            np.float_(line[40:51]),
+                            float(line[18:29]),
+                            float(line[29:40]),
+                            float(line[40:51]),
                         ]
                     )
             elif "band " in line:
@@ -467,22 +467,24 @@ class PROCAR(ProjectionBand):  # Version safety
                         except StopIteration:
                             continue
         #
-        self.kvecs = np.array(self.kvecs[: self.numk])
-        self.proj = np.fromstring(orbitals, dtype=float, sep=" ")
+        self.kvecs: NDArray[np.float64] = np.array(kvecs[: self.numk])
+        self.proj: NDArray[np.float64] = np.fromstring(orbitals, dtype=float, sep=" ")
         del orbitals
-        norbital = len(self.label["orbital"])
+        norbital: int = len(self.label["orbital"])
         self.label["site"] = list(range(self.natom))
         self.nspin = self.proj.size // (self.numk * self.nbands * self.natom * norbital)
         if phase_read:
-            self.phase = np.fromstring(phase_r, dtype=float, sep=" ") + (
-                0 + 1.0j
-            ) * np.fromstring(phase_i, dtype=float, sep=" ")
+            self.phase: NDArray[np.float64] = np.fromstring(
+                phase_r, dtype=float, sep=" "
+            ) + (0 + 1.0j) * np.fromstring(phase_i, dtype=float, sep=" ")
             del phase_r, phase_i
         #
         if self.nspin == 1:  # standard
             self.label["spin"] = [""]
             self.label["energy"] = ["Energy"]
-            self.energies = np.array(energies).reshape(1, self.numk, self.nbands)
+            self.energies: NDArray[np.float64] = np.array(energies).reshape(
+                1, self.numk, self.nbands
+            )
             self.proj = self.proj.reshape(
                 (self.nspin, self.numk, self.nbands, self.natom, norbital)
             )
@@ -586,7 +588,7 @@ def _check_orbital_name(arg: str) -> str:
     str
 
     """
-    translate_dict = {
+    translate_dict: dict[str, str] = {
         "pypx": "pxpy",
         "pzpx": "pxpz",
         "pzpy": "pypz",
@@ -598,7 +600,7 @@ def _check_orbital_name(arg: str) -> str:
         "pzpypx": "p",
         "spd": "tot",
     }
-    proper_orbital_name_list = [
+    proper_orbital_name_list: list[str] = [
         "s",
         "py",
         "pz",
@@ -618,11 +620,11 @@ def _check_orbital_name(arg: str) -> str:
     raise ValueError(errmsg)
 
 
-def tyny_check(procar: IO[str]) -> tuple[int, int, int, list[str], bool]:
+def tiny_check(procar: IO[str]) -> tuple[int, int, int, list[str], bool]:
     """Check whether PROCAR file is good.
 
     Return numk, nbands, nion, orbital_names and
-    True/False if collienar calculation
+    True/False if collinear calculation
 
     """
     if "PROCAR lm decomposed + phase" not in next(procar):
@@ -635,8 +637,8 @@ def tyny_check(procar: IO[str]) -> tuple[int, int, int, list[str], bool]:
     numk, nbands, natom = [int(i) for i in (tmp[14:20], tmp[39:43], tmp[62:-1])]
     _ = [next(procar) for i in range(5)]
     section = []
-    orbitals = []
-    phases = []
+    orbitals: list[list[float]] = []
+    phases: list[list[float]] = []
     orbitalnames: list[str] = []
     for line in procar:
         if line.isspace():
