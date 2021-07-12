@@ -270,8 +270,8 @@ class WAVECAR(object):
         spin_i: int = 0,
         k_i: int = 0,
         band_i: int = 0,
-        gvec: Optional[NDArray] = None,
-        ngrid: Optional[NDArray] = None,
+        gvec: Optional[NDArray[np.float_]] = None,
+        ngrid: Optional[NDArray[np.int_]] = None,
         norm: bool = False,
         poscar: poscar.POSCAR = poscar.POSCAR(),
     ) -> Union[
@@ -283,7 +283,7 @@ class WAVECAR(object):
         the real space by using FFT transformation of the reciprocal
         space planewave coefficients.
 
-        The 3D FE grid size is detemined by ngrid, which defaults
+        The 3D FE grid size is determined by ngrid, which defaults
         to self.ngrid if it is not provided.  GVectors of the KS
         states is used to put 1D plane wave coefficient back to 3D
         grid.
@@ -297,13 +297,13 @@ class WAVECAR(object):
         band_i: int
             band index :math:`b_i`. starts with 0. default is 0.
         norm: bool
-            If true the Band coeffients are normliazed
+            If true the Band coefficients are normalized
         gvec: numpy.array, optional
             G-vector for calculation. (default is self.gvectors(k_i))
         ngrid: numpy.array, optional
             Ngrid for calculation. (default is self.ngrid).
         poscar: vaspy.poscar.POSCAR, optional
-            POSCAR object (defalut is blank POSCAR object)
+            POSCAR object (default is blank POSCAR object)
 
         Returns
         -----------
@@ -398,8 +398,8 @@ class WAVECAR(object):
             np.testing.assert_array_almost_equal(
                 poscar.scaling_factor * poscar.cell_vecs, self.realcell
             )
-            re = np.real(phi_r)
-            im = np.imag(phi_r)
+            re: NDArray[np.float_] = np.real(phi_r)
+            im: NDArray[np.float_] = np.imag(phi_r)
             if phi_r.ndim == 3:
                 vaspgrid.grid.data = np.concatenate((re.flatten("F"), im.flatten("F")))
             else:  # SOI
@@ -440,13 +440,15 @@ class WAVECAR(object):
 
 
 def make_kgrid(
-    ngrid: Sequence[int], gamma: bool = False, para: bool = PARALLEL
+    ngrid: tuple[int, ...] | NDArray[np.int_],
+    gamma: bool = False,
+    para: bool = PARALLEL,
 ) -> NDArray[np.float_]:
     """Return kgrid.
 
     Parameters
     -----------
-    ngrid: tuple or array-like
+    ngrid: tuple or NDArray
         Grid size
     gamma: boolean, default, false
         Set true if only gamma calculations (use vasp with -DwNGZHalf)
