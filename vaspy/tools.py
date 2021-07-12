@@ -144,12 +144,12 @@ def cuboid(crystal_axes: Sequence[float]) -> NDArray[np.float64]:
 
     Return
     """
-    a: NDArray[np.float64] = np.array(crystal_axes[0])
-    b: NDArray[np.float64] = np.array(crystal_axes[1])
-    c: NDArray[np.float64] = np.array(crystal_axes[2])
-    o: NDArray[np.float64] = np.array((0.0, 0.0, 0.0))
-    points: NDArray[np.float64] = np.array((o, a, b, c, a + b, a + c, b + c, a + b + c))
-    box: NDArray[np.float64] = np.array(
+    a: NDArray[np.float_] = np.array(crystal_axes[0])
+    b: NDArray[np.float_] = np.array(crystal_axes[1])
+    c: NDArray[np.float_] = np.array(crystal_axes[2])
+    o: NDArray[np.float_] = np.array((0, 0, 0))
+    points: NDArray[np.float_] = np.array((o, a, b, c, a + b, a + c, b + c, a + b + c))
+    box: NDArray[np.float_] = np.array(
         (np.min(points.T, axis=1), np.max(points.T, axis=1))
     ).T
     return box

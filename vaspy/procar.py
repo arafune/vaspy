@@ -45,9 +45,9 @@ class ProjectionBand(EnergyBand):
     -----------
     natom: int
         number of atoms
-    proj: NDArray
+    proj: NDArray[np.float_]
         Orbital projection. proj[spin_i, k_i, band_i, site_i, orbital_i]
-    phase: NDArray
+    phase: NDArray[np.float_]
         Phase data.  phase[spin_i, k_i, band_i, site_i, orbital_i]
 
     """
@@ -56,8 +56,8 @@ class ProjectionBand(EnergyBand):
         self,
         kvecs: Sequence[float] = (),
         energies: Sequence[float] = (),
-        proj: Optional[NDArray[np.float64]] = None,
-        phase: Optional[NDArray[np.float64]] = None,
+        proj: Optional[NDArray[np.float_]] = None,
+        phase: Optional[NDArray[np.float_]] = None,
         nspin: int = 1,
     ) -> None:
         """Initialize."""
@@ -68,7 +68,7 @@ class ProjectionBand(EnergyBand):
 
     def append_sumsite(
         self, sites: tuple[int, int], site_name: str
-    ) -> NDArray[np.float64]:
+    ) -> NDArray[np.float_]:
         """Append site-sum results.
 
         After this method, shape changes as following
@@ -95,7 +95,7 @@ class ProjectionBand(EnergyBand):
         self.label["site"].append(site_name)
         logger.debug("self.label: {}".format(self.label))
         #    spin, k, band, atom
-        sumsite: NDArray[np.float64] = self.proj[:, :, :, sites, :].sum(
+        sumsite: NDArray[np.float_] = self.proj[:, :, :, sites, :].sum(
             axis=-2, keepdims=True
         )
         self.proj = np.concatenate((self.proj, sumsite), axis=-2)
@@ -103,7 +103,7 @@ class ProjectionBand(EnergyBand):
 
     def append_sumorbital(
         self, orbitals: Union[tuple[int, ...], int], orbital_name: str
-    ) -> Optional[NDArray[np.float64]]:
+    ) -> Optional[NDArray[np.float_]]:
         """Append orbital-sum results.
 
         After this method, shape changes as following
@@ -121,7 +121,7 @@ class ProjectionBand(EnergyBand):
             return None
         self.label["orbital"].append(orbital_name)
         #    spin, k, band, atom
-        sumorbital: NDArray[np.float64] = self.proj[:, :, :, :, orbitals].sum(
+        sumorbital: NDArray[np.float_] = self.proj[:, :, :, :, orbitals].sum(
             axis=-1, keepdims=True
         )
         self.proj: NDArray[np.float64] = np.concatenate(

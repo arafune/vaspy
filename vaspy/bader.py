@@ -8,7 +8,6 @@ This program is not a part of vasp but it deeply connects with the vasp.
 """
 
 from __future__ import division  # Version safety
-from __future__ import print_function
 from typing import IO, Any, Union
 from pathlib import Path
 from vaspy.tools import open_by_suffix

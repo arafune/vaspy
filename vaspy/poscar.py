@@ -44,7 +44,7 @@ import re
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 from pathlib import Path
 import numpy as np
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike, NDArray
 
 from vaspy import tools
 from vaspy.tools import open_by_suffix
@@ -482,7 +482,7 @@ class POSCAR(PosCarHead, PosCarPos):
             self.to_cartesian()
         position: NDArray[np.float64] = self.positions[site]
         position -= rotate_at / self.scaling_factor
-        rotate: dict[str, Callable[[float], NDArray[np.float64]]] = {
+        rotate: dict[str, Callable[[float], NDArray[np.float_]]] = {
             "x": rotate_x,
             "y": rotate_y,
             "z": rotate_z,
@@ -830,7 +830,7 @@ class POSCAR(PosCarHead, PosCarPos):
                     center_pos: NDArray[np.float64] = _vectorize(center)
                     return np.linalg.norm(_vectorize(pos) - center_pos)
                 # fixme!! when the highest symmetry point
-                # can be detemined from the position list,
+                # can be determined from the position list,
                 # guess_molecule method does not require
                 # the "center" option.
                 # (molecule.

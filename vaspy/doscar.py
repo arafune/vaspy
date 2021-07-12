@@ -71,7 +71,7 @@ class DOSCAR(object):  # Version safety
     pdoses:
 
     energies: tuple[float]
-
+        Energy
     """
 
     def __init__(self, filename: Union[str, Path] = "") -> None:
@@ -352,7 +352,7 @@ class PDOS(DOS):
         ----------
         filename : str
             filename for output
-        energy : Union[list[float], tuple[float, ...]]
+        energy : list[float] |  tuple[float, ...]
             Energy data
         """
         header = ["Energy"]

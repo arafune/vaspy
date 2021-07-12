@@ -62,7 +62,7 @@ class VASPGrid(object):
         """Initialize."""
         self.poscar = poscar.POSCAR()
         self.grid = Grid3D()
-        self.additional: list[Optional[str]] = []
+        self.additional: list[str] = []
         if filename:
             self.load_file(open_by_suffix(str(filename)), pickles)
 
@@ -127,7 +127,9 @@ class VASPGrid(object):
                 else:
                     # for unused data stored in LOCPOT
                     self.additional.extend(line.split())
-        self.grid.data = np.fromstring(griddata, dtype=float, sep=" ")
+        self.grid.data: NDArray[np.float_] = np.fromstring(
+            griddata, dtype=float, sep=" "
+        )
         thefile.close()
 
     def __str__(self) -> str:
@@ -276,7 +278,7 @@ class Grid3D(object):
         """Initialize."""
         self.shape = shape
         if data is None:
-            self.data: NDArray[np.float64] = np.array([])
+            self.data: NDArray[np.float_] = np.array([])
         else:
             self.data = np.array(data)
 
@@ -306,7 +308,7 @@ class Grid3D(object):
 
     def slice(
         self, position: int, axis: str = "z", frame_i: int = 0
-    ) -> NDArray[np.float64]:
+    ) -> NDArray[np.float_]:
         """
         Parameters
         ----------
