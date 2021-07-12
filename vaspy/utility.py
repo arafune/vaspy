@@ -9,9 +9,9 @@ import argparse
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 import itertools
 from re import T
-from typing import Optional, Sequence, Tuple
+from typing import Optional, Sequence
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import ArrayLike, NDArray
 from mayavi import mlab
 
 from vaspy import tools, const
@@ -32,13 +32,13 @@ logger.propagate = False
 
 def view3d(
     vaspy_poscar: POSCAR,
-    repeat: Tuple[int, int, int] = (1, 1, 1),
+    repeat: tuple[int, int, int] = (1, 1, 1),
     output: Optional[str] = None,
-    figsize: Tuple[float, float] = (800.0, 800.0),
-    fgcolor: Tuple[int, int, int] = (0, 0, 0),
-    bgcolor: Tuple[int, int, int] = (1, 1, 1),
+    figsize: tuple[float, float] = (800.0, 800.0),
+    fgcolor: tuple[int, int, int] = (0, 0, 0),
+    bgcolor: tuple[int, int, int] = (1, 1, 1),
     line_thickness: float = 0.05,
-    line_color: Tuple[int, int, int] = (0, 0, 0),
+    line_color: tuple[int, int, int] = (0, 0, 0),
     is_parallel: bool = True,
     scale: float = 20.0,
     theta: float = 90,
@@ -185,15 +185,15 @@ def view3d(
 
 def view_atom_with_surface(
     vaspy_chgcar: vaspy.chgcar.CHGCAR,
-    repeat: Tuple[int, int, int] = (1, 1, 1),
+    repeat: tuple[int, int, int] = (1, 1, 1),
     output: Optional[str] = None,
-    figsize: Tuple[float, float] = (800, 800),
-    fgcolor: Tuple[int, int, int] = (0, 0, 0),
-    bgcolor: Tuple[int, int, int] = (1, 1, 1),
+    figsize: tuple[float, float] = (800, 800),
+    fgcolor: tuple[int, int, int] = (0, 0, 0),
+    bgcolor: tuple[int, int, int] = (1, 1, 1),
     line_thickness: float = 0.05,
-    line_color: Tuple[int, int, int] = (0, 0, 0),
+    line_color: tuple[int, int, int] = (0, 0, 0),
     is_parallel: bool = True,
-    volume_iso_color: Tuple[int, int, int] = (1, 1, 1),
+    volume_iso_color: tuple[int, int, int] = (1, 1, 1),
     scale: float = 20.0,
     theta: float = 90.0,
     phi: float = 0,
@@ -321,7 +321,7 @@ def _grid_nums(n_grids, crystal_axes, lab_axes):
     return tuple(new_grids)
 
 
-def grid_nums(n_grids, crystal_axes) -> Tuple[int, ...]:
+def grid_nums(n_grids, crystal_axes) -> tuple[int, ...]:
     """Return the number of gris of the Laboratory frame.
 
     Parameters
@@ -376,7 +376,7 @@ def _find_diagonal_indexes(n_grids, crystal_axes):
 
 
 def reallocate_to_labframe(
-    mesh_in_direct_coor: Tuple[int, ...],
+    mesh_in_direct_coor: tuple[int, ...],
     crystal_axes: ArrayLike,
     volume_data: ArrayLike,
     no_roll: bool = False,

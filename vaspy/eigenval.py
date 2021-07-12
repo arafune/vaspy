@@ -8,8 +8,8 @@ from pathlib import Path
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
-from numpy.typing import ArrayLike
-from typing import Dict, Optional, Sequence, Tuple, List, IO, Union
+from numpy.typing import NDArray
+from typing import Optional, Sequence, IO, Union
 from vaspy.tools import open_by_suffix
 
 try:
@@ -37,9 +37,9 @@ class EnergyBand(object):
 
     Attributes
     ----------
-    kvecs: ArrayLike
+    kvecs: NDArray
         kvectors
-    kdistances: ArrayLike
+    kdistances: NDArray
         kdisance
     numk: int
         number of kpoints
@@ -47,7 +47,7 @@ class EnergyBand(object):
         number of bands
     nsping: int
         spin character
-    energies: ArrayLike
+    energies: NDArray
         energies[spin_i, k_i, band_i], where spin_i, k_i, and band_i are spin-,
         k- and band-index, respectively.
     label: dict
@@ -56,9 +56,9 @@ class EnergyBand(object):
 
     Parameters
     ----------
-    kvecs: ArrayLike
+    kvecs: NDArray
             1D array data of k-vectors.
-    energies: ArrayLike
+    energies: NDArray
             1D array data of energies
     nspin: int
             number of spin: '1' means No-spin.  '2' means collinear spin,
@@ -75,14 +75,14 @@ class EnergyBand(object):
         nspin: int = 1,
     ) -> None:
         """Initialize."""
-        self.kvecs: ArrayLike = np.array(kvecs)
+        self.kvecs: NDArray = np.array(kvecs)
         self.numk: int = len(self.kvecs)
-        self.label: Dict["str", List["str"]] = {}
+        self.label: dict[str, list[str]] = {}
         try:
             self.nbands: int = len(energies) // len(kvecs)
         except ZeroDivisionError:
             self.nbands = 0
-        self.energies: ArrayLike = np.array(energies)
+        self.energies: NDArray[np.float_] = np.array(energies)
         self.nspin = nspin
         if self.nspin == 1:  # standard
             self.label["spin"] = [""]
@@ -96,7 +96,7 @@ class EnergyBand(object):
         self.label["k"] = ["#k"]
 
     @property
-    def kdistances(self) -> ArrayLike:
+    def kdistances(self) -> NDArray[np.float_]:
         """Return kdistances."""
         return np.cumsum(
             np.linalg.norm(
@@ -116,7 +116,7 @@ class EnergyBand(object):
         """
         self.energies -= fermi
 
-    def make_label(self, *keys: str) -> List[str]:
+    def make_label(self, *keys: str) -> list[str]:
         """Return array the used for label for CSV-like data.
 
         Parameters
@@ -124,13 +124,13 @@ class EnergyBand(object):
         keys: tuple
             key tuple used for label
         """
-        label_list = []
+        label_list: list[str] = []
         for key in keys:
             for tmp in self.label[key]:
                 label_list.append(tmp)
         return label_list
 
-    def to_3dlist(self) -> List[List[List[float]]]:
+    def to_3dlist(self) -> list[list[list[float]]]:
         """Return 3D mentional list.
 
         list[band_i, [k_i, energy, (energy_down)]]
@@ -138,7 +138,7 @@ class EnergyBand(object):
         This list format would be useful for str output
 
         """
-        bandstructure = []
+        bandstructure: list[list[list[float]]] = []
         for energies in self.energies.T.tolist():
             band = []
             for k, energy in zip(self.kdistances[:, np.newaxis].tolist(), energies):
@@ -227,9 +227,7 @@ class EnergyBand(object):
         ]
         return plt.gca()
 
-    def show(
-        self, yrange: Optional[Tuple[float, float]] = None, spin_i: int = 0
-    ) -> None:  # How to set default value?
+    def show(self, yrange=None, spin_i: int = 0) -> None:  # How to set default value?
         """Draw band structure by using maptlotlib.
 
         For 'just seeing' use.
@@ -254,7 +252,7 @@ class EnergyBand(object):
 
     def to_physical_kvector(
         self,
-        recvec: ArrayLike = np.array(
+        recvec: NDArray = np.array(
             ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)),
         ),
     ) -> None:
@@ -262,7 +260,7 @@ class EnergyBand(object):
 
         Parameters
         -----------
-        recvec: array, ArrayLike, optional (default is the unit vector)
+        recvec: array, NDArray, optional (default is the unit vector)
             reciprocal vector
 
         Notes
@@ -274,8 +272,8 @@ class EnergyBand(object):
         """
         logger.debug("recvec: {}".format(recvec))
         logger.debug("self.kvecs: {}".format(self.kvecs))
-        recvec: ArrayLike = np.array(recvec)
-        self.kvecs: ArrayLike = np.array([recvec.dot(kvecs) for kvecs in self.kvecs])
+        recvec: NDArray = np.array(recvec)
+        self.kvecs: NDArray = np.array([recvec.dot(kvecs) for kvecs in self.kvecs])
 
 
 class EIGENVAL(EnergyBand):
@@ -301,7 +299,7 @@ class EIGENVAL(EnergyBand):
         if filename:
             self.load_file(open_by_suffix(str(filename)))
 
-    def __getitem__(self, item: int) -> Tuple[List[float], List[List[float]]]:
+    def __getitem__(self, item: int) -> tuple[list[float], list[list[float]]]:
         """
 
         Parameters
@@ -311,10 +309,10 @@ class EIGENVAL(EnergyBand):
 
         Returns
         -------
-        Tuple of list of float and list of float
+        tuple[ of list of float and list of float
         """
-        energies: List[List[List[float]]] = self.energies.transpose(1, 2, 0).tolist()
-        kvec: List[List[float]] = self.kvecs.tolist()
+        energies: list[list[list[float]]] = self.energies.transpose(1, 2, 0).tolist()
+        kvec: list[list[float]] = self.kvecs.tolist()
         return list(zip(kvec, energies))[item]
 
     def __len__(self) -> int:
@@ -343,8 +341,8 @@ class EIGENVAL(EnergyBand):
                 self.energies.append(
                     [float(i) for i in next(thefile).split()[1 : self.nspin + 1]]
                 )
-        self.kvecs: ArrayLike = np.array(self.kvecs)
-        self.energies: ArrayLike = np.array(self.energies).T.reshape(
+        self.kvecs: NDArray = np.array(self.kvecs)
+        self.energies: NDArray = np.array(self.energies).T.reshape(
             self.nspin, self.numk, self.nbands
         )
         thefile.close()

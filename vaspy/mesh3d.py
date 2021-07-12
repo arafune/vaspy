@@ -8,11 +8,11 @@ from __future__ import annotations
 
 import copy
 import os
-from typing import Optional, IO, Sequence, Tuple, Union, List
+from typing import Optional, IO, Sequence, Union
 from pathlib import Path
 
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import ArrayLike, NDArray
 
 from vaspy import poscar, tools
 from vaspy.tools import open_by_suffix
@@ -62,7 +62,7 @@ class VASPGrid(object):
         """Initialize."""
         self.poscar = poscar.POSCAR()
         self.grid = Grid3D()
-        self.additional: List[Optional[str]] = []
+        self.additional: list[str] = []
         if filename:
             self.load_file(open_by_suffix(str(filename)), pickles)
 
@@ -79,7 +79,7 @@ class VASPGrid(object):
 
         """
         separator: str = ""
-        tmp: List[str] = []
+        tmp: list[str] = []
         griddata = ""
         # read POSCAR part
         line: str = thefile.readline()
@@ -127,7 +127,9 @@ class VASPGrid(object):
                 else:
                     # for unused data stored in LOCPOT
                     self.additional.extend(line.split())
-        self.grid.data = np.fromstring(griddata, dtype=float, sep=" ")
+        self.grid.data: NDArray[np.float_] = np.fromstring(
+            griddata, dtype=float, sep=" "
+        )
         thefile.close()
 
     def __str__(self) -> str:
@@ -270,13 +272,13 @@ class Grid3D(object):
 
     def __init__(
         self,
-        shape: Tuple[int, ...] = (0, 0, 0),
+        shape: tuple[int, ...] = (0, 0, 0),
         data: Optional[Sequence[float]] = None,
     ) -> None:
         """Initialize."""
         self.shape = shape
         if data is None:
-            self.data: ArrayLike = np.array([])
+            self.data: NDArray[np.float_] = np.array([])
         else:
             self.data = np.array(data)
 

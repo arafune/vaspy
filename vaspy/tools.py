@@ -9,8 +9,8 @@ from itertools import zip_longest
 import os
 import re
 import numpy as np
-from numpy.typing import ArrayLike
-from typing import List, Iterable, Sequence, Tuple, Union, IO, Any, Optional
+from numpy.typing import NDArray
+from typing import Iterable, Sequence, Union, IO, Any, Optional
 
 
 def open_by_suffix(filename: str) -> IO[str]:
@@ -39,7 +39,7 @@ _RESINGLE = re.compile(r"\d+")
 
 def atom_selection_to_list(
     input_str: str, number: bool = True
-) -> List[Union[int, str]]:
+) -> list[Union[int, str]]:
     """Return list of ordered "String" represents the number.
 
     Parameters
@@ -77,7 +77,7 @@ def atom_selection_to_list(
 
 def atomtypes_atomnums_to_atoms(
     atomtypes: Iterable[str], atomnums: Iterable[int]
-) -> Tuple[str, ...]:
+) -> tuple[str, ...]:
     """Return list representation for atom in use.
 
     Parameters
@@ -102,7 +102,7 @@ def atomtypes_atomnums_to_atoms(
     return tuple(atoms)
 
 
-def atoms_to_atomtypes_atomnums(atoms: List[str]) -> Tuple[List[str], List[int]]:
+def atoms_to_atomtypes_atomnums(atoms: list[str]) -> tuple[list[str], list[int]]:
     r"""Return atomnums and atomtypes list.
 
     Returns
@@ -121,8 +121,8 @@ def atoms_to_atomtypes_atomnums(atoms: List[str]) -> Tuple[List[str], List[int]]
 
     """
     thelast = ""
-    atomnums: List[int] = []
-    atomtypes: List[str] = []
+    atomnums: list[int] = []
+    atomtypes: list[str] = []
     while atoms:
         atom = atoms.pop(0)
         if thelast == atom:
@@ -134,7 +134,7 @@ def atoms_to_atomtypes_atomnums(atoms: List[str]) -> Tuple[List[str], List[int]]
     return atomtypes, atomnums
 
 
-def cuboid(crystal_axes: Union[Sequence[List[float]], ArrayLike]) -> ArrayLike:
+def cuboid(crystal_axes: Union[list[float], NDArray[np.float_]]) -> NDArray[np.float_]:
     """Return the coordinates for cuboid that includes tetrahedron represented by vectors.
 
     Parameters
@@ -144,12 +144,14 @@ def cuboid(crystal_axes: Union[Sequence[List[float]], ArrayLike]) -> ArrayLike:
 
     Return
     """
-    a: ArrayLike = np.array(crystal_axes[0])
-    b: ArrayLike = np.array(crystal_axes[1])
-    c: ArrayLike = np.array(crystal_axes[2])
-    o: ArrayLike = np.array((0, 0, 0))
-    points: ArrayLike = np.array((o, a, b, c, a + b, a + c, b + c, a + b + c))
-    box: ArrayLike = np.array((np.min(points.T, axis=1), np.max(points.T, axis=1))).T
+    a: NDArray[np.float_] = np.array(crystal_axes[0])
+    b: NDArray[np.float_] = np.array(crystal_axes[1])
+    c: NDArray[np.float_] = np.array(crystal_axes[2])
+    o: NDArray[np.float_] = np.array((0, 0, 0))
+    points: NDArray[np.float_] = np.array((o, a, b, c, a + b, a + c, b + c, a + b + c))
+    box: NDArray[np.float_] = np.array(
+        (np.min(points.T, axis=1), np.max(points.T, axis=1))
+    ).T
     return box
     """return np.array(
         (
@@ -163,7 +165,7 @@ def cuboid(crystal_axes: Union[Sequence[List[float]], ArrayLike]) -> ArrayLike:
 if __name__ == "__main__":
     import argparse
 
-    def EACH_SLICE_DEMO(L: Sequence[Any], n: int) -> List[Any]:
+    def EACH_SLICE_DEMO(L: Sequence[Any], n: int) -> list[Any]:
         return list(each_slice(L, n))
 
     demo = {

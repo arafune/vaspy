@@ -16,10 +16,10 @@ The first is absolutely required.
 import itertools
 import logging
 from logging import Formatter, StreamHandler, getLogger
-from typing import IO, Optional, Sequence, Tuple, Union, List
+from typing import IO, Optional, Sequence, Union
 from pathlib import Path
 import numpy as np
-from numpy.typing import ArrayLike, DTypeLike
+from numpy.typing import ArrayLike, DTypeLike, NDArray
 
 # import vaspy.const as const
 from vaspy.tools import open_by_suffix
@@ -57,9 +57,9 @@ class VSIM_ASC(object):
     def __init__(self, filename: Union[str, Path] = "") -> None:
         """Initialize."""
         self.system_name: str = ""
-        self.atoms: List[str] = []
+        self.atoms: list[str] = []
         #
-        self.qpts: List[ArrayLike] = []
+        self.qpts: list[ArrayLike] = []
         self.freqs: ArrayLike = []
         #
         if filename:
@@ -81,7 +81,9 @@ class VSIM_ASC(object):
         dxx, dyx, dyy = [float(x) for x in next(thefile).split()]
         # the 3rd line represents dzx, dzy, dzz
         dzx, dzy, dzz = [float(x) for x in next(thefile).split()]
-        self.lattice_vectors = np.array([[dxx, 0, 0], [dyx, dyy, 0], [dzx, dzy, dzz]])
+        self.lattice_vectors: NDArray[np.float_] = np.array(
+            [[dxx, 0, 0], [dyx, dyy, 0], [dzx, dzy, dzz]]
+        )
         self.atoms = []
         self.positions = []
         self.d_vectors = []
@@ -101,7 +103,7 @@ class VSIM_ASC(object):
                 if aline[-1] == "\\":
                     aline = aline[:-1]
                 modedata = aline.split(";")
-                qpt = np.array([float(x) for x in modedata[0:3]])
+                qpt: NDArray[np.float_] = np.array([float(x) for x in modedata[0:3]])
                 freq = float(modedata[3])
                 self.qpts.append(qpt)
                 self.freqs.append(freq)
@@ -124,10 +126,10 @@ class VSIM_ASC(object):
     def build_phono_motion(
         self,
         mode: int = 0,
-        supercell: Tuple[int, int, int] = (2, 2, 1),
+        supercell: tuple[int, int, int] = (2, 2, 1),
         n_frames: int = 30,
         magnitude: float = 1,
-    ) -> List[ArrayLike]:
+    ) -> list:
         """Build data for creating POSCAR etc.
 
         Parameters
@@ -137,7 +139,7 @@ class VSIM_ASC(object):
         supercell: tuple
             supercell dimensions
         n_frames: int
-            total number of animation frmaes
+            total number of animation frames
 
         """
         qpt = self.qpts[mode]
@@ -194,8 +196,8 @@ def supercell_lattice_vectors(lattice_vectors, cell_id) -> ArrayLike:
 
 def animate_atom_phonon(
     position: Sequence[float],
-    qpt_cart: ArrayLike,
-    d_vector: ArrayLike,
+    qpt_cart: NDArray[np.float_],
+    d_vector: NDArray[np.float_],
     n_frames: int = 30,
     s_frame: int = 0,
     e_frame: Optional[int] = None,

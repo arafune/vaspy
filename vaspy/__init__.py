@@ -22,9 +22,9 @@ from vaspy import (
     tools,
     incar,
 )
-from typing import Optional, Union, List, Any
+from typing import Optional, Union, Any
 
-__all__: List[str] = [
+__all__: list[str] = [
     "bader",
     "chgcar",
     "doscar",

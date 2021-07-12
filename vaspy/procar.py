@@ -13,11 +13,11 @@ This module provides PROCAR, ProjectionBand classes.
 import csv
 import re
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
-from typing import IO, List, Optional, Sequence, Tuple, Union
+from typing import IO, Optional, Sequence, Union
 from pathlib import Path
 
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import NDArray
 
 from vaspy.eigenval import EnergyBand
 from vaspy.tools import open_by_suffix
@@ -45,9 +45,9 @@ class ProjectionBand(EnergyBand):
     -----------
     natom: int
         number of atoms
-    proj: ArrayLike
+    proj: NDArray[np.float_]
         Orbital projection. proj[spin_i, k_i, band_i, site_i, orbital_i]
-    phase: ArrayLike
+    phase: NDArray[np.float_]
         Phase data.  phase[spin_i, k_i, band_i, site_i, orbital_i]
 
     """
@@ -56,17 +56,19 @@ class ProjectionBand(EnergyBand):
         self,
         kvecs: Sequence[float] = (),
         energies: Sequence[float] = (),
-        proj: Optional[ArrayLike] = None,
-        phase: Optional[ArrayLike] = None,
+        proj: Optional[NDArray[np.float_]] = None,
+        phase: Optional[NDArray[np.float_]] = None,
         nspin: int = 1,
     ) -> None:
         """Initialize."""
         super(ProjectionBand, self).__init__()
-        self.natom = 0
+        self.natom: ints = 0
         self.proj = proj
         self.phase = phase
 
-    def append_sumsite(self, sites: Tuple[int, int], site_name: str) -> ArrayLike:
+    def append_sumsite(
+        self, sites: tuple[int, int], site_name: str
+    ) -> NDArray[np.float_]:
         """Append site-sum results.
 
         After this method, shape changes as following
@@ -93,13 +95,15 @@ class ProjectionBand(EnergyBand):
         self.label["site"].append(site_name)
         logger.debug("self.label: {}".format(self.label))
         #    spin, k, band, atom
-        sumsite: ArrayLike = self.proj[:, :, :, sites, :].sum(axis=-2, keepdims=True)
+        sumsite: NDArray[np.float_] = self.proj[:, :, :, sites, :].sum(
+            axis=-2, keepdims=True
+        )
         self.proj = np.concatenate((self.proj, sumsite), axis=-2)
         return sumsite
 
     def append_sumorbital(
-        self, orbitals: Union[Tuple[int, ...], int], orbital_name: str
-    ) -> Optional[ArrayLike]:
+        self, orbitals: Union[tuple[int, ...], int], orbital_name: str
+    ) -> Optional[NDArray[np.float_]]:
         """Append orbital-sum results.
 
         After this method, shape changes as following
@@ -117,13 +121,13 @@ class ProjectionBand(EnergyBand):
             return None
         self.label["orbital"].append(orbital_name)
         #    spin, k, band, atom
-        sumorbital: ArrayLike = self.proj[:, :, :, :, orbitals].sum(
+        sumorbital: NDArray[np.float_] = self.proj[:, :, :, :, orbitals].sum(
             axis=-1, keepdims=True
         )
         self.proj = np.concatenate((self.proj, sumorbital), axis=-1)
         return sumorbital
 
-    def orbital_index(self, arg: str) -> Tuple[int, ...]:
+    def orbital_index(self, arg: str) -> tuple[int, ...]:
         """Return the indexes corresponding orbital names.
 
         This method returns the tuple of orbital number in
@@ -185,9 +189,9 @@ class ProjectionBand(EnergyBand):
 
     def make_label(
         self,
-        site_indexes: Optional[Tuple[int, ...]] = None,
-        orbital_indexes_sets: Optional[Tuple[Tuple[int, ...]]] = None,
-    ) -> List[str]:
+        site_indexes: Optional[tuple[int, ...]] = None,
+        orbital_indexes_sets: Optional[tuple[tuple[int, ...]]] = None,
+    ) -> list[str]:
         """Return array the used for **label** for CSV-like data.
 
         Parameters
@@ -225,7 +229,7 @@ class ProjectionBand(EnergyBand):
         self,
         site_indexes: Sequence[int] = (),
         orbital_indexes_sets: Sequence[Sequence[int]] = (),
-    ) -> List[float]:
+    ) -> list[float]:
         """Return 3D list data that are easily converted to txt data for csv.
 
         Parameters
@@ -417,7 +421,7 @@ class PROCAR(ProjectionBand):  # Version safety
             Check your INCAR the calculations.\n"
 
         self.kvecs = []
-        energies: List[float] = []
+        energies: list[float] = []
         orbitals = ""
         phase_r = ""
         phase_i = ""
@@ -612,7 +616,7 @@ def _check_orbital_name(arg: str) -> str:
     raise ValueError(errmsg)
 
 
-def tyny_check(procar: IO[str]) -> Tuple[int, int, int, List[str], bool]:
+def tyny_check(procar: IO[str]) -> tuple[int, int, int, list[str], bool]:
     """Check whether PROCAR file is good.
 
     Return numk, nbands, nion, orbital_names and
@@ -631,7 +635,7 @@ def tyny_check(procar: IO[str]) -> Tuple[int, int, int, List[str], bool]:
     section = []
     orbitals = []
     phases = []
-    orbitalnames: List[str] = []
+    orbitalnames: list[str] = []
     for line in procar:
         if line.isspace():
             break

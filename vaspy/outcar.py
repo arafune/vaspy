@@ -9,7 +9,7 @@ from __future__ import unicode_literals  # Version safety
 from __future__ import annotations
 
 from vaspy.tools import open_by_suffix
-from typing import List, Sequence, Union, IO
+from typing import Sequence, Union, IO
 from pathlib import Path
 
 
@@ -51,25 +51,25 @@ class OUTCAR(object):  # Version safety
     def __init__(self, filename: Union[str, Path] = "") -> None:
         """Initialize."""
         self.natom = 0
-        self.atomtypes: List[str] = []
-        self.atomnums: List[int] = []
-        self.posforce: List[List[List[float]]] = []
-        self.posforce_title: List[List[str]] = []
-        self.atom_names: List[str] = []
+        self.atomtypes: list[str] = []
+        self.atomnums: list[int] = []
+        self.posforce: list[list[list[float]]] = []
+        self.posforce_title: list[list[str]] = []
+        self.atom_names: list[str] = []
         self.fermi = 0.0
-        self.site_label: List[str] = []
+        self.site_label: list[str] = []
         self.numk = 0
         self.nkdim = 0
         self.nbands = 0
-        self.magnetizations: List[List[List[float]]] = []
-        self.total_charges: List[List[List[float]]] = []
-        self.kvecs: List[List[float]] = []
-        self.weights: List[float] = []
-        self.totens: List[float] = []
+        self.magnetizations: list[list[list[float]]] = []
+        self.total_charges: list[list[list[float]]] = []
+        self.kvecs: list[list[float]] = []
+        self.weights: list[float] = []
+        self.totens: list[float] = []
         if filename:
             self.load_file(open_by_suffix(str(filename)))
 
-    def set_atom_names(self) -> List[str]:
+    def set_atom_names(self) -> list[str]:
         """Build atom_names (the list of atomname_with_index)."""
         self.atom_names = []
         for elm, ionnum in zip(self.atomtypes, self.atomnums):
@@ -103,10 +103,10 @@ class OUTCAR(object):  # Version safety
 
         """
         # local variables
-        section: List[str] = []
-        posforce: List[str] = []
-        magnetizations: List[List[float]] = []
-        total_charges: List[List[float]] = []
+        section: list[str] = []
+        posforce: list[str] = []
+        magnetizations: list[list[float]] = []
+        total_charges: list[list[float]] = []
         kvec_weight = []
         # parse
         for line in thefile:
@@ -205,7 +205,7 @@ class OUTCAR(object):  # Version safety
 
     def select_posforce_header(
         self, posforce_flag: Sequence[bool], *sites: int
-    ) -> List[str]:
+    ) -> list[str]:
         """Return the position and force header selected."""
         selected_sites: Sequence[int]
         if sites == () or sites[0] == []:
@@ -225,7 +225,7 @@ class OUTCAR(object):  # Version safety
 
     def select_posforce(
         self, posforce_flag: Sequence[bool], *sites: int
-    ) -> List[List[float]]:
+    ) -> list[list[float]]:
         """Return the position and force selected by posforce_flag.
 
         Notes

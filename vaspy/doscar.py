@@ -46,7 +46,7 @@ import sys
 from operator import add
 import csv
 from collections.abc import Iterable
-from typing import Sequence, Union, Optional, IO, List, Tuple
+from typing import Sequence, Union, Optional, IO
 from pathlib import Path
 
 try:
@@ -70,8 +70,8 @@ class DOSCAR(object):  # Version safety
 
     pdoses:
 
-    energies: Tuple[float]
-
+    energies: tuple[float]
+        Energy
     """
 
     def __init__(self, filename: Union[str, Path] = "") -> None:
@@ -84,8 +84,8 @@ class DOSCAR(object):  # Version safety
         """
         self.natom: int = 0
         self.tdos: Optional[TDOS] = None
-        self.pdoses: List[PDOS] = []
-        self.energies: Tuple[float, ...] = tuple()
+        self.pdoses: list[PDOS] = []
+        self.energies: tuple[float, ...] = tuple()
         if filename:
             self.load_file(open_by_suffix(str(filename)))
 
@@ -104,10 +104,10 @@ class DOSCAR(object):  # Version safety
         header = thefile.readline()
 
         nedos: int = int(header[32:37])
-        tmp: List[List[float]] = [
+        tmp: list[list[float]] = [
             [float(i) for i in next(thefile).split()] for _ in range(nedos)
         ]
-        tmp_dos: List[Tuple[float]] = [*zip(*tmp)]
+        tmp_dos: list[tuple[float]] = [*zip(*tmp)]
         #
         self.energies = tmp_dos[0]
         if len(tmp_dos) == 3:
@@ -160,9 +160,9 @@ class DOS(Sequence):  # Version safety
 
     """
 
-    def __init__(self, array: Optional[Tuple[float]] = None) -> None:
+    def __init__(self, array: Optional[tuple[float]] = None) -> None:
         """Initialize."""
-        self.dos: List[Union[Tuple[float, ...], List[float]]] = []
+        self.dos: list[Union[tuple[float, ...], list[float]]] = []
         self.header: str = ""
         if array:
             self.dos = [*zip(*array)]
@@ -173,7 +173,7 @@ class DOS(Sequence):  # Version safety
 
     def __getitem__(
         self, idx: Union[int, slice]
-    ) -> Union[Tuple[float, ...], List[Tuple[float]]]:
+    ) -> Union[tuple[float, ...], list[tuple[float]]]:
         return self.dos[idx]
 
     @property
@@ -183,8 +183,8 @@ class DOS(Sequence):  # Version safety
     def export_csv(
         self,
         filename: str,
-        energy: Union[List[float], Tuple[float, ...]],
-        header: List[str],
+        energy: Union[list[float], tuple[float, ...]],
+        header: list[str],
     ) -> None:
         """Export data to csv file"""
         assert len(energy) == len(self)
@@ -201,22 +201,22 @@ class TDOS(DOS):
 
     Attributes
     ----------
-    header : List[str]
+    header : list[str]
 
     dos:
     """
 
-    def __init__(self, array: Optional[Tuple[float]]) -> None:
+    def __init__(self, array: Optional[tuple[float]]) -> None:
         """Initialize
 
         Parameters
         ----------
-        array : Optional[Tuple[float]]
+        array : Optional[tuple[float]]
             DOS data
         """
         super().__init__(array)
         if len(self.dos[0]) == 1:
-            self.header: List[str] = ["Energy", "TDOS"]
+            self.header: list[str] = ["Energy", "TDOS"]
         elif len(self.dos[0]) == 2:  # collinear spin
             self.header = ["Energy", "TDOS_up", "TDOS_down"]
             self.dos = [(d[0], -d[1]) for d in self.dos]
@@ -230,7 +230,7 @@ class TDOS(DOS):
     def export_csv(
         self,
         filename: str,
-        energy: Union[List[float], Tuple[float, ...]],
+        energy: Union[list[float], tuple[float, ...]],
     ) -> None:
         return super().export_csv(filename, header=self.header, energy=energy)
 
@@ -250,7 +250,7 @@ class PDOS(DOS):
 
     Parameters
     -----------
-    array: List[Tuple[float, ...]]
+    array: list[tuple[float, ...]]
         DOS data
     site: str
         site name
@@ -279,13 +279,13 @@ class PDOS(DOS):
     spins = ("up", "down")
 
     def __init__(
-        self, array: Optional[Tuple[float]] = None, site: Optional[str] = None
+        self, array: Optional[tuple[float]] = None, site: Optional[str] = None
     ) -> None:
         """Initialize."""
         super().__init__(array)
         self.site = "" if site is None else site
-        self.orbital_spin: List[str] = list()
-        self.total: List[Tuple[float, ...]] = []
+        self.orbital_spin: list[str] = list()
+        self.total: list[tuple[float, ...]] = []
         if array is not None:
             if len(self.dos[0]) == 9 or len(self.dos[0]) == 16:
                 self.orbital_spin = self.orbitalnames
@@ -321,7 +321,7 @@ class PDOS(DOS):
                 print(len(self.dos[0]))
                 raise RuntimeError("Check the DOSCAR file")
 
-    def projected(self, orbital: Union[str, int]) -> Union[Tuple[float], List[float]]:
+    def projected(self, orbital: Union[str, int]) -> Union[tuple[float], list[float]]:
         if isinstance(orbital, int):
             idx = orbital
         else:
@@ -331,7 +331,7 @@ class PDOS(DOS):
     def graphview(self, *orbitalnames: str) -> None:
         """Show DOS graph by using matplotlib.  For 'just seeing' use."""
         try:
-            alist: List[int] = [
+            alist: list[int] = [
                 self.orbital_spin.index(orbname) for orbname in orbitalnames
             ]
         except ValueError:
@@ -344,7 +344,7 @@ class PDOS(DOS):
         plt.show()
 
     def export_csv(
-        self, filename: str, energy: Union[List[float], Tuple[float, ...]]
+        self, filename: str, energy: Union[list[float], tuple[float, ...]]
     ) -> None:
         """Export data to file object (or file-like object) as csv format.
 
@@ -352,7 +352,7 @@ class PDOS(DOS):
         ----------
         filename : str
             filename for output
-        energy : Union[List[float], Tuple[float, ...]]
+        energy : list[float] |  tuple[float, ...]
             Energy data
         """
         header = ["Energy"]
