@@ -45,9 +45,9 @@ class ProjectionBand(EnergyBand):
     -----------
     natom: int
         number of atoms
-    proj: NDArray[np.float_]
+    proj: NDArray[np.float64]
         Orbital projection. proj[spin_i, k_i, band_i, site_i, orbital_i]
-    phase: NDArray[np.float_]
+    phase: NDArray[np.float64]
         Phase data.  phase[spin_i, k_i, band_i, site_i, orbital_i]
 
     """
@@ -56,8 +56,8 @@ class ProjectionBand(EnergyBand):
         self,
         kvecs: Sequence[float] = (),
         energies: Sequence[float] = (),
-        proj: Optional[NDArray[np.float_]] = None,
-        phase: Optional[NDArray[np.float_]] = None,
+        proj: Optional[NDArray[np.float64]] = None,
+        phase: Optional[NDArray[np.float64]] = None,
         nspin: int = 1,
     ) -> None:
         """Initialize."""
@@ -68,7 +68,7 @@ class ProjectionBand(EnergyBand):
 
     def append_sumsite(
         self, sites: tuple[int, int], site_name: str
-    ) -> NDArray[np.float_]:
+    ) -> NDArray[np.float64]:
         """Append site-sum results.
 
         After this method, shape changes as following
@@ -103,7 +103,7 @@ class ProjectionBand(EnergyBand):
 
     def append_sumorbital(
         self, orbitals: Union[tuple[int, ...], int], orbital_name: str
-    ) -> Optional[NDArray[np.float_]]:
+    ) -> Optional[NDArray[np.float64]]:
         """Append orbital-sum results.
 
         After this method, shape changes as following
@@ -121,7 +121,7 @@ class ProjectionBand(EnergyBand):
             return None
         self.label["orbital"].append(orbital_name)
         #    spin, k, band, atom
-        sumorbital: NDArray[np.float_] = self.proj[:, :, :, :, orbitals].sum(
+        sumorbital: NDArray[np.float64] = self.proj[:, :, :, :, orbitals].sum(
             axis=-1, keepdims=True
         )
         self.proj: NDArray[np.float64] = np.concatenate(

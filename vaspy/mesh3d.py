@@ -125,7 +125,7 @@ class VASPGrid(object):
                 else:
                     # for unused data stored in LOCPOT
                     self.additional.extend(line.split())
-        self.grid.data: NDArray[np.float_] = np.fromstring(
+        self.grid.data: NDArray[np.float64] = np.fromstring(
             griddata, dtype=float, sep=" "
         )
         thefile.close()
@@ -276,7 +276,7 @@ class Grid3D(object):
         """Initialize."""
         self.shape = shape
         if data is None:
-            self.data: NDArray[np.float_] = np.array([])
+            self.data: NDArray[np.float64] = np.array([])
         else:
             self.data = np.array(data)
 
@@ -306,7 +306,7 @@ class Grid3D(object):
 
     def slice(
         self, position: int, axis: str = "z", frame_i: int = 0
-    ) -> NDArray[np.float_]:
+    ) -> NDArray[np.float64]:
         """
         Parameters
         ----------

@@ -81,7 +81,7 @@ class VSIM_ASC(object):
         dxx, dyx, dyy = [float(x) for x in next(thefile).split()]
         # the 3rd line represents dzx, dzy, dzz
         dzx, dzy, dzz = [float(x) for x in next(thefile).split()]
-        self.lattice_vectors: NDArray[np.float_] = np.array(
+        self.lattice_vectors: NDArray[np.float64] = np.array(
             [[dxx, 0, 0], [dyx, dyy, 0], [dzx, dzy, dzz]]
         )
         self.atoms = []
@@ -103,7 +103,7 @@ class VSIM_ASC(object):
                 if aline[-1] == "\\":
                     aline = aline[:-1]
                 modedata = aline.split(";")
-                qpt: NDArray[np.float_] = np.array([float(x) for x in modedata[0:3]])
+                qpt: NDArray[np.float64] = np.array([float(x) for x in modedata[0:3]])
                 freq = float(modedata[3])
                 self.qpts.append(qpt)
                 self.freqs.append(freq)
@@ -131,7 +131,7 @@ class VSIM_ASC(object):
         supercell: tuple[int, int, int] = (2, 2, 1),
         n_frames: int = 30,
         magnitude: float = 1,
-    ) -> list[NDArray[np.float_]]:
+    ) -> list[NDArray[np.float64]]:
         """Build data for creating POSCAR etc.
 
         Parameters
@@ -198,8 +198,8 @@ def supercell_lattice_vectors(lattice_vectors, cell_id) -> NDArray[np.float64]:
 
 def animate_atom_phonon(
     position: Sequence[float],
-    qpt_cart: NDArray[np.float_],
-    d_vector: NDArray[np.float_],
+    qpt_cart: NDArray[np.float64],
+    d_vector: NDArray[np.float64],
     n_frames: int = 30,
     s_frame: int = 0,
     e_frame: Optional[int] = None,
@@ -230,8 +230,8 @@ def animate_atom_phonon(
         list of atom position representing animation
 
     """
-    position0: NDArray[np.float_] = np.array(position)  # for safe
-    positions: list[NDArray[np.float_]] = []
+    position0: NDArray[np.float64] = np.array(position)  # for safe
+    positions: list[NDArray[np.float64]] = []
     if not e_frame:
         e_frame = s_frame + n_frames - 1
     for frame in range(s_frame, e_frame + 1):

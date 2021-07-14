@@ -482,7 +482,7 @@ class POSCAR(PosCarHead, PosCarPos):
             self.to_cartesian()
         position: NDArray[np.float64] = self.positions[site]
         position -= rotate_at / self.scaling_factor
-        rotate: dict[str, Callable[[float], NDArray[np.float_]]] = {
+        rotate: dict[str, Callable[[float], NDArray[np.float64]]] = {
             "x": rotate_x,
             "y": rotate_y,
             "z": rotate_z,

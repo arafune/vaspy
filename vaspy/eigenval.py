@@ -75,14 +75,14 @@ class EnergyBand(object):
         nspin: int = 1,
     ) -> None:
         """Initialize."""
-        self.kvecs: NDArray[np.float_] = np.array(kvecs)
+        self.kvecs: NDArray[np.float64] = np.array(kvecs)
         self.numk: int = len(self.kvecs)
         self.label: dict[str, list[str]] = {}
         try:
             self.nbands: int = len(energies) // len(kvecs)
         except ZeroDivisionError:
             self.nbands = 0
-        self.energies: NDArray[np.float_] = np.array(energies)
+        self.energies: NDArray[np.float64] = np.array(energies)
         self.nspin: int = nspin
         if self.nspin == 1:  # standard
             self.label["spin"] = [""]
@@ -96,7 +96,7 @@ class EnergyBand(object):
         self.label["k"] = ["#k"]
 
     @property
-    def kdistances(self) -> NDArray[np.float_]:
+    def kdistances(self) -> NDArray[np.float64]:
         """Return kdistances."""
         return np.cumsum(
             np.linalg.norm(
@@ -254,7 +254,7 @@ class EnergyBand(object):
 
     def to_physical_kvector(
         self,
-        recvec: NDArray[np.float_] = np.array(
+        recvec: NDArray[np.float64] = np.array(
             ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)),
         ),
     ) -> None:
@@ -343,8 +343,8 @@ class EIGENVAL(EnergyBand):
                 energies.append(
                     [float(i) for i in next(thefile).split()[1 : self.nspin + 1]]
                 )
-        self.kvecs: NDArray[np.float_] = np.array(kvecs)
-        self.energies: NDArray[np.float_] = np.array(energies).T.reshape(
+        self.kvecs: NDArray[np.float64] = np.array(kvecs)
+        self.energies: NDArray[np.float64] = np.array(energies).T.reshape(
             self.nspin, self.numk, self.nbands
         )
         thefile.close()
