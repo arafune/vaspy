@@ -182,7 +182,7 @@ class EnergyBand(object):
 
         """
         labels = self.make_label("k", "energy")
-        output = labels[0]
+        output: str = labels[0]
         for label in labels[1:]:
             output += "\t" + label
         output += "\n"

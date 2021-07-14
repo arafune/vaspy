@@ -100,7 +100,7 @@ class DOSCAR(object):  # Version safety
         """
         firstline = thefile.readline()
         self.natom = int(firstline[0:4])
-        [thefile.readline() for i in range(4)]
+        [thefile.readline() for _ in range(4)]
         header = thefile.readline()
 
         nedos: int = int(header[32:37])

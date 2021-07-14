@@ -95,7 +95,7 @@ class ProjectionBand(EnergyBand):
         self.label["site"].append(site_name)
         logger.debug("self.label: {}".format(self.label))
         #    spin, k, band, atom
-        sumsite: NDArray[Any, np.float_] = self.proj[:, :, :, sites, :].sum(
+        sumsite: NDArray[np.float64] = self.proj[:, :, :, sites, :].sum(
             axis=-2, keepdims=True
         )
         self.proj = np.concatenate((self.proj, sumsite), axis=-2)
