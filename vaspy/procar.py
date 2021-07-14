@@ -13,7 +13,7 @@ This module provides PROCAR, ProjectionBand classes.
 import csv
 import re
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
-from typing import IO, Optional, Sequence, Union, Any
+from typing import IO, Optional, Sequence, Union
 from pathlib import Path
 
 import numpy as np

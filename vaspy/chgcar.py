@@ -47,7 +47,7 @@ class CHGCAR(VASPGrid):
 
     def __init__(self, filename: Union[str, Path] = "", pickles: str = "") -> None:
         """Initialize."""
-        super(CHGCAR, self).__init__(None)
+        super(CHGCAR, self).__init__()
         self.spin: list[str] = [""]
         if filename:
             self.load_file(open_by_suffix(str(filename)), pickles)

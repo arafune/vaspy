@@ -125,9 +125,7 @@ class VASPGrid(object):
                 else:
                     # for unused data stored in LOCPOT
                     self.additional.extend(line.split())
-        self.grid.data: NDArray[np.float64] = np.fromstring(
-            griddata, dtype=float, sep=" "
-        )
+        self.grid.data = np.fromstring(griddata, dtype=float, sep=" ")
         thefile.close()
 
     def __str__(self) -> str:
@@ -290,7 +288,7 @@ class Grid3D(object):
         """Return the number of grid frames."""
         return divmod(self.data.size, self.size)[0]
 
-    def frame(self, frame_i: int) -> NDArray[np.float64]:
+    def frame(self, frame_i: int) -> Grid3D:
         """Return the i-th frame.
 
         Parameters
