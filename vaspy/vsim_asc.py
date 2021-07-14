@@ -146,17 +146,18 @@ class VSIM_ASC(object):
 
         """
         qpt = self.qpts[mode]
-        bmatrix = 2 * np.pi * np.linalg.inv(self.lattice_vectors).transpose()
-        qpt_cart = qpt.dot(bmatrix)
+        bmatrix: NDArray[np.float64] = (
+            2 * np.pi * np.linalg.inv(self.lattice_vectors).transpose()
+        )
+        qpt_cart: float = qpt.dot(bmatrix)
         logger.debug(
             "qpt_cart[x] = {}, qpt_cart[y] = {}, qpt_cart[z] ={}".format(
                 qpt_cart[0], qpt_cart[1], qpt_cart[2]
             )
         )
         #
-        animation_positions = []
+        animation_positions: list[list[NDArray[np.float64]]] = []
         for atom_i, position in enumerate(self.positions):
-
             for cell_id in itertools.product(
                 range(supercell[0]), range(supercell[1]), range(supercell[2])
             ):
@@ -191,7 +192,7 @@ def supercell_lattice_vectors(lattice_vectors, cell_id) -> NDArray[np.float64]:
     np.array
 
     """
-    supercell_vectors = []
+    supercell_vectors: list[float] = []
     for x, x_i in zip(lattice_vectors, cell_id):
         supercell_vectors.append(x * x_i)
     return np.array(supercell_vectors)
