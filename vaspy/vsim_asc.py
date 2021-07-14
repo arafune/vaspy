@@ -19,7 +19,7 @@ from logging import Formatter, StreamHandler, getLogger
 from typing import IO, Optional, Sequence, Union
 from pathlib import Path
 import numpy as np
-from numpy.typing import DTypeLike, NDArray
+from numpy.typing import NDArray
 
 # import vaspy.const as const
 from vaspy.tools import open_by_suffix
@@ -60,7 +60,7 @@ class VSIM_ASC(object):
         self.atoms: list[str] = []
         #
         self.qpts: list[NDArray[np.float64]] = []
-        self.freqs: list[float] = []
+        self.freqs: NDArray[np.float64]
         #
         if filename:
             self.load_file(open_by_suffix(str(filename)))
@@ -86,7 +86,8 @@ class VSIM_ASC(object):
         )
         self.atoms = []
         self.positions = []
-        self.d_vectors = []
+        d_vectors: list[list[complex]] = []
+        freqs: list[float] = []
         for line in thefile:
             line = line.strip()
             if line[0] == "#" or line[0] == "!":
@@ -106,23 +107,23 @@ class VSIM_ASC(object):
                 qpt: NDArray[np.float64] = np.array([float(x) for x in modedata[0:3]])
                 freq = float(modedata[3])
                 self.qpts.append(qpt)
-                self.freqs.append(freq)
+                freqs.append(freq)
             elif "]" in line:
                 pass
             else:  # displacement vector
                 vectors = [float(x) for x in line[1:-1].split(";")]
-                self.d_vectors.append(
+                d_vectors.append(
                     [
                         vectors[0] + vectors[3] * 1j,
                         vectors[1] + vectors[4] * 1j,
                         vectors[2] + vectors[5] * 1j,
                     ]
                 )
-        n_phonons = len(self.freqs)
-        self.d_vectors: NDArray[np.float64] = np.array(self.d_vectors).reshape(
+        n_phonons = len(freqs)
+        self.d_vectors: NDArray[np.complex128] = np.array(d_vectors).reshape(
             n_phonons, len(self.atoms), 3
         )
-        self.freqs: NDArray[np.float64] = np.array(self.freqs)
+        self.freqs = np.array(freqs)
         thefile.close()
 
     def build_phono_motion(
@@ -131,7 +132,7 @@ class VSIM_ASC(object):
         supercell: tuple[int, int, int] = (2, 2, 1),
         n_frames: int = 30,
         magnitude: float = 1,
-    ) -> list[NDArray[np.float64]]:
+    ) -> list[list[NDArray[np.float64]]]:
         """Build data for creating POSCAR etc.
 
         Parameters
