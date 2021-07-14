@@ -46,7 +46,7 @@ __all__: list[str] = [
 __version__: str = "0.6.0"
 
 
-def load(filename: str, mode: Optional[str] = None, additional: str = "") -> Any:
+def load(filename: str, mode: str = "", additional: str = "") -> Any:
     """Load files.
 
     Guess the file type by the filename.

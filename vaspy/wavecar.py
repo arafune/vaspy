@@ -438,7 +438,7 @@ class WAVECAR(object):
 
 
 def make_kgrid(
-    ngrid: tuple[int, ...] | NDArray[np.int_],
+    ngrid: Union[tuple[int, ...], NDArray[np.int_]] = (),
     gamma: bool = False,
     para: bool = PARALLEL,
 ) -> NDArray[np.float_]:
