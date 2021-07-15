@@ -270,12 +270,14 @@ class WAVECAR(object):
         spin_i: int = 0,
         k_i: int = 0,
         band_i: int = 0,
-        gvec: Optional[NDArray[np.float64]] = None,
+        gvector: Optional[NDArray[np.int64]] = None,
         ngrid: Optional[NDArray[np.int64]] = None,
         norm: bool = False,
         poscar: poscar.POSCAR = poscar.POSCAR(),
     ) -> Union[
-        NDArray[np.float64], tuple[NDArray[np.float64], NDArray[np.float64]], VASPGrid
+        NDArray[np.complex128],
+        tuple[NDArray[np.float64], NDArray[np.float64]],
+        VASPGrid,
     ]:
         r"""Return the pseudo-wavefunction in real space.
 
@@ -298,7 +300,7 @@ class WAVECAR(object):
             band index :math:`b_i`. starts with 0. default is 0.
         norm: bool
             If true the Band coefficients are normalized
-        gvec: numpy.array, optional
+        gvector: numpy.array, optional
             G-vector for calculation. (default is self.gvectors(k_i))
         ngrid: numpy.array, optional
             Ngrid for calculation. (default is self.ngrid).
@@ -333,11 +335,13 @@ class WAVECAR(object):
             ngrid = self.ngrid.copy()
         else:
             ngrid = np.array(ngrid, dtype=int)
-        if gvec is None:
-            gvec = self.gvectors(k_i)
+        if gvector is None:
+            gvec: NDArray[np.int64] = self.gvectors(k_i)
+        else:
+            gvec = gvector
         gvec %= ngrid[np.newaxis, :]
         if self.gamma and PARALLEL:
-            phi_k: NDArray[np.complex_] = np.zeros(
+            phi_k: NDArray[np.complex128] = np.zeros(
                 (ngrid[0], ngrid[1], ngrid[2] // 2 + 1), dtype=np.complex128
             )
         elif self.gamma and not PARALLEL:
@@ -381,8 +385,8 @@ class WAVECAR(object):
             phi_k[0, 0, 0] *= np.sqrt(2.0)
             phi_k = restore_gamma_grid(phi_k)
         #
-        self.phi_k = phi_k  # For debug
-        phi_r = ifftn(phi_k)
+        self.phi_k: NDArray[np.complex128] = phi_k  # For debug
+        phi_r: NDArray[np.complex128] = ifftn(phi_k)
         if poscar.scaling_factor == 0.0:  # poscar is not given.
             if phi_r.ndim == 3:
                 return phi_r.T
@@ -539,7 +543,7 @@ def check_symmetry(grid3d: NDArray[np.float64]) -> bool:
 
 def restore_gamma_grid(
     grid3d: NDArray[np.complex128], para: bool = PARALLEL
-) -> NDArray[np.float64]:
+) -> NDArray[np.complex128]:
     """Return Grid from the size-reduced matrix for gammareal Wavecar.
 
     Parameters
