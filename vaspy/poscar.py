@@ -119,7 +119,7 @@ class PosCarHead:
             raise TypeError
 
     @property
-    def realcell(self):
+    def realcell(self) -> NDArray[np.float64]:
         """Alias of cell_vecs to keep consistency with wavecar.py."""
         return self.__cell_vecs
 
@@ -279,8 +279,8 @@ class POSCAR(PosCarHead, PosCarPos):
 
         for line, _ in zip(poscar, self.site_label):
             # if not elem: break
-            tmp = line.split()
-            self.positions.append(np.float_(np.array(tmp[:3])))
+            tmp: list[str] = line.split()
+            self.positions.append(np.asarray(np.array(tmp[:3]), dtype=np.float64))
             if self.selective:
                 self.coordinate_changeflags.append(" ".join(tmp[3:]))
 
@@ -367,7 +367,7 @@ class POSCAR(PosCarHead, PosCarPos):
         sposcar.cell_vecs[1] = sposcar.cell_vecs[1] * n_y
         sposcar.cell_vecs[2] = sposcar.cell_vecs[2] * n_z
         sposcar.atomnums = [i * n_x * n_y * n_z for i in sposcar.atomnums]
-        spositions = sposcar.positions
+        spositions: list[NDArray[np.float64]] = sposcar.positions
         sposcar.positions = []
         spositions = [
             np.array([x[0] / n_x, x[1] / n_y, x[2] / n_z]) for x in spositions
@@ -397,7 +397,7 @@ class POSCAR(PosCarHead, PosCarPos):
     # class method? or independent function?
     def nearest(
         self,
-        array: Sequence[float],
+        array: NDArray[np.float64],
         point: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         """Return the nearest position in the periodic space.
@@ -416,7 +416,7 @@ class POSCAR(PosCarHead, PosCarPos):
         return min(array, key=lambda pos: np.linalg.norm(pos - point))
 
     # class method? or independent function?
-    def make27candidate(self, position: Sequence[float]) -> list[NDArray[np.float64]]:
+    def make27candidate(self, position: ArrayLike) -> list[NDArray[np.float64]]:
         """Return 27 vectors set correspond the neiboring.
 
         Parameters
@@ -576,7 +576,7 @@ class POSCAR(PosCarHead, PosCarPos):
 
         """
         if not isinstance(other, POSCAR):
-            return NotImplemented
+            raise RuntimeError  # return NotImplemented
         dest_poscar = copy.deepcopy(self)
         if dest_poscar.scaling_factor != other.scaling_factor:
             raise ValueError("scaling factor is different.")
@@ -650,7 +650,7 @@ class POSCAR(PosCarHead, PosCarPos):
 
         """
         if not isinstance(other, POSCAR):
-            return NotImplemented
+            raise RuntimeError  ## return NotImplemented
         dest_poscar = copy.deepcopy(self)
         original_is_direct = False
         if dest_poscar.is_direct():
@@ -703,7 +703,7 @@ class POSCAR(PosCarHead, PosCarPos):
             a string representation of POSCAR
 
         """
-        tmp = []
+        tmp: list[str] = []
         tmp.append(self.system_name)
         tmp.append(str(self.scaling_factor))
         tmp.append("".join("   {0:20.17f}".format(i) for i in self.cell_vecs[0]))
@@ -737,7 +737,7 @@ class POSCAR(PosCarHead, PosCarPos):
             used in CHGCAR
 
         """
-        tmp = []
+        tmp: list[str] = []
         tmp.append(self.system_name)
         tmp.append("  {0:.14f}".format(self.scaling_factor))
         for k in range(3):
@@ -824,7 +824,7 @@ class POSCAR(PosCarHead, PosCarPos):
             target_atom = self.positions[site]
             atoms27 = self.make27candidate(target_atom)
 
-            def func(pos: Sequence[float], center: Optional[Sequence[float]]) -> float:
+            def func(pos: ArrayLike, center: Optional[Sequence[float]]) -> float:
                 molecule[index] = _vectorize(pos)
                 if center is not None:  # bool([np.ndarray]) => Error
                     center_pos: NDArray[np.float64] = _vectorize(center)
@@ -930,7 +930,7 @@ class POSCAR(PosCarHead, PosCarPos):
             file.write(str(self))
 
 
-def point_in_box(point: Sequence[float], cell_vecs: Sequence[float]) -> bool:
+def point_in_box(point: ArrayLike, cell_vecs: ArrayLike) -> bool:
     """Return True if point is located in the box.
 
     Parameters
@@ -949,7 +949,7 @@ def point_in_box(point: Sequence[float], cell_vecs: Sequence[float]) -> bool:
     if three_by_three(cell_vecs):
         thepoint: NDArray[np.float64] = np.array(point).flatten()
         cell_vectors: NDArray[np.float64] = np.array(cell_vecs)
-        result: float = np.dot(np.linalg.inv(cell_vectors.T), thepoint)
+        result: NDArray[np.float64] = np.dot(np.linalg.inv(cell_vectors.T), thepoint)
         return all((0 <= float(q) <= 1) for q in result)
     else:
         raise TypeError
@@ -1048,7 +1048,7 @@ def rotate_z(theta_deg: float) -> NDArray[np.float64]:
     )
 
 
-def three_by_three(vec: Sequence[float]) -> bool:
+def three_by_three(vec: ArrayLike) -> bool:
     """Return True if vec can be converted into the 3x3 matrix.
 
     Parameters
@@ -1069,7 +1069,7 @@ def three_by_three(vec: Sequence[float]) -> bool:
     return [3, 3, 3] == [len(_) for _ in vec]
 
 
-def _vectorize(vector: Sequence[float]) -> NDArray[np.float64]:
+def _vectorize(vector: ArrayLike) -> NDArray[np.float64]:
     """Return np.ndarray object
 
     Parameters
