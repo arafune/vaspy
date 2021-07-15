@@ -433,9 +433,9 @@ class Grid3D(object):
 
         """
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size : (frame_i + 1) * self.size].reshape(
-            (self.shape[2], self.shape[1], self.shape[0])
-        )
+        data: NDArray[np.float64] = self.data[
+            frame_i * self.size : (frame_i + 1) * self.size
+        ].reshape((self.shape[2], self.shape[1], self.shape[0]))
         if axis_name == "X":
             data = np.average(np.average(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
         elif axis_name == "Y":
@@ -463,9 +463,9 @@ class Grid3D(object):
 
         """
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size : (frame_i + 1) * self.size].reshape(
-            (self.shape[2], self.shape[1], self.shape[0])
-        )
+        data: NDArray[np.float64] = self.data[
+            frame_i * self.size : (frame_i + 1) * self.size
+        ].reshape((self.shape[2], self.shape[1], self.shape[0]))
         if axis_name == "X":
             data = np.min(np.min(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
         elif axis_name == "Y":
@@ -493,9 +493,9 @@ class Grid3D(object):
 
         """
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size : (frame_i + 1) * self.size].reshape(
-            (self.shape[2], self.shape[1], self.shape[0])
-        )
+        data: NDArray[np.float64] = self.data[
+            frame_i * self.size : (frame_i + 1) * self.size
+        ].reshape((self.shape[2], self.shape[1], self.shape[0]))
         if axis_name == "X":
             data = np.max(np.max(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
         elif axis_name == "Y":
@@ -525,9 +525,9 @@ class Grid3D(object):
 
         """
         axis_name = axis_name.capitalize()
-        data = self.data[frame_i * self.size : (frame_i + 1) * self.size].reshape(
-            (self.shape[2], self.shape[1], self.shape[0])
-        )
+        data: NDArray[np.float64] = self.data[
+            frame_i * self.size : (frame_i + 1) * self.size
+        ].reshape((self.shape[2], self.shape[1], self.shape[0]))
         if axis_name == "X":
             data = np.median(np.median(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
         elif axis_name == "Y":

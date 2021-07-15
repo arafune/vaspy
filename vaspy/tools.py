@@ -186,7 +186,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="""collection of tools used in this package.""",
         formatter_class=argparse.RawTextHelpFormatter,
-        epilog="""-a/--args option arguments are interpleted by eval().
+        epilog="""-a/--args option arguments are interpreted by eval().
 so strings must be given with quotations("" or '').
 Because command line regards spaces as break,
 list argument must be written without any space.
@@ -197,7 +197,7 @@ list argument must be written without any space.
         metavar="funcname",
         nargs="+",
         choices=available,
-        help="""Demonstrate choosen function.
+        help="""Demonstrate the function.
 *all* shows all function in the choice.
 If -a/--args option is given, get argument(s) from command line.
 Otherwise use prepared argument(s).""",

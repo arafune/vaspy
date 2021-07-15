@@ -209,7 +209,7 @@ class OUTCAR(object):  # Version safety
         """Return the position and force header selected."""
         selected_sites: Sequence[int]
         if sites == () or sites[0] == []:
-            selected_sites = range(1, self.natom + 1)
+            selected_sites: range = range(1, self.natom + 1)
         if isinstance(sites[0], (list, tuple)):
             selected_sites = [n for n in sites[0]]
         return [

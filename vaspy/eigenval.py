@@ -133,7 +133,7 @@ class EnergyBand(object):
         return label_list
 
     def to_3dlist(self) -> list[list[float]]:
-        """Return 3D mentional list.
+        """Return 3D list.
 
         list[band_i, [k_i, energy, (energy_down)]]
 
@@ -274,7 +274,7 @@ class EnergyBand(object):
         """
         logger.debug("recvec: {}".format(recvec))
         logger.debug("self.kvecs: {}".format(self.kvecs))
-        recvec: NDArray[np.float64] = np.array(recvec)
+        recvec = np.array(recvec)
         self.kvecs = np.array([recvec.dot(kvecs) for kvecs in self.kvecs])
 
 

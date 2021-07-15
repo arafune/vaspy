@@ -149,7 +149,7 @@ class VSIM_ASC(object):
         bmatrix: NDArray[np.float64] = (
             2 * np.pi * np.linalg.inv(self.lattice_vectors).transpose()
         )
-        qpt_cart: float = qpt.dot(bmatrix)
+        qpt_cart: NDArray[np.float64] = qpt.dot(bmatrix)
         logger.debug(
             "qpt_cart[x] = {}, qpt_cart[y] = {}, qpt_cart[z] ={}".format(
                 qpt_cart[0], qpt_cart[1], qpt_cart[2]
@@ -178,7 +178,9 @@ class VSIM_ASC(object):
         return animation_positions
 
 
-def supercell_lattice_vectors(lattice_vectors, cell_id) -> NDArray[np.float64]:
+def supercell_lattice_vectors(
+    lattice_vectors: NDArray[np.float64], cell_id: Sequence[int]
+) -> NDArray[np.float64]:
     """Return lattice vectors of supercell.
 
     Parameters

@@ -163,7 +163,7 @@ class DOS(Sequence):  # Version safety
     def __init__(self, array: Optional[tuple[float]] = None) -> None:
         """Initialize."""
         self.dos: list[Union[tuple[float, ...], list[float]]] = []
-        self.header: str = ""
+        self.header: Union[str, list[str]] = ""
         if array:
             self.dos = [*zip(*array)]
 
@@ -216,7 +216,7 @@ class TDOS(DOS):
         """
         super().__init__(array)
         if len(self.dos[0]) == 1:
-            self.header: list[str] = ["Energy", "TDOS"]
+            self.header = ["Energy", "TDOS"]
         elif len(self.dos[0]) == 2:  # collinear spin
             self.header = ["Energy", "TDOS_up", "TDOS_down"]
             self.dos = [(d[0], -d[1]) for d in self.dos]
