@@ -268,7 +268,7 @@ class Grid3D(object):
 
     def __init__(
         self,
-        shape: tuple[int, ...] = (0, 0, 0),
+        shape: Union[tuple[int, ...], NDArray[np.int64]] = (0, 0, 0),
         data: Optional[Sequence[float]] = None,
     ) -> None:
         """Initialize."""

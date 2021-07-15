@@ -204,12 +204,12 @@ class OUTCAR(object):  # Version safety
         thefile.close()
 
     def select_posforce_header(
-        self, posforce_flag: Sequence[bool], *sites: int
+        self, posforce_flag: Sequence[bool], *sites: tuple[Union[int, list[int]]]
     ) -> list[str]:
         """Return the position and force header selected."""
         selected_sites: Sequence[int]
         if sites == () or sites[0] == []:
-            selected_sites: range = range(1, self.natom + 1)
+            selected_sites = range(1, self.natom + 1)
         if isinstance(sites[0], (list, tuple)):
             selected_sites = [n for n in sites[0]]
         return [
@@ -224,7 +224,7 @@ class OUTCAR(object):  # Version safety
     # correct?
 
     def select_posforce(
-        self, posforce_flag: Sequence[bool], *sites: int
+        self, posforce_flag: Sequence[bool], *sites: tuple[Union[int, list[int]]]
     ) -> list[list[float]]:
         """Return the position and force selected by posforce_flag.
 
