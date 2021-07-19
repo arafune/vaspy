@@ -68,7 +68,7 @@ class ProjectionBand(EnergyBand):
 
     def append_sumsite(
         self, sites: tuple[int, int], site_name: str
-    ) -> NDArray[np.float64]:
+    ) -> Optional[NDArray[np.float64]]:
         """Append site-sum results.
 
         After this method, shape changes as following
