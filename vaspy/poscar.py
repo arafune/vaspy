@@ -613,8 +613,8 @@ class POSCAR(PosCarHead, PosCarPos):
         logger.debug("one.positions: {}".format(one.positions))
         atoms = tools.atomtypes_atomnums_to_atoms(self.atomtypes, self.atomnums)
         logger.debug("atoms: {}".format(atoms))
-        one_atoms = []
-        other_atoms = []
+        one_atoms: list[str] = []
+        other_atoms: list[str] = []
         for i, (element, position, coordinate_flag) in enumerate(
             zip(atoms, self.positions, self.coordinate_changeflags)
         ):
