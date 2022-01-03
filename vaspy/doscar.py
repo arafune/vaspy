@@ -46,7 +46,7 @@ import sys
 from operator import add
 import csv
 from collections.abc import Iterable
-from typing import Sequence, Optional, IO
+from typing import Sequence, IO
 from pathlib import Path
 
 try:
@@ -83,7 +83,7 @@ class DOSCAR(object):  # Version safety
             file name of "DOSCAR"
         """
         self.natom: int = 0
-        self.tdos: Optional[TDOS] = None
+        self.tdos: TDOS|None = None
         self.pdoses: list[PDOS] = []
         self.energies: tuple[float, ...] = tuple()
         if filename:
@@ -160,7 +160,7 @@ class DOS(Sequence):  # Version safety
 
     """
 
-    def __init__(self, array: Optional[tuple[float]] = None) -> None:
+    def __init__(self, array: tuple[float]|None = None) -> None:
         """Initialize."""
         self.dos: list[tuple[float, ...]|list[float]] = []
         self.header: str|list[str] = ""
@@ -206,12 +206,12 @@ class TDOS(DOS):
     dos:
     """
 
-    def __init__(self, array: Optional[tuple[float]]) -> None:
+    def __init__(self, array: tuple[float]|None) -> None:
         """Initialize
 
         Parameters
         ----------
-        array : Optional[tuple[float]]
+        array : tuple[float]|None
             DOS data
         """
         super().__init__(array)
@@ -279,11 +279,11 @@ class PDOS(DOS):
     spins = ("up", "down")
 
     def __init__(
-        self, array: Optional[tuple[float]] = None, site: Optional[str] = None
+        self, array: tuple[float]|None = None, site: str = ""
     ) -> None:
         """Initialize."""
         super().__init__(array)
-        self.site = "" if site is None else site
+        self.site = site
         self.orbital_spin: list[str] = list()
         self.total: list[tuple[float, ...]] = []
         if array is not None:

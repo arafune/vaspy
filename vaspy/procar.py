@@ -13,7 +13,7 @@ from __future__ import annotations
 import csv
 import re
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
-from typing import IO, Optional, Sequence
+from typing import IO, Sequence
 from pathlib import Path
 
 import numpy as np
@@ -56,8 +56,8 @@ class ProjectionBand(EnergyBand):
         self,
         kvecs: Sequence[float] = (),
         energies: Sequence[float] = (),
-        proj: Optional[NDArray[np.float64]] = None,
-        phase: Optional[NDArray[np.float64]] = None,
+        proj: NDArray[np.float64]|None = None,
+        phase: NDArray[np.float64]|None = None,
         nspin: int = 1,
     ) -> None:
         """Initialize."""
@@ -68,7 +68,7 @@ class ProjectionBand(EnergyBand):
 
     def append_sumsite(
         self, sites: tuple[int, int], site_name: str
-    ) -> Optional[NDArray[np.float64]]:
+    ) -> NDArray[np.float64]|None:
         """Append site-sum results.
 
         After this method, shape changes as following
@@ -103,7 +103,7 @@ class ProjectionBand(EnergyBand):
 
     def append_sumorbital(
         self, orbitals:tuple[int, ...]|int, orbital_name: str
-    ) -> Optional[NDArray[np.float64]]:
+    ) -> NDArray[np.float64]|None:
         """Append orbital-sum results.
 
         After this method, shape changes as following
@@ -191,8 +191,8 @@ class ProjectionBand(EnergyBand):
 
     def make_label(
         self,
-        site_indexes: Optional[tuple[int, ...]] = None,
-        orbital_indexes_sets: Optional[tuple[tuple[int, ...]]] = None,
+        site_indexes: tuple[int, ...]|None = None,
+        orbital_indexes_sets: tuple[tuple[int, ...]]|None = None,
     ) -> list[str]:
         """Return array the used for **label** for CSV-like data.
 

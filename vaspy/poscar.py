@@ -51,7 +51,6 @@ from vaspy.tools import open_by_suffix
 from typing import (
     Sequence,
     Any,
-    Optional,
     IO,
     Generator,
     Callable,
@@ -228,7 +227,7 @@ class POSCAR(PosCarHead, PosCarPos):
 
     """
 
-    def __init__(self, arg: Optional[Sequence[str]] = None) -> None:
+    def __init__(self, arg: Sequence[str]|None = None) -> None:
         """Initialization.
 
         Parameters
@@ -290,7 +289,7 @@ class POSCAR(PosCarHead, PosCarPos):
     def sort(
         self,
         from_site: int = 0,
-        to_site: Optional[int] = None,
+        to_site: int|None = None,
         axis: str|int = "z",
     ) -> None:
         """Sort positions attribute by coordinate.
@@ -788,7 +787,7 @@ class POSCAR(PosCarHead, PosCarPos):
             self.positions = [mat.dot(v) for v in self.positions]
 
     def guess_molecule(
-        self, site_list: Sequence[int], center: Optional[Sequence[float]] = None
+        self, site_list: Sequence[int], center: Sequence[float]|None = None
     ) -> None:
         """Arrange atom position to form a molecule.
 
@@ -823,7 +822,7 @@ class POSCAR(PosCarHead, PosCarPos):
             target_atom = self.positions[site]
             atoms27 = self.make27candidate(target_atom)
 
-            def func(pos: ArrayLike, center: Optional[Sequence[float]]) -> float:
+            def func(pos: ArrayLike, center: Sequence[float]|None) -> float:
                 molecule[index] = _vectorize(pos)
                 if center is not None:  # bool([np.ndarray]) => Error
                     center_pos: NDArray[np.float64] = _vectorize(center)

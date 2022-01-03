@@ -17,7 +17,7 @@ from __future__ import annotations
 import itertools
 import logging
 from logging import Formatter, StreamHandler, getLogger
-from typing import IO, Optional, Sequence
+from typing import IO, Sequence
 from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
@@ -207,7 +207,7 @@ def animate_atom_phonon(
     d_vector: NDArray[np.float64],
     n_frames: int = 30,
     s_frame: int = 0,
-    e_frame: Optional[int] = None,
+    e_frame: int|None = None,
     magnitude: float = 1.0,
 ) -> list[NDArray[np.float64]]:
     """Return atom position series determined by d_vector and q.

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Module for WAVECAR class."""
 from __future__ import annotations
-from typing import IO, Optional, Sequence
+from typing import IO, Sequence
 import numpy as np
 from numpy.typing import DTypeLike, NDArray
 from scipy.fftpack import ifftn
@@ -269,8 +269,8 @@ class WAVECAR(object):
         spin_i: int = 0,
         k_i: int = 0,
         band_i: int = 0,
-        gvector: Optional[NDArray[np.int64]] = None,
-        ngrid: Optional[NDArray[np.int64]] = None,
+        gvector: NDArray[np.int64]|None = None,
+        ngrid: NDArray[np.int64]|None = None,
         norm: bool = False,
         poscar: poscar.POSCAR = poscar.POSCAR(),
     ) ->NDArray[np.complex128]|tuple[NDArray[np.float64]|NDArray[np.float64]]|VASPGrid:

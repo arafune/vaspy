@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import copy
 import os
-from typing import Optional, IO, Sequence
+from typing import IO, Sequence
 from pathlib import Path
 
 import numpy as np
@@ -269,7 +269,7 @@ class Grid3D(object):
     def __init__(
         self,
         shape: tuple[int, ...]|NDArray[np.int64] = (0, 0, 0),
-        data: Optional[Sequence[float]] = None,
+        data: Sequence[float]|None = None,
     ) -> None:
         """Initialize."""
         self.shape = shape
@@ -339,8 +339,8 @@ class Grid3D(object):
     def integrate(
         self,
         axis: str,
-        from_coor: Optional[int] = None,
-        to_coor: Optional[int] = None,
+        from_coor: int|None = None,
+        to_coor: int|None = None,
         frame_i: int = 0,
     ) -> NDArray[np.float64]:
         """Return 2D data integrated occupacy along the 'axis'.

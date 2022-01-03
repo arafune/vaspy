@@ -10,7 +10,7 @@ import argparse
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 import itertools
 from re import T
-from typing import Optional, Sequence
+from typing import Sequence
 import numpy as np
 from numpy.typing import NDArray
 from mayavi import mlab
@@ -34,7 +34,7 @@ logger.propagate = False
 def view3d(
     vaspy_poscar: POSCAR,
     repeat: tuple[int, int, int] = (1, 1, 1),
-    output: Optional[str] = None,
+    output: str|None = None,
     figsize: tuple[float, float] = (800.0, 800.0),
     fgcolor: tuple[int, int, int] = (0, 0, 0),
     bgcolor: tuple[int, int, int] = (1, 1, 1),
@@ -187,7 +187,7 @@ def view3d(
 def view_atom_with_surface(
     vaspy_chgcar: vaspy.chgcar.CHGCAR,
     repeat: tuple[int, int, int] = (1, 1, 1),
-    output: Optional[str] = None,
+    output: str|None = None,
     figsize: tuple[float, float] = (800, 800),
     fgcolor: tuple[int, int, int] = (0, 0, 0),
     bgcolor: tuple[int, int, int] = (1, 1, 1),
