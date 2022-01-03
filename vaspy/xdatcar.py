@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """This module provide XDATCAR class."""
 
+from __future__ import annotations
 import numpy as np
 
 from vaspy.poscar import PosCarHead
 from vaspy.tools import open_by_suffix
 from pathlib import Path
-from typing import IO, Union
+from typing import IO
 
 
 class XDATCAR(PosCarHead):
@@ -18,7 +19,7 @@ class XDATCAR(PosCarHead):
 
     """
 
-    def __init__(self, filename: Union[str, Path] = "") -> None:
+    def __init__(self, filename: str|Path = "") -> None:
         """Initialize.
 
         Parameters

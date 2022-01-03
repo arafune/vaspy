@@ -7,8 +7,8 @@ Bader charge anaslysis performed by bader.
 This program is not a part of vasp but it deeply connects with the vasp.
 """
 
-from __future__ import division  # Version safety
-from typing import IO, Any, Union
+from __future__ import division, annotations  # Version safety
+from typing import IO, Any
 from pathlib import Path
 from vaspy.tools import open_by_suffix
 
@@ -42,12 +42,12 @@ class BaderACF(object):
 
     """
 
-    def __init__(self, filename: Union[str, Path] = "") -> None:
+    def __init__(self, filename: str|Path = "") -> None:
         """Initialize
 
         Parameters
         ----------
-        filename : Union[str, Path], optional
+        filename : str|Path
             filename, by default ""
         """
         self.natom = 0

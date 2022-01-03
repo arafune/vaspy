@@ -5,6 +5,7 @@
 In general, VESTA is pretty nice. However, due to GUI, it is
 difficult to make a series of figures of the model structure.
 """
+from __future__ import annotations
 import argparse
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 import itertools

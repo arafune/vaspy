@@ -13,10 +13,11 @@ This module generates
 
 The first is absolutely required.
 """
+from __future__ import annotations
 import itertools
 import logging
 from logging import Formatter, StreamHandler, getLogger
-from typing import IO, Optional, Sequence, Union
+from typing import IO, Optional, Sequence
 from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
@@ -54,7 +55,7 @@ class VSIM_ASC(object):
 
     """
 
-    def __init__(self, filename: Union[str, Path] = "") -> None:
+    def __init__(self, filename: str|Path = "") -> None:
         """Initialize."""
         self.system_name: str = ""
         self.atoms: list[str] = []

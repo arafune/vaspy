@@ -1,6 +1,6 @@
 """This module provides EIGENVAL."""
 
-from __future__ import division, print_function
+from __future__ import division, print_function, annotations
 
 import csv
 import sys
@@ -9,7 +9,7 @@ from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
 from numpy.typing import NDArray
-from typing import Sequence, IO, Union
+from typing import Sequence, IO
 from vaspy.tools import open_by_suffix
 
 try:
@@ -293,7 +293,7 @@ class EIGENVAL(EnergyBand):
 
     """
 
-    def __init__(self, filename: Union[str, Path, None] = None) -> None:
+    def __init__(self, filename: str|Path = "") -> None:
         """Initialize."""
         super(EIGENVAL, self).__init__()
         self.natom: int = 0

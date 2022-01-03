@@ -9,7 +9,7 @@ from __future__ import unicode_literals  # Version safety
 from __future__ import annotations
 
 from vaspy.tools import open_by_suffix
-from typing import Sequence, Union, IO
+from typing import Sequence, IO
 from pathlib import Path
 
 
@@ -48,7 +48,7 @@ class OUTCAR(object):  # Version safety
 
     """
 
-    def __init__(self, filename: Union[str, Path] = "") -> None:
+    def __init__(self, filename: str|Path = "") -> None:
         """Initialize."""
         self.natom = 0
         self.atomtypes: list[str] = []
@@ -93,7 +93,7 @@ class OUTCAR(object):  # Version safety
             for i in self.atom_names
         ]
 
-    def load_file(self, thefile: Union[IO[str]]) -> None:
+    def load_file(self, thefile: IO[str]) -> None:
         """Parse OUTCAR file.
 
         Parameters
@@ -204,7 +204,7 @@ class OUTCAR(object):  # Version safety
         thefile.close()
 
     def select_posforce_header(
-        self, posforce_flag: Sequence[bool], *sites: tuple[Union[int, list[int]]]
+        self, posforce_flag: Sequence[bool], *sites: tuple[int|list[int]]
     ) -> list[str]:
         """Return the position and force header selected."""
         selected_sites: Sequence[int]
@@ -224,7 +224,7 @@ class OUTCAR(object):  # Version safety
     # correct?
 
     def select_posforce(
-        self, posforce_flag: Sequence[bool], *sites: tuple[Union[int, list[int]]]
+        self, posforce_flag: Sequence[bool], *sites: tuple[int|list[int]]
     ) -> list[list[float]]:
         """Return the position and force selected by posforce_flag.
 

@@ -51,7 +51,6 @@ from vaspy.tools import open_by_suffix
 from typing import (
     Sequence,
     Any,
-    Union,
     Optional,
     IO,
     Generator,
@@ -210,7 +209,7 @@ class PosCarPos(object):
         """
         return not self.is_cartesian()
 
-    def __getitem__(self, item: Union[int]) -> NDArray[np.float64]:
+    def __getitem__(self, item: int) -> NDArray[np.float64]:
         return self.positions[item]
 
 
@@ -241,12 +240,12 @@ class POSCAR(PosCarHead, PosCarPos):
         super(POSCAR, self).__init__()
         PosCarPos.__init__(self)
         if isinstance(arg, (str, Path)):
-            poscar: Union[tuple[str, ...], list[str]] = open_by_suffix(arg).readlines()
+            poscar: tuple[str, ...]|list[str] = open_by_suffix(arg).readlines()
             self.load_array(poscar)
         if isinstance(arg, (list, tuple)):
             self.load_array(arg)
 
-    def load_array(self, input_poscar: Union[list[str], tuple[str, ...]]) -> None:
+    def load_array(self, input_poscar: list[str]|tuple[str, ...]) -> None:
         """Parse POSCAR as list.
 
         Parameters
@@ -292,7 +291,7 @@ class POSCAR(PosCarHead, PosCarPos):
         self,
         from_site: int = 0,
         to_site: Optional[int] = None,
-        axis: Union[str, int] = "z",
+        axis: str|int = "z",
     ) -> None:
         """Sort positions attribute by coordinate.
 

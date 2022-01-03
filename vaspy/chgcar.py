@@ -6,7 +6,7 @@ translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 from __future__ import annotations
 
 import copy
-from typing import IO, Union
+from typing import IO
 from pathlib import Path
 from vaspy.mesh3d import VASPGrid
 from vaspy.tools import open_by_suffix
@@ -45,7 +45,7 @@ class CHGCAR(VASPGrid):
 
     """
 
-    def __init__(self, filename: Union[str, Path] = "", pickles: str = "") -> None:
+    def __init__(self, filename: str|Path = "", pickles: str = "") -> None:
         """Initialize."""
         super(CHGCAR, self).__init__()
         self.spin: list[str] = [""]

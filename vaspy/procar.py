@@ -9,11 +9,11 @@ This module provides PROCAR, ProjectionBand classes.
 * EnergyBand class is used for drawing the energy band.
 * Projection class is used for storing the orbital projection data
 """
-
+from __future__ import annotations
 import csv
 import re
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
-from typing import IO, Optional, Sequence, Union
+from typing import IO, Optional, Sequence
 from pathlib import Path
 
 import numpy as np
@@ -102,7 +102,7 @@ class ProjectionBand(EnergyBand):
         return sumsite
 
     def append_sumorbital(
-        self, orbitals: Union[tuple[int, ...], int], orbital_name: str
+        self, orbitals:tuple[int, ...]|int, orbital_name: str
     ) -> Optional[NDArray[np.float64]]:
         """Append orbital-sum results.
 
@@ -398,7 +398,7 @@ class PROCAR(ProjectionBand):  # Version safety
     """
 
     def __init__(
-        self, filename: Union[str, Path] = "", phase_read: bool = False
+        self, filename: str|Path = "", phase_read: bool = False
     ) -> None:
         """Initialize."""
         super(PROCAR, self).__init__()

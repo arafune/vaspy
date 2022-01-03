@@ -3,14 +3,14 @@
 """
 Module for tools used in vaspy
 """
-
+from __future__ import annotations
 import bz2
 from itertools import zip_longest
 import os
 import re
 import numpy as np
 from numpy.typing import NDArray
-from typing import Iterable, Sequence, Union, IO, Any, Optional
+from typing import Iterable, Sequence, IO, Any, Optional
 
 
 def open_by_suffix(filename: str) -> IO[str]:
@@ -39,7 +39,7 @@ _RESINGLE = re.compile(r"\d+")
 
 def atom_selection_to_list(
     input_str: str, number: bool = True
-) -> list[Union[int, str]]:
+) -> list[int|str]:
     """Return list of ordered "String" represents the number.
 
     Parameters
@@ -135,7 +135,10 @@ def atoms_to_atomtypes_atomnums(atoms: list[str]) -> tuple[list[str], list[int]]
 
 
 def cuboid(crystal_axes: Sequence[float]) -> NDArray[np.float64]:
-    """Return the coordinates for cuboid that includes tetrahedron represented by vectors.
+    """Return the coordinates for cuboid
+
+    Return the coordinates for the cuboid that includes tetrahedron
+    represented by vectors.
 
     Parameters
     ------------
@@ -145,7 +148,7 @@ def cuboid(crystal_axes: Sequence[float]) -> NDArray[np.float64]:
     Return
     """
     a: NDArray[np.float64] = np.array(crystal_axes[0])
-    b: NDArray[np.float64] = np.array(crystal_axes[1])
+    b: NDArray[np.float64] = np.array(crystal_axes[1], dtype=np.float64)
     c: NDArray[np.float64] = np.array(crystal_axes[2])
     o: NDArray[np.float64] = np.array((0, 0, 0))
     points: NDArray[np.float64] = np.array((o, a, b, c, a + b, a + c, b + c, a + b + c))
@@ -153,13 +156,6 @@ def cuboid(crystal_axes: Sequence[float]) -> NDArray[np.float64]:
         (np.min(points.T, axis=1), np.max(points.T, axis=1))
     ).T
     return box
-    """return np.array(
-        (
-            (np.array([p[1] - p[0] for p in box])[0], 0, 0),
-            (0, np.array([p[1] - p[0] for p in box])[1], 0),
-            (0, 0, np.array([p[1] - p[0] for p in box])[2]),
-        )
-    )"""
 
 
 if __name__ == "__main__":

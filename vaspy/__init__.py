@@ -3,6 +3,8 @@
 
 modules for VASP pre/post-process
 """
+
+from __future__ import annotations
 import os.path
 import re
 
@@ -22,7 +24,7 @@ from vaspy import (
     tools,
     incar,
 )
-from typing import Optional, Union, Any
+from typing import Any
 
 __all__: list[str] = [
     "bader",

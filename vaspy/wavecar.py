@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """Module for WAVECAR class."""
-
-from typing import IO, Optional, Sequence, Union
-
+from __future__ import annotations
+from typing import IO, Optional, Sequence
 import numpy as np
 from numpy.typing import DTypeLike, NDArray
 from scipy.fftpack import ifftn
@@ -274,11 +273,7 @@ class WAVECAR(object):
         ngrid: Optional[NDArray[np.int64]] = None,
         norm: bool = False,
         poscar: poscar.POSCAR = poscar.POSCAR(),
-    ) -> Union[
-        NDArray[np.complex128],
-        tuple[NDArray[np.float64], NDArray[np.float64]],
-        VASPGrid,
-    ]:
+    ) ->NDArray[np.complex128]|tuple[NDArray[np.float64]|NDArray[np.float64]]|VASPGrid:
         r"""Return the pseudo-wavefunction in real space.
 
         Calculate the pseudo-wavefunction of the KS states in
@@ -442,7 +437,7 @@ class WAVECAR(object):
 
 
 def make_kgrid(
-    ngrid: Union[tuple[int, ...], NDArray[np.int64]] = (),
+    ngrid: tuple[int, ...]|NDArray[np.int64] = (),
     gamma: bool = False,
     para: bool = PARALLEL,
 ) -> NDArray[np.float64]:

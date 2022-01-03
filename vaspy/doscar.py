@@ -46,7 +46,7 @@ import sys
 from operator import add
 import csv
 from collections.abc import Iterable
-from typing import Sequence, Union, Optional, IO
+from typing import Sequence, Optional, IO
 from pathlib import Path
 
 try:
@@ -74,12 +74,12 @@ class DOSCAR(object):  # Version safety
         Energy
     """
 
-    def __init__(self, filename: Union[str, Path] = "") -> None:
+    def __init__(self, filename: str|Path = "") -> None:
         """Initialize
 
         Parameters
         ----------
-        filename : Union[str, Path, None], optional
+        filename : str|Path, optional
             file name of "DOSCAR"
         """
         self.natom: int = 0
@@ -162,8 +162,8 @@ class DOS(Sequence):  # Version safety
 
     def __init__(self, array: Optional[tuple[float]] = None) -> None:
         """Initialize."""
-        self.dos: list[Union[tuple[float, ...], list[float]]] = []
-        self.header: Union[str, list[str]] = ""
+        self.dos: list[tuple[float, ...]|list[float]] = []
+        self.header: str|list[str] = ""
         if array:
             self.dos = [*zip(*array)]
 
@@ -172,8 +172,8 @@ class DOS(Sequence):  # Version safety
         return len(self.dos)
 
     def __getitem__(
-        self, idx: Union[int, slice]
-    ) -> Union[tuple[float, ...], list[tuple[float]]]:
+        self, idx: int|slice
+    ) -> tuple[float, ...]|list[tuple[float]]:
         return self.dos[idx]
 
     @property
@@ -183,7 +183,7 @@ class DOS(Sequence):  # Version safety
     def _export_csv(
         self,
         filename: str,
-        energy: Union[list[float], tuple[float, ...]],
+        energy: list[float]|tuple[float, ...],
         header: list[str],
     ) -> None:
         """Export data to csv file"""
@@ -230,7 +230,7 @@ class TDOS(DOS):
     def export_csv(
         self,
         filename: str,
-        energy: Union[list[float], tuple[float, ...]],
+        energy: list[float]|tuple[float, ...],
     ) -> None:
         return super()._export_csv(filename, header=self.header, energy=energy)
 
@@ -321,7 +321,7 @@ class PDOS(DOS):
                 print(len(self.dos[0]))
                 raise RuntimeError("Check the DOSCAR file")
 
-    def projected(self, orbital: Union[str, int]) -> Union[tuple[float], list[float]]:
+    def projected(self, orbital: str|int) -> tuple[float]|list[float]:
         if isinstance(orbital, int):
             idx = orbital
         else:
@@ -344,7 +344,7 @@ class PDOS(DOS):
         plt.show()
 
     def export_csv(
-        self, filename: str, energy: Union[list[float], tuple[float, ...]]
+        self, filename: str, energy: list[float]|tuple[float, ...]
     ) -> None:
         """Export data to file object (or file-like object) as csv format.
 
