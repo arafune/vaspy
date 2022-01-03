@@ -10,7 +10,7 @@ import os
 import re
 import numpy as np
 from numpy.typing import NDArray
-from typing import Iterable, Sequence, IO, Any, Optional
+from typing import Iterable, Sequence, IO, Any
 
 
 def open_by_suffix(filename: str) -> IO[str]:
@@ -23,7 +23,7 @@ def open_by_suffix(filename: str) -> IO[str]:
 
 
 def each_slice(
-    iterable: Iterable, n: int, fillvalue: Optional[float] = None
+    iterable: Iterable, n: int, fillvalue: float|None = None
 ) -> Iterable[Any]:
     """each_slice(iterable, n[, fillvalue]) => iterator
 
