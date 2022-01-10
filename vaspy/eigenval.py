@@ -229,7 +229,7 @@ class EnergyBand(object):
         ]
         return plt.gca()
 
-    def show(self, yrange=None, spin_i: int = 0) -> None:  # How to set default value?
+    def show(self, y_range:tuple[float, float]|None=None, spin_i: int = 0) -> None:  # How to set default value?
         """Draw band structure by using maptlotlib.
 
         For 'just seeing' use.
@@ -246,8 +246,8 @@ class EnergyBand(object):
         """
         for band_i in range(self.energies.shape[2]):
             plt.plot(self.kdistances, self.energies[spin_i, :, band_i], color="blue")
-        if yrange is not None:
-            plt.ylim([yrange[0], yrange[1]])
+        if y_range is not None:
+            plt.ylim([y_range[0], y_range[1]])
         plt.xlim([self.kdistances[0], self.kdistances[-1]])
         plt.ylabel(self.label["energy"][spin_i] + " (eV)")
         plt.show()
