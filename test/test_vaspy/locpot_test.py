@@ -4,8 +4,8 @@ import os
 
 import numpy as np
 import pytest
-from vaspy.locpot import LOCPOT
 import vaspy
+from vaspy.locpot import LOCPOT
 
 datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
 

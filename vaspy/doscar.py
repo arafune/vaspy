@@ -42,12 +42,12 @@ From VASP webpage::
 from __future__ import annotations
 
 import copy
-import sys
-from operator import add
 import csv
+import sys
 from collections.abc import Iterable
-from typing import Sequence, IO
+from operator import add
 from pathlib import Path
+from typing import IO, Sequence
 
 try:
     import matplotlib.pyplot as plt

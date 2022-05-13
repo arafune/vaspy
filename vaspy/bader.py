@@ -7,9 +7,11 @@ Bader charge anaslysis performed by bader.
 This program is not a part of vasp but it deeply connects with the vasp.
 """
 
-from __future__ import division, annotations  # Version safety
-from typing import IO, Any
+from __future__ import annotations, division  # Version safety
+
 from pathlib import Path
+from typing import IO, Any
+
 from vaspy.tools import open_by_suffix
 
 

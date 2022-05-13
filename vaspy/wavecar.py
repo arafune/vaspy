@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 """Module for WAVECAR class."""
 from __future__ import annotations
+
 from typing import IO, Sequence
+
 import numpy as np
 from numpy.typing import DTypeLike, NDArray
 from scipy.fftpack import ifftn
 
 import vaspy.mesh3d as mesh3d
-from vaspy.mesh3d import VASPGrid
 import vaspy.poscar as poscar
+from vaspy.mesh3d import VASPGrid
 
 Ry_in_eV: float = 13.605826
 au_in_AA: float = 0.529177249

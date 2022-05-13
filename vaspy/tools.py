@@ -4,13 +4,15 @@
 Module for tools used in vaspy
 """
 from __future__ import annotations
+
 import bz2
-from itertools import zip_longest
 import os
 import re
+from itertools import zip_longest
+from typing import IO, Any, Iterable, Sequence
+
 import numpy as np
 from numpy.typing import NDArray
-from typing import Iterable, Sequence, IO, Any
 
 
 def open_by_suffix(filename: str) -> IO[str]:

@@ -2,15 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import os
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 import numpy as np
-from numpy.testing import assert_array_equal
 import pytest
 import vaspy
 import vaspy.poscar
-
+from numpy.testing import assert_array_equal
 
 datadir = Path(__file__).parent / "data"
 

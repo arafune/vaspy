@@ -5,10 +5,10 @@ Script to demonstrate vaspy.incar functionality.
 
 """
 import argparse
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
+
 import vaspy
 import vaspy.incar
-
-from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 
 LOGLEVEL = DEBUG
 logger = getLogger(__name__)

@@ -4,11 +4,11 @@
 import os
 
 import numpy as np
+import vaspy.procar as procar
 
 # import tempfile
 
 
-import vaspy.procar as procar
 
 
 class TestSinglePROCAR(object):

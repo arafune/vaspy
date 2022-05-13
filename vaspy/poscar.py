@@ -43,18 +43,13 @@ import itertools as it
 import re
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 from pathlib import Path
+from typing import IO, Any, Callable, Generator, Sequence
+
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from vaspy import tools
 from vaspy.tools import open_by_suffix
-from typing import (
-    Sequence,
-    Any,
-    IO,
-    Generator,
-    Callable,
-)
 
 # logger
 LOGLEVEL = INFO
@@ -227,7 +222,7 @@ class POSCAR(PosCarHead, PosCarPos):
 
     """
 
-    def __init__(self, arg: Sequence[str]|None = None) -> None:
+    def __init__(self, arg: Sequence[str] | None = None) -> None:
         """Initialization.
 
         Parameters
@@ -239,12 +234,12 @@ class POSCAR(PosCarHead, PosCarPos):
         super(POSCAR, self).__init__()
         PosCarPos.__init__(self)
         if isinstance(arg, (str, Path)):
-            poscar: tuple[str, ...]|list[str] = open_by_suffix(arg).readlines()
+            poscar: tuple[str, ...] | list[str] = open_by_suffix(arg).readlines()
             self.load_array(poscar)
         if isinstance(arg, (list, tuple)):
             self.load_array(arg)
 
-    def load_array(self, input_poscar: list[str]|tuple[str, ...]) -> None:
+    def load_array(self, input_poscar: list[str] | tuple[str, ...]) -> None:
         """Parse POSCAR as list.
 
         Parameters
@@ -289,8 +284,8 @@ class POSCAR(PosCarHead, PosCarPos):
     def sort(
         self,
         from_site: int = 0,
-        to_site: int|None = None,
-        axis: str|int = "z",
+        to_site: int | None = None,
+        axis: str | int = "z",
     ) -> None:
         """Sort positions attribute by coordinate.
 
@@ -787,7 +782,7 @@ class POSCAR(PosCarHead, PosCarPos):
             self.positions = [mat.dot(v) for v in self.positions]
 
     def guess_molecule(
-        self, site_list: Sequence[int], center: Sequence[float]|None = None
+        self, site_list: Sequence[int], center: Sequence[float] | None = None
     ) -> None:
         """Arrange atom position to form a molecule.
 
@@ -822,7 +817,7 @@ class POSCAR(PosCarHead, PosCarPos):
             target_atom = self.positions[site]
             atoms27 = self.make27candidate(target_atom)
 
-            def func(pos: ArrayLike, center: Sequence[float]|None) -> float:
+            def func(pos: ArrayLike, center: Sequence[float] | None) -> float:
                 molecule[index] = _vectorize(pos)
                 if center is not None:  # bool([np.ndarray]) => Error
                     center_pos: NDArray[np.float64] = _vectorize(center)

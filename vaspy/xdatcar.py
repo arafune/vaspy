@@ -2,12 +2,14 @@
 """This module provide XDATCAR class."""
 
 from __future__ import annotations
+
+from pathlib import Path
+from typing import IO
+
 import numpy as np
 
 from vaspy.poscar import PosCarHead
 from vaspy.tools import open_by_suffix
-from pathlib import Path
-from typing import IO
 
 
 class XDATCAR(PosCarHead):

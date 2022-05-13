@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import copy
 import os
-from typing import IO, Sequence
 from pathlib import Path
+from typing import IO, Sequence
 
 import numpy as np
 from numpy.typing import NDArray

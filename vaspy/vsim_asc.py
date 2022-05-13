@@ -14,11 +14,13 @@ This module generates
 The first is absolutely required.
 """
 from __future__ import annotations
+
 import itertools
 import logging
 from logging import Formatter, StreamHandler, getLogger
-from typing import IO, Sequence
 from pathlib import Path
+from typing import IO, Sequence
+
 import numpy as np
 from numpy.typing import NDArray
 

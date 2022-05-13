@@ -1,15 +1,16 @@
 """This module provides EIGENVAL."""
 
-from __future__ import division, print_function, annotations
+from __future__ import annotations, division, print_function
 
 import csv
 import sys
-from pathlib import Path
 from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
+from pathlib import Path
+from typing import IO, Sequence
 
 import numpy as np
 from numpy.typing import NDArray
-from typing import Sequence, IO
+
 from vaspy.tools import open_by_suffix
 
 try:

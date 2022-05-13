@@ -3,7 +3,6 @@
 import os
 
 import numpy as np
-
 import vaspy.mesh3d as mesh3d
 
 

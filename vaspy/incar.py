@@ -3,12 +3,13 @@
 
 from __future__ import annotations
 
-from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
-from collections.abc import Mapping
 import pprint
 import re
+from collections.abc import Mapping
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 from pathlib import Path
-from typing import Any, Generator, IO
+from typing import IO, Any, Generator
+
 from vaspy.tools import open_by_suffix
 
 # logger

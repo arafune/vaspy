@@ -6,18 +6,20 @@ In general, VESTA is pretty nice. However, due to GUI, it is
 difficult to make a series of figures of the model structure.
 """
 from __future__ import annotations
+
 import argparse
-from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 import itertools
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 from re import T
 from typing import Sequence
-import numpy as np
-from numpy.typing import NDArray
-from mayavi import mlab
 
-from vaspy import tools, const
-from vaspy.poscar import POSCAR
+import numpy as np
+from mayavi import mlab
+from numpy.typing import NDArray
+
 import vaspy
+from vaspy import const, tools
+from vaspy.poscar import POSCAR
 
 LOGLEVEL = INFO
 logger = getLogger(__name__)

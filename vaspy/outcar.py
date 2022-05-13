@@ -8,9 +8,10 @@ This module provides OUTCAR class
 from __future__ import unicode_literals  # Version safety
 from __future__ import annotations
 
-from vaspy.tools import open_by_suffix
-from typing import Sequence, IO
 from pathlib import Path
+from typing import IO, Sequence
+
+from vaspy.tools import open_by_suffix
 
 
 class OUTCAR(object):  # Version safety

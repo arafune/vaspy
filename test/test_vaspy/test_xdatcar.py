@@ -3,7 +3,6 @@
 import os
 
 import numpy as np
-
 import vaspy.xdatcar as xdatcar
 
 

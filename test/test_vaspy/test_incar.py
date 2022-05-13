@@ -1,12 +1,11 @@
 from pathlib import Path
-from _pytest.fixtures import fixture
 
 import numpy as np
-from numpy.testing import assert_array_equal
 import pytest
 import vaspy
 import vaspy.incar
-
+from _pytest.fixtures import fixture
+from numpy.testing import assert_array_equal
 
 datadir = Path(__file__).parent / "data"
 
