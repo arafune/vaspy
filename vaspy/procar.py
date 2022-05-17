@@ -57,8 +57,8 @@ class ProjectionBand(EnergyBand):
         self,
         kvecs: Sequence[float] = (),
         energies: Sequence[float] = (),
-        proj: NDArray[np.float64]|None = None,
-        phase: NDArray[np.float64]|None = None,
+        proj: NDArray[np.float64] | None = None,
+        phase: NDArray[np.float64] | None = None,
         nspin: int = 1,
     ) -> None:
         """Initialize."""
@@ -69,7 +69,7 @@ class ProjectionBand(EnergyBand):
 
     def append_sumsite(
         self, sites: tuple[int, int], site_name: str
-    ) -> NDArray[np.float64]|None:
+    ) -> NDArray[np.float64] | None:
         """Append site-sum results.
 
         After this method, shape changes as following
@@ -103,8 +103,8 @@ class ProjectionBand(EnergyBand):
         return sumsite
 
     def append_sumorbital(
-        self, orbitals:tuple[int, ...]|int, orbital_name: str
-    ) -> NDArray[np.float64]|None:
+        self, orbitals: tuple[int, ...] | int, orbital_name: str
+    ) -> NDArray[np.float64] | None:
         """Append orbital-sum results.
 
         After this method, shape changes as following
@@ -192,8 +192,8 @@ class ProjectionBand(EnergyBand):
 
     def make_label(
         self,
-        site_indexes: tuple[int, ...]|None = None,
-        orbital_indexes_sets: tuple[tuple[int, ...]]|None = None,
+        site_indexes: tuple[int, ...] | None = None,
+        orbital_indexes_sets: tuple[tuple[int, ...]] | None = None,
     ) -> list[str]:
         """Return array the used for **label** for CSV-like data.
 
@@ -398,9 +398,7 @@ class PROCAR(ProjectionBand):  # Version safety
 
     """
 
-    def __init__(
-        self, filename: str|Path = "", phase_read: bool = False
-    ) -> None:
+    def __init__(self, filename: str | Path = "", phase_read: bool = False) -> None:
         """Initialize."""
         super(PROCAR, self).__init__()
         if filename:

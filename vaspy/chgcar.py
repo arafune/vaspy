@@ -46,7 +46,7 @@ class CHGCAR(VASPGrid):
 
     """
 
-    def __init__(self, filename: str|Path = "", pickles: str = "") -> None:
+    def __init__(self, filename: str | Path = "", pickles: str = "") -> None:
         """Initialize."""
         super(CHGCAR, self).__init__()
         self.spin: list[str] = [""]

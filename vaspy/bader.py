@@ -44,7 +44,7 @@ class BaderACF(object):
 
     """
 
-    def __init__(self, filename: str|Path = "") -> None:
+    def __init__(self, filename: str | Path = "") -> None:
         """Initialize
 
         Parameters

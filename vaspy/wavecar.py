@@ -271,11 +271,13 @@ class WAVECAR(object):
         spin_i: int = 0,
         k_i: int = 0,
         band_i: int = 0,
-        gvector: NDArray[np.int64]|None = None,
-        ngrid: NDArray[np.int64]|None = None,
+        gvector: NDArray[np.int64] | None = None,
+        ngrid: NDArray[np.int64] | None = None,
         norm: bool = False,
         poscar: poscar.POSCAR = poscar.POSCAR(),
-    ) ->NDArray[np.complex128]|tuple[NDArray[np.float64]|NDArray[np.float64]]|VASPGrid:
+    ) -> NDArray[np.complex128] | tuple[
+        NDArray[np.float64] | NDArray[np.float64]
+    ] | VASPGrid:
         r"""Return the pseudo-wavefunction in real space.
 
         Calculate the pseudo-wavefunction of the KS states in
@@ -439,7 +441,7 @@ class WAVECAR(object):
 
 
 def make_kgrid(
-    ngrid: tuple[int, ...]|NDArray[np.int64] = (),
+    ngrid: tuple[int, ...] | NDArray[np.int64] = (),
     gamma: bool = False,
     para: bool = PARALLEL,
 ) -> NDArray[np.float64]:

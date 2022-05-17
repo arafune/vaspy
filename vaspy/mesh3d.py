@@ -56,7 +56,7 @@ class VASPGrid(object):
 
     """
 
-    def __init__(self, filename: str|Path = "", pickles: str = "") -> None:
+    def __init__(self, filename: str | Path = "", pickles: str = "") -> None:
         """Initialize."""
         self.poscar = poscar.POSCAR()
         self.grid = Grid3D()
@@ -268,8 +268,8 @@ class Grid3D(object):
 
     def __init__(
         self,
-        shape: tuple[int, ...]|NDArray[np.int64] = (0, 0, 0),
-        data: Sequence[float]|None = None,
+        shape: tuple[int, ...] | NDArray[np.int64] = (0, 0, 0),
+        data: Sequence[float] | None = None,
     ) -> None:
         """Initialize."""
         self.shape = shape
@@ -339,8 +339,8 @@ class Grid3D(object):
     def integrate(
         self,
         axis: str,
-        from_coor: int|None = None,
-        to_coor: int|None = None,
+        from_coor: int | None = None,
+        to_coor: int | None = None,
         frame_i: int = 0,
     ) -> NDArray[np.float64]:
         """Return 2D data integrated occupacy along the 'axis'.

@@ -57,7 +57,7 @@ class VSIM_ASC(object):
 
     """
 
-    def __init__(self, filename: str|Path = "") -> None:
+    def __init__(self, filename: str | Path = "") -> None:
         """Initialize."""
         self.system_name: str = ""
         self.atoms: list[str] = []
@@ -209,7 +209,7 @@ def animate_atom_phonon(
     d_vector: NDArray[np.float64],
     n_frames: int = 30,
     s_frame: int = 0,
-    e_frame: int|None = None,
+    e_frame: int | None = None,
     magnitude: float = 1.0,
 ) -> list[NDArray[np.float64]]:
     """Return atom position series determined by d_vector and q.

@@ -25,7 +25,7 @@ def open_by_suffix(filename: str) -> IO[str]:
 
 
 def each_slice(
-    iterable: Iterable, n: int, fillvalue: float|None = None
+    iterable: Iterable, n: int, fillvalue: float | None = None
 ) -> Iterable[Any]:
     """each_slice(iterable, n[, fillvalue]) => iterator
 
@@ -39,9 +39,7 @@ _RERANGE = re.compile(r"(\d+)-(\d+)")
 _RESINGLE = re.compile(r"\d+")
 
 
-def atom_selection_to_list(
-    input_str: str, number: bool = True
-) -> list[int|str]:
+def atom_selection_to_list(input_str: str, number: bool = True) -> list[int | str]:
     """Return list of ordered "String" represents the number.
 
     Parameters
@@ -231,7 +229,7 @@ use default values.""".format(
                 )
                 values = demo[func]
             else:
-                values = [eval(s) for s in args.values[index]]
+                values = tuple([eval(s) for s in args.values[index]])
             index += 1
         print("Demonstrate function {0}()\ninput:  ".format(func), end="")
         print(*values, sep=" : ")

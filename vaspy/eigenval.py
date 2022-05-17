@@ -230,7 +230,9 @@ class EnergyBand(object):
         ]
         return plt.gca()
 
-    def show(self, y_range:tuple[float, float]|None=None, spin_i: int = 0) -> None:  # How to set default value?
+    def show(
+        self, y_range: tuple[float, float] | None = None, spin_i: int = 0
+    ) -> None:  # How to set default value?
         """Draw band structure by using maptlotlib.
 
         For 'just seeing' use.
@@ -294,7 +296,7 @@ class EIGENVAL(EnergyBand):
 
     """
 
-    def __init__(self, filename: str|Path = "") -> None:
+    def __init__(self, filename: str | Path = "") -> None:
         """Initialize."""
         super(EIGENVAL, self).__init__()
         self.natom: int = 0

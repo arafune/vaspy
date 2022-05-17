@@ -49,7 +49,7 @@ class OUTCAR(object):  # Version safety
 
     """
 
-    def __init__(self, filename: str|Path = "") -> None:
+    def __init__(self, filename: str | Path = "") -> None:
         """Initialize."""
         self.natom = 0
         self.atomtypes: list[str] = []
@@ -205,7 +205,7 @@ class OUTCAR(object):  # Version safety
         thefile.close()
 
     def select_posforce_header(
-        self, posforce_flag: Sequence[bool], *sites: tuple[int|list[int]]
+        self, posforce_flag: Sequence[bool], *sites: tuple[int | list[int]]
     ) -> list[str]:
         """Return the position and force header selected."""
         selected_sites: Sequence[int]
@@ -225,7 +225,7 @@ class OUTCAR(object):  # Version safety
     # correct?
 
     def select_posforce(
-        self, posforce_flag: Sequence[bool], *sites: tuple[int|list[int]]
+        self, posforce_flag: Sequence[bool], *sites: tuple[int | list[int]]
     ) -> list[list[float]]:
         """Return the position and force selected by posforce_flag.
 

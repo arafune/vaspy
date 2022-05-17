@@ -21,7 +21,7 @@ class XDATCAR(PosCarHead):
 
     """
 
-    def __init__(self, filename: str|Path = "") -> None:
+    def __init__(self, filename: str | Path = "") -> None:
         """Initialize.
 
         Parameters

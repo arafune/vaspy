@@ -119,14 +119,14 @@ def remove_sharp(str_: str) -> tuple[str, bool]:
 class Incar(Mapping):
     """General class for INCAR file"""
 
-    def __init__(self, filename: Path|str = "") -> None:
+    def __init__(self, filename: Path | str = "") -> None:
         """
         Parameters
         ----------
         filename: str, pathlib.Path
             filename of INCAR
         """
-        self._incar: dict[str, tuple[str|int|float, bool]] = {}
+        self._incar: dict[str, tuple[str | int | float, bool]] = {}
         self.additional_comments: dict[str, str] = {}
         #
         if filename:
@@ -181,12 +181,10 @@ class Incar(Mapping):
         for key in self._incar:
             yield key
 
-    def __getitem__(self, key_item: str) -> tuple[str|float, bool]:
+    def __getitem__(self, key_item: str) -> tuple[str | float, bool]:
         return self._incar.__getitem__(key_item)
 
-    def __setitem__(
-        self, key_item: str, value_item: tuple[str|float, bool]
-    ) -> None:
+    def __setitem__(self, key_item: str, value_item: tuple[str | float, bool]) -> None:
         self._incar.__setitem__(key_item, value_item)
 
     def __len__(self) -> int:
@@ -225,7 +223,7 @@ class Incar(Mapping):
             )
         return output
 
-    def active(self, keyword: str) -> str|float|bool:
+    def active(self, keyword: str) -> str | float | bool:
         """Return True if keyword is active.  False if keyword is not set or comment out
 
         Parameters
@@ -245,7 +243,7 @@ class Incar(Mapping):
         str
             Check messages
         """
-        checks: dict[str, bool|int|float|str] = {
+        checks: dict[str, bool | int | float | str] = {
             'When ICHARG = 11, Recommend "LWAVE = .FALSE, LCHARG = .FALSE"\n': (
                 self.active("ICHARG") == 11
                 and (

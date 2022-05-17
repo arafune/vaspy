@@ -74,7 +74,7 @@ class DOSCAR(object):  # Version safety
         Energy
     """
 
-    def __init__(self, filename: str|Path = "") -> None:
+    def __init__(self, filename: str | Path = "") -> None:
         """Initialize
 
         Parameters
@@ -83,7 +83,7 @@ class DOSCAR(object):  # Version safety
             file name of "DOSCAR"
         """
         self.natom: int = 0
-        self.tdos: TDOS|None = None
+        self.tdos: TDOS | None = None
         self.pdoses: list[PDOS] = []
         self.energies: tuple[float, ...] = tuple()
         if filename:
@@ -160,10 +160,10 @@ class DOS(Sequence):  # Version safety
 
     """
 
-    def __init__(self, array: tuple[float]|None = None) -> None:
+    def __init__(self, array: tuple[float] | None = None) -> None:
         """Initialize."""
-        self.dos: list[tuple[float, ...]|list[float]] = []
-        self.header: str|list[str] = ""
+        self.dos: list[tuple[float, ...] | list[float]] = []
+        self.header: str | list[str] = ""
         if array:
             self.dos = [*zip(*array)]
 
@@ -171,9 +171,7 @@ class DOS(Sequence):  # Version safety
         """x.__len__() <=> len(x)."""
         return len(self.dos)
 
-    def __getitem__(
-        self, idx: int|slice
-    ) -> tuple[float, ...]|list[tuple[float]]:
+    def __getitem__(self, idx: int | slice) -> tuple[float, ...] | list[tuple[float]]:
         return self.dos[idx]
 
     @property
@@ -183,7 +181,7 @@ class DOS(Sequence):  # Version safety
     def _export_csv(
         self,
         filename: str,
-        energy: list[float]|tuple[float, ...],
+        energy: list[float] | tuple[float, ...],
         header: list[str],
     ) -> None:
         """Export data to csv file"""
@@ -206,7 +204,7 @@ class TDOS(DOS):
     dos:
     """
 
-    def __init__(self, array: tuple[float]|None) -> None:
+    def __init__(self, array: tuple[float] | None) -> None:
         """Initialize
 
         Parameters
@@ -230,7 +228,7 @@ class TDOS(DOS):
     def export_csv(
         self,
         filename: str,
-        energy: list[float]|tuple[float, ...],
+        energy: list[float] | tuple[float, ...],
     ) -> None:
         return super()._export_csv(filename, header=self.header, energy=energy)
 
@@ -278,9 +276,7 @@ class PDOS(DOS):
     spins_soi = ("mT", "mX", "mY", "mZ")
     spins = ("up", "down")
 
-    def __init__(
-        self, array: tuple[float]|None = None, site: str = ""
-    ) -> None:
+    def __init__(self, array: tuple[float] | None = None, site: str = "") -> None:
         """Initialize."""
         super().__init__(array)
         self.site = site
@@ -321,7 +317,7 @@ class PDOS(DOS):
                 print(len(self.dos[0]))
                 raise RuntimeError("Check the DOSCAR file")
 
-    def projected(self, orbital: str|int) -> tuple[float]|list[float]:
+    def projected(self, orbital: str | int) -> tuple[float] | list[float]:
         if isinstance(orbital, int):
             idx = orbital
         else:
@@ -344,7 +340,7 @@ class PDOS(DOS):
         plt.show()
 
     def export_csv(
-        self, filename: str, energy: list[float]|tuple[float, ...]
+        self, filename: str, energy: list[float] | tuple[float, ...]
     ) -> None:
         """Export data to file object (or file-like object) as csv format.
 
