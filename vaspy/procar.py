@@ -5,9 +5,9 @@ This module provides PROCAR, ProjectionBand classes.
 
 * PROCAR class is used to stored the PROCAR information in the memory.
 * Band_with_Projection class is used in vaspy-procar.py script.
-    *  This class is essentially used on ipython, but not so easy for use.
-* EnergyBand class is used for drawing the energy band.
-* Projection class is used for storing the orbital projection data
+    *  This class is essentially usable on ipython, but not so easy for use.
+* EnergyBand class is for drawing the energy band.
+* Projection class is for storing the orbital projection data
 """
 from __future__ import annotations
 
@@ -186,6 +186,18 @@ class ProjectionBand(EnergyBand):
             return (orbital_names.index("py"), orbital_names.index("pz"))
         elif orbital_name == "pxpz":
             return (orbital_names.index("px"), orbital_names.index("pz"))
+        elif orbital_name == "spd":
+            return (
+                orbital_names.index("s"),
+                orbital_names.index("px"),
+                orbital_names.index("py"),
+                orbital_names.index("pz"),
+                orbital_names.index("dxy"),
+                orbital_names.index("dyz"),
+                orbital_names.index("dz2"),
+                orbital_names.index("dxz"),
+                orbital_names.index("dx2"),
+            )
         else:
             err = str(orbital_name) + " is not a proper (composed) orbital name."
         raise RuntimeError(err)

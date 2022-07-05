@@ -50,7 +50,7 @@ parser.add_argument(
     type=tools.atom_selection_to_list,
     help="""atom index specifed with range.
 Use "-" or ","
- (ex.) --site 1,2,7-9""",
+    (ex.) --site 1,2,7-9""",
 )
 parser.add_argument(
     "--as",
@@ -103,7 +103,7 @@ sitenames = tuple(chain.from_iterable(args.atomsetname))
 flat_orbitals = tuple(chain.from_iterable(args.orbital))
 #
 # As atomindex used here begins with "1", but siteindex used in procar.py
-# internaly begins with "0".  (This is because VASP is fortran program !)
+# internally begins with "0".  (VASP is written with fortran!)
 siteindex = [[i - 1 for i in internal] for internal in args.atomindex]
 #
 logger.debug("siteindex: {}".format(siteindex))
