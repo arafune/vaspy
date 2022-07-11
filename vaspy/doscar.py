@@ -187,8 +187,8 @@ class DOS(Sequence):  # Version safety
         """Export data to csv file"""
         assert len(energy) == len(self)
         assert len(header) == len(self[0]) + 1
-        with open(filename, mode="w") as csvfile:
-            writer = csv.writer(csvfile, delimiter="\t")
+        with open(filename, mode="w") as csv_file:
+            writer = csv.writer(csv_file, delimiter="\t")
             writer.writerow(header)
             for e, d in zip(energy, self.dos):
                 writer.writerow([e] + list(d))
@@ -220,7 +220,7 @@ class TDOS(DOS):
             self.dos = [(d[0], -d[1]) for d in self.dos]
 
     def graphview(self) -> None:
-        """Show graphview by matplotlib."""
+        """Show graph view by matplotlib."""
         for density in self.dos[1:]:
             plt.plot(self.dos[0], density)
         plt.show()
@@ -324,7 +324,7 @@ class PDOS(DOS):
             idx = self.orbital_spin.index(orbital)
         return [d[idx] for d in self.dos]
 
-    def graphview(self, *orbitalnames: str) -> None:
+    def graph_view(self, *orbitalnames: str) -> None:
         """Show DOS graph by using matplotlib.  For 'just seeing' use."""
         try:
             alist: list[int] = [
