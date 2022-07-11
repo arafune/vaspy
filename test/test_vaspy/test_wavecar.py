@@ -4,10 +4,11 @@
 import os
 
 import numpy as np
+from numpy.testing import assert_almost_equal
+
 import vaspy
 import vaspy.poscar as poscar
 import vaspy.wavecar as wavecar
-from numpy.testing import assert_almost_equal
 
 
 class TestHatomWavecar(object):
@@ -30,7 +31,7 @@ class TestHatomWavecar(object):
         np.testing.assert_array_equal(
             [[25.0, 0.0, 0.0], [0.0, 25.0, 0.0], [0.0, 0.0, 25.0]], self.h.realcell
         )
-        assert_almost_equal(25 ** 3, self.h.volume)
+        assert_almost_equal(25**3, self.h.volume)
         np.testing.assert_array_almost_equal([101, 101, 101], self.h.ngrid)
         #
         260834 == self.h.nplwvs[0]
@@ -71,7 +72,7 @@ class TestCOWavecar(object):
     def test_wavecar_band(self):
         """test for CO WAVECAR band"""
         self.co.band()
-        #assert None == self.kpath
+        # assert None == self.kpath
         assert (self.co.nspin, self.co.numk, self.co.nbands) == self.co.bands.shape
         np.testing.assert_array_almost_equal(
             [-29.49120151, -14.03737717, -11.88106463, -11.88106223, -9.00976389],
@@ -156,7 +157,7 @@ class TestGrapheneWavecar(object):
             [0.00013770, 0.00014605, 0.00017262, 0.00021561, 0.00026360],
             vaspgrid.grid.data[:5],
         )
-        assert 2 == vaspgrid.grid.nframe
+        assert 2 == vaspgrid.grid.n_frame
 
 
 class test_RestoreGammaGrid(object):
@@ -287,4 +288,4 @@ class TestCobaltWavecar(object):
             ],
             vaspgrid.grid.data[:5],
         )
-        assert 4 == vaspgrid.grid.nframe
+        assert 4 == vaspgrid.grid.n_frame

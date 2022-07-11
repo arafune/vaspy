@@ -63,11 +63,11 @@ class CHGCAR(VASPGrid):
 
         """
         super(CHGCAR, self).load_file(the_file, pickles)
-        if self.grid.nframe == 1:
+        if self.grid.n_frame == 1:
             self.spin = [""]
-        elif self.grid.nframe == 2:
+        elif self.grid.n_frame == 2:
             self.spin = ["up+down", "up-down"]
-        elif self.grid.nframe == 4:
+        elif self.grid.n_frame == 4:
             self.spin = ["mT", "mX", "mY", "mZ"]
         else:
             raise RuntimeError("CHGCAR is correct?")
