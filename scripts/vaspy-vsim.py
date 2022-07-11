@@ -42,7 +42,7 @@ n_modes = len(vsim_data.freqs)
 positions = vsim_data.build_phono_motion(
     mode=args.mode, supercell=dim, n_frames=args.frames, magnitude=args.magnitude
 )
-ionnums, iontypes = vsim_asc.ions_to_iontypes_ionnums(vsim_data.ions)
+ionnums, atom_types = vsim_asc.ions_to_atom_types_ionnums(vsim_data.ions)
 ionnums = [i * dim[0] * dim[1] * dim[2] for i in ionnums]
 motion_frames = [[p[frame] for p in positions] for frame in range(args.frames)]
 #
@@ -55,7 +55,7 @@ if args.poscar:
         vasp_poscar += "_mode_" + str(args.mode) + "_frame_" + str(frame)
         vasp_poscar.scaling_factor = 1.0
         vasp_poscar.cell_vecs = supercell
-        vasp_poscar.iontypes = iontypes
+        vasp_poscar.atom_types = atom_types
         vasp_poscar.ionnums = ionnums
         vasp_poscar.coordinate_type = "CARTESIAN"
         vasp_poscar.positions = motion_frames[frame]
@@ -69,7 +69,7 @@ else:
         xdatcar_str += "      {:#.6f}   {:#.6f}    {:6f}\n".format(
             supercell[i][0], supercell[i][1], supercell[i][2]
         )
-    for element in iontypes:
+    for element in atom_types:
         xdatcar_str += "    {}".format(element)
     xdatcar_str += "\n"
     for ionnum in ionnums:

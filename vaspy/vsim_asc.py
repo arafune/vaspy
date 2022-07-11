@@ -99,7 +99,7 @@ class VSIM_ASC(object):
                 x, y, z, atom = line.split()
                 self.atoms.append(atom)
                 self.positions.append(np.array([float(x), float(y), float(z)]))
-        # self.ionnums, self.iontypes = ions_to_iontypes_ionnums(self.ions)
+        # self.ionnums, self.atom_types = ions_to_atom_types_ionnums(self.ions)
         #
         for line in phonon_lines:
             if "metaData" in line:

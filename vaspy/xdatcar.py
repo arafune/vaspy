@@ -49,7 +49,7 @@ class XDATCAR(PosCarHead):
         self.cell_vecs[0] = np.array([float(x) for x in next(the_file).split()])
         self.cell_vecs[1] = np.array([float(x) for x in next(the_file).split()])
         self.cell_vecs[2] = np.array([float(x) for x in next(the_file).split()])
-        self.atomtypes = next(the_file).split()
+        self.atom_types = next(the_file).split()
         self.atomnums = [int(x) for x in next(the_file).split()]
         positions = []
         for line in the_file:
@@ -78,7 +78,7 @@ class XDATCAR(PosCarHead):
             tmp += "      {:#.6f}   {:#.6f}    {:6f}\n".format(
                 self.cell_vecs[i][0], self.cell_vecs[i][1], self.cell_vecs[i][2]
             )
-        for element in self.atomtypes:
+        for element in self.atom_types:
             tmp += "    {}".format(element)
         tmp += "\n"
         for atomnum in self.atomnums:

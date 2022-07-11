@@ -75,14 +75,14 @@ def atom_selection_to_list(input_str: str, number: bool = True) -> list[int | st
     return sorted(list(output))
 
 
-def atomtypes_atomnums_to_atoms(
-    atomtypes: Iterable[str], atomnums: Iterable[int]
+def atom_types_atomnums_to_atoms(
+    atom_types: Iterable[str], atomnums: Iterable[int]
 ) -> tuple[str, ...]:
     """Return list representation for atom in use.
 
     Parameters
     ------------
-    atomtypes: list
+    atom_types: list
         atom names
     atomnums: list
         atom numbers
@@ -91,47 +91,47 @@ def atomtypes_atomnums_to_atoms(
     --------
     >>> test_nums = [2, 3, 2, 1]
     >>> test_elements = ['Si', 'Ag', 'H', 'Si']
-    >>> atomtypes_atomnums_to_atoms(test_elements, test_nums)
+    >>> atom_types_atomnums_to_atoms(test_elements, test_nums)
     ('Si', 'Si', 'Ag', 'Ag', 'Ag', 'H', 'H', 'Si')
 
     """
     atoms = []
-    for elem, nums in zip(atomtypes, atomnums):
+    for elem, nums in zip(atom_types, atomnums):
         for _ in range(nums):
             atoms.append(elem)
     return tuple(atoms)
 
 
-def atoms_to_atomtypes_atomnums(atoms: list[str]) -> tuple[list[str], list[int]]:
-    r"""Return atomnums and atomtypes list.
+def atoms_to_atom_types_atomnums(atoms: list[str]) -> tuple[list[str], list[int]]:
+    r"""Return atomnums and atom_types list.
 
     Returns
     --------
     atomnums
         list of number of atoms
-    atomtypes
+    atom_types
         list of atomnames
 
 
     Examples
     --------
     >>> test = ['Si', 'Si', 'Ag', 'Ag', 'Ag', 'H', 'H', 'Si']
-    >>> atoms_to_atomtypes_atomnums(test)
+    >>> atoms_to_atom_types_atomnums(test)
     (['Si', 'Ag', 'H', 'Si'], [2, 3, 2, 1])
 
     """
     thelast = ""
     atomnums: list[int] = []
-    atomtypes: list[str] = []
+    atom_types: list[str] = []
     while atoms:
         atom = atoms.pop(0)
         if thelast == atom:
             atomnums[-1] = atomnums[-1] + 1
         else:
             atomnums.append(1)
-            atomtypes.append(atom)
+            atom_types.append(atom)
         thelast = atom
-    return atomtypes, atomnums
+    return atom_types, atomnums
 
 
 def cuboid(crystal_axes: Sequence[float]) -> NDArray[np.float64]:

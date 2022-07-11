@@ -27,15 +27,15 @@ class TestSinglePROCAR(object):
     def test_sigleprocar_firstcheck(self):
         """Load test for PROCAR_single."""
         assert [""] == self.singleprocar.label["spin"]
-        assert 3 == self.singleprocar.natom
-        assert 1 == self.singleprocar.nbands
-        assert 1 == self.singleprocar.numk
+        assert 3 == self.singleprocar.n_atom
+        assert 1 == self.singleprocar.n_bands
+        assert 1 == self.singleprocar.num_k
         np.testing.assert_array_equal([[[-15.0]]], self.singleprocar.energies)
         np.testing.assert_array_equal(
             ["s", "py", "pz", "px", "dxy", "dyz", "dz2", "dxz", "dx2", "tot"],
             self.singleprocar.label["orbital"],
         )
-        np.testing.assert_array_equal([[0.0, 0.0, 0.0]], self.singleprocar.kvecs)
+        np.testing.assert_array_equal([[0.0, 0.0, 0.0]], self.singleprocar.k_vectors)
 
     def test_projection1(self):
         """Test Projection class."""
@@ -259,9 +259,9 @@ class TestSpinPolarizedPROCAR(object):
     def test_spinprocar_firstcheck(self):
         """Load test for PROCAR_spin_dummy."""
         assert ["_up", "_down"] == self.spinprocar.label["spin"]
-        assert 3 == self.spinprocar.natom
-        assert 4 == self.spinprocar.nbands
-        assert 3 == self.spinprocar.numk
+        assert 3 == self.spinprocar.n_atom
+        assert 4 == self.spinprocar.n_bands
+        assert 3 == self.spinprocar.num_k
         np.testing.assert_array_almost_equal(
             np.array(
                 [
@@ -285,7 +285,7 @@ class TestSpinPolarizedPROCAR(object):
         )
         np.testing.assert_array_equal(
             [[0.0, 0.0, 0.0], [0.25, 0.25, 0.00], [0.50, 0.50, 0.00]],
-            self.spinprocar.kvecs,
+            self.spinprocar.k_vectors,
         )
         np.testing.assert_array_equal(720, self.spinprocar.proj.size)
         np.testing.assert_array_equal(
@@ -545,9 +545,9 @@ class TestSOIPROCAR(object):
     def test_soiprocar_firstcheck(self):
         """Load test for PROCAR_SOI_dummy."""
         assert ["_mT", "_mX", "_mY", "_mZ"] == self.soiprocar.label["spin"]
-        assert 3 == self.soiprocar.natom
-        assert 2 == self.soiprocar.nbands
-        assert 3 == self.soiprocar.numk
+        assert 3 == self.soiprocar.n_atom
+        assert 2 == self.soiprocar.n_bands
+        assert 3 == self.soiprocar.num_k
         np.testing.assert_array_equal(
             np.array([[[-10.0, -5.0], [-7.0, -4.0], [-6.0, -1.0]]]),
             self.soiprocar.energies,
@@ -558,9 +558,9 @@ class TestSOIPROCAR(object):
         )
         np.testing.assert_array_equal(
             [[0.0, 0.0, 0.0], [0.25, 0.25, 0.00], [0.50, 0.50, 0.00]],
-            self.soiprocar.kvecs,
+            self.soiprocar.k_vectors,
         )
-        # 72 = natom * nbands * numk * 4
+        # 72 = n_atom * n_bands * num_k * 4
         np.testing.assert_array_equal(720, self.soiprocar.proj.size)
         np.testing.assert_array_equal(
             [
@@ -647,8 +647,8 @@ class TestSOIPROCAR(object):
         """test for Band_with_projection.energies setter (SOI)"""
         assert self.soiprocar.energies.shape == (
             1,
-            self.soiprocar.numk,
-            self.soiprocar.nbands,
+            self.soiprocar.num_k,
+            self.soiprocar.n_bands,
         )
         np.testing.assert_array_equal(
             self.soiprocar.energies, [[[-10, -5], [-7, -4], [-6, -1]]]
@@ -664,9 +664,9 @@ class TestSOIPROCAR(object):
         """test for Band_with_projection.orbitals setter (SOI)"""
         assert self.soiprocar.proj.shape == (
             4,
-            self.soiprocar.numk,
-            self.soiprocar.nbands,
-            self.soiprocar.natom,
+            self.soiprocar.num_k,
+            self.soiprocar.n_bands,
+            self.soiprocar.n_atom,
             10,
         )
 
@@ -843,9 +843,9 @@ class test_functions_in_procarpy(object):
         data_spin = open(datadir + "PROCAR_spin_dummy")
 
         result_single = procar.tiny_check(data_single)
-        assert 1 == result_single[0]  # numk
-        assert 1 == result_single[1]  # nbands
-        assert 3 == result_single[2]  # natom
+        assert 1 == result_single[0]  # num_k
+        assert 1 == result_single[1]  # n_bands
+        assert 3 == result_single[2]  # n_atom
         assert [
             "s",
             "py",
@@ -860,9 +860,9 @@ class test_functions_in_procarpy(object):
         ] == result_single[3]
         assert result_single[4]  # collinear
         result_spin = procar.tiny_check(data_spin)
-        assert 3 == result_spin[0]  # numk
-        assert 4 == result_spin[1]  # nbands
-        assert 3 == result_spin[2]  # natom
+        assert 3 == result_spin[0]  # num_k
+        assert 4 == result_spin[1]  # n_bands
+        assert 3 == result_spin[2]  # n_atom
         assert [
             "s",
             "py",
@@ -879,9 +879,9 @@ class test_functions_in_procarpy(object):
         assert result_spin[4]  # collinear
         data_soi = open(datadir + "PROCAR_SOI_dummy")
         result_soi = procar.tiny_check(data_soi)
-        assert 3 == result_soi[0]  # numk
-        assert 2 == result_soi[1]  # nbands
-        assert 3 == result_soi[2]  # natom
+        assert 3 == result_soi[0]  # num_k
+        assert 2 == result_soi[1]  # n_bands
+        assert 3 == result_soi[2]  # n_atom
         assert [
             "s",
             "py",

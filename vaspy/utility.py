@@ -80,8 +80,8 @@ def view3d(
     poscar.tune_scaling_factor(1.0)
     unit_cell = poscar.cell_vecs
     ## poscar.atomnums = [144, 288, 19, 18, 2, 3]
-    ## poscar.atomtypes = ['Mo', 'S', 'C', 'H', 'N', 'O']
-    atom_symbols = tools.atomtypes_atomnums_to_atoms(poscar.atomtypes, poscar.atomnums)
+    ## poscar.atom_types = ['Mo', 'S', 'C', 'H', 'N', 'O']
+    atom_symbols = tools.atom_types_atomnums_to_atoms(poscar.atom_types, poscar.atomnums)
     uniq_atom_symbols = list(set(atom_symbols))
     site_indexes = {}
     for atom in uniq_atom_symbols:

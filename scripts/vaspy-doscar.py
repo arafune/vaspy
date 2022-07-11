@@ -75,7 +75,7 @@ if args.outcar is not NotImplemented:
     args.fermi = outcar.fermi
 #
 if atomlist == []:
-    atomlist.extend("atom" + str(i) for i in range(1, doscar.natom + 1))
+    atomlist.extend("atom" + str(i) for i in range(1, doscar.n_atom + 1))
 #
 # construct TDOS & PDOS objects
 #

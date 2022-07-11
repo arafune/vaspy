@@ -27,7 +27,7 @@ class BaderACF(object):
 
     Attributes
     ----------
-    natom: int
+    n_atom: int
         Number of atoms
     positions: list
         Atom positions in :math:`\AA`
@@ -52,7 +52,7 @@ class BaderACF(object):
         filename : str|Path
             filename, by default ""
         """
-        self.natom = 0
+        self.n_atom = 0
         self.positions: list[list[float]] = []
         self.charges: list[float] = []
         self.mindists: list[float] = []
@@ -88,5 +88,5 @@ class BaderACF(object):
         self.vac_charge = float(next(the_file).split()[-1])
         self.vac_vol = float(next(the_file).split()[-1])
         self.n_electron = float(next(the_file).split()[-1])
-        self.natom = len(self.positions)
+        self.n_atom = len(self.positions)
         the_file.close()

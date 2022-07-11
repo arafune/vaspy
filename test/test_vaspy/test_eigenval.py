@@ -27,12 +27,12 @@ class TestEIGENVAL(object):
 
     def test_check_basic_parameters(self) -> None:
         """Check the basic parameters stored."""
-        assert 344 == self.eigenval_spin.natom
-        assert 2 == self.eigenval_spin.nspin
-        assert 1890 == self.eigenval_spin.nbands
-        assert 1 == self.eigenval_spin.numk
+        assert 344 == self.eigenval_spin.n_atom
+        assert 2 == self.eigenval_spin.n_spin
+        assert 1890 == self.eigenval_spin.n_bands
+        assert 1 == self.eigenval_spin.num_k
         assert (2, 1, 1890) == self.eigenval_spin.energies.shape
-        assert_array_equal([0.0, 0.0, 0.0], self.eigenval_spin.kvecs[0])
+        assert_array_equal([0.0, 0.0, 0.0], self.eigenval_spin.k_vectors[0])
         assert_array_almost_equal(
             [[-22.893072, -22.891405, -22.841659, -22.832997, -22.761726, -22.737184]],
             self.eigenval_spin.energies[0, :, :6],
@@ -40,10 +40,10 @@ class TestEIGENVAL(object):
         assert_array_equal([5.806516], self.eigenval_spin.energies[0, :, -1])
         assert_array_equal([5.813531], self.eigenval_spin.energies[1, :, -1])
         #
-        assert 1 == self.eigenval_soi.natom
-        assert 1 == self.eigenval_soi.nspin
-        assert 54 == self.eigenval_soi.nbands
-        assert 625 == self.eigenval_soi.numk
+        assert 1 == self.eigenval_soi.n_atom
+        assert 1 == self.eigenval_soi.n_spin
+        assert 54 == self.eigenval_soi.n_bands
+        assert 625 == self.eigenval_soi.num_k
         assert_array_equal(
             [-9.548122, -9.491253, -9.322813, -9.050432, -8.691472, -8.285128],
             self.eigenval_soi.energies[0, :, 0][0:6],
@@ -52,17 +52,17 @@ class TestEIGENVAL(object):
 
     def test_to_physical_kvector(self) -> None:
         """Test for to_physical_kvector."""
-        assert_array_almost_equal([[0.0, 0.0, 0.0]], self.eigenval_spin.kvecs)
+        assert_array_almost_equal([[0.0, 0.0, 0.0]], self.eigenval_spin.k_vectors)
         assert_array_almost_equal(
             [[0.0, 0.0, 0.0], [4.0e-02, 0, 0.0], [8.0e-02, 0, 0]],
-            self.eigenval_soi.kvecs[0:3],
+            self.eigenval_soi.k_vectors[0:3],
         )
         self.eigenval_soi.to_physical_kvector(
             recvec=np.array(((2, 0, 0), (0, 2, 0), (0, 0, 2)))
         )
         assert_array_almost_equal(
             [[0.0, 0.0, 0.0], [8.0e-02, 0, 0.0], [16.0e-02, 0, 0]],
-            self.eigenval_soi.kvecs[0:3],
+            self.eigenval_soi.k_vectors[0:3],
         )
 
     def test_make_label(self) -> None:

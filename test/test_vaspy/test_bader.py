@@ -26,7 +26,7 @@ class TestBader(object):
         assert 1.2829 == self.acf.vac_charge
         assert 157.7708 == self.acf.vac_vol
         assert 2828.000 == self.acf.n_electron
-        assert 344, self.acf.natom
+        assert 344, self.acf.n_atom
         np.testing.assert_array_almost_equal(
             [6.745000, -37.491966, 11.674620], self.acf.positions[0]
         )

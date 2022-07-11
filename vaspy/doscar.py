@@ -63,7 +63,7 @@ class DOSCAR(object):  # Version safety
 
     Attributes
     ----------
-    natom: int
+    n_atom: int
         number of atoms
 
     tdos:
@@ -82,7 +82,7 @@ class DOSCAR(object):  # Version safety
         filename : str|Path, optional
             file name of "DOSCAR"
         """
-        self.natom: int = 0
+        self.n_atom: int = 0
         self.tdos: TDOS | None = None
         self.pdoses: list[PDOS] = []
         self.energies: tuple[float, ...] = tuple()
@@ -99,7 +99,7 @@ class DOSCAR(object):  # Version safety
 
         """
         firstline = the_file.readline()
-        self.natom = int(firstline[0:4])
+        self.n_atom = int(firstline[0:4])
         [the_file.readline() for _ in range(4)]
         header = the_file.readline()
 

@@ -125,7 +125,7 @@ class CHGCAR(VASPGrid):
         dest.grid.data = dest.grid.data.flatten()
         return dest
 
-    def majorityspin(self) -> CHGCAR:
+    def majority_spin(self) -> CHGCAR:
         """Return CHGCAR for majority spin.
 
         This method is for CHGCAR given by ``ISPIN=2`` but not-SOI
@@ -137,14 +137,14 @@ class CHGCAR(VASPGrid):
             CHGCAR for the majority spin charge
 
         """
-        assert len(self.spin) == 2, "This CHGCAR is not spinresolved version"
+        assert len(self.spin) == 2, "This CHGCAR is not spin resolved version"
         dest = copy.deepcopy(self)
         tmp = dest.grid.data.reshape(2, self.grid.size)
         dest.grid.data = (tmp[0] + tmp[1]) / 2
         dest.spin = ["up"]
         return dest
 
-    def minorityspin(self) -> CHGCAR:
+    def minority_spin(self) -> CHGCAR:
         """Return CHGCAR for minority spin.
 
         This method is for CHGCAR given by ``ISPIN=2`` but not-SOI

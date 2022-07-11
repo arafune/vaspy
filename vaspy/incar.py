@@ -219,7 +219,7 @@ class Incar(Mapping):
         if len(incar) != 0:
             print(incar)
             raise RuntimeError(
-                "Unkonwn tags are used!!! Check your INCAR, or the script"
+                "Unknown tags are used!!! Check your INCAR, or the script"
             )
         return output
 
@@ -236,7 +236,7 @@ class Incar(Mapping):
         return False
 
     def lint_all(self) -> str:
-        """Tyny lint for vasp
+        """Tiny lint for vasp
 
         Returns
         -------

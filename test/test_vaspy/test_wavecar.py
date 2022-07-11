@@ -23,10 +23,10 @@ class TestHatomWavecar(object):
         """Test for H atom WAVECAR header"""
         self.h.gamma
         self.h.check_DwNGZHalf()
-        assert self.h.nspin == 1
+        assert self.h.n_spin == 1
         assert np.complex64 == self.h.prec
-        assert self.h.numk == 1
-        assert self.h.nbands == 27
+        assert self.h.num_k == 1
+        assert self.h.n_bands == 27
         assert self.h.encut == 600
         np.testing.assert_array_equal(
             [[25.0, 0.0, 0.0], [0.0, 25.0, 0.0], [0.0, 0.0, 25.0]], self.h.realcell
@@ -55,12 +55,12 @@ class TestCOWavecar(object):
         rtag, wfprec
         """
         assert 711680 == self.co.recl  # record length
-        assert 2 == self.co.nspin  # spin
+        assert 2 == self.co.n_spin  # spin
         assert 45200 == self.co.rtag  # precision flag
         assert np.complex64 == self.co.prec
 
-        assert 1 == self.co.numk
-        assert 54 == self.co.nbands
+        assert 1 == self.co.num_k
+        assert 54 == self.co.n_bands
         assert 400 == self.co.encut
         assert_almost_equal(-8.05748789, self.co.efermi)
         np.testing.assert_array_equal(
@@ -73,7 +73,7 @@ class TestCOWavecar(object):
         """test for CO WAVECAR band"""
         self.co.band()
         # assert None == self.kpath
-        assert (self.co.nspin, self.co.numk, self.co.nbands) == self.co.bands.shape
+        assert (self.co.n_spin, self.co.num_k, self.co.n_bands) == self.co.bands.shape
         np.testing.assert_array_almost_equal(
             [-29.49120151, -14.03737717, -11.88106463, -11.88106223, -9.00976389],
             self.co.bands[0, 0, 0:5],
@@ -106,11 +106,11 @@ class TestGrapheneWavecar(object):
     def test_wavecar_header(self):
         """Test for Graphene WAVECAR property"""
         assert 30864 == self.gr.recl  # record length
-        assert 1 == self.gr.nspin  # spin
+        assert 1 == self.gr.n_spin  # spin
         assert 45200 == self.gr.rtag  # precision flag
         assert np.complex64 == self.gr.prec
-        assert 240 == self.gr.numk
-        assert 27 == self.gr.nbands
+        assert 240 == self.gr.num_k
+        assert 27 == self.gr.n_bands
         assert 550 == self.gr.encut
         assert_almost_equal(-2.9500542715, self.gr.efermi)
         np.testing.assert_array_almost_equal(
@@ -133,8 +133,8 @@ class TestGrapheneWavecar(object):
         # maximum and minimum number of plane-waves per node :  3857  3785
         assert 3857 == self.gr.nplwvs.max()
         assert 3785 == self.gr.nplwvs.min()
-        assert (self.gr.numk,) == self.gr.kpath.shape  # gr.numk = 240
-        assert (self.gr.nspin, self.gr.numk, self.gr.nbands) == self.gr.bands.shape
+        assert (self.gr.num_k,) == self.gr.kpath.shape  # gr.num_k = 240
+        assert (self.gr.n_spin, self.gr.num_k, self.gr.n_bands) == self.gr.bands.shape
         np.testing.assert_array_almost_equal(
             [-22.516876, -10.623282, -6.106901, -6.094072, 0.245639, 1.006991],
             self.gr.bands[0, 0, 0:6],
@@ -165,14 +165,14 @@ class test_RestoreGammaGrid(object):
     def test_check_symmetry(self):
         """Test for check_symmetry"""
         assert not wavecar.check_symmetry(np.arange(3 * 3 * 3).reshape((3, 3, 3)))
-        okgrid = np.array(
+        k_grid = np.array(
             [
                 [[0, 1, 1], [3, 4, 7], [3, 7, 4]],
                 [[9, 10, 11], [12, 13, 14], [15, 16, 17]],
                 [[9, 11, 10], [15, 17, 16], [12, 14, 13]],
             ]
         )
-        assert wavecar.check_symmetry(okgrid)
+        assert wavecar.check_symmetry(k_grid)
 
     def test_RestorGammaGrid(self):
         """Test for RestoreGammaGrid function"""
@@ -235,11 +235,11 @@ class TestCobaltWavecar(object):
     def test_wavecar_header(self):
         """Test for Cobalt property"""
         assert 7968 == self.co.recl  # record length
-        assert 1 == self.co.nspin  # spin
+        assert 1 == self.co.n_spin  # spin
         assert 45200 == self.co.rtag  # precision flag
         assert np.complex64 == self.co.prec
-        assert 9 == self.co.numk
-        assert 54 == self.co.nbands
+        assert 9 == self.co.num_k
+        assert 54 == self.co.n_bands
         assert 400 == self.co.encut
         assert_almost_equal(-0.84118407515959326, self.co.efermi)
         np.testing.assert_array_almost_equal(
@@ -258,8 +258,8 @@ class TestCobaltWavecar(object):
         # from OUTCAR
         assert 996 == self.co.nplwvs.max()
         assert 958 == self.co.nplwvs.min()
-        assert (self.co.numk,) == self.co.kpath.shape  # co.numk = 240
-        assert (self.co.nspin, self.co.numk, self.co.nbands) == self.co.bands.shape
+        assert (self.co.num_k,) == self.co.kpath.shape  # co.num_k = 240
+        assert (self.co.n_spin, self.co.num_k, self.co.n_bands) == self.co.bands.shape
         np.testing.assert_array_almost_equal(
             [-6.532492, -5.858599, -4.037263, -3.418892, -3.265558, -2.642231],
             self.co.bands[0, 0, 0:6],

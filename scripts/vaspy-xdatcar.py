@@ -54,14 +54,14 @@ if args.split:
     xdatcar = XDATCAR(args.files[0])
     scaling_factor = xdatcar.scaling_factor
     cell_vecs = xdatcar.cell_vecs
-    iontypes = xdatcar.iontypes
+    atom_types = xdatcar.atom_types
     ionnums = xdatcar.ionnums
     for frame, configuration in enumerate(xdatcar.configurations):
         poscar = POSCAR()
         poscar.system_name = xdatcar.system_name + "_frame_" + str(frame + 1)
         poscar.scaling_factor = scaling_factor
         poscar.cell_vecs = cell_vecs
-        poscar.iontypes = iontypes
+        poscar.atom_types = atom_types
         poscar.ionnums = ionnums
         poscar.coordinate_type = "Direct"
         poscar.positions = configuration
@@ -74,7 +74,7 @@ if args.poscar:
     output_xdatcar.system_name = poscars[0].system_name
     output_xdatcar.scaling_factor = poscars[0].scaling_factor
     output_xdatcar.cell_vecs = poscars[0].cell_vecs
-    output_xdatcar.iontypes = poscars[0].iontypes
+    output_xdatcar.atom_types = poscars[0].atom_types
     output_xdatcar.ionnums = poscars[0].ionnums
     positions = []
     for poscar in poscars:
