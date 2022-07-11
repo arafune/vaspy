@@ -35,15 +35,15 @@ class VASPGrid(object):
         Direct                            # 8th line poscar.POSCAR[7]
         0.047680  0.261795  0.361962      # 9th line poscar.POSCAR[8]
         ....
-                                            # the single blanck line
-        240   240   288                     # number of gridmesh
+                                            # the single blanc line
+        240   240   288                     # number of grid mesh
         0.0000 0.0005 0.0002 0.0020 0.0001  # five columns in each line
         0.0030 0.0025 0.0001 0.0023 0.0003  #  ...
         ...                                 #  ...
 
-    In CHGCAR file, information about "augmentation occupacies" is
+    In CHGCAR file, information about "augmentation occupancies" is
     filled after ech charge, magnetization values. Currently,
-    "augmentation occupacies" is ignored.
+    "augmentation occupancies" is ignored.
 
     In LOCPOT file, additional information (probably) about the ion
     itself by usually the value of unity is filled.  i.e. 0.1000E+1
@@ -64,12 +64,12 @@ class VASPGrid(object):
         if filename:
             self.load_file(open_by_suffix(str(filename)), pickles)
 
-    def load_file(self, thefile: IO[str], pickles: str = "") -> None:
+    def load_file(self, the_file: IO[str], pickles: str = "") -> None:
         """Construct the object from the file.
 
         Parameters
         ----------
-        thefile: StringIO
+        the_file: StringIO
             file
 
         pickles: str
@@ -80,13 +80,13 @@ class VASPGrid(object):
         tmp: list[str] = []
         griddata = ""
         # read POSCAR part
-        line: str = thefile.readline()
+        line: str = the_file.readline()
         while not line.isspace():
             tmp.append(line.strip("\n"))
-            line = thefile.readline()
+            line = the_file.readline()
         self.poscar.load_array(tmp)
         # read grid size and use it as separator
-        separator = thefile.readline()
+        separator = the_file.readline()
         self.grid.shape = tuple([int(string) for string in separator.split()])
         # Volumetric data
         if pickles:
@@ -96,21 +96,21 @@ class VASPGrid(object):
                 self.grid.data = np.load(pickles)["arr_0"]
             else:
                 raise TypeError("Check the volmetric data type")
-            thefile.close()
+            the_file.close()
             return None
-        griddata += next(thefile).replace("***********", "Nan")
+        griddata += next(the_file).replace("***********", "Nan")
         if self.grid.size % len(griddata.split()) == 0:
             lines_for_mesh = self.grid.size // len(griddata.split())
         else:
             lines_for_mesh = self.grid.size // len(griddata.split()) + 1
         for _ in range(lines_for_mesh - 1):  # read the first frame
-            griddata += next(thefile).replace("***********", "Nan")
+            griddata += next(the_file).replace("***********", "Nan")
         section = "grid"
-        for line in thefile:
+        for line in the_file:
             if section == "aug":
                 if separator in line:
                     for _ in range(lines_for_mesh):
-                        griddata += next(thefile).replace("***********", "Nan")
+                        griddata += next(the_file).replace("***********", "Nan")
                     section = "grid"
                 elif "augmentation occupancies " in line:
                     pass  # Used for CHGCAR, not LOCPOT. not implementd
@@ -121,12 +121,12 @@ class VASPGrid(object):
                     section = "aug"
                 elif separator in line:
                     for _ in range(lines_for_mesh):
-                        griddata += next(thefile).replace("***********", "Nan")
+                        griddata += next(the_file).replace("***********", "Nan")
                 else:
                     # for unused data stored in LOCPOT
                     self.additional.extend(line.split())
         self.grid.data = np.fromstring(griddata, dtype=float, sep=" ")
-        thefile.close()
+        the_file.close()
 
     def __str__(self) -> str:
         """String representation.
@@ -150,9 +150,9 @@ class VASPGrid(object):
             file name
 
         """
-        thefile: IO[str]
-        with open(filename, mode="w", newline="\n") as thefile:
-            thefile.write(str(self))
+        the_file: IO[str]
+        with open(filename, mode="w", newline="\n") as the_file:
+            the_file.write(str(self))
 
     def frame(self, frame_i: int) -> VASPGrid:
         """Return VASPGrid object for only frame_i th frame.

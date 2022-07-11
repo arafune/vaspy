@@ -35,11 +35,11 @@ class BaderACF(object):
         charges
     vols: list
         volumes
-    vaccharge: float
+    vac_charge: float
         vacuum charge
-    vacvol: float
+    vac_vol: float
         vacuum volume
-    nelectron: float
+    n_electron: float
         number of electron
 
     """
@@ -57,26 +57,26 @@ class BaderACF(object):
         self.charges: list[float] = []
         self.mindists: list[float] = []
         self.vols: list[float] = []
-        self.vaccharge: float = 0.0
-        self.vacvol: float = 0.0
-        self.nelectron: float = 0.0
+        self.vac_charge: float = 0.0
+        self.vac_vol: float = 0.0
+        self.n_electron: float = 0.0
         if filename:
             self.parse(open_by_suffix(str(filename)))
 
-    def parse(self, thefile: IO[Any]) -> None:
+    def parse(self, the_file: IO[Any]) -> None:
         """Parse AFC.dat.
 
         Parameters
         ----------
-        thefile : IO[Any]
+        the_file : IO[Any]
             'ACF.dat' file
         """
         # the first line is like:
         #     X     Y     Z     CHARGE      MIN DIST   ATOMIC VOL
-        next(thefile)
+        next(the_file)
         # the 2nd line is just "----------"
-        separator = next(thefile)
-        for line in thefile:
+        separator = next(the_file)
+        for line in the_file:
             if separator in line:
                 break
             else:
@@ -85,8 +85,8 @@ class BaderACF(object):
                 self.charges.append(float(tmp[4]))
                 self.mindists.append(float(tmp[5]))
                 self.vols.append(float(tmp[6]))
-        self.vaccharge = float(next(thefile).split()[-1])
-        self.vacvol = float(next(thefile).split()[-1])
-        self.nelectron = float(next(thefile).split()[-1])
+        self.vac_charge = float(next(the_file).split()[-1])
+        self.vac_vol = float(next(the_file).split()[-1])
+        self.n_electron = float(next(the_file).split()[-1])
         self.natom = len(self.positions)
-        thefile.close()
+        the_file.close()

@@ -89,23 +89,23 @@ class DOSCAR(object):  # Version safety
         if filename:
             self.load_file(open_by_suffix(str(filename)))
 
-    def load_file(self, thefile: IO[str]) -> None:
+    def load_file(self, the_file: IO[str]) -> None:
         """Parse DOSCAR file and store it in memory.
 
         Parameters
         ------------
-        thefile: StringIO
+        the_file: StringIO
             "DOSCAR" file
 
         """
-        firstline = thefile.readline()
+        firstline = the_file.readline()
         self.natom = int(firstline[0:4])
-        [thefile.readline() for _ in range(4)]
-        header = thefile.readline()
+        [the_file.readline() for _ in range(4)]
+        header = the_file.readline()
 
         nedos: int = int(header[32:37])
         tmp: list[list[float]] = [
-            [float(i) for i in next(thefile).split()] for _ in range(nedos)
+            [float(i) for i in next(the_file).split()] for _ in range(nedos)
         ]
         tmp_dos: list[tuple[float]] = [*zip(*tmp)]
         #
@@ -119,18 +119,18 @@ class DOSCAR(object):  # Version safety
         #
 
         try:
-            line = next(thefile)
+            line = next(the_file)
         except StopIteration:
             line = ""
         while line == header:
-            tmp = [[float(i) for i in next(thefile).split()] for _ in range(nedos)]
+            tmp = [[float(i) for i in next(the_file).split()] for _ in range(nedos)]
             self.pdoses.append(PDOS([*zip(*tmp)][1:]))
             try:
-                line = next(thefile)
+                line = next(the_file)
             except StopIteration:
                 line = ""
 
-        thefile.close()
+        the_file.close()
 
     def fermi_correction(self, fermi: float) -> None:
         """Correct energy by Fermi level.

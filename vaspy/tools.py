@@ -18,10 +18,10 @@ from numpy.typing import NDArray
 def open_by_suffix(filename: str) -> IO[str]:
     """Open file."""
     if os.path.splitext(filename)[1] == ".bz2":
-        thefile = bz2.open(filename, mode="rt")
+        the_file = bz2.open(filename, mode="rt")
     else:
-        thefile = open(filename, mode="rt")
-    return thefile
+        the_file = open(filename, mode="rt")
+    return the_file
 
 
 def each_slice(

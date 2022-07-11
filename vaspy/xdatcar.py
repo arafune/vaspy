@@ -35,24 +35,24 @@ class XDATCAR(PosCarHead):
         if filename:
             self.load_file(open_by_suffix(str(filename)))
 
-    def load_file(self, thefile: IO[str]) -> None:
+    def load_file(self, the_file: IO[str]) -> None:
         """Parse PROCAR.
 
         Parameters
         ----------
-        thefile: StringIO
+        the_file: StringIO
             'XDATCAR' file
 
         """
-        self.system_name = next(thefile).strip()
-        self.scaling_factor = float(next(thefile).strip())
-        self.cell_vecs[0] = np.array([float(x) for x in next(thefile).split()])
-        self.cell_vecs[1] = np.array([float(x) for x in next(thefile).split()])
-        self.cell_vecs[2] = np.array([float(x) for x in next(thefile).split()])
-        self.atomtypes = next(thefile).split()
-        self.atomnums = [int(x) for x in next(thefile).split()]
+        self.system_name = next(the_file).strip()
+        self.scaling_factor = float(next(the_file).strip())
+        self.cell_vecs[0] = np.array([float(x) for x in next(the_file).split()])
+        self.cell_vecs[1] = np.array([float(x) for x in next(the_file).split()])
+        self.cell_vecs[2] = np.array([float(x) for x in next(the_file).split()])
+        self.atomtypes = next(the_file).split()
+        self.atomnums = [int(x) for x in next(the_file).split()]
         positions = []
-        for line in thefile:
+        for line in the_file:
             if "Direct configuration=" in line:
                 if positions:
                     self.configurations.append(positions)
@@ -61,7 +61,7 @@ class XDATCAR(PosCarHead):
                 position = np.array([float(x) for x in line.strip().split()])
                 positions.append(position)
         self.configurations.append(positions)
-        thefile.close()
+        the_file.close()
 
     def __str__(self) -> str:
         """Return as str.

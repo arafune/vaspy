@@ -28,8 +28,8 @@ class CHGCAR(VASPGrid):
         Direct                            # 8th line poscar.POSCAR[7]
         0.047680  0.261795  0.361962      # 9th line poscar.POSCAR[8]
         ...
-                                            # the single blanck line
-        240   240   288                     # number of gridmesh
+                                            # the single blanc line
+        240   240   288                     # number of grid mesh
         0.0000 0.0005 0.0002 0.0020 0.0001  # five columns in each line
         0.0030 0.0025 0.0001 0.0023 0.0003  #  ...
         ...                                 #  ...
@@ -42,7 +42,7 @@ class CHGCAR(VASPGrid):
 
     Notes
     -----
-    Current verstion ignores "augmentation occupacies".
+    Current version ignores "augmentation occupancies".
 
     """
 
@@ -53,16 +53,16 @@ class CHGCAR(VASPGrid):
         if filename:
             self.load_file(open_by_suffix(str(filename)), pickles)
 
-    def load_file(self, thefile: IO[str], pickles: str = "") -> None:
+    def load_file(self, the_file: IO[str], pickles: str = "") -> None:
         """Parse CHGCAR file to construct CHGCAR object.
 
         Parameters
         ----------
-        thefile: IO
+        the_file: IO
             CHGCAR file
 
         """
-        super(CHGCAR, self).load_file(thefile, pickles)
+        super(CHGCAR, self).load_file(the_file, pickles)
         if self.grid.nframe == 1:
             self.spin = [""]
         elif self.grid.nframe == 2:
@@ -71,7 +71,7 @@ class CHGCAR(VASPGrid):
             self.spin = ["mT", "mX", "mY", "mZ"]
         else:
             raise RuntimeError("CHGCAR is correct?")
-        thefile.close()
+        the_file.close()
 
     def magnetization(self, direction: str = "") -> CHGCAR:
         """Return CHGCAR for magnetization.
@@ -85,16 +85,16 @@ class CHGCAR(VASPGrid):
         For non-collinear spin-polarized calculations
         (``ISPIN=2`` and ``LSORBIT=.TRUE.``),
         CHGCAR file stores the total charge density and the
-        magnetisation density in the x, y and z direction in this order.
+        magnetization density in the x, y and z direction in this order.
 
-        For collinear spinpolarized calculation the argument does
+        For collinear spin polarized calculation the argument does
         not make a sense.  For non-collinear CHGCAR, direction
         should be one of 'x', 'y', 'z' and 't'
 
         Parameters
         ----------
         direction: str, optional
-            specify x, y, z or t in noncollinear calculation.
+            specify x, y, z or t in non-collinear calculation.
             't' means the total.
 
         Returns
@@ -104,7 +104,7 @@ class CHGCAR(VASPGrid):
 
         """
         if len(self.spin) == 1:
-            raise RuntimeError("This CHGCAR is not spinresolved version")
+            raise RuntimeError("This CHGCAR is not spin resolved version")
         dest = copy.deepcopy(self)
         if len(self.spin) == 2:
             dest.grid = dest.grid.frame(1)
@@ -156,7 +156,7 @@ class CHGCAR(VASPGrid):
             CHGCAR for the minority spin charge
 
         """
-        assert len(self.spin) == 2, "This CHGCAR is not spinresolved version"
+        assert len(self.spin) == 2, "This CHGCAR is not spin resolved version"
         dest = copy.deepcopy(self)
         tmp = dest.grid.data.reshape(2, self.grid.size)
         dest.grid.data = (tmp[0] - tmp[1]) / 2

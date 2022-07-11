@@ -132,16 +132,16 @@ class Incar(Mapping):
         if filename:
             self.load_file(open_by_suffix(str(filename)))
 
-    def load_file(self, thefile: IO[str]) -> None:
+    def load_file(self, the_file: IO[str]) -> None:
         """Load INCAR file.
 
         Parameters
         -----------
-        thefile: StringIO
+        the_file: StringIO
             "INCAR" file
         """
         incar: dict[str, tuple[str, bool]] = {}
-        for line in thefile:
+        for line in the_file:
             line, active = remove_sharp(line)
             if "=" in line:
                 tag, value_str = line.split("=")

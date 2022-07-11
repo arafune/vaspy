@@ -324,30 +324,30 @@ class EIGENVAL(EnergyBand):
         """Return numk as the result of len()"""
         return self.numk
 
-    def load_file(self, thefile: IO[str]) -> None:
+    def load_file(self, the_file: IO[str]) -> None:
         """Parse EIGENVAL."""
-        self.natom, _, _, self.nspin = [int(i) for i in next(thefile).split()]
+        self.natom, _, _, self.nspin = [int(i) for i in next(the_file).split()]
         if self.nspin == 2:
             self.label["energy"] = ["Energy_up", "Energy_down"]
         else:
             self.label["energy"] = ["Energy"]
-        next(thefile)
-        next(thefile)
-        next(thefile)
-        next(thefile)
-        _, self.numk, self.nbands = [int(i) for i in next(thefile).split()]
+        next(the_file)
+        next(the_file)
+        next(the_file)
+        next(the_file)
+        _, self.numk, self.nbands = [int(i) for i in next(the_file).split()]
         kvecs: list[list[float]] = []
         energies: list[list[float]] = []
         for _ in range(self.numk):
             # the first line in the sigleset begins with the blank
-            next(thefile)
-            kvecs.append([float(i) for i in next(thefile).split()[0:3]])
+            next(the_file)
+            kvecs.append([float(i) for i in next(the_file).split()[0:3]])
             for _ in range(self.nbands):
                 energies.append(
-                    [float(i) for i in next(thefile).split()[1 : self.nspin + 1]]
+                    [float(i) for i in next(the_file).split()[1 : self.nspin + 1]]
                 )
         self.kvecs: NDArray[np.float64] = np.array(kvecs)
         self.energies: NDArray[np.float64] = np.array(energies).T.reshape(
             self.nspin, self.numk, self.nbands
         )
-        thefile.close()
+        the_file.close()

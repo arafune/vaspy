@@ -416,18 +416,18 @@ class PROCAR(ProjectionBand):  # Version safety
         if filename:
             self.load_file(open_by_suffix(str(filename)), phase_read)
 
-    def load_file(self, thefile: IO[str], phase_read: bool = False) -> None:
+    def load_file(self, the_file: IO[str], phase_read: bool = False) -> None:
         """Parse PROCAR.
 
         Parameters
         ----------
-        thefile: StringIO
+        the_file: StringIO
             'PROCAR' file
         phase_read: boolean
             Switch for loading phase characters
 
         """
-        first_line = next(thefile)
+        first_line = next(the_file)
         assert (
             "PROCAR lm decomposed + phase" in first_line
         ), "This PROCAR is not a proper format\n \
@@ -439,7 +439,7 @@ class PROCAR(ProjectionBand):  # Version safety
         phase_r = ""
         phase_i = ""
         self.label["orbital"] = []
-        for line in thefile:
+        for line in the_file:
             if line.isspace():
                 continue
             elif "k-points: " in line:
@@ -462,19 +462,19 @@ class PROCAR(ProjectionBand):  # Version safety
             elif "ion" in line:
                 if "tot" in line and not self.label["orbital"]:
                     self.label["orbital"] = line.split()[1:]
-                line = next(thefile)
+                line = next(the_file)
                 while "ion " not in line:
                     if "tot " not in line:
                         orbitals += line[3:]
-                    line = next(thefile)
+                    line = next(the_file)
                 if phase_read:
-                    line = next(thefile)
+                    line = next(the_file)
                     for _ in range(self.natom):
                         try:
                             phase_r += line[3:]
-                            line = next(thefile)
+                            line = next(the_file)
                             phase_i += line[3:]
-                            line = next(thefile)
+                            line = next(the_file)
                         except StopIteration:
                             continue
         #
@@ -530,7 +530,7 @@ class PROCAR(ProjectionBand):  # Version safety
         else:
             raise ValueError
         del energies
-        thefile.close()
+        the_file.close()
 
     def set_spin_character(self, phase_read: bool = False):
         """Set label of Energy and Spin character.

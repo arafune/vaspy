@@ -94,12 +94,12 @@ class OUTCAR(object):  # Version safety
             for i in self.atom_names
         ]
 
-    def load_file(self, thefile: IO[str]) -> None:
+    def load_file(self, the_file: IO[str]) -> None:
         """Parse OUTCAR file.
 
         Parameters
         ----------
-        thefile: StringIO
+        the_file: StringIO
             "OUTCAR" file
 
         """
@@ -110,7 +110,7 @@ class OUTCAR(object):  # Version safety
         total_charges: list[list[float]] = []
         kvec_weight = []
         # parse
-        for line in thefile:
+        for line in the_file:
             if section == ["force"]:
                 if "total drift" in line:
                     section.pop()
@@ -170,7 +170,8 @@ class OUTCAR(object):  # Version safety
                     self.totens.append(float(line.split("=")[-1].split()[0]))
                 elif "reciprocal lattice vectors" in line:
                     self.recvec = [
-                        [float(i) for i in next(thefile)[43:].split()] for i in range(3)
+                        [float(i) for i in next(the_file)[43:].split()]
+                        for i in range(3)
                     ]
                 elif " magnetization (x)" in line:
                     magnetizations = []
@@ -179,7 +180,7 @@ class OUTCAR(object):  # Version safety
                     total_charges = []
                     section.append("total_charge")
                 elif " Following reciprocal coordinates:" in line:
-                    next(thefile)
+                    next(the_file)
                     kvec_weight = []
                     section.append("kvec_weight")
                 else:
@@ -202,7 +203,7 @@ class OUTCAR(object):  # Version safety
         for i in kvec_weight:
             self.kvecs.append([i[0], i[1], i[2]])
             self.weights.append(i[3])
-        thefile.close()
+        the_file.close()
 
     def select_posforce_header(
         self, posforce_flag: Sequence[bool], *sites: tuple[int | list[int]]
