@@ -46,7 +46,7 @@ class EnergyBand(object):
         number of kpoints
     nbands: int
         number of bands
-    nsping: int
+    nspin: int
         spin character
     energies: NDArray
         energies[spin_i, k_i, band_i], where spin_i, k_i, and band_i are spin-,
@@ -141,14 +141,14 @@ class EnergyBand(object):
         This list format would be useful for str output
 
         """
-        bandstructure: list[list[float]] = []
+        band_structure: list[list[float]] = []
         for energies in self.energies.T.tolist():
             band: list[float] = []
             for k, energy in zip(self.kdistances[:, np.newaxis].tolist(), energies):
                 k.extend(energy)
                 band.append(k)
-            bandstructure.append(band)
-        return bandstructure
+            band_structure.append(band)
+        return band_structure
 
     def to_csv(self, csv_file: str, blankline: bool = True) -> None:
         """Write data to csv file.

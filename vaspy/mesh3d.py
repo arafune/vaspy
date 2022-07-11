@@ -256,7 +256,7 @@ class Grid3D(object):
     ----------
     size: tuple
         number of mesh in the single frame
-    nframe: int
+    n_frame: int
         number of frames
     shape: tuple
         shape[0], shape[1], shape[2]
@@ -284,7 +284,7 @@ class Grid3D(object):
         return self.shape[0] * self.shape[1] * self.shape[2]
 
     @property
-    def nframe(self) -> int:
+    def n_frame(self) -> int:
         """Return the number of grid frames."""
         return divmod(self.data.size, self.size)[0]
 
@@ -297,9 +297,9 @@ class Grid3D(object):
             frame index
 
         """
-        assert frame_i < self.nframe
+        assert frame_i < self.n_frame
         dest = copy.deepcopy(self)
-        dest.data = self.data.reshape(self.nframe, self.size)[frame_i]
+        dest.data = self.data.reshape(self.n_frame, self.size)[frame_i]
         return dest
 
     def slice(
@@ -401,7 +401,7 @@ class Grid3D(object):
 
         """
         outputstr: str = ""
-        mesharray = self.data.reshape(self.nframe, self.size)
+        mesharray = self.data.reshape(self.n_frame, self.size)
         for tmp in mesharray:
             output = []
             outputstr += "\n  {0}  {1}  {2}\n".format(
