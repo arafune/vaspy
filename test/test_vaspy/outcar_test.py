@@ -21,7 +21,7 @@ class TestOUTCAR(object):
     def test_read_basic_properties(self, outcar0: vaspy.outcar.OUTCAR):
         """Test for OUTCAR reading basic properties"""
         assert -0.7681 == outcar0.fermi
-        assert 54 == outcar0.nbands
+        assert 54 == outcar0.n_bands
         #
         # reciprocal vectors
         np.testing.assert_almost_equal(
@@ -33,8 +33,8 @@ class TestOUTCAR(object):
         np.testing.assert_almost_equal(
             np.array([0.000000000, 0.000000000, 0.023484312]), outcar0.recvec[2]
         )
-        # kvecs and weights
-        assert 33 == len(outcar0.kvecs)
+        # k_vectors and weights
+        assert 33 == len(outcar0.k_vectors)
         assert 33 == len(outcar0.weights)
         np.testing.assert_array_almost_equal(
             [
@@ -46,7 +46,7 @@ class TestOUTCAR(object):
                 [0.294118, 0.000000, 0.000000],
                 [0.352941, -0.000000, 0.000000],
             ],
-            outcar0.kvecs[:7],
+            outcar0.k_vectors[:7],
         )
         np.testing.assert_array_almost_equal(
             [1.000000, 6.000000, 6.000000, 6.000000, 6.000000, 6.000000, 6.000000],

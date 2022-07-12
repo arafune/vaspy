@@ -40,15 +40,15 @@ class WAVECAR(object):
     ------------
     recl: numpy.int
         Record length
-    nspin: numpy.int
+    n_spin: numpy.int
         Number of spins
     rtag: int
         Tag for precsion in WAVECAR
     nplwvs: int
         Number of plane waves.
-    numk: int
+    num_k: int
         Number of k-points
-    nbands: int
+    n_bands: int
         Number of bands
     encut: float
         Cut off energy in eV unit.
@@ -58,7 +58,7 @@ class WAVECAR(object):
         fermi level
     rcpcell: numpy.array
         Vectors for the unit cell in reciprocal space
-    kvecs: NDArray
+    k_vectors: NDArray
         kvector
     bands: NDArray
         Energy
@@ -83,7 +83,7 @@ class WAVECAR(object):
         #
         self.header()
         self.band()
-        if self.numk == 1:
+        if self.num_k == 1:
             self.check_DwNGZHalf()
 
     def header(self) -> None:
@@ -92,15 +92,15 @@ class WAVECAR(object):
         Information of the system is stored in the first two record
         in WAVECAR file
 
-        rec1: recl, nspin, rtag
-        rec2: numk, nbands ,encut, ((cell(i, j) i=1, 3), j=1, 3), efermi
+        rec1: recl, n_spin, rtag
+        rec2: num_k, n_bands ,encut, ((cell(i, j) i=1, 3), j=1, 3), efermi
 
         """
         self.wfc.seek(0)
         self.recl: int
-        self.nspin: int
+        self.n_spin: int
         self.rtag: int
-        self.recl, self.nspin, self.rtag = np.array(
+        self.recl, self.n_spin, self.rtag = np.array(
             np.fromfile(self.wfc, dtype=float, count=3), dtype=int
         )
         self.wfc.seek(self.recl)
@@ -108,8 +108,8 @@ class WAVECAR(object):
         #
         dump: NDArray[np.float64] = np.fromfile(self.wfc, dtype=float, count=13)
         #
-        self.numk: int = int(dump[0])
-        self.nbands: int = int(dump[1])
+        self.num_k: int = int(dump[0])
+        self.n_bands: int = int(dump[1])
         self.encut: float = dump[2]
         self.realcell: NDArray[np.float64] = dump[3:12].reshape((3, 3))
         self.efermi: float = dump[12]
@@ -161,28 +161,28 @@ class WAVECAR(object):
         * occupation  (as a function of spin-, k-, and band index)
 
         """
-        self.kvecs: NDArray[np.float64] = np.zeros((self.numk, 3), dtype=float)
+        self.k_vectors: NDArray[np.float64] = np.zeros((self.num_k, 3), dtype=float)
         self.bands: NDArray[np.float64] = np.zeros(
-            (self.nspin, self.numk, self.nbands), dtype=float
+            (self.n_spin, self.num_k, self.n_bands), dtype=float
         )
-        self.nplwvs: NDArray[np.float64] = np.zeros(self.numk, dtype=int)
+        self.nplwvs: NDArray[np.float64] = np.zeros(self.num_k, dtype=int)
         self.occs: NDArray[np.float64] = np.zeros(
-            (self.nspin, self.numk, self.nbands), dtype=float
+            (self.n_spin, self.num_k, self.n_bands), dtype=float
         )
-        for spin_i in range(self.nspin):
-            for k_i in range(self.numk):
-                pos = 2 + spin_i * self.numk * (self.nbands + 1)
-                pos += k_i * (self.nbands + 1)
+        for spin_i in range(self.n_spin):
+            for k_i in range(self.num_k):
+                pos = 2 + spin_i * self.num_k * (self.n_bands + 1)
+                pos += k_i * (self.n_bands + 1)
                 self.wfc.seek(pos * self.recl)
                 #                print(self.wfc.tell())
-                dump = np.fromfile(self.wfc, dtype=float, count=4 + 3 * self.nbands)
+                dump = np.fromfile(self.wfc, dtype=float, count=4 + 3 * self.n_bands)
                 if spin_i == 0:
                     self.nplwvs[k_i] = int(dump[0])
-                    self.kvecs[k_i] = dump[1:4]
+                    self.k_vectors[k_i] = dump[1:4]
                 dump = dump[4:].reshape((-1, 3))
                 self.bands[spin_i, k_i, :] = dump[:, 0]
                 self.occs[spin_i, k_i, :] = dump[:, 2]
-        if self.numk == 1:
+        if self.num_k == 1:
             self.kpath = None
         else:
             self.kpath = np.concatenate(
@@ -192,7 +192,8 @@ class WAVECAR(object):
                     ],
                     np.cumsum(
                         np.linalg.norm(
-                            np.dot(np.diff(self.kvecs, axis=0), self.rcpcell), axis=1
+                            np.dot(np.diff(self.k_vectors, axis=0), self.rcpcell),
+                            axis=1,
                         )
                     ),
                 )
@@ -221,18 +222,19 @@ class WAVECAR(object):
 
         """
 
-        kvec = self.kvecs[k_i]
-        # kgrid = []
-        kgrid: NDArray[np.float64] = make_kgrid(self.ngrid, self.gamma, para=PARALLEL)
+        k_vector = self.k_vectors[k_i]
+        # k_grid = []
+        k_grid: NDArray[np.float64] = make_k_grid(self.ngrid, self.gamma, para=PARALLEL)
         hbar2over2m = 13.605826 * 0.529177249 * 0.529177249
         energy_k = (
             hbar2over2m
             * np.linalg.norm(
-                np.dot(kgrid + kvec[np.newaxis, :], 2 * np.pi * self.rcpcell), axis=1
+                np.dot(k_grid + k_vector[np.newaxis, :], 2 * np.pi * self.rcpcell),
+                axis=1,
             )
             ** 2
         )
-        g_vec = kgrid[np.where(energy_k < self.encut)[0]]
+        g_vec = k_grid[np.where(energy_k < self.encut)[0]]
         return np.array(g_vec, dtype=int)
 
     def bandcoeff(
@@ -254,8 +256,8 @@ class WAVECAR(object):
             If true the Band coeffients are normliazed (default is false)
 
         """
-        irec = 3 + spin_i * self.numk * (self.nbands + 1)
-        irec += k_i * (self.nbands + 1) + band_i
+        irec = 3 + spin_i * self.num_k * (self.n_bands + 1)
+        irec += k_i * (self.n_bands + 1) + band_i
         self.wfc.seek(irec * self.recl)
         #        print(self.wfc.tell())
         nplw = self.nplwvs[k_i]
@@ -419,9 +421,9 @@ class WAVECAR(object):
         the1stline = "record length  =       {0}  "
         the1stline += "spins =           {1}  "
         the1stline += "prec flag        {2}"
-        string = the1stline.format(self.recl, self.nspin, self.rtag)
-        string += "\nno. k points =          {0}".format(self.numk)
-        string += "\nno. bands =          {0}".format(self.nbands)
+        string = the1stline.format(self.recl, self.n_spin, self.rtag)
+        string += "\nno. k points =          {0}".format(self.num_k)
+        string += "\nno. bands =          {0}".format(self.n_bands)
         string += "\nreal space lattice vectors:"
         for i in range(3):
             string += "\na" + str(i + 1)
@@ -440,12 +442,12 @@ class WAVECAR(object):
         return string
 
 
-def make_kgrid(
+def make_k_grid(
     ngrid: tuple[int, ...] | NDArray[np.int64] = (),
     gamma: bool = False,
     para: bool = PARALLEL,
 ) -> NDArray[np.float64]:
-    """Return kgrid.
+    """Return k_grid.
 
     Parameters
     -----------
@@ -466,7 +468,7 @@ def make_kgrid(
     fy = [ii if ii < ngrid[1] // 2 + 1 else ii - ngrid[1] for ii in range(ngrid[1])]
     fz = [ii if ii < ngrid[2] // 2 + 1 else ii - ngrid[2] for ii in range(ngrid[2])]
     if gamma and para:
-        kgrid: NDArray[np.float64] = np.array(
+        k_grid: NDArray[np.float64] = np.array(
             [
                 (fx[ix], fy[iy], fz[iz])
                 for iz in range(ngrid[2])
@@ -481,7 +483,7 @@ def make_kgrid(
             dtype=float,
         )
     elif gamma and not para:
-        kgrid = np.array(
+        k_grid = np.array(
             [
                 (fx[ix], fy[iy], fz[iz])
                 for iz in range(ngrid[2])
@@ -497,7 +499,7 @@ def make_kgrid(
         )
 
     else:
-        kgrid = np.array(
+        k_grid = np.array(
             [
                 (fx[ix], fy[iy], fz[iz])
                 for iz in range(ngrid[2])
@@ -506,7 +508,7 @@ def make_kgrid(
             ],
             dtype=float,
         )
-    return kgrid
+    return k_grid
 
 
 def check_symmetry(grid3d: NDArray[np.float64]) -> bool:
@@ -524,8 +526,8 @@ def check_symmetry(grid3d: NDArray[np.float64]) -> bool:
     """
     assert grid3d.ndim == 3, "Must be 3D Grid"
     grid = grid3d.shape
-    kgrid = make_kgrid(grid)
-    for k in kgrid:
+    k_grid = make_k_grid(grid)
+    for k in k_grid:
         ix, iy, iz = int(k[0]), int(k[1]), int(k[2])
         if ix >= 0 and iy >= 0 and iz >= 0:
             if grid3d[ix][iy][iz] != np.conjugate(grid3d[-ix][-iy][-iz]):

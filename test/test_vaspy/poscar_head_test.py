@@ -8,7 +8,7 @@ from vaspy import poscar
 class Test_POSCAR_Head(object):
     def setup_method(self, method):
         self.poscar_head = poscar.PosCarHead()
-        self.poscar_head.atomtypes = ["Ag", "Si"]
+        self.poscar_head.atom_types = ["Ag", "Si"]
         self.poscar_head.atomnums = [3, 5]
         self.poscar_head.system_name = "testPOSCAR"
 

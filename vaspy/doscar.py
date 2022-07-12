@@ -63,7 +63,7 @@ class DOSCAR(object):  # Version safety
 
     Attributes
     ----------
-    natom: int
+    n_atom: int
         number of atoms
 
     tdos:
@@ -82,30 +82,30 @@ class DOSCAR(object):  # Version safety
         filename : str|Path, optional
             file name of "DOSCAR"
         """
-        self.natom: int = 0
+        self.n_atom: int = 0
         self.tdos: TDOS | None = None
         self.pdoses: list[PDOS] = []
         self.energies: tuple[float, ...] = tuple()
         if filename:
             self.load_file(open_by_suffix(str(filename)))
 
-    def load_file(self, thefile: IO[str]) -> None:
+    def load_file(self, the_file: IO[str]) -> None:
         """Parse DOSCAR file and store it in memory.
 
         Parameters
         ------------
-        thefile: StringIO
+        the_file: StringIO
             "DOSCAR" file
 
         """
-        firstline = thefile.readline()
-        self.natom = int(firstline[0:4])
-        [thefile.readline() for _ in range(4)]
-        header = thefile.readline()
+        firstline = the_file.readline()
+        self.n_atom = int(firstline[0:4])
+        [the_file.readline() for _ in range(4)]
+        header = the_file.readline()
 
         nedos: int = int(header[32:37])
         tmp: list[list[float]] = [
-            [float(i) for i in next(thefile).split()] for _ in range(nedos)
+            [float(i) for i in next(the_file).split()] for _ in range(nedos)
         ]
         tmp_dos: list[tuple[float]] = [*zip(*tmp)]
         #
@@ -119,18 +119,18 @@ class DOSCAR(object):  # Version safety
         #
 
         try:
-            line = next(thefile)
+            line = next(the_file)
         except StopIteration:
             line = ""
         while line == header:
-            tmp = [[float(i) for i in next(thefile).split()] for _ in range(nedos)]
+            tmp = [[float(i) for i in next(the_file).split()] for _ in range(nedos)]
             self.pdoses.append(PDOS([*zip(*tmp)][1:]))
             try:
-                line = next(thefile)
+                line = next(the_file)
             except StopIteration:
                 line = ""
 
-        thefile.close()
+        the_file.close()
 
     def fermi_correction(self, fermi: float) -> None:
         """Correct energy by Fermi level.
@@ -187,8 +187,8 @@ class DOS(Sequence):  # Version safety
         """Export data to csv file"""
         assert len(energy) == len(self)
         assert len(header) == len(self[0]) + 1
-        with open(filename, mode="w") as csvfile:
-            writer = csv.writer(csvfile, delimiter="\t")
+        with open(filename, mode="w") as csv_file:
+            writer = csv.writer(csv_file, delimiter="\t")
             writer.writerow(header)
             for e, d in zip(energy, self.dos):
                 writer.writerow([e] + list(d))
@@ -220,7 +220,7 @@ class TDOS(DOS):
             self.dos = [(d[0], -d[1]) for d in self.dos]
 
     def graphview(self) -> None:
-        """Show graphview by matplotlib."""
+        """Show graph view by matplotlib."""
         for density in self.dos[1:]:
             plt.plot(self.dos[0], density)
         plt.show()
@@ -324,7 +324,7 @@ class PDOS(DOS):
             idx = self.orbital_spin.index(orbital)
         return [d[idx] for d in self.dos]
 
-    def graphview(self, *orbitalnames: str) -> None:
+    def graph_view(self, *orbitalnames: str) -> None:
         """Show DOS graph by using matplotlib.  For 'just seeing' use."""
         try:
             alist: list[int] = [

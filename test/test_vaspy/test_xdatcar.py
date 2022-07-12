@@ -27,7 +27,7 @@ class TestXDATCAR(object):
             [1.592000, 2.757425, 0.000000], self.xdatcar_test.cell_vecs[1]
         )
         np.testing.assert_allclose([0, 0, 38.0], self.xdatcar_test.cell_vecs[2])
-        assert ["Mo", "S"]== self.xdatcar_test.atomtypes
+        assert ["Mo", "S"]== self.xdatcar_test.atom_types
         assert [1, 2] == self.xdatcar_test.atomnums
         assert 5 == len(self.xdatcar_test.configurations)
         #

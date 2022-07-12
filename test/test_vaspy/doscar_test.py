@@ -31,7 +31,7 @@ def ispin2() -> vaspy.doscar.DOSCAR:
 
 class Test_ispin1_TDOS:
     def test_basic_property(self, ispin1: DOSCAR):
-        assert ispin1.natom == 39
+        assert ispin1.n_atom == 39
         assert len(ispin1.energies) == 301
         assert len(ispin1.tdos) == 301
         assert ispin1.tdos[0][0] == 0.0
@@ -43,7 +43,7 @@ class Test_ispin1_TDOS:
 
 class Test_ispin2_TDOS:
     def test_basic_property(self, ispin2: DOSCAR):
-        assert ispin2.natom == 57
+        assert ispin2.n_atom == 57
         assert len(ispin2.energies) == 31
         assert len(ispin2.tdos) == 31
         assert ispin2.tdos[0][0] == 0.0

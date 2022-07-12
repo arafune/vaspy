@@ -191,7 +191,7 @@ class TestPOSCAR(object):
             np.array([0.0, 0.0, 1.02529049]), supercell.cell_vecs[2]
         )
         assert "NiC4S4" == supercell.system_name
-        assert ["Ni", "C", "S"] == supercell.atomtypes
+        assert ["Ni", "C", "S"] == supercell.atom_types
         assert [18, 72, 72] == supercell.atomnums
         supercell = self.testposcar.supercell(1, 1, 1)
         np.testing.assert_allclose(self.testposcar.positions[0], supercell.positions[0])
@@ -223,7 +223,7 @@ class TestPOSCAR(object):
         """Test for POSCAR.split."""
         one, other = self.testposcar.split([2, 3, 4, 5, 6])
         assert 5 == len(one.positions)
-        assert ["Ni", "C"] == one.atomtypes
+        assert ["Ni", "C"] == one.atom_types
         assert [1, 4] == one.atomnums
         assert one.selective
         assert other.selective

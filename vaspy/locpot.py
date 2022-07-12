@@ -65,11 +65,11 @@ class LOCPOT(mesh3d.VASPGrid):
         plt.plot(horizontal_axis, y_max, label="max")
         plt.plot(horizontal_axis, y_min, label="min")
         plt.plot(horizontal_axis, y_median, label="median")
-        xlabel = "Position along " + axis_name + "-axis (A)"
+        x_label = "Position along " + axis_name + "-axis (A)"
         title = "Local potential (" + axis_name + ")"
         plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left", borderaxespad=0)
         plt.title(title)
-        plt.xlabel(xlabel)
+        plt.xlabel(x_label)
         plt.ylabel("Energy  ( eV )")
         if save:
             plt.savefig(save, dpi=600, format="png")

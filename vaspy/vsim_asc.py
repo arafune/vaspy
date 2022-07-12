@@ -37,7 +37,7 @@ stream_handler.setFormatter(handler_format)
 class VSIM_ASC(object):
     """Class for VSIM_ASC.
 
-    Collection of phonon mode data from v_scim ascii file
+    Collection of phonon mode data from v_sim ascii file
 
     Attributes
     -----------
@@ -68,22 +68,22 @@ class VSIM_ASC(object):
         if filename:
             self.load_file(open_by_suffix(str(filename)))
 
-    def load_file(self, thefile: IO[str]) -> None:
+    def load_file(self, the_file: IO[str]) -> None:
         """Parse vsim.ascii.
 
         Parameters
         ----------
-        thefile: StringIO
+        the_file: StringIO
             "VSIM.ascii" file
 
         """
         phonon_lines = []
         # the first line is system name
-        self.system_name = next(thefile)[1:].strip()
+        self.system_name = next(the_file)[1:].strip()
         # the 2nd line represents dxx, dyx, dyy
-        dxx, dyx, dyy = [float(x) for x in next(thefile).split()]
+        dxx, dyx, dyy = [float(x) for x in next(the_file).split()]
         # the 3rd line represents dzx, dzy, dzz
-        dzx, dzy, dzz = [float(x) for x in next(thefile).split()]
+        dzx, dzy, dzz = [float(x) for x in next(the_file).split()]
         self.lattice_vectors: NDArray[np.float64] = np.array(
             [[dxx, 0, 0], [dyx, dyy, 0], [dzx, dzy, dzz]]
         )
@@ -91,7 +91,7 @@ class VSIM_ASC(object):
         self.positions = []
         d_vectors: list[list[complex]] = []
         freqs: list[float] = []
-        for line in thefile:
+        for line in the_file:
             line = line.strip()
             if line[0] == "#" or line[0] == "!":
                 phonon_lines.append(line[1:].strip())
@@ -99,7 +99,7 @@ class VSIM_ASC(object):
                 x, y, z, atom = line.split()
                 self.atoms.append(atom)
                 self.positions.append(np.array([float(x), float(y), float(z)]))
-        # self.ionnums, self.iontypes = ions_to_iontypes_ionnums(self.ions)
+        # self.ionnums, self.atom_types = ions_to_atom_types_ionnums(self.ions)
         #
         for line in phonon_lines:
             if "metaData" in line:
@@ -127,7 +127,7 @@ class VSIM_ASC(object):
             n_phonons, len(self.atoms), 3
         )
         self.freqs = np.array(freqs)
-        thefile.close()
+        the_file.close()
 
     def build_phono_motion(
         self,

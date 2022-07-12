@@ -3,6 +3,7 @@
 import os
 
 import numpy as np
+
 import vaspy
 
 
@@ -22,10 +23,10 @@ class TestBader(object):
         VACUUM VOLUME:             157.7708
         NUMBER OF ELECTRONS:      2828.0000
         """
-        assert 1.2829 == self.acf.vaccharge
-        assert 157.7708 == self.acf.vacvol
-        assert 2828.000 == self.acf.nelectron
-        assert 344, self.acf.natom
+        assert 1.2829 == self.acf.vac_charge
+        assert 157.7708 == self.acf.vac_vol
+        assert 2828.000 == self.acf.n_electron
+        assert 344, self.acf.n_atom
         np.testing.assert_array_almost_equal(
             [6.745000, -37.491966, 11.674620], self.acf.positions[0]
         )

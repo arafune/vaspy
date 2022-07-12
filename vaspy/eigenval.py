@@ -38,15 +38,15 @@ class EnergyBand(object):
 
     Attributes
     ----------
-    kvecs: NDArray
+    k_vectors: NDArray
         kvectors
     kdistances: NDArray
         kdisance
-    numk: int
+    num_k: int
         number of kpoints
-    nbands: int
+    n_bands: int
         number of bands
-    nsping: int
+    n_spin: int
         spin character
     energies: NDArray
         energies[spin_i, k_i, band_i], where spin_i, k_i, and band_i are spin-,
@@ -57,11 +57,11 @@ class EnergyBand(object):
 
     Parameters
     ----------
-    kvecs: NDArray
+    k_vectors: NDArray
             1D array data of k-vectors.
     energies: NDArray
             1D array data of energies
-    nspin: int
+    n_spin: int
             number of spin: '1' means No-spin.  '2' means collinear spin,
             '4' means noncollinear spin.
             In this class does not distinguish non-collinear spin
@@ -71,27 +71,27 @@ class EnergyBand(object):
 
     def __init__(
         self,
-        kvecs: Sequence[float] = (),
+        k_vectors: Sequence[float] = (),
         energies: Sequence[float] = (),
-        nspin: int = 1,
+        n_spin: int = 1,
     ) -> None:
         """Initialize."""
-        self.kvecs: NDArray[np.float64] = np.array(kvecs)
-        self.numk: int = len(self.kvecs)
+        self.k_vectors: NDArray[np.float64] = np.array(k_vectors)
+        self.num_k: int = len(self.k_vectors)
         self.label: dict[str, list[str]] = {}
         try:
-            self.nbands: int = len(energies) // len(kvecs)
+            self.n_bands: int = len(energies) // len(k_vectors)
         except ZeroDivisionError:
-            self.nbands = 0
+            self.n_bands = 0
         self.energies: NDArray[np.float64] = np.array(energies)
-        self.nspin: int = nspin
-        if self.nspin == 1:  # standard
+        self.n_spin: int = n_spin
+        if self.n_spin == 1:  # standard
             self.label["spin"] = [""]
             self.label["energy"] = ["Energy"]
-        elif self.nspin == 2:  # spin-polarized
+        elif self.n_spin == 2:  # spin-polarized
             self.label["energy"] = ["Energy_up", "Energy_down"]
             self.label["spin"] = ["_up", "_down"]
-        elif self.nspin == 4:  # non-collinear
+        elif self.n_spin == 4:  # non-collinear
             self.label["energy"] = ["Energy"]
             self.label["spin"] = ["_mT", "_mX", "_mY", "_mZ"]
         self.label["k"] = ["#k"]
@@ -102,7 +102,7 @@ class EnergyBand(object):
         return np.cumsum(
             np.linalg.norm(
                 np.concatenate(
-                    (np.array([[0.0, 0.0, 0.0]]), np.diff(self.kvecs, axis=0))
+                    (np.array([[0.0, 0.0, 0.0]]), np.diff(self.k_vectors, axis=0))
                 ),
                 axis=1,
             )
@@ -141,14 +141,14 @@ class EnergyBand(object):
         This list format would be useful for str output
 
         """
-        bandstructure: list[list[float]] = []
+        band_structure: list[list[float]] = []
         for energies in self.energies.T.tolist():
             band: list[float] = []
             for k, energy in zip(self.kdistances[:, np.newaxis].tolist(), energies):
                 k.extend(energy)
                 band.append(k)
-            bandstructure.append(band)
-        return bandstructure
+            band_structure.append(band)
+        return band_structure
 
     def to_csv(self, csv_file: str, blankline: bool = True) -> None:
         """Write data to csv file.
@@ -261,7 +261,7 @@ class EnergyBand(object):
             ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)),
         ),
     ) -> None:
-        """Change kvec unit to inverse AA.
+        """Change k-vector unit to inverse AA.
 
         Parameters
         -----------
@@ -276,9 +276,11 @@ class EnergyBand(object):
 
         """
         logger.debug("recvec: {}".format(recvec))
-        logger.debug("self.kvecs: {}".format(self.kvecs))
+        logger.debug("self.k_vectors: {}".format(self.k_vectors))
         recvec = np.array(recvec)
-        self.kvecs = np.array([recvec.dot(kvecs) for kvecs in self.kvecs])
+        self.k_vectors = np.array(
+            [recvec.dot(k_vectors) for k_vectors in self.k_vectors]
+        )
 
 
 class EIGENVAL(EnergyBand):
@@ -291,7 +293,7 @@ class EIGENVAL(EnergyBand):
 
     Attributes
     ----------
-    natom: int
+    n_atom: int
         Number of atoms
 
     """
@@ -299,7 +301,7 @@ class EIGENVAL(EnergyBand):
     def __init__(self, filename: str | Path = "") -> None:
         """Initialize."""
         super(EIGENVAL, self).__init__()
-        self.natom: int = 0
+        self.n_atom: int = 0
         #
         if filename:
             self.load_file(open_by_suffix(str(filename)))
@@ -317,37 +319,37 @@ class EIGENVAL(EnergyBand):
         tuple of list of float and list of float
         """
         energies: list[list[list[float]]] = self.energies.transpose(1, 2, 0).tolist()
-        kvec: list[list[float]] = self.kvecs.tolist()
+        kvec: list[list[float]] = self.k_vectors.tolist()
         return list(zip(kvec, energies))[item]
 
     def __len__(self) -> int:
-        """Return numk as the result of len()"""
-        return self.numk
+        """Return num_k as the result of len()"""
+        return self.num_k
 
-    def load_file(self, thefile: IO[str]) -> None:
+    def load_file(self, the_file: IO[str]) -> None:
         """Parse EIGENVAL."""
-        self.natom, _, _, self.nspin = [int(i) for i in next(thefile).split()]
-        if self.nspin == 2:
+        self.n_atom, _, _, self.n_spin = [int(i) for i in next(the_file).split()]
+        if self.n_spin == 2:
             self.label["energy"] = ["Energy_up", "Energy_down"]
         else:
             self.label["energy"] = ["Energy"]
-        next(thefile)
-        next(thefile)
-        next(thefile)
-        next(thefile)
-        _, self.numk, self.nbands = [int(i) for i in next(thefile).split()]
-        kvecs: list[list[float]] = []
+        next(the_file)
+        next(the_file)
+        next(the_file)
+        next(the_file)
+        _, self.num_k, self.n_bands = [int(i) for i in next(the_file).split()]
+        k_vectors: list[list[float]] = []
         energies: list[list[float]] = []
-        for _ in range(self.numk):
+        for _ in range(self.num_k):
             # the first line in the sigleset begins with the blank
-            next(thefile)
-            kvecs.append([float(i) for i in next(thefile).split()[0:3]])
-            for _ in range(self.nbands):
+            next(the_file)
+            k_vectors.append([float(i) for i in next(the_file).split()[0:3]])
+            for _ in range(self.n_bands):
                 energies.append(
-                    [float(i) for i in next(thefile).split()[1 : self.nspin + 1]]
+                    [float(i) for i in next(the_file).split()[1 : self.n_spin + 1]]
                 )
-        self.kvecs: NDArray[np.float64] = np.array(kvecs)
+        self.k_vectors: NDArray[np.float64] = np.array(k_vectors)
         self.energies: NDArray[np.float64] = np.array(energies).T.reshape(
-            self.nspin, self.numk, self.nbands
+            self.n_spin, self.num_k, self.n_bands
         )
-        thefile.close()
+        the_file.close()

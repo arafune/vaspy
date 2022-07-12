@@ -90,9 +90,9 @@ else:
 procar = procar.PROCAR(args.procar)
 procar.fermi_correction(fermi)
 if recvec:
-    logger.debug("procar.kvecs: {}".format(procar.kvecs))
+    logger.debug("procar.k_vectors: {}".format(procar.k_vectors))
     procar.to_physical_kvector(recvec)
-    logger.debug("procar.kvecs in (AA): {}".format(procar.kvecs))
+    logger.debug("procar.k_vectors in (AA): {}".format(procar.k_vectors))
 
 #
 assert (

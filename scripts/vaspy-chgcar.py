@@ -5,17 +5,18 @@
 import argparse
 
 import numpy as np
+
 from vaspy.chgcar import CHGCAR
 
 # HINT list methods for --spin option below.
 # they are called with just one argument, CHGCAR instance.
-spinmethods = {
+spin_methods = {
     "mag": CHGCAR.magnetization,
     "magX": (lambda chg: chg.magnetization("x")),  # < Error !! FixMe
     "magY": (lambda chg: chg.magnetization("y")),  # < Error !! FixMe
     "magZ": (lambda chg: chg.magnetization("z")),  # < Error !! FixMe
-    "majority": CHGCAR.majorityspin,
-    "minority": CHGCAR.minorityspin,
+    "majority": CHGCAR.majority_spin,
+    "minority": CHGCAR.minority_spin,
 }
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
@@ -96,7 +97,7 @@ def check_position_axes(chgcar1: CHGCAR, chgcar2: CHGCAR) -> bool:
 if args.spin is not None:
     if args.CHGCAR_file_2 is not None:
         parser.error("Only one CHGCAR file for --spin operations")
-    if args.spin in spinmethods:
+    if args.spin in spin_methods:
         if args.spin == "magX":
             dest_chgcar = args.CHGCAR_file_1.magnetization("x")
         elif args.spin == "magY":
@@ -106,9 +107,9 @@ if args.spin is not None:
         elif args.spin == "mag":
             dest_chgcar = args.CHGCAR_file_1.magnetization()
         elif args.spin == "majority":
-            dest_chgcar = args.CHGCAR_file_1.majorityspin()
+            dest_chgcar = args.CHGCAR_file_1.majority_spin()
         elif args.spin == "minority":
-            dest_chgcar = args.CHGCAR_file_1.minorityspin()
+            dest_chgcar = args.CHGCAR_file_1.minority_spin()
     else:
         parser.error("Such spin operation parameter is not defined.")
 #

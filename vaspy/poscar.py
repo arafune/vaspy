@@ -73,10 +73,10 @@ class PosCarHead:
         system name
     scaling_factor: float
         scaling factor
-    atomtypes : list
+    atom_types : list
         list of ion name
     atomnums : list
-        list of number of atoms. Corresponding to `atomtypes`
+        list of number of atoms. Corresponding to `atom_types`
 
     """
 
@@ -87,7 +87,7 @@ class PosCarHead:
         )
         self.system_name: str = ""
         self.scaling_factor: float = 0.0
-        self.atomtypes: list[str] = []
+        self.atom_types: list[str] = []
         self.atomnums: list[int] = []
         self.__site_label: list[str] = []
 
@@ -136,14 +136,14 @@ class PosCarHead:
         """Return list style of "site_label" (e.g.  "#0:Ag1")."""
         # self.__site_label = []
         # ii = 1
-        # for elm, n in zip(self.atomtypes, self.atomnums):
+        # for elm, n in zip(self.atom_types, self.atomnums):
         #     self.__site_label.extend(
         #         '#{0}:{1}{2}'.format(ii + m, elm, m + 1) for m in range(n))
         #     ii += n
         # return self.__site_label
         self.__site_label = []
         atomnames: list[str] = []
-        for elm, atomnums in zip(self.atomtypes, self.atomnums):
+        for elm, atomnums in zip(self.atom_types, self.atomnums):
             for j in range(1, atomnums + 1):
                 elem_num = elm + str(j)
                 if elem_num not in atomnames:
@@ -254,12 +254,12 @@ class POSCAR(PosCarHead, PosCarPos):
         self.cell_vecs[0] = [float(x) for x in next(poscar).split()]
         self.cell_vecs[1] = [float(x) for x in next(poscar).split()]
         self.cell_vecs[2] = [float(x) for x in next(poscar).split()]
-        self.atomtypes: list[str] = next(poscar).split()
+        self.atom_types: list[str] = next(poscar).split()
         # parse POSCAR evenif the element names are not set.
         # At present, the String representation number
         #   are used for the  dummy name.
-        if self.atomtypes[0].isdigit():
-            self.atomnums = [int(i) for i in self.atomtypes]
+        if self.atom_types[0].isdigit():
+            self.atomnums = [int(i) for i in self.atom_types]
         else:
             self.atomnums = [int(x) for x in next(poscar).split()]
         line7 = next(poscar)
@@ -575,7 +575,7 @@ class POSCAR(PosCarHead, PosCarPos):
             raise ValueError("scaling factor is different.")
         if np.linalg.norm(dest_poscar.cell_vecs - other.cell_vecs) != 0:
             raise ValueError("lattice vectors (cell matrix) are different.")
-        dest_poscar.atomtypes.extend(other.atomtypes)
+        dest_poscar.atom_types.extend(other.atom_types)
         dest_poscar.atomnums.extend(other.atomnums)
         dest_poscar.positions.extend(other.positions)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
@@ -604,7 +604,7 @@ class POSCAR(PosCarHead, PosCarPos):
         one.coordinate_changeflags = []
         other.coordinate_changeflags = []
         logger.debug("one.positions: {}".format(one.positions))
-        atoms = tools.atomtypes_atomnums_to_atoms(self.atomtypes, self.atomnums)
+        atoms = tools.atom_types_atomnums_to_atoms(self.atom_types, self.atomnums)
         logger.debug("atoms: {}".format(atoms))
         one_atoms: list[str] = []
         other_atoms: list[str] = []
@@ -620,8 +620,8 @@ class POSCAR(PosCarHead, PosCarPos):
                 other.positions.append(position)
                 other.coordinate_changeflags.append(coordinate_flag)
         logger.debug("one_atoms: {}".format(one_atoms))
-        one.atomtypes, one.atomnums = tools.atoms_to_atomtypes_atomnums(one_atoms)
-        other.atomtypes, other.atomnums = tools.atoms_to_atomtypes_atomnums(other_atoms)
+        one.atom_types, one.atomnums = tools.atoms_to_atom_types_atomnums(one_atoms)
+        other.atom_types, other.atomnums = tools.atoms_to_atom_types_atomnums(other_atoms)
         return one, other
 
     def merge(self, other: POSCAR) -> POSCAR:
@@ -653,7 +653,7 @@ class POSCAR(PosCarHead, PosCarPos):
         original_scaling_factor = dest_poscar.scaling_factor
         other_poscar.tune_scaling_factor(original_scaling_factor)
         other_poscar.to_cartesian()
-        dest_poscar.atomtypes.extend(other.atomtypes)
+        dest_poscar.atom_types.extend(other.atom_types)
         dest_poscar.atomnums.extend(other.atomnums)
         dest_poscar.positions.extend(other.positions)
         dest_poscar.coordinate_changeflags.extend(other.coordinate_changeflags)
@@ -676,8 +676,8 @@ class POSCAR(PosCarHead, PosCarPos):
         out_list.append(self.cell_vecs[0])
         out_list.append(self.cell_vecs[1])
         out_list.append(self.cell_vecs[2])
-        if not self.atomtypes[0].isdigit():
-            out_list.append(self.atomtypes)
+        if not self.atom_types[0].isdigit():
+            out_list.append(self.atom_types)
         out_list.append(self.atomnums)
         if self.selective:
             out_list.append("Selective Dynamics")
@@ -702,8 +702,8 @@ class POSCAR(PosCarHead, PosCarPos):
         tmp.append("".join("   {0:20.17f}".format(i) for i in self.cell_vecs[0]))
         tmp.append("".join("   {0:20.17f}".format(i) for i in self.cell_vecs[1]))
         tmp.append("".join("   {0:20.17f}".format(i) for i in self.cell_vecs[2]))
-        if not self.atomtypes[0].isdigit():
-            tmp.append(" " + " ".join(self.atomtypes))
+        if not self.atom_types[0].isdigit():
+            tmp.append(" " + " ".join(self.atom_types))
         tmp.append(" " + " ".join(str(i) for i in self.atomnums))
         if self.selective:
             tmp.append("Selective Dynamics")
@@ -735,8 +735,8 @@ class POSCAR(PosCarHead, PosCarPos):
         tmp.append("  {0:.14f}".format(self.scaling_factor))
         for k in range(3):
             tmp.append("".join("{0:12.6f}".format(i) for i in self.cell_vecs[k]))
-        if not self.atomtypes[0].isdigit():
-            tmp.append(" " + "".join(["{0:>5}".format(i) for i in self.atomtypes]))
+        if not self.atom_types[0].isdigit():
+            tmp.append(" " + "".join(["{0:>5}".format(i) for i in self.atom_types]))
         tmp.append("".join(["{0:>6}".format(i) for i in self.atomnums]))
         tmp.append(self.coordinate_type)
         for pos in self.positions:
