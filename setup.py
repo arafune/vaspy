@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Setup script for vaspy
 """
-from distutils.core import setup
 import sys
+from distutils.core import setup
+
 from vaspy import __version__
 
 reqpkgs = ["numpy", "matplotlib"]

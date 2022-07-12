@@ -4,12 +4,12 @@ import os
 
 import numpy as np
 import pytest
+
 import vaspy
 
 
 class TestOUTCAR(object):
-    """class for test of vaspy.outcar module
-    """
+    """class for test of vaspy.outcar module"""
 
     @pytest.fixture
     def outcar0(self):

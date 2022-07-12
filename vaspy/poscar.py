@@ -621,7 +621,9 @@ class POSCAR(PosCarHead, PosCarPos):
                 other.coordinate_changeflags.append(coordinate_flag)
         logger.debug("one_atoms: {}".format(one_atoms))
         one.atom_types, one.atomnums = tools.atoms_to_atom_types_atomnums(one_atoms)
-        other.atom_types, other.atomnums = tools.atoms_to_atom_types_atomnums(other_atoms)
+        other.atom_types, other.atomnums = tools.atoms_to_atom_types_atomnums(
+            other_atoms
+        )
         return one, other
 
     def merge(self, other: POSCAR) -> POSCAR:

@@ -3,13 +3,12 @@
 import os
 
 import numpy as np
+
 import vaspy.vsim_asc as vsim_asc
 
 
 class TestVsimASCII(object):
-    """Class for Test of Vsim_asc
-
-"""
+    """Class for Test of Vsim_asc"""
 
     def setup_method(self, method):
         """VSIM."""

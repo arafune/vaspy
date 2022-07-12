@@ -7,6 +7,7 @@ Script to convert V_Sim ascii file to POSCAR or XDATCAR
 import argparse
 
 import numpy as np
+
 import vaspy.poscar as poscar
 import vaspy.vsim_asc as vsim_asc
 

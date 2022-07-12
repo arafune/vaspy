@@ -7,6 +7,7 @@ Script file for use (demonstrate) vaspy.outcar module
 import argparse
 
 import numpy as np
+
 from vaspy import tools
 from vaspy.outcar import OUTCAR
 

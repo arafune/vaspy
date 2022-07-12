@@ -4,11 +4,10 @@
 import os
 
 import numpy as np
+
 import vaspy.procar as procar
 
 # import tempfile
-
-
 
 
 class TestSinglePROCAR(object):
@@ -208,7 +207,8 @@ class TestSinglePROCAR(object):
         # same as above
 
         assert self.singleprocar.make_label(
-            (3,), ((self.singleprocar.orbital_index(o) for o in ("p", "pxpy", "d")),),
+            (3,),
+            ((self.singleprocar.orbital_index(o) for o in ("p", "pxpy", "d")),),
         ) == ["#k", "Energy", "zero_two_p", "zero_two_pxpy", "zero_two_d"]
 
     def test_text_sheet(self):
@@ -379,8 +379,7 @@ class TestSpinPolarizedPROCAR(object):
         )
 
     def test_spinprocar_fermi_correction(self):
-        """test for fermi_correction (SPIN).
-        """
+        """test for fermi_correction (SPIN)."""
         self.spinprocar.fermi_correction(1.0)
         np.testing.assert_array_equal(
             self.spinprocar.energies,
@@ -484,8 +483,7 @@ class TestSpinPolarizedPROCAR(object):
         ]
 
     def test_spinprocar_make_label(self):
-        """test for Band_with_projection.set_header  (SPIN).
-        """
+        """test for Band_with_projection.set_header  (SPIN)."""
         self.spinprocar.append_sumsite((0, 2), "test")
         for orbital in ("p", "pxpy", "d"):
             self.spinprocar.append_sumorbital(
@@ -609,8 +607,7 @@ class TestSOIPROCAR(object):
         )
 
     def test_make_label(self):
-        """test for make label from PROCAR_soi w/o append_sum*
-        """
+        """test for make label from PROCAR_soi w/o append_sum*"""
         label = self.soiprocar.make_label((0, 2), ((0, 3, 1), (4, 7)))
         assert label == [
             "#k",
@@ -790,8 +787,7 @@ class TestSOIPROCAR(object):
         ]
 
     def test_soiprocar_make_label(self):
-        """test for make_label  (SOI)
-        """
+        """test for make_label  (SOI)"""
         self.soiprocar.append_sumsite((0, 2), "test")
         for orbital in ("p", "pxpy", "d"):
             self.soiprocar.append_sumorbital(
@@ -896,4 +892,3 @@ class test_functions_in_procarpy(object):
         ] == result_soi[3]
 
         assert not (result_soi[4])  # collinear
-

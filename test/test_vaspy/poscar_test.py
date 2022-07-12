@@ -7,9 +7,10 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from numpy.testing import assert_array_equal
+
 import vaspy
 import vaspy.poscar
-from numpy.testing import assert_array_equal
 
 datadir = Path(__file__).parent / "data"
 

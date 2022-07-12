@@ -2,10 +2,11 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-import vaspy
-import vaspy.incar
 from _pytest.fixtures import fixture
 from numpy.testing import assert_array_equal
+
+import vaspy
+import vaspy.incar
 
 datadir = Path(__file__).parent / "data"
 
@@ -49,4 +50,3 @@ class TestPOSCAR(object):
     LORBIT = 12
 """
         )
-

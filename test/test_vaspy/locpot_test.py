@@ -4,10 +4,12 @@ import os
 
 import numpy as np
 import pytest
+
 import vaspy
 from vaspy.locpot import LOCPOT
 
 datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
+
 
 class TestLOCPOT(object):
     def setup_method(self, method):
@@ -191,4 +193,3 @@ class TestLOCPOT(object):
             self.testlocpot2.grid.max_along_axis("k")
             self.testlocpot2.grid.min_along_axis("k")
             self.testlocpot2.grid.average_along_axis("k")
-
