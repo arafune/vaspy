@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """Test for EIGENVAL class."""
 import os
-from typing import Callable
 
 import numpy as np
 import pytest
+from numpy.testing import assert_array_almost_equal, assert_array_equal
+
 import vaspy
 import vaspy.eigenval as eigenval
-from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
 
@@ -80,7 +80,13 @@ class TestEIGENVAL(object):
         assert_array_equal(self.eigenval_soi[0][1][0], [-9.548122])
         assert_array_equal(
             self.eigenval_soi[0][1][:5],
-            [[-9.548122], [-9.31537], [-6.490189], [-6.186601], [-6.034935],],
+            [
+                [-9.548122],
+                [-9.31537],
+                [-6.490189],
+                [-6.186601],
+                [-6.034935],
+            ],
         )
         assert_array_equal(
             [x[0] for x in self.eigenval_soi[:3]],
