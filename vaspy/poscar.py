@@ -43,13 +43,17 @@ import itertools as it
 import re
 from logging import INFO, Formatter, StreamHandler, getLogger
 from pathlib import Path
-from typing import IO, Any, Callable, Generator, Sequence
+from typing import IO, TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
 
 from vaspy import tools
 from vaspy.tools import open_by_suffix
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Generator, Sequence
+
+    from numpy.typing import ArrayLike, NDArray
 
 # logger
 LOGLEVEL = INFO
@@ -83,7 +87,7 @@ class PosCarHead:
     def __init__(self) -> None:
         """Initialization."""
         self.__cell_vecs: NDArray[np.float64] = np.array(
-            [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+            [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
         )
         self.system_name: str = ""
         self.scaling_factor: float = 0.0
@@ -134,13 +138,9 @@ class PosCarHead:
     @property
     def site_label(self) -> list[str]:
         """Return list style of "site_label" (e.g.  "#0:Ag1")."""
-        # self.__site_label = []
-        # ii = 1
         # for elm, n in zip(self.atom_types, self.atomnums):
         #     self.__site_label.extend(
         #         '#{0}:{1}{2}'.format(ii + m, elm, m + 1) for m in range(n))
-        #     ii += n
-        # return self.__site_label
         self.__site_label = []
         atomnames: list[str] = []
         for elm, atomnums in zip(self.atom_types, self.atomnums):
@@ -162,7 +162,7 @@ class PosCarHead:
         self.__site_label = value
 
 
-class PosCarPos(object):
+class PosCarPos:
     """POSCAR_DOS Class.
 
     Attributes
@@ -185,7 +185,7 @@ class PosCarPos(object):
         """Return True if Cartesian coordinate is set.
 
         Returns
-        --------
+        -------
         boolean
             True if coordinate is cartesian
 
@@ -196,7 +196,7 @@ class PosCarPos(object):
         """Return True if DIRECT coordinate is set.
 
         Returns
-        --------
+        -------
         Boolean
             True if coordinate is direct (not cartesian)
 
@@ -217,7 +217,7 @@ class POSCAR(PosCarHead, PosCarPos):
     CONTCAR, which has already works well.
 
     Attributes
-    ------------
+    ----------
     system_name, scaling_factor, cell_vecs
 
     """
@@ -226,17 +226,17 @@ class POSCAR(PosCarHead, PosCarPos):
         """Initialization.
 
         Parameters
-        -----------
+        ----------
         arg: str
             POSCAR file name, or list of POSCAR text.
 
         """
-        super(POSCAR, self).__init__()
+        super().__init__()
         PosCarPos.__init__(self)
-        if isinstance(arg, (str, Path)):
+        if isinstance(arg, str | Path):
             poscar: tuple[str, ...] | list[str] = open_by_suffix(arg).readlines()
             self.load_array(poscar)
-        if isinstance(arg, (list, tuple)):
+        if isinstance(arg, list | tuple):
             self.load_array(arg)
 
     def load_array(self, input_poscar: list[str] | tuple[str, ...]) -> None:
@@ -271,15 +271,13 @@ class POSCAR(PosCarHead, PosCarPos):
             self.coordinate_type = line7
 
         for line, _ in zip(poscar, self.site_label):
-            # if not elem: break
             tmp: list[str] = line.split()
             self.positions.append(np.asarray(np.array(tmp[:3]), dtype=np.float64))
             if self.selective:
                 self.coordinate_changeflags.append(" ".join(tmp[3:]))
 
     def __iter__(self) -> Generator:
-        for each in self.positions:
-            yield each
+        yield from self.positions
 
     def sort(
         self,
@@ -290,7 +288,7 @@ class POSCAR(PosCarHead, PosCarPos):
         """Sort positions attribute by coordinate.
 
         Parameters
-        -----------
+        ----------
         from_site: int, default 0
             first index # for sort
 
@@ -302,7 +300,7 @@ class POSCAR(PosCarHead, PosCarPos):
 
 
         Notes
-        ------
+        -----
         The first site # is "0". It's the pythonic way.
         The element difference is **not** taken into account.
 
@@ -318,7 +316,7 @@ class POSCAR(PosCarHead, PosCarPos):
         self.positions = (
             self.positions[:from_site]
             + sorted(
-                self.positions[from_site:to_site], key=lambda sortaxis: sortaxis[axis]
+                self.positions[from_site:to_site], key=lambda sortaxis: sortaxis[axis],
             )
             + self.positions[to_site:]
         )
@@ -327,7 +325,7 @@ class POSCAR(PosCarHead, PosCarPos):
         r"""Return the :math:`(n_x \\times n_y \\times n_z)` supercell.
 
         Parameters
-        -----------
+        ----------
         n_x: int
             repeat number along x axis
         n_y: int
@@ -337,7 +335,7 @@ class POSCAR(PosCarHead, PosCarPos):
 
 
         Returns
-        ---------
+        -------
         POSCAR
             POSCAR object of the supercell
 
@@ -347,9 +345,11 @@ class POSCAR(PosCarHead, PosCarPos):
             or not isinstance(n_y, int)
             or not isinstance(n_z, int)
         ):
-            raise ValueError("arguments must be positive integer")
+            msg = "arguments must be positive integer"
+            raise ValueError(msg)
         if n_x <= 0 or n_y <= 0 or n_z <= 0:
-            raise ValueError("arguments must be positive integer")
+            msg = "arguments must be positive integer"
+            raise ValueError(msg)
         #
         sposcar = copy.deepcopy(self)
         original_is_cartesian = sposcar.is_cartesian()
@@ -375,8 +375,8 @@ class POSCAR(PosCarHead, PosCarPos):
                                     spos[0] + i_x / n_x,
                                     spos[1] + i_y / n_y,
                                     spos[2] + i_z / n_z,
-                                ]
-                            )
+                                ],
+                            ),
                         )
         sposcar.coordinate_changeflags = []
         for flags in self.coordinate_changeflags:
@@ -396,13 +396,13 @@ class POSCAR(PosCarHead, PosCarPos):
         """Return the nearest position in the periodic space.
 
         Parameters
-        -----------
+        ----------
         array: list of float  # << Check
 
         point: numpy.ndarray
 
         Returns
-        --------
+        -------
         numpy.ndarray
 
         """
@@ -413,13 +413,13 @@ class POSCAR(PosCarHead, PosCarPos):
         """Return 27 vectors set correspond the neiboring.
 
         Parameters
-        -----------
+        ----------
         position: numpy.ndarray, list
             atom position defined in the coordinated by
             cell_vecs ( scaling facter is not accounted).
 
         Returns
-        --------
+        -------
         list
 
         """
@@ -431,7 +431,7 @@ class POSCAR(PosCarHead, PosCarPos):
                     i * self.cell_vecs[0]
                     + j * self.cell_vecs[1]
                     + k * self.cell_vecs[2]
-                    + position
+                    + position,
                 )
         else:
             for i, j, k in it.product([-1, 0, 1], [-1, 0, 1], [-1, 0, 1]):
@@ -439,12 +439,12 @@ class POSCAR(PosCarHead, PosCarPos):
                     i * np.array([1.0, 0.0, 0.0])
                     + j * np.array([0.0, 1.0, 0.0])
                     + k * np.array([0.0, 0.0, 1.0])
-                    + position
+                    + position,
                 )
         return candidates27
 
     def rotate_atom(
-        self, site: int, axis_name: str, theta_deg: float, center: Sequence[float]
+        self, site: int, axis_name: str, theta_deg: float, center: Sequence[float],
     ) -> None:
         """Rotate the atom.
 
@@ -468,9 +468,11 @@ class POSCAR(PosCarHead, PosCarPos):
         if len(center) != 3:
             raise ValueError
         if not point_in_box(rotate_at / self.scaling_factor, self.cell_vecs):
-            raise ValueError("the center must be in the Braves lattice")
+            msg = "the center must be in the Braves lattice"
+            raise ValueError(msg)
         if not isinstance(site, int):
-            raise ValueError("argument error in rotate_atom method")
+            msg = "argument error in rotate_atom method"
+            raise ValueError(msg)
         if not self.is_cartesian():
             self.to_cartesian()
         position: NDArray[np.float64] = self.positions[site]
@@ -524,7 +526,7 @@ class POSCAR(PosCarHead, PosCarPos):
             original_is_cartesian = True
             self.to_direct()
         axis_name = axis_name.capitalize()
-        rotate: dict["str", Callable[[float], NDArray[np.float64]]] = {
+        rotate: dict[str, Callable[[float], NDArray[np.float64]]] = {
             "X": rotate_x,
             "Y": rotate_y,
             "Z": rotate_z,
@@ -560,7 +562,7 @@ class POSCAR(PosCarHead, PosCarPos):
         other: POSCAR
 
         Returns
-        --------
+        -------
         POSCAR
 
         Todo
@@ -572,9 +574,11 @@ class POSCAR(PosCarHead, PosCarPos):
             raise RuntimeError  # return NotImplemented
         dest_poscar = copy.deepcopy(self)
         if dest_poscar.scaling_factor != other.scaling_factor:
-            raise ValueError("scaling factor is different.")
+            msg = "scaling factor is different."
+            raise ValueError(msg)
         if np.linalg.norm(dest_poscar.cell_vecs - other.cell_vecs) != 0:
-            raise ValueError("lattice vectors (cell matrix) are different.")
+            msg = "lattice vectors (cell matrix) are different."
+            raise ValueError(msg)
         dest_poscar.atom_types.extend(other.atom_types)
         dest_poscar.atomnums.extend(other.atomnums)
         dest_poscar.positions.extend(other.positions)
@@ -587,7 +591,7 @@ class POSCAR(PosCarHead, PosCarPos):
         Useful for differential charge distribution calculations.
 
         Parameters
-        -----------
+        ----------
         indexes: tuple or list
             index array for a POSCAR file
 
@@ -603,13 +607,13 @@ class POSCAR(PosCarHead, PosCarPos):
         other.positions = []
         one.coordinate_changeflags = []
         other.coordinate_changeflags = []
-        logger.debug("one.positions: {}".format(one.positions))
+        logger.debug(f"one.positions: {one.positions}")
         atoms = tools.atom_types_atomnums_to_atoms(self.atom_types, self.atomnums)
-        logger.debug("atoms: {}".format(atoms))
+        logger.debug(f"atoms: {atoms}")
         one_atoms: list[str] = []
         other_atoms: list[str] = []
         for i, (element, position, coordinate_flag) in enumerate(
-            zip(atoms, self.positions, self.coordinate_changeflags)
+            zip(atoms, self.positions, self.coordinate_changeflags),
         ):
             if i in indexes:
                 one_atoms.append(element)
@@ -619,10 +623,10 @@ class POSCAR(PosCarHead, PosCarPos):
                 other_atoms.append(element)
                 other.positions.append(position)
                 other.coordinate_changeflags.append(coordinate_flag)
-        logger.debug("one_atoms: {}".format(one_atoms))
+        logger.debug(f"one_atoms: {one_atoms}")
         one.atom_types, one.atomnums = tools.atoms_to_atom_types_atomnums(one_atoms)
         other.atom_types, other.atomnums = tools.atoms_to_atom_types_atomnums(
-            other_atoms
+            other_atoms,
         )
         return one, other
 
@@ -634,12 +638,12 @@ class POSCAR(PosCarHead, PosCarPos):
         Use the cell vectors of the first POSCAR.
 
         Parameters
-        ------------
+        ----------
         other: POSCAR
             POSCAR object
 
         Returns
-        --------
+        -------
         POSCAR
             added poscar object
 
@@ -667,7 +671,7 @@ class POSCAR(PosCarHead, PosCarPos):
         """Return POSCAR as list.
 
         Returns
-        ---------
+        -------
         list
             a list representation of POSCAR.
 
@@ -693,7 +697,7 @@ class POSCAR(PosCarHead, PosCarPos):
         """Return as str.
 
         Returns
-        --------
+        -------
         str
             a string representation of POSCAR
 
@@ -701,9 +705,9 @@ class POSCAR(PosCarHead, PosCarPos):
         tmp: list[str] = []
         tmp.append(self.system_name)
         tmp.append(str(self.scaling_factor))
-        tmp.append("".join("   {0:20.17f}".format(i) for i in self.cell_vecs[0]))
-        tmp.append("".join("   {0:20.17f}".format(i) for i in self.cell_vecs[1]))
-        tmp.append("".join("   {0:20.17f}".format(i) for i in self.cell_vecs[2]))
+        tmp.append("".join(f"   {i:20.17f}" for i in self.cell_vecs[0]))
+        tmp.append("".join(f"   {i:20.17f}" for i in self.cell_vecs[1]))
+        tmp.append("".join(f"   {i:20.17f}" for i in self.cell_vecs[2]))
         if not self.atom_types[0].isdigit():
             tmp.append(" " + " ".join(self.atom_types))
         tmp.append(" " + " ".join(str(i) for i in self.atomnums))
@@ -711,14 +715,14 @@ class POSCAR(PosCarHead, PosCarPos):
             tmp.append("Selective Dynamics")
         tmp.append(self.coordinate_type)
         for pos, t_or_f, atom in it.zip_longest(
-            self.positions, self.coordinate_changeflags, self.site_label, fillvalue=""
+            self.positions, self.coordinate_changeflags, self.site_label, fillvalue="",
         ):
             tmp.append(
-                " ".join("  {0:20.17f}".format(i) for i in pos)
+                " ".join(f"  {i:20.17f}" for i in pos)
                 + " "
                 + t_or_f
                 + " "
-                + atom
+                + atom,
             )
         return "\n".join(tmp) + "\n"
 
@@ -726,7 +730,7 @@ class POSCAR(PosCarHead, PosCarPos):
         """Return str object (short version).
 
         Returns
-        ---------
+        -------
         str
             a string representation of POSCAR, with short (8) digit format.
             used in CHGCAR
@@ -734,22 +738,22 @@ class POSCAR(PosCarHead, PosCarPos):
         """
         tmp: list[str] = []
         tmp.append(self.system_name)
-        tmp.append("  {0:.14f}".format(self.scaling_factor))
+        tmp.append(f"  {self.scaling_factor:.14f}")
         for k in range(3):
-            tmp.append("".join("{0:12.6f}".format(i) for i in self.cell_vecs[k]))
+            tmp.append("".join(f"{i:12.6f}" for i in self.cell_vecs[k]))
         if not self.atom_types[0].isdigit():
-            tmp.append(" " + "".join(["{0:>5}".format(i) for i in self.atom_types]))
-        tmp.append("".join(["{0:>6}".format(i) for i in self.atomnums]))
+            tmp.append(" " + "".join([f"{i:>5}" for i in self.atom_types]))
+        tmp.append("".join([f"{i:>6}" for i in self.atomnums]))
         tmp.append(self.coordinate_type)
         for pos in self.positions:
-            tmp.append("".join("{0:10.6f}".format(i) for i in pos))
+            tmp.append("".join(f"{i:10.6f}" for i in pos))
         return "\n".join(tmp) + "\n"
 
     def tune_scaling_factor(self, new_scaling_factor: float = 1.0) -> None:
         """Change scaling factor to new value.
 
         Parameters
-        ------------
+        ----------
         new_scaling_factor: float
 
         Note
@@ -784,21 +788,21 @@ class POSCAR(PosCarHead, PosCarPos):
             self.positions = [mat.dot(v) for v in self.positions]
 
     def guess_molecule(
-        self, site_list: Sequence[int], center: Sequence[float] | None = None
+        self, site_list: Sequence[int], center: Sequence[float] | None = None,
     ) -> None:
         """Arrange atom position to form a molecule.
 
         This method is effective to rotate a molecule.
 
         Parameters
-        -----------
+        ----------
         site_list: list
             list of site number (the number begins with #0)
         center: list
             center position of "molecule" (Optional).
 
         Returns
-        ---------
+        -------
         NDArray
             Array of Vector that represents "molecule".
 
@@ -830,7 +834,6 @@ class POSCAR(PosCarHead, PosCarPos):
                 # the "center" option.
                 # (molecule.
                 #     product(molecule)).inject(0.0) do | s, vectors |
-                # s+ (vectors[0]-vectors[1]).magnitude
                 s: float = 0.0
                 for vectors in it.product(molecule, molecule):
                     s += np.linalg.norm(vectors[0] - vectors[1])
@@ -842,7 +845,7 @@ class POSCAR(PosCarHead, PosCarPos):
             self.positions[site] = pos
 
     def translate(
-        self, vector: Sequence[float], atomlist: Sequence[int]
+        self, vector: Sequence[float], atomlist: Sequence[int],
     ) -> list[NDArray[np.float64]]:
         """Translate the selected atom(s) by vector.
 
@@ -859,7 +862,7 @@ class POSCAR(PosCarHead, PosCarPos):
         the first atom is "0", to follow the pythonic way.
 
         Returns
-        --------
+        -------
         NDArray
                 position
 
@@ -899,7 +902,7 @@ class POSCAR(PosCarHead, PosCarPos):
         """Translate **all** atoms by vector.
 
         Parameters
-        -----------
+        ----------
         vector: list, numpy.array
             translational vector
 
@@ -929,14 +932,14 @@ def point_in_box(point: ArrayLike, cell_vecs: ArrayLike) -> bool:
     """Return True if point is located in the box.
 
     Parameters
-    -----------
+    ----------
     point: numpy.ndarray, numpy.matrix, list, tuple
         vector representing the "point"
     cell_vecs: numpy.ndarray, numpy.matrix, list, tuple
         vectors defining the "box"
 
     Returns
-    ---------
+    -------
     bool
         True if the point is interior in the "box" defined the cell_vecs.
 
@@ -977,7 +980,7 @@ def rotate_x(theta_deg: float) -> NDArray[np.float64]:
             [1.0, 0.0, 0.0],
             [0.0, np.cos(theta_deg * degree), -np.sin(theta_deg * degree)],
             [0.0, np.sin(theta_deg * degree), np.cos(theta_deg * degree)],
-        ]
+        ],
     )
 
 
@@ -985,12 +988,12 @@ def rotate_y(theta_deg: float) -> NDArray[np.float64]:
     """Rotation matrix around Y-axis.
 
     Parameters
-    ------------
+    ----------
     theta_deg: float
         Rotation angle
 
     Returns
-    ----------
+    -------
     np.ndarray
         Rotation matrix (around Y)
 
@@ -1008,7 +1011,7 @@ def rotate_y(theta_deg: float) -> NDArray[np.float64]:
             [np.cos(theta_deg * degree), 0.0, np.sin(theta_deg * degree)],
             [0.0, 1.0, 0.0],
             [-np.sin(theta_deg * degree), 0.0, np.cos(theta_deg * degree)],
-        ]
+        ],
     )
 
 
@@ -1016,12 +1019,12 @@ def rotate_z(theta_deg: float) -> NDArray[np.float64]:
     """Rotation matrix around Z-axis.
 
     Parameters
-    ------------
+    ----------
     theta_deg: float
         Rotation angle
 
     Returns
-    ----------
+    -------
     np.ndarray
         Rotation matrix (around Z)
 
@@ -1039,7 +1042,7 @@ def rotate_z(theta_deg: float) -> NDArray[np.float64]:
             [np.cos(theta_deg * degree), -np.sin(theta_deg * degree), 0.0],
             [np.sin(theta_deg * degree), np.cos(theta_deg * degree), 0.0],
             [0.0, 0.0, 1.0],
-        ]
+        ],
     )
 
 
@@ -1052,12 +1055,12 @@ def three_by_three(vec: ArrayLike) -> bool:
         Vector like object to check whether can be written by the 3x3 matrix
 
     Returns
-    --------
+    -------
     bool
         True if the vec can be written by 3x3 matrix
 
     """
-    if not isinstance(vec, (np.ndarray, np.matrix, list, tuple)):
+    if not isinstance(vec, np.ndarray | np.matrix | list | tuple):
         return False
     if len(vec) != 3:
         return False
@@ -1065,21 +1068,21 @@ def three_by_three(vec: ArrayLike) -> bool:
 
 
 def _vectorize(vector: ArrayLike) -> NDArray[np.float64]:
-    """Return np.ndarray object
+    """Return np.ndarray object.
 
     Parameters
-    -----------
+    ----------
     vector: array-like
         array-like object to be wanted as the vector.
 
     Returns
-    ----------
+    -------
     NDArray
         Numpy array (flatten)
     """
-
-    if not isinstance(vector, (np.ndarray, np.matrix, list, tuple)):
-        raise TypeError("Cannot convert into vector.")
+    if not isinstance(vector, np.ndarray | np.matrix | list | tuple):
+        msg = "Cannot convert into vector."
+        raise TypeError(msg)
     return np.array(vector).flatten()
 
 

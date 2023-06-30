@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Script to demonstrate vaspy.incar functionality.
-
-"""
+"""Script to demonstrate vaspy.incar functionality."""
 import argparse
 from logging import DEBUG, Formatter, StreamHandler, getLogger
 
@@ -40,11 +36,11 @@ args = parser.parse_args()
 assert not (
     args.lint and (args.i or args.r)
 ), "Lint option and re-format option (-i, -r) is exclusive."
-logger.debug("args: {}".format(args))
+logger.debug(f"args: {args}")
 incar: vaspy.incar.Incar = vaspy.load(args.incar_file[0])
 
 if args.i:
-    with open(args.incar_file[0], mode="wt") as incar_file:
+    with open(args.incar_file[0], mode="w") as incar_file:
         incar_file.write(incar.__str__())
 if args.r:
     print(incar)

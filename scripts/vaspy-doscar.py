@@ -1,11 +1,9 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Script to use(demonstrate) vaspy.doscar."""
 
 import argparse
 import os
 import sys
-from typing import List
 
 from vaspy import tools
 from vaspy.doscar import DOSCAR, PDOS, TDOS
@@ -66,7 +64,7 @@ the name is used in the output filename.""",
 args = parser.parse_args()
 
 doscar = DOSCAR(args.doscar)
-atomlist: List[str] = list()
+atomlist: list[str] = []
 if args.outcar is not NotImplemented:
     if args.outcar is None:
         args.outcar = os.path.join(os.path.dirname(args.doscar), "OUTCAR")
@@ -90,7 +88,7 @@ doses.extend(PDOS(*each) for each in zip(doscar.dos_container, atomlist))  # tmp
 if args.atomset is not None:  # atomset and atomsetname are given by
     # the command line argument.
     if len(args.atomset) == len(args.atomsetname):
-        pdoses = list()
+        pdoses = []
         for site, name in zip(args.atomset, args.atomsetname):
             each = PDOS()
             for atomNo in site:
@@ -101,7 +99,8 @@ if args.atomset is not None:  # atomset and atomsetname are given by
             filename = a_pdos.site + ".dat"
             a_pdos.export_csv(filename)
     else:
-        raise ValueError("Check your command.")
+        msg = "Check your command."
+        raise ValueError(msg)
 #
 doses[0].export_csv("total.dat")
 for thedos, atom_index in zip(doses[1:], atomlist):

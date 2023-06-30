@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import os
 from pathlib import Path
@@ -10,7 +9,7 @@ import vaspy
 from vaspy.doscar import DOSCAR, PDOS
 
 
-class TestDOSCAR(object):
+class TestDOSCAR:
     def setUp(self):
         currentpath = os.path.abspath(os.path.dirname(__file__))
         testDOS = currentpath + "/DOSCAR_dummy"
@@ -20,12 +19,12 @@ class TestDOSCAR(object):
 datadir = Path(__file__).parent / "data"
 
 
-@pytest.fixture
+@pytest.fixture()
 def ispin1() -> vaspy.doscar.DOSCAR:
     return vaspy.load(str(datadir / "DOSCAR_dummy"))
 
 
-@pytest.fixture
+@pytest.fixture()
 def ispin2() -> vaspy.doscar.DOSCAR:
     return vaspy.load(str(datadir / "DOSCAR_spin"))
 
@@ -53,7 +52,7 @@ class Test_ispin2_TDOS:
         assert ispin2.tdos.header == ["Energy", "TDOS_up", "TDOS_down"]
 
 
-class Test_ispin2_PDOS(object):
+class Test_ispin2_PDOS:
     def test_pdos_sign(self, ispin2: DOSCAR):
         assert ispin2.pdoses[0][-2] == [
             0.3502e-04,
@@ -152,9 +151,9 @@ class Test_ispin2_PDOS(object):
         ]
 
 
-class TestTDOS(object):
+class TestTDOS:
     pass
 
 
-class TestPDOS(object):
+class TestPDOS:
     pass

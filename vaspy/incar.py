@@ -1,16 +1,18 @@
 # -*- conding: utf-8 -*-
-"""VASPY class for INCAR file"""
+"""VASPY class for INCAR file."""
 
 from __future__ import annotations
 
 import pprint
 import re
-from collections.abc import Mapping
+from collections.abc import Generator, Mapping
 from logging import INFO, Formatter, StreamHandler, getLogger
-from pathlib import Path
-from typing import IO, Generator
+from typing import IO, TYPE_CHECKING
 
 from vaspy.tools import open_by_suffix
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # logger
 LOGLEVEL = INFO
@@ -117,11 +119,10 @@ def remove_sharp(str_: str) -> tuple[str, bool]:
 
 
 class Incar(Mapping):
-    """General class for INCAR file"""
+    """General class for INCAR file."""
 
     def __init__(self, filename: Path | str = "") -> None:
-        """
-        Parameters
+        """Parameters
         ----------
         filename: str, pathlib.Path
             filename of INCAR
@@ -136,7 +137,7 @@ class Incar(Mapping):
         """Load INCAR file.
 
         Parameters
-        -----------
+        ----------
         the_file: StringIO
             "INCAR" file
         """
@@ -178,8 +179,7 @@ class Incar(Mapping):
                     self.additional_comments[tag] = com
 
     def __iter__(self) -> Generator:
-        for key in self._incar:
-            yield key
+        yield from self._incar
 
     def __getitem__(self, key_item: str) -> tuple[str | float, bool]:
         return self._incar.__getitem__(key_item)
@@ -196,35 +196,36 @@ class Incar(Mapping):
     def __str__(self) -> str:
         output: str = ""
         incar = self._incar.copy()
-        for tag_type in tags.keys():
+        for tag_type in tags:
             if len(set(tags[tag_type]) & set(incar.keys())) > 0:
-                output += " {}:\n".format(tag_type)
+                output += f" {tag_type}:\n"
                 for tag in tags[tag_type]:
                     if tag in incar:
                         if tag in ["EDIFF"]:
                             if incar[tag][1]:
-                                output += "    {} = {:.2E}".format(tag, incar[tag][0])
+                                output += f"    {tag} = {incar[tag][0]:.2E}"
                             else:
-                                output += "#   {} = {:.2E}".format(tag, incar[tag][0])
+                                output += f"#   {tag} = {incar[tag][0]:.2E}"
                         else:
                             if incar[tag][1]:
-                                output += "    {} = {}".format(tag, incar[tag][0])
+                                output += f"    {tag} = {incar[tag][0]}"
                             else:
-                                output += "#   {} = {}".format(tag, incar[tag][0])
+                                output += f"#   {tag} = {incar[tag][0]}"
                         if tag in self.additional_comments:
-                            output += "   ! {}\n".format(self.additional_comments[tag])
+                            output += f"   ! {self.additional_comments[tag]}\n"
                         else:
                             output += "\n"
                         del incar[tag]
         if len(incar) != 0:
             print(incar)
+            msg = "Unknown tags are used!!! Check your INCAR, or the script"
             raise RuntimeError(
-                "Unknown tags are used!!! Check your INCAR, or the script"
+                msg,
             )
         return output
 
     def active(self, keyword: str) -> str | float | bool:
-        """Return True if keyword is active.  False if keyword is not set or comment out
+        """Return True if keyword is active.  False if keyword is not set or comment out.
 
         Parameters
         ----------
@@ -236,7 +237,7 @@ class Incar(Mapping):
         return False
 
     def lint_all(self) -> str:
-        """Tiny lint for vasp
+        """Tiny lint for vasp.
 
         Returns
         -------
@@ -250,7 +251,7 @@ class Incar(Mapping):
                     self.active("LWAVE") == ".TRUE."
                     or self.active("LCHARG") == ".TRUE."
                 )
-            )
+            ),
         }
         checks["DIPOLE correction is hard for not ISTART=2."] = (
             self.active("ISTART") != 2 and self.active("LDIPOL") == ".TRUE."
@@ -265,7 +266,7 @@ class Incar(Mapping):
             self.active("LSORBIT") == ".TRUE." and self.active("ISYM") != -1
         )
         checks['"NPAR" is not recommend. Consider to use "NCORE"\n'] = self.active(
-            "NPAR"
+            "NPAR",
         )
         checks['if IBRION > 4 (to DFPT), Remove "NPAR/NCORE" keyword\n'] = (
             self.active("IBRION") > 4

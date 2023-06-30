@@ -1,0 +1,28 @@
+[project]
+name = "vaspy"
+version = "0.1.0"
+description = "Add a short description here"
+authors = [{ name = "Ryuichi Arafune", email = "ryuichi.arafune@gmail.com" }]
+dependencies = []
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.ruff]
+target-version = "py311"
+ignore = [
+  "ANN101",
+  "S101",
+  "PD011",  # pandas-use-of-dot-values
+  "FBT002", # boolean-default-value-in-function-definition
+]
+select = ["ALL"]

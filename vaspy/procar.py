@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-# translate from procar.rb of scRipt4VASP 2014/2/26 master branch
-"""
-This module provides PROCAR, ProjectionBand classes.
+"""Module provides PROCAR, ProjectionBand classes.
 
 * PROCAR class is used to stored the PROCAR information in the memory.
 * Band_with_Projection class is used in vaspy-procar.py script.
@@ -14,14 +11,18 @@ from __future__ import annotations
 import csv
 import re
 from logging import INFO, Formatter, StreamHandler, getLogger
-from pathlib import Path
-from typing import IO, Sequence
+from typing import IO, TYPE_CHECKING
 
 import numpy as np
-from numpy.typing import NDArray
 
 from vaspy.eigenval import EnergyBand
 from vaspy.tools import open_by_suffix
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from pathlib import Path
+
+    from numpy.typing import NDArray
 
 # logger
 LOGLEVEL = INFO
@@ -43,7 +44,7 @@ class ProjectionBand(EnergyBand):
     the band structure, to represent the orbital.
 
     Attributes
-    -----------
+    ----------
     n_atom: int
         number of atoms
     proj: NDArray[np.float64]
@@ -62,13 +63,15 @@ class ProjectionBand(EnergyBand):
         n_spin: int = 1,
     ) -> None:
         """Initialize."""
-        super(ProjectionBand, self).__init__()
+        super().__init__()
         self.n_atom: int = 0
         self.proj = proj
         self.phase = phase
 
     def append_sumsite(
-        self, sites: tuple[int, int], site_name: str
+        self,
+        sites: tuple[int, int],
+        site_name: str,
     ) -> NDArray[np.float64] | None:
         """Append site-sum results.
 
@@ -76,7 +79,7 @@ class ProjectionBand(EnergyBand):
         self[n_spin, num_k, n_bands, n_atom + 1, norbital]
 
         Parameters
-        ------------
+        ----------
         sites: tuple
             site index for summention
         site_name: str
@@ -84,26 +87,29 @@ class ProjectionBand(EnergyBand):
 
         """
         # As the original label['site'] is just a number beginnig from zero
-        logger.debug("self.label: {}".format(self.label))
-        logger.debug("self.n_atom: {}".format(self.n_atom))
-        logger.debug("sites: {}".format(sites))
+        logger.debug(f"self.label: {self.label}")
+        logger.debug(f"self.n_atom: {self.n_atom}")
+        logger.debug(f"sites: {sites}")
 
         if len(sites) == 1 and sites[0] in self.label["site"][: self.n_atom]:
             self.label["site"][sites[0]] = site_name
-            logger.debug("self.label: {}".format(self.label))
+            logger.debug(f"self.label: {self.label}")
         if site_name in self.label["site"]:
             return None
         self.label["site"].append(site_name)
-        logger.debug("self.label: {}".format(self.label))
+        logger.debug(f"self.label: {self.label}")
         #    spin, k, band, atom
         sumsite: NDArray[np.float64] = self.proj[:, :, :, sites, :].sum(
-            axis=-2, keepdims=True
+            axis=-2,
+            keepdims=True,
         )
         self.proj = np.concatenate((self.proj, sumsite), axis=-2)
         return sumsite
 
     def append_sumorbital(
-        self, orbitals: tuple[int, ...] | int, orbital_name: str
+        self,
+        orbitals: tuple[int, ...] | int,
+        orbital_name: str,
     ) -> NDArray[np.float64] | None:
         """Append orbital-sum results.
 
@@ -111,7 +117,7 @@ class ProjectionBand(EnergyBand):
         self[n_spin, num_k, n_bands, n_atom, norbital + 1]
 
         Parameters
-        -----------
+        ----------
         orbitals: tuple
             orbital index for summention
         oribtal_name : str
@@ -123,10 +129,12 @@ class ProjectionBand(EnergyBand):
         self.label["orbital"].append(orbital_name)
         #    spin, k, band, atom
         sumorbital: NDArray[np.float64] = self.proj[:, :, :, :, orbitals].sum(
-            axis=-1, keepdims=True
+            axis=-1,
+            keepdims=True,
         )
         self.proj: NDArray[np.float64] = np.concatenate(
-            (self.proj, sumorbital), axis=-1
+            (self.proj, sumorbital),
+            axis=-1,
         )
         return sumorbital
 
@@ -150,7 +158,7 @@ class ProjectionBand(EnergyBand):
 
 
         Returns
-        --------
+        -------
         tuple
             number corresponding to (composed) orbital name.
 
@@ -217,7 +225,7 @@ class ProjectionBand(EnergyBand):
             index tuple for output
 
         """
-        label_list = super(ProjectionBand, self).make_label("k", "energy")
+        label_list = super().make_label("k", "energy")
         if not (site_indexes and orbital_indexes_sets):
             return label_list
         for site_i, orbitals in zip(site_indexes, orbital_indexes_sets):
@@ -248,7 +256,7 @@ class ProjectionBand(EnergyBand):
         """Return 3D list data that are easily converted to txt data for csv.
 
         Parameters
-        ------------
+        ----------
         site_indexes: list or tuple that contains int
             site name for output  (the elements must be in self.label['site'])
             e.g., (3, 5)
@@ -257,7 +265,7 @@ class ProjectionBand(EnergyBand):
             e.g., ((1 ,5 , 11), (0, 3))
 
         Returns
-        --------
+        -------
         list:
             3D list, the first dimension corresponds to the data for band_i
             and each band_i contains kdistances, energy (or energies), and
@@ -265,19 +273,18 @@ class ProjectionBand(EnergyBand):
 
         """
         assert len(site_indexes) == len(
-            orbital_indexes_sets
+            orbital_indexes_sets,
         ), "must len(sites)==len(orbitals)"
         if not (site_indexes and orbital_indexes_sets):
-            return super(ProjectionBand, self).to_3dlist()
+            return super().to_3dlist()
         # make np.array named projband from proj by using
         # site_indexes, orbital_indexes_sets values:
-        # projband[spin_i, k_i, band_i, site_orbital]
         # Note that projband.ndim is 4
         array_list = []
         for site_i, orbitals in zip(site_indexes, orbital_indexes_sets):
             for orbital_i in orbitals:
                 array_list.append(
-                    self.proj[:, :, :, site_i, orbital_i][:, :, :, np.newaxis]
+                    self.proj[:, :, :, site_i, orbital_i][:, :, :, np.newaxis],
                 )
         # このtranspose で、
         # A_mT_orb1, A_mX_orb1, A_mY_orb1, A_mZ_orb1, サイトB_mT_orb2...
@@ -288,7 +295,8 @@ class ProjectionBand(EnergyBand):
             .reshape(self.n_bands, self.num_k, -1)
         )
         kvalues = np.array((self.kdistances.tolist()) * self.n_bands)[
-            :, np.newaxis
+            :,
+            np.newaxis,
         ].reshape(self.n_bands, self.num_k, 1)
         projband = np.concatenate((kvalues, self.energies.T, output_proj), axis=-1)
         return projband.tolist()
@@ -331,7 +339,7 @@ class ProjectionBand(EnergyBand):
         """Return csv-like text data.
 
         Parameters
-        -----------
+        ----------
         site_indexes: list or tuple that contains int
             site name for output  (the elements must be in self.label['site'])
             e.g., (3, 5)
@@ -340,21 +348,21 @@ class ProjectionBand(EnergyBand):
             e.g., ((1 ,5 , 11), (0, 3))
 
         Returns
-        --------
+        -------
         str
 
         """
         assert len(site_indexes) == len(
-            orbital_indexes_sets
+            orbital_indexes_sets,
         ), "must len(site_indexes)==len(orbitals_indexes_sets)"
         output = "\t".join(self.make_label(site_indexes, orbital_indexes_sets))
         output += "\n"
         list3d = self.to_3dlist(site_indexes, orbital_indexes_sets)
         for band_i in list3d:
             for line in band_i:
-                output += "{0: .8e}".format(line[0])
+                output += f"{line[0]: .8e}"
                 for element in line[1:]:
-                    output += "\t{0:.8e}".format(element)
+                    output += f"\t{element:.8e}"
                 output += "\n"
             output += "\n"
         return output
@@ -412,7 +420,7 @@ class PROCAR(ProjectionBand):  # Version safety
 
     def __init__(self, filename: str | Path = "", phase_read: bool = False) -> None:
         """Initialize."""
-        super(PROCAR, self).__init__()
+        super().__init__()
         if filename:
             self.load_file(open_by_suffix(str(filename)), phase_read)
 
@@ -443,9 +451,9 @@ class PROCAR(ProjectionBand):  # Version safety
             if line.isspace():
                 continue
             elif "k-points: " in line:
-                self.num_k, self.n_bands, self.n_atom = [
+                self.num_k, self.n_bands, self.n_atom = (
                     int(i) for i in re.split(r"\s|:", line) if i.isdigit()
-                ]
+                )
             elif "k-point " in line:
                 try:
                     k_vectors.append([float(i) for i in line.split()[3:6]])
@@ -455,7 +463,7 @@ class PROCAR(ProjectionBand):  # Version safety
                             float(line[18:29]),
                             float(line[29:40]),
                             float(line[40:51]),
-                        ]
+                        ],
                     )
             elif "band " in line:
                 energies.append(float(line.split()[4]))
@@ -488,7 +496,9 @@ class PROCAR(ProjectionBand):  # Version safety
         )
         if phase_read:
             self.phase: NDArray[np.float64] = np.fromstring(
-                phase_r, dtype=float, sep=" "
+                phase_r,
+                dtype=float,
+                sep=" ",
             ) + (0 + 1.0j) * np.fromstring(phase_i, dtype=float, sep=" ")
             del phase_r, phase_i
         #
@@ -496,38 +506,44 @@ class PROCAR(ProjectionBand):  # Version safety
             self.label["spin"] = [""]
             self.label["energy"] = ["Energy"]
             self.energies: NDArray[np.float64] = np.array(energies).reshape(
-                1, self.num_k, self.n_bands
+                1,
+                self.num_k,
+                self.n_bands,
             )
             self.proj = self.proj.reshape(
-                (self.n_spin, self.num_k, self.n_bands, self.n_atom, norbital)
+                (self.n_spin, self.num_k, self.n_bands, self.n_atom, norbital),
             )
             if phase_read:
                 self.phase = self.phase.reshape(
-                    (self.n_spin, self.num_k, self.n_bands, self.n_atom, norbital - 1)
+                    (self.n_spin, self.num_k, self.n_bands, self.n_atom, norbital - 1),
                 )
         elif self.n_spin == 2:  # collinear
             self.label["spin"] = ["_up", "_down"]
             self.label["energy"] = ["Energy_up", "Energy_down"]
             self.energies = np.array(energies).reshape(2, self.num_k, self.n_bands)
             self.proj = self.proj.reshape(
-                (self.n_spin, self.num_k, self.n_bands, self.n_atom, norbital)
+                (self.n_spin, self.num_k, self.n_bands, self.n_atom, norbital),
             )
             if phase_read:
                 self.phase = self.phase.reshape(
-                    (self.n_spin, self.num_k, self.n_bands, self.n_atom, norbital - 1)
+                    (self.n_spin, self.num_k, self.n_bands, self.n_atom, norbital - 1),
                 )
         elif self.n_spin == 4:  # non-collinear
             self.label["spin"] = ["_mT", "_mX", "_mY", "_mZ"]
             self.label["energy"] = ["Energy"]
             self.energies = np.array(energies).reshape(1, self.num_k, self.n_bands)
             self.proj = self.proj.reshape(
-                self.num_k, self.n_bands, self.n_spin, self.n_atom, norbital
+                self.num_k,
+                self.n_bands,
+                self.n_spin,
+                self.n_atom,
+                norbital,
             ).transpose(
-                (2, 0, 1, 3, 4)
+                (2, 0, 1, 3, 4),
             )  # The order is spin, k, band, atom, orbital
             if phase_read:
                 self.phase = self.phase.reshape(
-                    (1, self.num_k, self.n_bands, self.n_atom, norbital - 1)
+                    (1, self.num_k, self.n_bands, self.n_atom, norbital - 1),
                 )
         else:
             raise ValueError
@@ -543,7 +559,6 @@ class PROCAR(ProjectionBand):  # Version safety
             If True, treat the shape of self.phase
 
         """
-        pass
 
     def __repr__(self) -> str:
         """__str__() <=> str(x).
@@ -564,11 +579,11 @@ class PROCAR(ProjectionBand):  # Version safety
     # of phase component: {6}"""
         string = ""
         for orb in self.label["orbital"]:
-            string += "{0}  ".format(orb)
+            string += f"{orb}  "
         template2 = """
-    # Orbitals are: {0}
+    # Orbitals are: {}
         """.format(
-            str
+            str,
         )
         return (
             template1.format(
@@ -597,7 +612,7 @@ def _check_orbital_name(arg: str) -> str:
         the string to be checked as the orbital name
 
     Returns
-    --------
+    -------
     str
 
     """
@@ -624,8 +639,15 @@ def _check_orbital_name(arg: str) -> str:
         "dxz",
         "dx2",
         "tot",
-    ] + ["sp", "p", "pxpy", "pxpz", "pypz", "spd", "d"]
-    if arg in translate_dict.keys():
+        "sp",
+        "p",
+        "pxpy",
+        "pxpz",
+        "pypz",
+        "spd",
+        "d",
+    ]
+    if arg in translate_dict:
         arg = translate_dict[arg]
     if arg in proper_orbital_name_list:
         return arg
@@ -642,12 +664,12 @@ def tiny_check(procar: IO[str]) -> tuple[int, int, int, list[str], bool]:
     """
     if "PROCAR lm decomposed + phase" not in next(procar):
         procar.close()
+        msg = "This PROCAR is not a proper format (Not phase data included.)\n                             Check your INCAR the calculations.\n"
         raise RuntimeError(
-            "This PROCAR is not a proper format (Not phase data included.)\n \
-                            Check your INCAR the calculations.\n"
+            msg,
         )
     tmp = next(procar)
-    num_k, n_bands, n_atom = [int(i) for i in (tmp[14:20], tmp[39:43], tmp[62:-1])]
+    num_k, n_bands, n_atom = (int(i) for i in (tmp[14:20], tmp[39:43], tmp[62:-1]))
     _ = [next(procar) for i in range(5)]
     section = []
     orbitals: list[list[float]] = []
@@ -673,6 +695,7 @@ def tiny_check(procar: IO[str]) -> tuple[int, int, int, list[str], bool]:
     elif len(orbitals) == n_atom * 4:
         collinear = False
     else:
-        raise RuntimeError("PROCAR is not proper format")
+        msg = "PROCAR is not proper format"
+        raise RuntimeError(msg)
     procar.seek(0)
     return num_k, n_bands, n_atom, orbital_names, collinear

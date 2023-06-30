@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """VASPy.
 
 modules for VASP pre/post-process
@@ -10,8 +9,22 @@ import os.path
 import re
 from typing import Any
 
-from vaspy import (bader, chgcar, const, doscar, eigenval, incar, locpot,
-                   mesh3d, outcar, poscar, procar, tools, vsim_asc, wavecar)
+from vaspy import (
+    bader,
+    chgcar,
+    const,
+    doscar,
+    eigenval,
+    incar,
+    locpot,
+    mesh3d,
+    outcar,
+    poscar,
+    procar,
+    tools,
+    vsim_asc,
+    wavecar,
+)
 
 __all__: list[str] = [
     "bader",
@@ -57,7 +70,6 @@ def load(filename: str, mode: str = "", additional: str = "") -> Any:
             eigenval, wavecar (case insensitive).
 
     """
-
     filenamebase = os.path.basename(filename).lower()
     mode = mode.lower()
     if re.search(r"poscar|contcar", filenamebase) or mode == "poscar":
@@ -83,4 +95,5 @@ def load(filename: str, mode: str = "", additional: str = "") -> Any:
     elif re.search(r"acf", filenamebase) or mode == "bader":
         return bader.BaderACF(filename)
     else:
-        raise RuntimeError("The loding mode cannot be identified!  Set 'mode'")
+        msg = "The loding mode cannot be identified!  Set 'mode'"
+        raise RuntimeError(msg)

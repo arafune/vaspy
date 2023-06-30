@@ -1,24 +1,22 @@
-#! /usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-This module provides OUTCAR class
-"""
+"""This module provides OUTCAR class."""
 
 
-from __future__ import unicode_literals  # Version safety
 from __future__ import annotations
 
-from pathlib import Path
-from typing import IO, Sequence
+from typing import IO, TYPE_CHECKING
 
 from vaspy.tools import open_by_suffix
 
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from pathlib import Path
 
-class OUTCAR(object):  # Version safety
+
+class OUTCAR:  # Version safety
     """Class for OUTCAR file.
 
-    Attributes
-    -------------
+    Attributes:
+    ----------
     n_atom: int
         number of atom
     atom_types: list
@@ -43,8 +41,8 @@ class OUTCAR(object):  # Version safety
         evolution of total charge
 
 
-    Todo
-    ------
+    Todo:
+    ----
     posforce should be devided to positions and forces.
 
     """
@@ -192,7 +190,7 @@ class OUTCAR(object):  # Version safety
                     elm + str(j)
                     for (elm, n) in zip(self.atom_types, self.atomnums)
                     for j in range(1, int(n) + 1)
-                ]
+                ],
             )
         ]
         self.posforce = [
@@ -206,14 +204,14 @@ class OUTCAR(object):  # Version safety
         the_file.close()
 
     def select_posforce_header(
-        self, posforce_flag: Sequence[bool], *sites: tuple[int | list[int]]
+        self, posforce_flag: Sequence[bool], *sites: tuple[int | list[int]],
     ) -> list[str]:
         """Return the position and force header selected."""
         selected_sites: Sequence[int]
         if sites == () or sites[0] == []:
             selected_sites = range(1, self.n_atom + 1)
-        if isinstance(sites[0], (list, tuple)):
-            selected_sites = [n for n in sites[0]]
+        if isinstance(sites[0], list | tuple):
+            selected_sites = list(sites[0])
         return [
             posforce
             for (index, site) in enumerate(self.posforce_title)
@@ -226,20 +224,20 @@ class OUTCAR(object):  # Version safety
     # correct?
 
     def select_posforce(
-        self, posforce_flag: Sequence[bool], *sites: tuple[int | list[int]]
+        self, posforce_flag: Sequence[bool], *sites: tuple[int | list[int]],
     ) -> list[list[float]]:
         """Return the position and force selected by posforce_flag.
 
         Notes
-        -------
+        -----
         posforce_flag: An 6-element True/False list that indicates
                 the output (ex.) [True, True, False, True, True, False]
 
         """
         if sites == () or sites[0] == []:
             selected_sites: Sequence[int] = range(1, self.n_atom + 1)
-        if isinstance(sites[0], (list, tuple)):
-            selected_sites = [n for n in sites[0]]
+        if isinstance(sites[0], list | tuple):
+            selected_sites = list(sites[0])
         return [
             [
                 posforce

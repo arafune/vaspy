@@ -1,11 +1,10 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 
 from vaspy import poscar
 
 
-class Test_POSCAR_Head(object):
+class Test_POSCAR_Head:
     def setup_method(self, method):
         self.poscar_head = poscar.PosCarHead()
         self.poscar_head.atom_types = ["Ag", "Si"]
@@ -13,5 +12,5 @@ class Test_POSCAR_Head(object):
         self.poscar_head.system_name = "testPOSCAR"
 
     def test_poscar_head(self):
-        assert "testPOSCAR" == self.poscar_head.system_name
-        assert "#0:Ag1" == self.poscar_head.site_label[0]
+        assert self.poscar_head.system_name == "testPOSCAR"
+        assert self.poscar_head.site_label[0] == "#0:Ag1"

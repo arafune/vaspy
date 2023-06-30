@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Script to use(demonstrate) vaspy.chgcar module."""
 
 import argparse
@@ -22,7 +21,7 @@ spin_methods = {
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument(
-    "--add", action="store_true", default=False, help="Add two CHGCAR files"
+    "--add", action="store_true", default=False, help="Add two CHGCAR files",
 )
 group.add_argument(
     "--merge",
@@ -76,7 +75,7 @@ def check_position_axes(chgcar1: CHGCAR, chgcar2: CHGCAR) -> bool:
     """Check the cell vectors and atom positions are same in two CHGCAR.
 
     Parameters
-    -----------
+    ----------
     chgcar1, chgcar2: vaspy.CHGCAR
 
     Returns
@@ -115,7 +114,8 @@ if args.spin is not None:
 #
 if args.add or args.diff or args.merge:
     if args.CHGCAR_file_2 is None:
-        raise parser.error("Two CHGCAR files are required.")
+        msg = "Two CHGCAR files are required."
+        raise parser.error(msg)
     if args.add:
         dest_chgcar = args.CHGCAR_file_1 + args.CHGCAR_file_2
     elif args.diff:
