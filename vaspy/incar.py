@@ -6,9 +6,9 @@ from __future__ import annotations
 import pprint
 import re
 from collections.abc import Mapping
-from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
+from logging import INFO, Formatter, StreamHandler, getLogger
 from pathlib import Path
-from typing import IO, Any, Generator
+from typing import IO, Generator
 
 from vaspy.tools import open_by_suffix
 

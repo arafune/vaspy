@@ -41,7 +41,7 @@ from __future__ import annotations
 import copy
 import itertools as it
 import re
-from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
+from logging import INFO, Formatter, StreamHandler, getLogger
 from pathlib import Path
 from typing import IO, Any, Callable, Generator, Sequence
 

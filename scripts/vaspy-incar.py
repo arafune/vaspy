@@ -5,7 +5,7 @@ Script to demonstrate vaspy.incar functionality.
 
 """
 import argparse
-from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
+from logging import DEBUG, Formatter, StreamHandler, getLogger
 
 import vaspy
 import vaspy.incar

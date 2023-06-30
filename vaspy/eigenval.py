@@ -4,7 +4,7 @@ from __future__ import annotations, division, print_function
 
 import csv
 import sys
-from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
+from logging import INFO, Formatter, StreamHandler, getLogger
 from pathlib import Path
 from typing import IO, Sequence
 

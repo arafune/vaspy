@@ -2,7 +2,7 @@
 """Module for WAVECAR class."""
 from __future__ import annotations
 
-from typing import IO, Sequence
+from typing import IO
 
 import numpy as np
 from numpy.typing import DTypeLike, NDArray
@@ -277,9 +277,11 @@ class WAVECAR(object):
         ngrid: NDArray[np.int64] | None = None,
         norm: bool = False,
         poscar: poscar.POSCAR = poscar.POSCAR(),
-    ) -> NDArray[np.complex128] | tuple[
-        NDArray[np.float64] | NDArray[np.float64]
-    ] | VASPGrid:
+    ) -> (
+        NDArray[np.complex128]
+        | tuple[NDArray[np.float64] | NDArray[np.float64]]
+        | VASPGrid
+    ):
         r"""Return the pseudo-wavefunction in real space.
 
         Calculate the pseudo-wavefunction of the KS states in
@@ -292,7 +294,7 @@ class WAVECAR(object):
         grid.
 
         Parameters
-        -----------
+        ----------
         spin_i: int
             spin index (0 or 1). default is 0
         k_i: int
@@ -309,7 +311,7 @@ class WAVECAR(object):
             POSCAR object (default is blank POSCAR object)
 
         Returns
-        -----------
+        -------
         numpy.array
             If poscar is not specified, for Collinear-wavecar file.
             data for the wavefunction in the real space.
@@ -326,9 +328,9 @@ class WAVECAR(object):
             represents the real part of the wavefunction at :math:`k_i` and
             :math:`b_i` in the real space, the latter frame the imaginary
             part. For the SOI wavecar, 4 frames.
-            The first and second are for the "up" wavefunction (Real, Imaginary), and the third
-            and fourth are "down" wavefunction(Real, Imaginary). (Judging SOI by
-            gvectors(k_i).shape[0] :math:`\neq` bandcoeff(k_i).size)
+            The first and second are for the "up" wavefunction (Real, Imaginary),
+            and the third and fourth are "down" wavefunction(Real, Imaginary).
+            (Judging SOI by gvectors(k_i).shape[0] :math:`\neq` bandcoeff(k_i).size)
 
         """
 

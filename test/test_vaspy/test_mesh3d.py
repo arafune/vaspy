@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import os
 
-import numpy as np
 
 import vaspy.mesh3d as mesh3d
 
@@ -11,7 +10,7 @@ class TestMesh3d(object):
     """Class for EIGENVAL class test"""
 
     def setup_method(self):
-        datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
+        os.path.abspath(os.path.dirname(__file__)) + "/data/"
 
     #        self.eigenval_soi = eigenval.EIGENVAL(datadir + 'EIGENVAL.soi')
 

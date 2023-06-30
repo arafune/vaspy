@@ -6,7 +6,7 @@ script to use(demonstrate) vaspy.poscar functions.
 
 import argparse
 import functools as ft
-from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
+from logging import INFO, Formatter, StreamHandler, getLogger
 from typing import List
 
 from vaspy import tools

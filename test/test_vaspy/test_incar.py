@@ -1,9 +1,6 @@
 from pathlib import Path
 
-import numpy as np
 import pytest
-from _pytest.fixtures import fixture
-from numpy.testing import assert_array_equal
 
 import vaspy
 import vaspy.incar

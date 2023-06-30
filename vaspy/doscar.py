@@ -44,7 +44,6 @@ from __future__ import annotations
 import copy
 import csv
 import sys
-from collections.abc import Iterable
 from operator import add
 from pathlib import Path
 from typing import IO, Sequence

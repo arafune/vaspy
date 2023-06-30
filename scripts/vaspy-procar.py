@@ -6,7 +6,7 @@ import argparse
 import functools as ft
 import re
 from itertools import chain
-from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
+from logging import INFO, Formatter, StreamHandler, getLogger
 from typing import List, Tuple, Union
 
 import vaspy.procar as procar

@@ -9,9 +9,7 @@ from __future__ import annotations
 
 import argparse
 import itertools
-from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
-from re import T
-from typing import Sequence
+from logging import INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
 from mayavi import mlab
