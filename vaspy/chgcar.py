@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module for CHGCAR class.
 
 translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
@@ -6,11 +5,13 @@ translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 from __future__ import annotations
 
 import copy
-from pathlib import Path
-from typing import IO
+from typing import IO, TYPE_CHECKING
 
 from vaspy.mesh3d import VASPGrid
 from vaspy.tools import open_by_suffix
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class CHGCAR(VASPGrid):
@@ -48,7 +49,7 @@ class CHGCAR(VASPGrid):
 
     def __init__(self, filename: str | Path = "", pickles: str = "") -> None:
         """Initialize."""
-        super(CHGCAR, self).__init__()
+        super().__init__()
         self.spin: list[str] = [""]
         if filename:
             self.load_file(open_by_suffix(str(filename)), pickles)
@@ -62,7 +63,7 @@ class CHGCAR(VASPGrid):
             CHGCAR file
 
         """
-        super(CHGCAR, self).load_file(the_file, pickles)
+        super().load_file(the_file, pickles)
         if self.grid.n_frame == 1:
             self.spin = [""]
         elif self.grid.n_frame == 2:
@@ -70,7 +71,8 @@ class CHGCAR(VASPGrid):
         elif self.grid.n_frame == 4:
             self.spin = ["mT", "mX", "mY", "mZ"]
         else:
-            raise RuntimeError("CHGCAR is correct?")
+            msg = "CHGCAR is correct?"
+            raise RuntimeError(msg)
         the_file.close()
 
     def magnetization(self, direction: str = "") -> CHGCAR:
@@ -104,7 +106,8 @@ class CHGCAR(VASPGrid):
 
         """
         if len(self.spin) == 1:
-            raise RuntimeError("This CHGCAR is not spin resolved version")
+            msg = "This CHGCAR is not spin resolved version"
+            raise RuntimeError(msg)
         dest = copy.deepcopy(self)
         if len(self.spin) == 2:
             dest.grid = dest.grid.frame(1)
@@ -151,7 +154,7 @@ class CHGCAR(VASPGrid):
         calculations.
 
         Returns
-        ---------
+        -------
         vaspy.chgcar.CHGCAR
             CHGCAR for the minority spin charge
 

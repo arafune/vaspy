@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test for EIGENVAL class."""
 import os
 
@@ -7,18 +6,17 @@ import pytest
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 import vaspy
-import vaspy.eigenval as eigenval
+from vaspy import eigenval
 
 datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
 
 
-@pytest.fixture
+@pytest.fixture()
 def cobalt() -> eigenval.EIGENVAL:
-    cobalt = vaspy.load(datadir + "EIGENVAL.Co-collinear", mode="EIGENVAL")
-    return cobalt
+    return vaspy.load(datadir + "EIGENVAL.Co-collinear", mode="EIGENVAL")
 
 
-class TestEIGENVAL(object):
+class TestEIGENVAL:
     """Class for EIGENVAL class test."""
 
     def setup_method(self) -> None:
@@ -27,11 +25,11 @@ class TestEIGENVAL(object):
 
     def test_check_basic_parameters(self) -> None:
         """Check the basic parameters stored."""
-        assert 344 == self.eigenval_spin.n_atom
-        assert 2 == self.eigenval_spin.n_spin
-        assert 1890 == self.eigenval_spin.n_bands
-        assert 1 == self.eigenval_spin.num_k
-        assert (2, 1, 1890) == self.eigenval_spin.energies.shape
+        assert self.eigenval_spin.n_atom == 344
+        assert self.eigenval_spin.n_spin == 2
+        assert self.eigenval_spin.n_bands == 1890
+        assert self.eigenval_spin.num_k == 1
+        assert self.eigenval_spin.energies.shape == (2, 1, 1890)
         assert_array_equal([0.0, 0.0, 0.0], self.eigenval_spin.k_vectors[0])
         assert_array_almost_equal(
             [[-22.893072, -22.891405, -22.841659, -22.832997, -22.761726, -22.737184]],
@@ -40,10 +38,10 @@ class TestEIGENVAL(object):
         assert_array_equal([5.806516], self.eigenval_spin.energies[0, :, -1])
         assert_array_equal([5.813531], self.eigenval_spin.energies[1, :, -1])
         #
-        assert 1 == self.eigenval_soi.n_atom
-        assert 1 == self.eigenval_soi.n_spin
-        assert 54 == self.eigenval_soi.n_bands
-        assert 625 == self.eigenval_soi.num_k
+        assert self.eigenval_soi.n_atom == 1
+        assert self.eigenval_soi.n_spin == 1
+        assert self.eigenval_soi.n_bands == 54
+        assert self.eigenval_soi.num_k == 625
         assert_array_equal(
             [-9.548122, -9.491253, -9.322813, -9.050432, -8.691472, -8.285128],
             self.eigenval_soi.energies[0, :, 0][0:6],
@@ -58,7 +56,7 @@ class TestEIGENVAL(object):
             self.eigenval_soi.k_vectors[0:3],
         )
         self.eigenval_soi.to_physical_kvector(
-            recvec=np.array(((2, 0, 0), (0, 2, 0), (0, 0, 2)))
+            recvec=np.array(((2, 0, 0), (0, 2, 0), (0, 0, 2))),
         )
         assert_array_almost_equal(
             [[0.0, 0.0, 0.0], [8.0e-02, 0, 0.0], [16.0e-02, 0, 0]],
@@ -68,12 +66,12 @@ class TestEIGENVAL(object):
     def test_make_label(self) -> None:
         """Test for make_label function."""
         labels_soi = self.eigenval_soi.make_label("k", "energy")
-        assert "#k" == labels_soi[0]
-        assert "Energy" == labels_soi[1]
+        assert labels_soi[0] == "#k"
+        assert labels_soi[1] == "Energy"
         labels_spin = self.eigenval_spin.make_label("k", "energy")
-        assert "#k" == labels_spin[0]
-        assert "Energy_up" == labels_spin[1]
-        assert "Energy_down" == labels_spin[2]
+        assert labels_spin[0] == "#k"
+        assert labels_spin[1] == "Energy_up"
+        assert labels_spin[2] == "Energy_down"
 
     def test__getitem_spi(self) -> None:
         assert_array_equal(self.eigenval_spin[0][0], [0.0, 0.0, 0.0])
@@ -108,12 +106,11 @@ class TestEIGENVAL(object):
         )
 
     def test_cobalt(self, cobalt: eigenval.EIGENVAL):
-        """Test EIGENVAL by using EIGENVAL.Co-collinear
+        """Test EIGENVAL by using EIGENVAL.Co-collinear.
 
         Collinear magnetism
 
         """
-
         assert_array_equal(cobalt[0][0], [0, 0, 0])
         assert_array_equal(cobalt[0][1][0], [-10.128206, -9.857677])
         assert_array_equal(cobalt[1][1][0], [-10.071635, -9.799951])

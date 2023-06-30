@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module for bader class.
 
 Bader charge anaslysis performed by bader.
@@ -7,15 +6,17 @@ Bader charge anaslysis performed by bader.
 This program is not a part of vasp but it deeply connects with the vasp.
 """
 
-from __future__ import annotations, division  # Version safety
+from __future__ import annotations  # Version safety
 
-from pathlib import Path
-from typing import IO, Any
+from typing import IO, TYPE_CHECKING, Any
 
 from vaspy.tools import open_by_suffix
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-class BaderACF(object):
+
+class BaderACF:
     r"""Class for storing bader charge analysis (ACF.dat).
 
     ACF.dat contains the coordinates of each atom, the charge
@@ -45,7 +46,7 @@ class BaderACF(object):
     """
 
     def __init__(self, filename: str | Path = "") -> None:
-        """Initialize
+        """Initialize.
 
         Parameters
         ----------

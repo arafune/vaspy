@@ -1,4 +1,4 @@
-"""mesh3D Module to provide class VASPGRID FFT-grid NG(X,Y,Z)F
+"""mesh3D Module to provide class VASPGRID FFT-grid NG(X,Y,Z)F.
 
 That is this is class VASPGRID is the parent class of CHGCAR,
 LOCPOT, and ELFCAR.  The ELFCAR class has not yet implemented yet, though.
@@ -8,18 +8,22 @@ from __future__ import annotations
 
 import copy
 import os
-from pathlib import Path
-from typing import IO, Sequence
+from typing import IO, TYPE_CHECKING
 
 import numpy as np
-from numpy.typing import NDArray
 
 from vaspy import poscar, tools
 from vaspy.tools import open_by_suffix
 
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from pathlib import Path
 
-class VASPGrid(object):
-    # Todo: Use Composite pattern!!!
+    from numpy.typing import NDArray
+
+
+class VASPGrid:
+    # TODO: Use Composite pattern!!!
     # VASPGrid should consists of POSCAR and Mesh3D object!!
     """Class for VaspGrid used in CHGCAR, LOCPOT, ELFCAR, etc.
 
@@ -51,7 +55,7 @@ class VASPGrid(object):
     self.ionnums. Currently this information is ignored.
 
     Attributes
-    -----------------
+    ----------
     poscar, grid, additional
 
     """
@@ -95,9 +99,10 @@ class VASPGrid(object):
             elif os.path.splitext(pickles)[1] == ".npz":
                 self.grid.data = np.load(pickles)["arr_0"]
             else:
-                raise TypeError("Check the volmetric data type")
+                msg = "Check the volmetric data type"
+                raise TypeError(msg)
             the_file.close()
-            return None
+            return
         griddata += next(the_file).replace("***********", "Nan")
         if self.grid.size % len(griddata.split()) == 0:
             lines_for_mesh = self.grid.size // len(griddata.split())
@@ -145,7 +150,7 @@ class VASPGrid(object):
         """Save object as the same file-style.
 
         Parameters
-        -----------
+        ----------
         filename: str
             file name
 
@@ -175,12 +180,12 @@ class VASPGrid(object):
         Use this method to calculate Bader analysis, for example.
 
         Parameters
-        ---------------
+        ----------
         other: VASPGrid
             Addtion VaspGrid object
 
         Returns
-        -----------
+        -------
         VASPGrid
             Rusultant by summing two grid values
 
@@ -189,7 +194,8 @@ class VASPGrid(object):
         try:
             add_grid.grid.data = self.grid.data + other.grid.data
         except ValueError:
-            raise RuntimeError("The mesh shapes are different each other")
+            msg = "The mesh shapes are different each other"
+            raise RuntimeError(msg)
         return add_grid
 
     def __add__(self, other: VASPGrid) -> VASPGrid:
@@ -198,12 +204,12 @@ class VASPGrid(object):
         x.__add__(y) <=> x + y
 
         Parameters
-        ---------------
+        ----------
         other: VASPGrid
             Addtion VaspGrid object
 
         Returns
-        -----------
+        -------
         Grid3D
             Rusultant by summing two grid values and poscar is also added.
 
@@ -213,7 +219,8 @@ class VASPGrid(object):
         try:
             add_grid.grid.data = self.grid.data + other.grid.data
         except ValueError:
-            raise RuntimeError("The mesh shapes are different each other")
+            msg = "The mesh shapes are different each other"
+            raise RuntimeError(msg)
         return add_grid
 
     def __sub__(self, other: VASPGrid) -> VASPGrid:
@@ -225,13 +232,13 @@ class VASPGrid(object):
         other: VASPGrid
             difference VASPGrid object
 
-        Returns
-        ----------
+        Returns:
+        -------
         Grid3D
             Resultant by difference between two objects.
 
-        Note
-        --------
+        Note:
+        ----
         The resultant grid data is the difference between two objects,
         of course. On the other hand, the atom position information
         unchange by this method.  Use the 'minuend' object.  The atom
@@ -242,11 +249,12 @@ class VASPGrid(object):
         try:
             diff_grid.grid.data = self.grid.data - other.grid.data
         except ValueError:
-            raise RuntimeError("The mesh shapes are different each other")
+            msg = "The mesh shapes are different each other"
+            raise RuntimeError(msg)
         return diff_grid
 
 
-class Grid3D(object):
+class Grid3D:
     """Class for NG(X,Y,Z)F in VASP.
 
     This class is used chg_array in CHGCAR, Potential in LOCPOT,
@@ -292,7 +300,7 @@ class Grid3D(object):
         """Return the i-th frame.
 
         Parameters
-        -----------
+        ----------
         frame_i:int
             frame index
 
@@ -303,17 +311,19 @@ class Grid3D(object):
         return dest
 
     def slice(
-        self, position: int, axis: str = "z", frame_i: int = 0
+        self,
+        position: int,
+        axis: str = "z",
+        frame_i: int = 0,
     ) -> NDArray[np.float64]:
-        """
-        Parameters
+        """Parameters
         ----------
         axis: str
             'x', 'y', or 'z'.  Case insensitive.
         position: int
             position for slice
 
-        Return
+        Return:
         ------
         NDArray
             2D numpy array that sliced from 3D mesh data.
@@ -323,18 +333,25 @@ class Grid3D(object):
         axis = axis.lower()
         if axis == "x":
             return griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
-                :, :, position
+                :,
+                :,
+                position,
             ]
         elif axis == "y":
             return griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
-                :, position, :
+                :,
+                position,
+                :,
             ]
         elif axis == "z":
             return griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
-                position, :, :
+                position,
+                :,
+                :,
             ]
         else:
-            raise RuntimeError('axis must be "x", "y" or "z".')
+            msg = 'axis must be "x", "y" or "z".'
+            raise RuntimeError(msg)
 
     def integrate(
         self,
@@ -368,26 +385,33 @@ class Grid3D(object):
         if axis == "x":
             return np.sum(
                 griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
-                    :, :, from_coor:to_coor
+                    :,
+                    :,
+                    from_coor:to_coor,
                 ],
                 axis=2,
             )
         elif axis == "y":
             return np.sum(
                 griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
-                    :, from_coor:to_coor, :
+                    :,
+                    from_coor:to_coor,
+                    :,
                 ],
                 axis=1,
             )
         elif axis == "z":
             return np.sum(
                 griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
-                    from_coor:to_coor, :, :
+                    from_coor:to_coor,
+                    :,
+                    :,
                 ],
                 axis=0,
             )
         else:
-            raise ValueError("incorrect axis")
+            msg = "incorrect axis"
+            raise ValueError(msg)
 
     def __str__(self) -> str:
         """Return as string object.
@@ -404,18 +428,22 @@ class Grid3D(object):
         mesharray = self.data.reshape(self.n_frame, self.size)
         for tmp in mesharray:
             output = []
-            outputstr += "\n  {0}  {1}  {2}\n".format(
-                self.shape[0], self.shape[1], self.shape[2]
+            outputstr += "\n  {}  {}  {}\n".format(
+                self.shape[0],
+                self.shape[1],
+                self.shape[2],
             )
             for array in tools.each_slice(tmp, 5):
                 output.append(
-                    "".join("  {0:18.11E}".format(i) for i in array if i is not None)
+                    "".join(f"  {i:18.11E}" for i in array if i is not None),
                 )
             outputstr += "\n".join(output)
         return outputstr + "\n"
 
     def average_along_axis(
-        self, axis_name: str, frame_i: int = 0
+        self,
+        axis_name: str,
+        frame_i: int = 0,
     ) -> NDArray[np.float64]:
         """Calculate average value of potential along 'axis'.
 
@@ -443,14 +471,15 @@ class Grid3D(object):
         elif axis_name == "Z":
             data = np.average(np.average(data, axis=2), axis=1)
         else:
-            raise ValueError("Wrong axis name set")
+            msg = "Wrong axis name set"
+            raise ValueError(msg)
         return data
 
     def min_along_axis(self, axis_name: str, frame_i: int = 0) -> NDArray[np.float64]:
         """Calculate minimum value of potential along 'axis'.
 
         Parameters
-        -----------
+        ----------
         axis_name: str
             'X', 'Y', or 'Z'
         mode: int, optional (default is 0)
@@ -473,14 +502,15 @@ class Grid3D(object):
         elif axis_name == "Z":
             data = np.min(np.min(data, axis=2), axis=1)
         else:
-            raise ValueError("Wrong axis name set")
+            msg = "Wrong axis name set"
+            raise ValueError(msg)
         return data
 
     def max_along_axis(self, axis_name: str, frame_i: int = 0) -> NDArray[np.float64]:
         """Calculate maximum value of potential along 'axis'.
 
         Parameters
-        -----------
+        ----------
         axis_name: str
             'X', 'Y', or 'Z'
         mode: int, optional (default is 0)
@@ -503,16 +533,19 @@ class Grid3D(object):
         elif axis_name == "Z":
             data = np.max(np.max(data, axis=2), axis=1)
         else:
-            raise ValueError("Wrong axis name set")
+            msg = "Wrong axis name set"
+            raise ValueError(msg)
         return data
 
     def median_along_axis(
-        self, axis_name: str, frame_i: int = 0
+        self,
+        axis_name: str,
+        frame_i: int = 0,
     ) -> NDArray[np.float64]:
         """Calculate median value of potential along 'axis'.
 
         Parameters
-        -----------
+        ----------
         axis_name: str
             'X', 'Y', or 'Z'
         mode: int, optional (default is 0)
@@ -535,5 +568,6 @@ class Grid3D(object):
         elif axis_name == "Z":
             data = np.median(np.median(data, axis=2), axis=1)
         else:
-            raise ValueError("Wrong axis name set")
+            msg = "Wrong axis name set"
+            raise ValueError(msg)
         return data

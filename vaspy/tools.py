@@ -1,18 +1,19 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-Module for tools used in vaspy
-"""
+"""Module for tools used in vaspy."""
 from __future__ import annotations
 
 import bz2
 import os
 import re
 from itertools import zip_longest
-from typing import IO, Any, Iterable, Sequence
+from typing import IO, TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import NDArray
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
+
+    from numpy.typing import NDArray
 
 
 def open_by_suffix(filename: str) -> IO[str]:
@@ -20,14 +21,14 @@ def open_by_suffix(filename: str) -> IO[str]:
     if os.path.splitext(filename)[1] == ".bz2":
         the_file = bz2.open(filename, mode="rt")
     else:
-        the_file = open(filename, mode="rt")
+        the_file = open(filename)
     return the_file
 
 
 def each_slice(
-    iterable: Iterable, n: int, fillvalue: float | None = None
+    iterable: Iterable, n: int, fillvalue: float | None = None,
 ) -> Iterable[Any]:
-    """each_slice(iterable, n[, fillvalue]) => iterator
+    """each_slice(iterable, n[, fillvalue]) => iterator.
 
     make new iterator object which get n item from [iterable] at once.
     """
@@ -48,7 +49,7 @@ def atom_selection_to_list(input_str: str, number: bool = True) -> list[int | st
         range of the atoms. the numbers deliminated by "-" or ","
 
     Returns
-    --------
+    -------
     list
         ordered "String" represents the number.
 
@@ -67,21 +68,21 @@ def atom_selection_to_list(input_str: str, number: bool = True) -> list[int | st
         if re.search(_RERANGE, each):
             start, stop = re.findall(_RERANGE, each)[0]
             # Version safety
-            output |= set(str(i) for i in range(int(start), int(stop) + 1))
+            output |= {str(i) for i in range(int(start), int(stop) + 1)}
         elif re.search(_RESINGLE, each):
             output.add(each)
     if number:
         return sorted(int(i) for i in output)
-    return sorted(list(output))
+    return sorted(output)
 
 
 def atom_types_atomnums_to_atoms(
-    atom_types: Iterable[str], atomnums: Iterable[int]
+    atom_types: Iterable[str], atomnums: Iterable[int],
 ) -> tuple[str, ...]:
     """Return list representation for atom in use.
 
     Parameters
-    ------------
+    ----------
     atom_types: list
         atom names
     atomnums: list
@@ -106,7 +107,7 @@ def atoms_to_atom_types_atomnums(atoms: list[str]) -> tuple[list[str], list[int]
     r"""Return atomnums and atom_types list.
 
     Returns
-    --------
+    -------
     atomnums
         list of number of atoms
     atom_types
@@ -135,13 +136,13 @@ def atoms_to_atom_types_atomnums(atoms: list[str]) -> tuple[list[str], list[int]
 
 
 def cuboid(crystal_axes: Sequence[float]) -> NDArray[np.float64]:
-    """Return the coordinates for cuboid
+    """Return the coordinates for cuboid.
 
     Return the coordinates for the cuboid that includes tetrahedron
     represented by vectors.
 
     Parameters
-    ------------
+    ----------
     vectors: array-like.
         Three vectors for tetrahedron.  (Crystal axis a,b,c)
 
@@ -153,7 +154,7 @@ def cuboid(crystal_axes: Sequence[float]) -> NDArray[np.float64]:
     o: NDArray[np.float64] = np.array((0, 0, 0))
     points: NDArray[np.float64] = np.array((o, a, b, c, a + b, a + c, b + c, a + b + c))
     box: NDArray[np.float64] = np.array(
-        (np.min(points.T, axis=1), np.max(points.T, axis=1))
+        (np.min(points.T, axis=1), np.max(points.T, axis=1)),
     ).T
     return box
 
@@ -168,7 +169,7 @@ if __name__ == "__main__":
         "EACH_SLICE_DEMO": (range(10), 3),
         "removeall": ([1, 0, 0, 1, 0, 1, 0, 0], 0),
         "flatten": (
-            (1, [range(2), 3, set([4, 5]), [6]], frozenset([7, 8])),  # Version safety
+            (1, [range(2), 3, {4, 5}, [6]], frozenset([7, 8])),  # Version safety
         ),
         "parse_Atomselection": ("1-5,8,9,11-15",),
     }
@@ -178,7 +179,7 @@ if __name__ == "__main__":
         "flatten": 1,
         "parse_Atomselection": 1,
     }
-    available = ["all"] + list(demo.keys())
+    available = ["all", *list(demo.keys())]
     parser = argparse.ArgumentParser(
         description="""collection of tools used in this package.""",
         formatter_class=argparse.RawTextHelpFormatter,
@@ -211,10 +212,7 @@ See epilog for notices for argument notation.""",
     )
     args = parser.parse_args()
 
-    if "all" in args.choice:
-        choices = demo.keys()
-    else:
-        choices = args.choice
+    choices = demo.keys() if "all" in args.choice else args.choice
     index = 0
     for func in choices:
         if args.values is None or len(args.values) <= index:
@@ -222,16 +220,16 @@ See epilog for notices for argument notation.""",
         else:
             if argcounts[func] != len(args.values[index]):
                 print(
-                    """argument number not match (require {0}, given {1})
+                    """argument number not match (require {}, given {})
 use default values.""".format(
-                        argcounts[func], len(args.values[index])
-                    )
+                        argcounts[func], len(args.values[index]),
+                    ),
                 )
                 values = demo[func]
             else:
                 values = tuple([eval(s) for s in args.values[index]])
             index += 1
-        print("Demonstrate function {0}()\ninput:  ".format(func), end="")
+        print(f"Demonstrate function {func}()\ninput:  ", end="")
         print(*values, sep=" : ")
         print("output: ", end="")
         print(vars()[func](*values))

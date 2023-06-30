@@ -1,9 +1,6 @@
 from pathlib import Path
 
-import numpy as np
 import pytest
-from _pytest.fixtures import fixture
-from numpy.testing import assert_array_equal
 
 import vaspy
 import vaspy.incar
@@ -11,17 +8,17 @@ import vaspy.incar
 datadir = Path(__file__).parent / "data"
 
 
-@pytest.fixture
+@pytest.fixture()
 def incar0() -> vaspy.incar.Incar:
     return vaspy.load(str(datadir / "INCAR.0"))
 
 
-@pytest.fixture
+@pytest.fixture()
 def graphene() -> vaspy.incar.Incar:
     return vaspy.load(str(datadir / "INCAR.Graphene"))
 
 
-class TestPOSCAR(object):
+class TestPOSCAR:
     def test_incar0(self, incar0: vaspy.incar.Incar) -> None:
         assert incar0["ISTART"] == (0, True)
         assert incar0["ICHARG"][1] is False

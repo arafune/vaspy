@@ -1,6 +1,6 @@
 #
 
-import vaspy.tools as tools
+from vaspy import tools
 
 
 def test_atom_selection_to_list():

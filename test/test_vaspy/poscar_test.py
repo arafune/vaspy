@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import os
 import tempfile
@@ -15,12 +14,12 @@ import vaspy.poscar
 datadir = Path(__file__).parent / "data"
 
 
-@pytest.fixture
+@pytest.fixture()
 def fepc() -> vaspy.poscar.POSCAR:
     return vaspy.load(str(datadir / "FePc.vasp"))
 
 
-class TestPOSCAR(object):
+class TestPOSCAR:
     def setup_method(self) -> None:
         global test_poscar_string
         filePOSCAR = tempfile.mkstemp()
@@ -32,14 +31,13 @@ class TestPOSCAR(object):
         os.remove(filePOSCAR[1])
 
     def test_fundamentals(self):
-        """Test for POSCAR class: fundamental data read"""
-        # a=os.getcwd()  # return the directory where nose execute.
-        assert "NiC4S4" == self.testposcar.system_name
+        """Test for POSCAR class: fundamental data read."""
+        assert self.testposcar.system_name == "NiC4S4"
         np.testing.assert_allclose(
-            np.array([0.866025404, -0.5, 0.0]), self.testposcar.cell_vecs[0]
+            np.array([0.866025404, -0.5, 0.0]), self.testposcar.cell_vecs[0],
         )
         np.testing.assert_allclose(
-            np.array([0.866025404, 0.5, 0.0]), self.testposcar.cell_vecs[1]
+            np.array([0.866025404, 0.5, 0.0]), self.testposcar.cell_vecs[1],
         )
         self.testposcar.cell_vecs[2] = (1, 0, 0)
         np.testing.assert_allclose(np.array([1, 0, 0]), self.testposcar.cell_vecs[2])
@@ -79,7 +77,7 @@ class TestPOSCAR(object):
         )
         assert vaspy.poscar.point_in_box((0.5, 0.1, 0.2), self.testposcar.cell_vecs)
         assert vaspy.poscar.point_in_box(
-            (0.5, 0.5, 0.2), ((1, 0, 0), (0, 1, 0), (0, 0, 1))
+            (0.5, 0.5, 0.2), ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
         )
 
     def test_is_cartesian(self):
@@ -98,7 +96,7 @@ class TestPOSCAR(object):
 
     def test_pos(self):
         np.testing.assert_array_equal(
-            np.array([0.0, 0.5, 0.5]), self.testposcar.positions[2]
+            np.array([0.0, 0.5, 0.5]), self.testposcar.positions[2],
         )
         np.testing.assert_allclose(
             np.array([0.23764, 0.429027113, 0.5]),
@@ -149,28 +147,28 @@ class TestPOSCAR(object):
 
     def test_to_list(self):
         tmp = self.testposcar.to_list()
-        assert "NiC4S4" == tmp[0]
-        assert 14.63 == tmp[1]
+        assert tmp[0] == "NiC4S4"
+        assert tmp[1] == 14.63
         np.testing.assert_allclose([0.8660254, -0.5, 0], tmp[2])
         np.testing.assert_allclose([0.8660254, 0.5, 0], tmp[3])
         np.testing.assert_allclose([0, 0, 1.0252904990], tmp[4])
         assert ["Ni", "C", "S"] == tmp[5]
         assert [3, 12, 12] == tmp[6]
-        assert "Selective Dynamics" == tmp[7]
-        assert "Direct" == tmp[8]
+        assert tmp[7] == "Selective Dynamics"
+        assert tmp[8] == "Direct"
         np.testing.assert_allclose([0.5, 0.5, 0.5], tmp[9][0])
         np.testing.assert_allclose([0.5, 0.0, 0.5], tmp[9][1])
         np.testing.assert_allclose([0.0, 0.5, 0.5], tmp[9][2])
         np.testing.assert_allclose([0.237639553, 0.429027113, 0.5], tmp[9][3])
         # ...
-        assert "T T T" == tmp[10][0]
-        assert "T T T" == tmp[10][1]
-        assert "T F T" == tmp[10][2]
+        assert tmp[10][0] == "T T T"
+        assert tmp[10][1] == "T T T"
+        assert tmp[10][2] == "T F T"
         #
-        assert "#0:Ni1" == tmp[11][0]
-        assert "#1:Ni2" == tmp[11][1]
-        assert "#2:Ni3" == tmp[11][2]
-        assert "#3:C1" == tmp[11][3]
+        assert tmp[11][0] == "#0:Ni1"
+        assert tmp[11][1] == "#1:Ni2"
+        assert tmp[11][2] == "#2:Ni3"
+        assert tmp[11][3] == "#3:C1"
 
     def test_to_str(self):
         global tmpstr_original
@@ -183,15 +181,15 @@ class TestPOSCAR(object):
         """Tests for poscar supercell method."""
         supercell = self.testposcar.supercell(3, 2, 1)
         np.testing.assert_allclose(
-            np.array([2.59807621, -1.5, 0.0]), supercell.cell_vecs[0]
+            np.array([2.59807621, -1.5, 0.0]), supercell.cell_vecs[0],
         )
         np.testing.assert_allclose(
-            np.array([1.73205081, 1.0, 0.0]), supercell.cell_vecs[1]
+            np.array([1.73205081, 1.0, 0.0]), supercell.cell_vecs[1],
         )
         np.testing.assert_allclose(
-            np.array([0.0, 0.0, 1.02529049]), supercell.cell_vecs[2]
+            np.array([0.0, 0.0, 1.02529049]), supercell.cell_vecs[2],
         )
-        assert "NiC4S4" == supercell.system_name
+        assert supercell.system_name == "NiC4S4"
         assert ["Ni", "C", "S"] == supercell.atom_types
         assert [18, 72, 72] == supercell.atomnums
         supercell = self.testposcar.supercell(1, 1, 1)
@@ -204,7 +202,7 @@ class TestPOSCAR(object):
                     self.testposcar.positions[0][0] / 3,
                     self.testposcar.positions[0][1] / 2,
                     self.testposcar.positions[0][2] / 1,
-                ]
+                ],
             ),
         )
         np.testing.assert_allclose(
@@ -214,7 +212,7 @@ class TestPOSCAR(object):
                     self.testposcar.positions[0][0] / 3 + 1 * (1 / 3),
                     self.testposcar.positions[0][1] / 2,
                     self.testposcar.positions[0][2] / 1,
-                ]
+                ],
             ),
         )
         supercell = self.testposcar.supercell(3, 2, 1)
@@ -223,7 +221,7 @@ class TestPOSCAR(object):
     def test_poscar_split(self):
         """Test for POSCAR.split."""
         one, other = self.testposcar.split([2, 3, 4, 5, 6])
-        assert 5 == len(one.positions)
+        assert len(one.positions) == 5
         assert ["Ni", "C"] == one.atom_types
         assert [1, 4] == one.atomnums
         assert one.selective
@@ -247,7 +245,7 @@ class TestPOSCAR(object):
     def test__getitem(self, fepc) -> None:
         print(fepc)
         assert_array_equal(
-            fepc[0], [0.1362036989956494, 0.0552692292217493, 0.0000000000000000]
+            fepc[0], [0.1362036989956494, 0.0552692292217493, 0.0000000000000000],
         )
         assert fepc[0][1] == 0.0552692292217493
         assert_array_equal(

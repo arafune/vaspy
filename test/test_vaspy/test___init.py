@@ -1,14 +1,12 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""This module provides test routines for __init__.py for vaspy module
-"""
+"""This module provides test routines for __init__.py for vaspy module."""
 import os
 
 import vaspy
 
 
-class TestInitModule(object):
-    """Class for Test of vaspy.module
+class TestInitModule:
+    """Class for Test of vaspy.module.
 
     The functions should be tested are in __init__.py
     """
@@ -17,7 +15,7 @@ class TestInitModule(object):
         self.datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
 
     def test_load_in_init(self):
-        """Test for __init__.py"""
+        """Test for __init__.py."""
         poscar = self.datadir + "POSCAR_dummy"
         procar_single = self.datadir + "PROCAR_single"
         procar_spin = self.datadir + "PROCAR_spin_dummy"

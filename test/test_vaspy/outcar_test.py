@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -+-
-"""Unit test for OUTCAR class"""
+"""Unit test for OUTCAR class."""
 import os
 
 import numpy as np
@@ -8,34 +7,34 @@ import pytest
 import vaspy
 
 
-class TestOUTCAR(object):
-    """class for test of vaspy.outcar module"""
+class TestOUTCAR:
+    """class for test of vaspy.outcar module."""
 
-    @pytest.fixture
+    @pytest.fixture()
     def outcar0(self):
-        """Reading OUTCAR file for test"""
+        """Reading OUTCAR file for test."""
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         datafile = datadir + "OUTCAR"
         return vaspy.load(datafile)
 
     def test_read_basic_properties(self, outcar0: vaspy.outcar.OUTCAR):
-        """Test for OUTCAR reading basic properties"""
-        assert -0.7681 == outcar0.fermi
-        assert 54 == outcar0.n_bands
+        """Test for OUTCAR reading basic properties."""
+        assert outcar0.fermi == -0.7681
+        assert outcar0.n_bands == 54
         #
         # reciprocal vectors
         np.testing.assert_almost_equal(
-            np.array([0.389375981, -0.224806327, 0.000000000]), outcar0.recvec[0]
+            np.array([0.389375981, -0.224806327, 0.000000000]), outcar0.recvec[0],
         )
         np.testing.assert_almost_equal(
-            np.array([0.000000000, 0.449612655, 0.000000000]), outcar0.recvec[1]
+            np.array([0.000000000, 0.449612655, 0.000000000]), outcar0.recvec[1],
         )
         np.testing.assert_almost_equal(
-            np.array([0.000000000, 0.000000000, 0.023484312]), outcar0.recvec[2]
+            np.array([0.000000000, 0.000000000, 0.023484312]), outcar0.recvec[2],
         )
         # k_vectors and weights
-        assert 33 == len(outcar0.k_vectors)
-        assert 33 == len(outcar0.weights)
+        assert len(outcar0.k_vectors) == 33
+        assert len(outcar0.weights) == 33
         np.testing.assert_array_almost_equal(
             [
                 [0.000000, 0.000000, 0.000000],
@@ -65,7 +64,7 @@ class TestOUTCAR(object):
             ],
             outcar0.total_charges[-1],
         )
-        assert 11 == len(outcar0.total_charges)
-        assert 7 == len(outcar0.total_charges[0])
-        assert 3 == len(outcar0.total_charges[0][0])
+        assert len(outcar0.total_charges) == 11
+        assert len(outcar0.total_charges[0]) == 7
+        assert len(outcar0.total_charges[0][0]) == 3
         np.testing.assert_almost_equal(-7.39238998, outcar0.totens[-1])

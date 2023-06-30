@@ -1,13 +1,9 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-script to use(demonstrate) vaspy.poscar functions.
-"""
+"""script to use(demonstrate) vaspy.poscar functions."""
 
 import argparse
 import functools as ft
-from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
-from typing import List
+from logging import INFO, Formatter, StreamHandler, getLogger
 
 from vaspy import tools
 from vaspy.poscar import POSCAR
@@ -24,10 +20,10 @@ logger.addHandler(handler)
 logger.propagate = False
 
 
-def split_to_float(string: str, n: int, name: str) -> List[float]:
+def split_to_float(string: str, n: int, name: str) -> list[float]:
     lis = string.split(",")
     if len(lis) != n:
-        message = "--{0} option requires {1} numbers".format(name, n)
+        message = f"--{name} option requires {n} numbers"
         raise argparse.ArgumentTypeError(message)
     return [float(i) for i in lis]
 
@@ -92,10 +88,10 @@ if not specified, use standard output""",
 )
 parser.add_argument("poscar", metavar="POSCAR_file (or CONTCAR_file)", type=POSCAR)
 parser.add_argument(
-    "--to_direct", action="store_true", help="""Change direct coordinates"""
+    "--to_direct", action="store_true", help="""Change direct coordinates""",
 )
 parser.add_argument(
-    "--to_cartesian", action="store_true", help="""Change cartesian coordinates"""
+    "--to_cartesian", action="store_true", help="""Change cartesian coordinates""",
 )
 parser.add_argument(
     "--split",
@@ -106,7 +102,7 @@ The second is the file name for other POSCAR (substrate part).""",
 )
 #
 args = parser.parse_args()
-logger.debug("args: {}".format(args))
+logger.debug(f"args: {args}")
 
 # translate option and rotate option are not set simulaneously.
 if args.translate and any([args.rotateX, args.rotateY, args.rotateZ]):
@@ -124,7 +120,7 @@ args.poscar.to_cartesian()
 #
 if not args.site:
     args.site = [
-        tools.atom_selection_to_list("1-{0}".format(sum(args.poscar.atomnums)))
+        tools.atom_selection_to_list(f"1-{sum(args.poscar.atomnums)}"),
     ]
 args.site = [i - 1 for i in args.site[0]]
 #
@@ -133,7 +129,7 @@ args.site = [i - 1 for i in args.site[0]]
 if args.translate:
     if len(args.site) != len(args.translate):
         parser.error(
-            "The number of the site sets is not consistent with the number of translations"
+            "The number of the site sets is not consistent with the number of translations",
         )
     for v, a in zip(args.translate, args.site):
         args.poscar.translate(v, a)
@@ -158,7 +154,8 @@ if any([args.rotateX, args.rotateY, args.rotateZ]):
     args.poscar.atoms_rotate(args.site, axis_name, theta, center)
 
 if args.to_direct and args.to_cartesian:
-    raise ValueError("Error!!  Set either of --to_direct or --to_cartesian")
+    msg = "Error!!  Set either of --to_direct or --to_cartesian"
+    raise ValueError(msg)
 
 if args.to_direct:
     args.poscar.to_direct()
@@ -171,7 +168,7 @@ if args.to_cartesian:
 if args.output is not None:
     args.poscar.save(args.output)
 elif args.split:
-    logger.debug("args.site: {}".format(args.site))
+    logger.debug(f"args.site: {args.site}")
     one, other = args.poscar.split(args.site)
     one.save(args.split[0])
     other.save(args.split[1])

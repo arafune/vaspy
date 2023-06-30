@@ -1,17 +1,21 @@
 """This module provides EIGENVAL."""
 
-from __future__ import annotations, division, print_function
+from __future__ import annotations
 
 import csv
 import sys
-from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
-from pathlib import Path
-from typing import IO, Sequence
+from logging import INFO, Formatter, StreamHandler, getLogger
+from typing import IO, TYPE_CHECKING
 
 import numpy as np
-from numpy.typing import NDArray
 
 from vaspy.tools import open_by_suffix
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from pathlib import Path
+
+    from numpy.typing import NDArray
 
 try:
     import matplotlib.pyplot as plt
@@ -31,7 +35,7 @@ logger.addHandler(handler)
 logger.propagate = False
 
 
-class EnergyBand(object):
+class EnergyBand:
     """Simple band structure object for analyzing by using ipython.
 
     Class for band structure
@@ -102,10 +106,10 @@ class EnergyBand(object):
         return np.cumsum(
             np.linalg.norm(
                 np.concatenate(
-                    (np.array([[0.0, 0.0, 0.0]]), np.diff(self.k_vectors, axis=0))
+                    (np.array([[0.0, 0.0, 0.0]]), np.diff(self.k_vectors, axis=0)),
                 ),
                 axis=1,
-            )
+            ),
         )
 
     def fermi_correction(self, fermi: float) -> None:
@@ -154,7 +158,7 @@ class EnergyBand(object):
         """Write data to csv file.
 
         Parameters
-        ------------
+        ----------
         csv_file: str
             filename for output
         label_str: str
@@ -176,7 +180,7 @@ class EnergyBand(object):
         """Return the str object.
 
         Returns
-        --------
+        -------
         str
             a string representation of EnergyBand.
             **Useful for gnuplot and Igor**.
@@ -190,9 +194,9 @@ class EnergyBand(object):
         list3d = self.to_3dlist()
         for band_i in list3d:
             for line in band_i:
-                output += "{0:.8e}".format(line[0])
+                output += f"{line[0]:.8e}"
                 for energy in line[1:]:
-                    output += "\t{0:.8e}".format(energy)
+                    output += f"\t{energy:.8e}"
                 output += "\n"
             output += "\n"
         return output
@@ -201,7 +205,7 @@ class EnergyBand(object):
         """Return Axes object of the energy band.
 
         Parameters
-        -----------
+        ----------
         color: str, optional (default is 'blue')
             color of the band line
 
@@ -209,7 +213,7 @@ class EnergyBand(object):
             default is 0
 
         Returns
-        ---------
+        -------
         matplotlib.pyplot.Axes
 
         Example
@@ -231,7 +235,7 @@ class EnergyBand(object):
         return plt.gca()
 
     def show(
-        self, y_range: tuple[float, float] | None = None, spin_i: int = 0
+        self, y_range: tuple[float, float] | None = None, spin_i: int = 0,
     ) -> None:  # How to set default value?
         """Draw band structure by using maptlotlib.
 
@@ -264,7 +268,7 @@ class EnergyBand(object):
         """Change k-vector unit to inverse AA.
 
         Parameters
-        -----------
+        ----------
         recvec: NDArray, optional (default is the unit vector)
             reciprocal vector
 
@@ -275,11 +279,11 @@ class EnergyBand(object):
             unit of the wavevector.
 
         """
-        logger.debug("recvec: {}".format(recvec))
-        logger.debug("self.k_vectors: {}".format(self.k_vectors))
+        logger.debug(f"recvec: {recvec}")
+        logger.debug(f"self.k_vectors: {self.k_vectors}")
         recvec = np.array(recvec)
         self.k_vectors = np.array(
-            [recvec.dot(k_vectors) for k_vectors in self.k_vectors]
+            [recvec.dot(k_vectors) for k_vectors in self.k_vectors],
         )
 
 
@@ -287,7 +291,7 @@ class EIGENVAL(EnergyBand):
     """Class for storing the data of EIGENVAL file.
 
     Parameters
-    -----------
+    ----------
     filename: str, Path
         File name of 'EIGENVAL'
 
@@ -300,16 +304,14 @@ class EIGENVAL(EnergyBand):
 
     def __init__(self, filename: str | Path = "") -> None:
         """Initialize."""
-        super(EIGENVAL, self).__init__()
+        super().__init__()
         self.n_atom: int = 0
         #
         if filename:
             self.load_file(open_by_suffix(str(filename)))
 
     def __getitem__(self, item: int) -> tuple[list[float], list[list[float]]]:
-        """
-
-        Parameters
+        """Parameters
         ----------
         item: int
             index of k-vector
@@ -323,12 +325,12 @@ class EIGENVAL(EnergyBand):
         return list(zip(kvec, energies))[item]
 
     def __len__(self) -> int:
-        """Return num_k as the result of len()"""
+        """Return num_k as the result of len()."""
         return self.num_k
 
     def load_file(self, the_file: IO[str]) -> None:
         """Parse EIGENVAL."""
-        self.n_atom, _, _, self.n_spin = [int(i) for i in next(the_file).split()]
+        self.n_atom, _, _, self.n_spin = (int(i) for i in next(the_file).split())
         if self.n_spin == 2:
             self.label["energy"] = ["Energy_up", "Energy_down"]
         else:
@@ -337,7 +339,7 @@ class EIGENVAL(EnergyBand):
         next(the_file)
         next(the_file)
         next(the_file)
-        _, self.num_k, self.n_bands = [int(i) for i in next(the_file).split()]
+        _, self.num_k, self.n_bands = (int(i) for i in next(the_file).split())
         k_vectors: list[list[float]] = []
         energies: list[list[float]] = []
         for _ in range(self.num_k):
@@ -346,10 +348,10 @@ class EIGENVAL(EnergyBand):
             k_vectors.append([float(i) for i in next(the_file).split()[0:3]])
             for _ in range(self.n_bands):
                 energies.append(
-                    [float(i) for i in next(the_file).split()[1 : self.n_spin + 1]]
+                    [float(i) for i in next(the_file).split()[1 : self.n_spin + 1]],
                 )
         self.k_vectors: NDArray[np.float64] = np.array(k_vectors)
         self.energies: NDArray[np.float64] = np.array(energies).T.reshape(
-            self.n_spin, self.num_k, self.n_bands
+            self.n_spin, self.num_k, self.n_bands,
         )
         the_file.close()

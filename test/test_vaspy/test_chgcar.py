@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 import os
 
 import numpy as np
@@ -10,10 +9,11 @@ import vaspy.chgcar
 data_dir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
 
 
-class TestCHGCAR(object):
+class TestCHGCAR:
     """Class for test of CHGCAR module.
 
-    Use CHGCAR for test data."""
+    Use CHGCAR for test data.
+    """
 
     def setup_method(self):
         data_file_spin = data_dir + "CHGCAR_spin"

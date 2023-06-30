@@ -1,8 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-Script file for use (demonstrate) vaspy.outcar module
-"""
+"""Script file for use (demonstrate) vaspy.outcar module."""
 
 import argparse
 
@@ -17,22 +14,22 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument(
-    "-x", "--posx", action="store_true", help="X-axis position", default=False
+    "-x", "--posx", action="store_true", help="X-axis position", default=False,
 )
 parser.add_argument(
-    "-y", "--posy", action="store_true", help="Y-axis position", default=False
+    "-y", "--posy", action="store_true", help="Y-axis position", default=False,
 )
 parser.add_argument(
-    "-z", "--posz", action="store_true", help="Z-axis position", default=False
+    "-z", "--posz", action="store_true", help="Z-axis position", default=False,
 )
 parser.add_argument(
-    "-X", "--forcex", action="store_true", help="Force along X-axis", default=False
+    "-X", "--forcex", action="store_true", help="Force along X-axis", default=False,
 )
 parser.add_argument(
-    "-Y", "--forcey", action="store_true", help="Force along Y-axis", default=False
+    "-Y", "--forcey", action="store_true", help="Force along Y-axis", default=False,
 )
 parser.add_argument(
-    "-Z", "--forcez", action="store_true", help="Force along Z-axis", default=False
+    "-Z", "--forcez", action="store_true", help="Force along Z-axis", default=False,
 )
 
 parser.add_argument(
@@ -49,7 +46,7 @@ parser.add_argument(
 for SITE you want to see.  If not specified, all atoms are selected""",
 )
 parser.add_argument(
-    "outcarfiles", type=OUTCAR, nargs="+", metavar="OUTCAR", help="OUTCAR_file(s)"
+    "outcarfiles", type=OUTCAR, nargs="+", metavar="OUTCAR", help="OUTCAR_file(s)",
 )
 parser.add_argument(
     "--plot",
@@ -92,7 +89,6 @@ if args.plot:
     plt.legend(
         bbox_to_anchor=(-0.1, -0.1),
         loc="upper left",
-        # loc="best",
         borderaxespad=0,
         ncol=len(headers) // 10 + 1,
     )

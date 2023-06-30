@@ -18,14 +18,17 @@ from __future__ import annotations
 import itertools
 import logging
 from logging import Formatter, StreamHandler, getLogger
-from pathlib import Path
-from typing import IO, Sequence
+from typing import IO, TYPE_CHECKING
 
 import numpy as np
-from numpy.typing import NDArray
 
-# import vaspy.const as const
 from vaspy.tools import open_by_suffix
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from pathlib import Path
+
+    from numpy.typing import NDArray
 
 logger = getLogger("LogTest")
 logger.setLevel(logging.DEBUG)
@@ -34,13 +37,13 @@ handler_format = Formatter(" %(asctime)s - %(levelname)s - %(message)s ")
 stream_handler.setFormatter(handler_format)
 
 
-class VSIM_ASC(object):
+class VSIM_ASC:
     """Class for VSIM_ASC.
 
     Collection of phonon mode data from v_sim ascii file
 
     Attributes
-    -----------
+    ----------
     system_name: str
         System name
     atoms: list
@@ -81,11 +84,11 @@ class VSIM_ASC(object):
         # the first line is system name
         self.system_name = next(the_file)[1:].strip()
         # the 2nd line represents dxx, dyx, dyy
-        dxx, dyx, dyy = [float(x) for x in next(the_file).split()]
+        dxx, dyx, dyy = (float(x) for x in next(the_file).split())
         # the 3rd line represents dzx, dzy, dzz
-        dzx, dzy, dzz = [float(x) for x in next(the_file).split()]
+        dzx, dzy, dzz = (float(x) for x in next(the_file).split())
         self.lattice_vectors: NDArray[np.float64] = np.array(
-            [[dxx, 0, 0], [dyx, dyy, 0], [dzx, dzy, dzz]]
+            [[dxx, 0, 0], [dyx, dyy, 0], [dzx, dzy, dzz]],
         )
         self.atoms = []
         self.positions = []
@@ -99,7 +102,6 @@ class VSIM_ASC(object):
                 x, y, z, atom = line.split()
                 self.atoms.append(atom)
                 self.positions.append(np.array([float(x), float(y), float(z)]))
-        # self.ionnums, self.atom_types = ions_to_atom_types_ionnums(self.ions)
         #
         for line in phonon_lines:
             if "metaData" in line:
@@ -120,11 +122,11 @@ class VSIM_ASC(object):
                         vectors[0] + vectors[3] * 1j,
                         vectors[1] + vectors[4] * 1j,
                         vectors[2] + vectors[5] * 1j,
-                    ]
+                    ],
                 )
         n_phonons = len(freqs)
         self.d_vectors: NDArray[np.complex128] = np.array(d_vectors).reshape(
-            n_phonons, len(self.atoms), 3
+            n_phonons, len(self.atoms), 3,
         )
         self.freqs = np.array(freqs)
         the_file.close()
@@ -155,16 +157,16 @@ class VSIM_ASC(object):
         qpt_cart: NDArray[np.float64] = qpt.dot(bmatrix)
         logger.debug(
             "qpt_cart[x] = {}, qpt_cart[y] = {}, qpt_cart[z] ={}".format(
-                qpt_cart[0], qpt_cart[1], qpt_cart[2]
-            )
+                qpt_cart[0], qpt_cart[1], qpt_cart[2],
+            ),
         )
         #
         animation_positions: list[list[NDArray[np.float64]]] = []
         for atom_i, position in enumerate(self.positions):
             for cell_id in itertools.product(
-                range(supercell[0]), range(supercell[1]), range(supercell[2])
+                range(supercell[0]), range(supercell[1]), range(supercell[2]),
             ):
-                logger.debug(" cell_id:{}".format(cell_id))
+                logger.debug(f" cell_id:{cell_id}")
                 abs_pos = position + (
                     self.lattice_vectors[0] * cell_id[0]
                     + self.lattice_vectors[1] * cell_id[1]
@@ -182,7 +184,7 @@ class VSIM_ASC(object):
 
 
 def supercell_lattice_vectors(
-    lattice_vectors: NDArray[np.float64], cell_id: Sequence[int]
+    lattice_vectors: NDArray[np.float64], cell_id: Sequence[int],
 ) -> NDArray[np.float64]:
     """Return lattice vectors of supercell.
 
@@ -215,7 +217,7 @@ def animate_atom_phonon(
     """Return atom position series determined by d_vector and q.
 
     Parameters
-    ------------
+    ----------
     position: list, tuple, np.array
         position of atom in cartesian coordinate
     qpt_cart: np.array
@@ -232,7 +234,7 @@ def animate_atom_phonon(
         Scale factor for atom moving
 
     Returns
-    ---------
+    -------
     positions: list
         list of atom position representing animation
 
@@ -243,30 +245,30 @@ def animate_atom_phonon(
         e_frame = s_frame + n_frames - 1
     for frame in range(s_frame, e_frame + 1):
         exponent = np.exp(
-            1.0j * (np.dot(position0, qpt_cart) - 2 * np.pi * frame / n_frames)
+            1.0j * (np.dot(position0, qpt_cart) - 2 * np.pi * frame / n_frames),
         )
         logger.debug(
             "r:{}, qpt_cart;{}, frame:{}, n_frames:{}".format(
-                position0, qpt_cart, frame, n_frames
-            )
+                position0, qpt_cart, frame, n_frames,
+            ),
         )
         logger.debug(
             "arg_exponent:{}".format(
-                1.0j * (np.dot(position0, qpt_cart) - 2 * np.pi * frame / n_frames)
-            )
+                1.0j * (np.dot(position0, qpt_cart) - 2 * np.pi * frame / n_frames),
+            ),
         )
-        logger.debug("exponent:{}".format(exponent))
+        logger.debug(f"exponent:{exponent}")
         normal_displ: NDArray[np.float64] = np.array(
-            list(map((lambda y: (y.real)), [x * exponent for x in d_vector]))
+            [(y.real) for y in [x * exponent for x in d_vector]],
         )
-        logger.debug("normal_displ:{}".format(normal_displ))
+        logger.debug(f"normal_displ:{normal_displ}")
         # The displacement vector calculated by (at least) phonopy is
         # taken into account the mass of the atom.
         # If the calculated displacement vector
         # does not contain the mass effect,
         # the normal_displ should be devided by sqrt(mass)
         positions.append(position0 + magnitude * normal_displ)
-        logger.debug("position.after_move:{}".format(positions[-1]))
+        logger.debug(f"position.after_move:{positions[-1]}")
     return positions
 
 

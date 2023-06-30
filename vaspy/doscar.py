@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""This module provides DOSCAR and related classes.
+"""Module provides DOSCAR and related classes.
 
 From VASP webpage::
 
@@ -44,10 +42,9 @@ from __future__ import annotations
 import copy
 import csv
 import sys
-from collections.abc import Iterable
+from collections.abc import Sequence
 from operator import add
-from pathlib import Path
-from typing import IO, Sequence
+from typing import IO, TYPE_CHECKING
 
 try:
     import matplotlib.pyplot as plt
@@ -55,8 +52,11 @@ except ImportError:
     sys.stderr.write("Install matplotlib, or you cannot use methods relating to draw\n")
 from vaspy.tools import open_by_suffix
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-class DOSCAR(object):  # Version safety
+
+class DOSCAR:  # Version safety
     """Class for DOSCAR file.
 
     A container of DOS object
@@ -75,7 +75,7 @@ class DOSCAR(object):  # Version safety
     """
 
     def __init__(self, filename: str | Path = "") -> None:
-        """Initialize
+        """Initialize.
 
         Parameters
         ----------
@@ -85,7 +85,7 @@ class DOSCAR(object):  # Version safety
         self.n_atom: int = 0
         self.tdos: TDOS | None = None
         self.pdoses: list[PDOS] = []
-        self.energies: tuple[float, ...] = tuple()
+        self.energies: tuple[float, ...] = ()
         if filename:
             self.load_file(open_by_suffix(str(filename)))
 
@@ -93,7 +93,7 @@ class DOSCAR(object):  # Version safety
         """Parse DOSCAR file and store it in memory.
 
         Parameters
-        ------------
+        ----------
         the_file: StringIO
             "DOSCAR" file
 
@@ -115,7 +115,8 @@ class DOSCAR(object):  # Version safety
         elif len(tmp_dos) == 5:
             self.tdos = TDOS((tmp_dos[1], tmp_dos[2]))
         else:
-            raise RuntimeError("Runtime Error: Check DOS file")
+            msg = "Runtime Error: Check DOS file"
+            raise RuntimeError(msg)
         #
 
         try:
@@ -153,7 +154,7 @@ class DOS(Sequence):  # Version safety
 
 
     Attributes
-    -----------
+    ----------
     dos: list
         the dos data.
         By default, the first column is the energy, the latter is the density.
@@ -184,14 +185,14 @@ class DOS(Sequence):  # Version safety
         energy: list[float] | tuple[float, ...],
         header: list[str],
     ) -> None:
-        """Export data to csv file"""
+        """Export data to csv file."""
         assert len(energy) == len(self)
         assert len(header) == len(self[0]) + 1
         with open(filename, mode="w") as csv_file:
             writer = csv.writer(csv_file, delimiter="\t")
             writer.writerow(header)
             for e, d in zip(energy, self.dos):
-                writer.writerow([e] + list(d))
+                writer.writerow([e, *list(d)])
 
 
 class TDOS(DOS):
@@ -205,7 +206,7 @@ class TDOS(DOS):
     """
 
     def __init__(self, array: tuple[float] | None) -> None:
-        """Initialize
+        """Initialize.
 
         Parameters
         ----------
@@ -247,7 +248,7 @@ class PDOS(DOS):
         just orbital name)
 
     Parameters
-    -----------
+    ----------
     array: list[tuple[float, ...]]
         DOS data
     site: str
@@ -280,7 +281,7 @@ class PDOS(DOS):
         """Initialize."""
         super().__init__(array)
         self.site = site
-        self.orbital_spin: list[str] = list()
+        self.orbital_spin: list[str] = []
         self.total: list[tuple[float, ...]] = []
         if array is not None:
             if len(self.dos[0]) == 9 or len(self.dos[0]) == 16:
@@ -295,11 +296,10 @@ class PDOS(DOS):
                 # set by negative value.
                 for i, dos_at_energy in enumerate(self.dos):
                     self.total.append(
-                        (sum(dos_at_energy[0::2]), -sum(dos_at_energy[1::2]))
+                        (sum(dos_at_energy[0::2]), -sum(dos_at_energy[1::2])),
                     )
                     tmp = []
                     for j, energy in enumerate(dos_at_energy):
-
                         if j % 2 == 0:
                             tmp.append(energy)
                         else:
@@ -315,13 +315,11 @@ class PDOS(DOS):
                     self.total.append((sum(dos_at_energy),))
             else:
                 print(len(self.dos[0]))
-                raise RuntimeError("Check the DOSCAR file")
+                msg = "Check the DOSCAR file"
+                raise RuntimeError(msg)
 
     def projected(self, orbital: str | int) -> tuple[float] | list[float]:
-        if isinstance(orbital, int):
-            idx = orbital
-        else:
-            idx = self.orbital_spin.index(orbital)
+        idx = orbital if isinstance(orbital, int) else self.orbital_spin.index(orbital)
         return [d[idx] for d in self.dos]
 
     def graph_view(self, *orbitalnames: str) -> None:
@@ -340,7 +338,9 @@ class PDOS(DOS):
         plt.show()
 
     def export_csv(
-        self, filename: str, energy: list[float] | tuple[float, ...]
+        self,
+        filename: str,
+        energy: list[float] | tuple[float, ...],
     ) -> None:
         """Export data to file object (or file-like object) as csv format.
 
@@ -360,7 +360,9 @@ class PDOS(DOS):
         super()._export_csv(filename, energy=energy, header=header)
 
     def plot_dos(
-        self, orbitals: Sequence[str], fermi: float = 0.0
+        self,
+        orbitals: Sequence[str],
+        fermi: float = 0.0,
     ) -> None:  # Not implemented yet
         """Plot DOS spectra by matplotlib.pyplot.
 
@@ -376,7 +378,6 @@ class PDOS(DOS):
         not implemented yet!!
 
         """
-        pass
 
     def __add__(self, other: PDOS) -> PDOS:
         """Add two DOS objects.
@@ -384,7 +385,7 @@ class PDOS(DOS):
         x.__add__(y) <-> x+y
 
         Parameters
-        -----------
+        ----------
         other: PDOS
             len(other.energies) must be equal to len(self.energies).
 

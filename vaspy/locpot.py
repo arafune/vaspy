@@ -1,13 +1,15 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """This module provides LOCPOT class."""
 #
 import sys
+from typing import TYPE_CHECKING
 
 import numpy as np
-from numpy.typing import NDArray
 
 from vaspy import mesh3d
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 try:
     import matplotlib.pyplot as plt
@@ -24,10 +26,10 @@ class LOCPOT(mesh3d.VASPGrid):
 
     def __init__(self, filename: str = "", pickles: str = "") -> None:
         """Initialize."""
-        super(LOCPOT, self).__init__(filename, pickles)
+        super().__init__(filename, pickles)
 
     def plot_potential_along_axis(
-        self, axis_name: str, frame: int = 0, save: str = ""
+        self, axis_name: str, frame: int = 0, save: str = "",
     ) -> None:  # FIXME!!
         """Plot potential curve along the axis.
 
@@ -43,7 +45,7 @@ class LOCPOT(mesh3d.VASPGrid):
         axes_length = self.poscar.axes_lengthes
         if axis_name == "X":
             horizontal_axis: NDArray[np.float64] = np.linspace(
-                0, axes_length[0], self.grid.shape[0]
+                0, axes_length[0], self.grid.shape[0],
             )
             plt.clf()
             plt.xlim(xmax=axes_length[0])
@@ -56,7 +58,8 @@ class LOCPOT(mesh3d.VASPGrid):
             plt.clf()
             plt.xlim(xmax=axes_length[2])
         else:
-            raise ValueError("Wrong axis name")
+            msg = "Wrong axis name"
+            raise ValueError(msg)
         y_average = self.grid.average_along_axis(axis_name, frame)
         y_max = self.grid.max_along_axis(axis_name, frame)
         y_min = self.grid.min_along_axis(axis_name, frame)

@@ -1,4 +1,3 @@
-# -*- coding:  utf-8 -*-
 """This module provide constant data such as atom mass etc."""
 
 
