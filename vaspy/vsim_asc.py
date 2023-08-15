@@ -248,9 +248,7 @@ def animate_atom_phonon(
             1.0j * (np.dot(position0, qpt_cart) - 2 * np.pi * frame / n_frames),
         )
         logger.debug(
-            "r:{}, qpt_cart;{}, frame:{}, n_frames:{}".format(
-                position0, qpt_cart, frame, n_frames,
-            ),
+            f"r:{position0}, qpt_cart;{qpt_cart}, frame:{frame}, n_frames:{n_frames}",
         )
         logger.debug(
             "arg_exponent:{}".format(

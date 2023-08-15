@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- conding: utf-8 -*-
-"""This module provides POSCAR class.
+"""POSCAR class.
 
 translate from poscar.rb of 2014/2/26, master branch
 
@@ -85,7 +85,7 @@ class PosCarHead:
     """
 
     def __init__(self) -> None:
-        """Initialization."""
+        """Initialize."""
         self.__cell_vecs: NDArray[np.float64] = np.array(
             [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
         )
@@ -143,7 +143,7 @@ class PosCarHead:
         #         '#{0}:{1}{2}'.format(ii + m, elm, m + 1) for m in range(n))
         self.__site_label = []
         atomnames: list[str] = []
-        for elm, atomnums in zip(self.atom_types, self.atomnums):
+        for elm, atomnums in zip(self.atom_types, self.atomnums, strict=True):
             for j in range(1, atomnums + 1):
                 elem_num = elm + str(j)
                 if elem_num not in atomnames:
@@ -175,7 +175,7 @@ class PosCarPos:
     """
 
     def __init__(self) -> None:
-        """Initialization."""
+        """Initialize."""
         self.coordinate_type = ""
         self.positions: list[NDArray[np.float64]] = []
         self.coordinate_changeflags: list[str] = []
@@ -223,7 +223,7 @@ class POSCAR(PosCarHead, PosCarPos):
     """
 
     def __init__(self, arg: Sequence[str] | None = None) -> None:
-        """Initialization.
+        """Initialize.
 
         Parameters
         ----------
@@ -307,16 +307,17 @@ class POSCAR(PosCarHead, PosCarPos):
         """
         if to_site is None:
             to_site = sum(self.atomnums)
-        if axis == "x" or axis == "X" or axis == 0:
+        if axis in ("x", "X", 0):
             axis = 0
-        elif axis == "y" or axis == "Y" or axis == 1:
+        elif axis in ("y", "Y", 1):
             axis = 1
-        elif axis == "z" or axis == "Z" or axis == 2:
+        elif axis in ("z", "Z", 2):
             axis = 2
         self.positions = (
             self.positions[:from_site]
             + sorted(
-                self.positions[from_site:to_site], key=lambda sortaxis: sortaxis[axis],
+                self.positions[from_site:to_site],
+                key=lambda sortaxis: sortaxis[axis],
             )
             + self.positions[to_site:]
         )
@@ -444,7 +445,11 @@ class POSCAR(PosCarHead, PosCarPos):
         return candidates27
 
     def rotate_atom(
-        self, site: int, axis_name: str, theta_deg: float, center: Sequence[float],
+        self,
+        site: int,
+        axis_name: str,
+        theta_deg: float,
+        center: Sequence[float],
     ) -> None:
         """Rotate the atom.
 
@@ -715,14 +720,13 @@ class POSCAR(PosCarHead, PosCarPos):
             tmp.append("Selective Dynamics")
         tmp.append(self.coordinate_type)
         for pos, t_or_f, atom in it.zip_longest(
-            self.positions, self.coordinate_changeflags, self.site_label, fillvalue="",
+            self.positions,
+            self.coordinate_changeflags,
+            self.site_label,
+            fillvalue="",
         ):
             tmp.append(
-                " ".join(f"  {i:20.17f}" for i in pos)
-                + " "
-                + t_or_f
-                + " "
-                + atom,
+                " ".join(f"  {i:20.17f}" for i in pos) + " " + t_or_f + " " + atom,
             )
         return "\n".join(tmp) + "\n"
 
@@ -788,7 +792,9 @@ class POSCAR(PosCarHead, PosCarPos):
             self.positions = [mat.dot(v) for v in self.positions]
 
     def guess_molecule(
-        self, site_list: Sequence[int], center: Sequence[float] | None = None,
+        self,
+        site_list: Sequence[int],
+        center: Sequence[float] | None = None,
     ) -> None:
         """Arrange atom position to form a molecule.
 
@@ -845,7 +851,9 @@ class POSCAR(PosCarHead, PosCarPos):
             self.positions[site] = pos
 
     def translate(
-        self, vector: Sequence[float], atomlist: Sequence[int],
+        self,
+        vector: Sequence[float],
+        atomlist: Sequence[int],
     ) -> list[NDArray[np.float64]]:
         """Translate the selected atom(s) by vector.
 

@@ -82,7 +82,8 @@ def view3d(
     poscar.tune_scaling_factor(1.0)
     unit_cell = poscar.cell_vecs
     atom_symbols = tools.atom_types_atomnums_to_atoms(
-        poscar.atom_types, poscar.atomnums,
+        poscar.atom_types,
+        poscar.atomnums,
     )
     uniq_atom_symbols = list(set(atom_symbols))
     site_indexes = {}
@@ -220,7 +221,9 @@ def view_atom_with_surface(
         volume_data = vaspy_chgcar.grid.frame(0).data.reshape(grid_size, order="F")
     else:
         volume_data = reallocate_to_labframe(
-            grid_size, unit_cell, vaspy_chgcar.grid.frame(0).data,
+            grid_size,
+            unit_cell,
+            vaspy_chgcar.grid.frame(0).data,
         )
     #
     view3d(
@@ -341,7 +344,7 @@ def grid_nums(n_grids, crystal_axes) -> tuple[int, ...]:
     lab_box = tools.cuboid(crystal_axes)
     lab_axes = np.array(
         (
-            ([p[1] - p[0] for p in lab_box][0], 0, 0),
+            (next(p[1] - p[0] for p in lab_box), 0, 0),
             (0, [p[1] - p[0] for p in lab_box][1], 0),
             (0, 0, [p[1] - p[0] for p in lab_box][2]),
         ),

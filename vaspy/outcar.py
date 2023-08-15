@@ -1,4 +1,4 @@
-"""This module provides OUTCAR class."""
+"""OUTCAR class."""
 
 
 from __future__ import annotations
@@ -71,7 +71,7 @@ class OUTCAR:  # Version safety
     def set_atom_names(self) -> list[str]:
         """Build atom_names (the list of atomname_with_index)."""
         self.atom_names = []
-        for elm, ionnum in zip(self.atom_types, self.atomnums):
+        for elm, ionnum in zip(self.atom_types, self.atomnums, strict=True):
             for j in range(1, ionnum + 1):
                 tmp = elm + str(j)
                 if tmp not in self.atom_names:
@@ -204,7 +204,9 @@ class OUTCAR:  # Version safety
         the_file.close()
 
     def select_posforce_header(
-        self, posforce_flag: Sequence[bool], *sites: tuple[int | list[int]],
+        self,
+        posforce_flag: Sequence[bool],
+        *sites: tuple[int | list[int]],
     ) -> list[str]:
         """Return the position and force header selected."""
         selected_sites: Sequence[int]
@@ -224,7 +226,9 @@ class OUTCAR:  # Version safety
     # correct?
 
     def select_posforce(
-        self, posforce_flag: Sequence[bool], *sites: tuple[int | list[int]],
+        self,
+        posforce_flag: Sequence[bool],
+        *sites: tuple[int | list[int]],
     ) -> list[list[float]]:
         """Return the position and force selected by posforce_flag.
 
