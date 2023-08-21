@@ -45,7 +45,7 @@ class WAVECAR:
     n_spin: numpy.int
         Number of spins
     rtag: int
-        Tag for precsion in WAVECAR
+        Tag for precision in WAVECAR
     nplwvs: int
         Number of plane waves.
     num_k: int
@@ -127,7 +127,7 @@ class WAVECAR:
         # FFT Minimum grid size. Always odd!!
         self.ngrid: NDArray[np.int64] = np.array(2 * cutoff + 1, dtype=int)
 
-    def check_DwNGZHalf(self) -> bool:
+    def check_DwNGZHalf(self) -> bool:  # noqa: N802
         r"""self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
         about half of the number of gvectors equals number of plane waves.
         """
@@ -156,7 +156,7 @@ class WAVECAR:
     def band(self) -> None:
         """Read the information about the band from WAVECAR file.
 
-        The infomation obtained by this method is as follows:
+        The information obtained by this method is as follows:
 
         * Number of plane waves (nplwv)
         * A integer set for k-vectors
@@ -264,7 +264,7 @@ class WAVECAR:
         band_i: int
             band index :math:`b_i`. starts with 0 (default value is 0)
         norm: bool
-            If true the Band coeffients are normliazed (default is false)
+            If true the Band coefficients are normliazed (default is false)
 
         """
         irec = 3 + spin_i * self.num_k * (self.n_bands + 1)

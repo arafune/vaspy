@@ -7,7 +7,6 @@ LOCPOT, and ELFCAR.  The ELFCAR class has not yet implemented yet, though.
 from __future__ import annotations
 
 import copy
-import os
 from pathlib import Path
 from typing import IO, TYPE_CHECKING
 
@@ -94,9 +93,9 @@ class VASPGrid:
         self.grid.shape = tuple([int(string) for string in separator.split()])
         # Volumetric data
         if pickles:
-            if os.path.splitext(pickles)[1] == ".npy":
+            if Path(pickles).suffix == ".npy":
                 self.grid.data = np.load(pickles)
-            elif os.path.splitext(pickles)[1] == ".npz":
+            elif Path(pickles).suffix == ".npz":
                 self.grid.data = np.load(pickles)["arr_0"]
             else:
                 msg = "Check the volmetric data type"
@@ -118,9 +117,9 @@ class VASPGrid:
                         griddata += next(the_file).replace("***********", "Nan")
                     section = "grid"
                 elif "augmentation occupancies " in line:
-                    pass  # Used for CHGCAR, not LOCPOT. not implementd
+                    pass  # Used for CHGCAR, not LOCPOT. not implemented
                 else:
-                    pass  # Used for CHGCAR, not LOCPOT. not implementd
+                    pass  # Used for CHGCAR, not LOCPOT. not implemented
             elif section == "grid":
                 if "augmentation occupancies " in line:
                     section = "aug"
@@ -182,7 +181,7 @@ class VASPGrid:
         Parameters
         ----------
         other: VASPGrid
-            Addtion VaspGrid object
+            Addition VaspGrid object
 
         Returns
         -------
@@ -206,7 +205,7 @@ class VASPGrid:
         Parameters
         ----------
         other: VASPGrid
-            Addtion VaspGrid object
+            Addition VaspGrid object
 
         Returns
         -------

@@ -86,7 +86,7 @@ class ProjectionBand(EnergyBand):
             label name for summed site, such as 'silicene', and 'SurfaceAu'
 
         """
-        # As the original label['site'] is just a number beginnig from zero
+        # As the original label['site'] is just a number beginning from zero
         logger.debug(f"self.label: {self.label}")
         logger.debug(f"self.n_atom: {self.n_atom}")
         logger.debug(f"sites: {sites}")

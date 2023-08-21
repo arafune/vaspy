@@ -21,7 +21,10 @@ spin_methods = {
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument(
-    "--add", action="store_true", default=False, help="Add two CHGCAR files",
+    "--add",
+    action="store_true",
+    default=False,
+    help="Add two CHGCAR files",
 )
 group.add_argument(
     "--merge",
@@ -41,7 +44,7 @@ group.add_argument(
     help="""spin-relatated operation.
 when this option is set --add, -diff are ignored,
 and CHGCAR_file_2 must not be set.
-spin operation is one of the followings:
+spin operation is one of the following:
 mag : show the magnetization
         density (for spin resolved calculations)
 magX : show the magnetization density in

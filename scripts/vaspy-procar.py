@@ -45,7 +45,7 @@ parser.add_argument(
     dest="atomindex",
     action="append",
     type=tools.atom_selection_to_list,
-    help="""atom index specifed with range.
+    help="""atom index specified with range.
 Use "-" or ","
     (ex.) --site 1,2,7-9""",
 )
@@ -134,6 +134,7 @@ logger.debug(f"orbital_indexes_sets: {orbital_indexes_sets}")
 #
 print(
     procar.text_sheet(
-        site_indexes=site_indexes, orbital_indexes_sets=orbital_indexes_sets,
+        site_indexes=site_indexes,
+        orbital_indexes_sets=orbital_indexes_sets,
     ),
 )

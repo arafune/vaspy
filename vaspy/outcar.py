@@ -43,7 +43,7 @@ class OUTCAR:  # Version safety
 
     Todo:
     ----
-    posforce should be devided to positions and forces.
+    posforce should be divided to positions and forces.
 
     """
 

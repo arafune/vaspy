@@ -2,6 +2,7 @@
 """Script to demonstrate vaspy.incar functionality."""
 import argparse
 from logging import DEBUG, Formatter, StreamHandler, getLogger
+from pathlib import Path
 
 import vaspy
 import vaspy.incar
@@ -22,13 +23,13 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpForm
 
 parser.add_argument(
     "-r",
-    help="""Show reformated INCAR (Use -i if edit in place)""",
+    help="""Show reformatted INCAR (Use -i if edit in place)""",
     action="store_true",
 )
 parser.add_argument("-i", help="""Edit the INCAR file in place""", action="store_true")
 parser.add_argument(
     "--lint",
-    help="""Tyny and private verion of code checker for vasp""",
+    help="""Tyny and private version of code checker for vasp""",
     action="store_true",
 )
 parser.add_argument("incar_file", metavar="INCAR_file", nargs=1)
@@ -40,7 +41,7 @@ logger.debug(f"args: {args}")
 incar: vaspy.incar.Incar = vaspy.load(args.incar_file[0])
 
 if args.i:
-    with open(args.incar_file[0], mode="w") as incar_file:
+    with Path(args.incar_file[0]).open(mode="w") as incar_file:
         incar_file.write(incar.__str__())
 if args.r:
     print(incar)

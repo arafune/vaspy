@@ -892,8 +892,8 @@ class POSCAR(PosCarHead, PosCarPos):
         return self.positions
 
     @property
-    def axes_lengthes(self) -> tuple[float, float, float]:
-        """Return cell axis lengthes.
+    def axes_lengths(self) -> tuple[float, float, float]:
+        """Return cell axis lengths.
 
         Returns
         -------

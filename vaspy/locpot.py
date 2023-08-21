@@ -29,7 +29,10 @@ class LOCPOT(mesh3d.VASPGrid):
         super().__init__(filename, pickles)
 
     def plot_potential_along_axis(
-        self, axis_name: str, frame: int = 0, save: str = "",
+        self,
+        axis_name: str,
+        frame: int = 0,
+        save: str = "",
     ) -> None:  # FIXME!!
         """Plot potential curve along the axis.
 
@@ -42,10 +45,12 @@ class LOCPOT(mesh3d.VASPGrid):
 
         """
         axis_name = axis_name.capitalize()
-        axes_length = self.poscar.axes_lengthes
+        axes_length = self.poscar.axes_lengths
         if axis_name == "X":
             horizontal_axis: NDArray[np.float64] = np.linspace(
-                0, axes_length[0], self.grid.shape[0],
+                0,
+                axes_length[0],
+                self.grid.shape[0],
             )
             plt.clf()
             plt.xlim(xmax=axes_length[0])

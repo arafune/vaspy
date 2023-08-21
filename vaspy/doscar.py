@@ -44,16 +44,15 @@ import csv
 import sys
 from collections.abc import Sequence
 from operator import add
-from typing import IO, TYPE_CHECKING
+from typing import IO, ClassVar
 
 try:
     import matplotlib.pyplot as plt
 except ImportError:
     sys.stderr.write("Install matplotlib, or you cannot use methods relating to draw\n")
-from vaspy.tools import open_by_suffix
+from pathlib import Path
 
-if TYPE_CHECKING:
-    from pathlib import Path
+from vaspy.tools import open_by_suffix
 
 
 class DOSCAR:  # Version safety
@@ -188,7 +187,7 @@ class DOS(Sequence):  # Version safety
         """Export data to csv file."""
         assert len(energy) == len(self)
         assert len(header) == len(self[0]) + 1
-        with open(filename, mode="w") as csv_file:
+        with Path(filename).open(mode="w") as csv_file:
             writer = csv.writer(csv_file, delimiter="\t")
             writer.writerow(header)
             for e, d in zip(energy, self.dos):
@@ -256,7 +255,7 @@ class PDOS(DOS):
 
     """
 
-    orbitalnames = [
+    orbitalnames: ClassVar[list[str] = [
         "s",
         "py",
         "pz",
@@ -329,7 +328,7 @@ class PDOS(DOS):
                 self.orbital_spin.index(orbname) for orbname in orbitalnames
             ]
         except ValueError:
-            err = "Check argment of this function\n"
+            err = "Check argument of this function\n"
             err += "The following name(s) are accepted:\n"
             err += ", ".join(self.orbital_spin)
             raise ValueError(err)
