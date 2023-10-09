@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""This module provides LOCPOT class."""
+"""LOCPOT class."""
 #
 import sys
 from typing import TYPE_CHECKING

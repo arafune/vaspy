@@ -80,12 +80,11 @@ class BaderACF:
         for line in the_file:
             if separator in line:
                 break
-            else:
-                tmp = line.split()
-                self.positions.append([float(pos) for pos in tmp[1:4]])
-                self.charges.append(float(tmp[4]))
-                self.mindists.append(float(tmp[5]))
-                self.vols.append(float(tmp[6]))
+            tmp = line.split()
+            self.positions.append([float(pos) for pos in tmp[1:4]])
+            self.charges.append(float(tmp[4]))
+            self.mindists.append(float(tmp[5]))
+            self.vols.append(float(tmp[6]))
         self.vac_charge = float(next(the_file).split()[-1])
         self.vac_vol = float(next(the_file).split()[-1])
         self.n_electron = float(next(the_file).split()[-1])

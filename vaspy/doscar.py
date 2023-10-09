@@ -255,7 +255,7 @@ class PDOS(DOS):
 
     """
 
-    orbitalnames: ClassVar[list[str] = [
+    orbitalnames: ClassVar[list[str]] = [
         "s",
         "py",
         "pz",
