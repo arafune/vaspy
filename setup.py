@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Setup script for vaspy
 """
 import sys

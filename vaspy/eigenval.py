@@ -148,7 +148,11 @@ class EnergyBand:
         band_structure: list[list[float]] = []
         for energies in self.energies.T.tolist():
             band: list[float] = []
-            for k, energy in zip(self.kdistances[:, np.newaxis].tolist(), energies):
+            for k, energy in zip(
+                self.kdistances[:, np.newaxis].tolist(),
+                energies,
+                strict=True,
+            ):
                 k.extend(energy)
                 band.append(k)
             band_structure.append(band)
@@ -322,7 +326,7 @@ class EIGENVAL(EnergyBand):
         """
         energies: list[list[list[float]]] = self.energies.transpose(1, 2, 0).tolist()
         kvec: list[list[float]] = self.k_vectors.tolist()
-        return list(zip(kvec, energies))[item]
+        return list(zip(kvec, energies, strict=True))[item]
 
     def __len__(self) -> int:
         """Return num_k as the result of len()."""

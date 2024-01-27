@@ -100,7 +100,7 @@ def atom_types_atomnums_to_atoms(
 
     """
     atoms = []
-    for elem, nums in zip(atom_types, atomnums):
+    for elem, nums in zip(atom_types, atomnums, strict=True):
         for _ in range(nums):
             atoms.append(elem)
     return tuple(atoms)

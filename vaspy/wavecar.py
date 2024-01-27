@@ -128,7 +128,9 @@ class WAVECAR:
         self.ngrid: NDArray[np.int64] = np.array(2 * cutoff + 1, dtype=int)
 
     def check_DwNGZHalf(self) -> bool:  # noqa: N802
-        r"""self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
+        r"""Check DwNGZHalf.
+
+        self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
         about half of the number of gvectors equals number of plane waves.
         """
         if self.gamma:
@@ -397,7 +399,7 @@ class WAVECAR:
         #
         self.phi_k: NDArray[np.complex128] = phi_k  # For debug
         phi_r: NDArray[np.complex128] = ifftn(phi_k)
-        if poscar.scaling_factor == 0.0:  # poscar is not given.
+        if poscar.scaling_factor == 0:  # poscar is not given.
             if phi_r.ndim == 3:
                 return phi_r.T
             return (phi_r[0] + phi_r[1]).T, (phi_r[0] - phi_r[1]).T

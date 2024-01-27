@@ -108,7 +108,7 @@ logger.debug(f"sitenames: {sitenames}")
 logger.debug(f"args.orbitals: {args.orbital}")
 logger.debug(f"orbitals flat: {flat_orbitals}")
 #
-for sites, name in zip(siteindex, sitenames):
+for sites, name in zip(siteindex, sitenames, strict=True):
     procar.append_sumsite(tuple(sites), name)
 for orb in tuple(set(flat_orbitals)):
     procar.append_sumorbital(procar.orbital_index(orb), orb)

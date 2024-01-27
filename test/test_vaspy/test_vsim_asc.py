@@ -46,4 +46,3 @@ class Test_animate_atom_phonon:
     """animate_atom_phonon(position, qpt_cart, d_vector, mass=1.0,
                         n_frames=30, s_frame=0, e_frame=None,
                         magnitude=1):"""
-    pass

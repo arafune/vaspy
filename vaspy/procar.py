@@ -227,7 +227,7 @@ class ProjectionBand(EnergyBand):
         label_list = super().make_label("k", "energy")
         if not (site_indexes and orbital_indexes_sets):
             return label_list
-        for site_i, orbitals in zip(site_indexes, orbital_indexes_sets):
+        for site_i, orbitals in zip(site_indexes, orbital_indexes_sets, strict=True):
             for orbital_i in orbitals:
                 for spin_i in self.label["spin"]:
                     try:
@@ -280,7 +280,7 @@ class ProjectionBand(EnergyBand):
         # site_indexes, orbital_indexes_sets values:
         # Note that projband.ndim is 4
         array_list = []
-        for site_i, orbitals in zip(site_indexes, orbital_indexes_sets):
+        for site_i, orbitals in zip(site_indexes, orbital_indexes_sets, strict=True):
             for orbital_i in orbitals:
                 array_list.append(
                     self.proj[:, :, :, site_i, orbital_i][:, :, :, np.newaxis],

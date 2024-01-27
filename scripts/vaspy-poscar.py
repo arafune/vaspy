@@ -88,10 +88,14 @@ if not specified, use standard output""",
 )
 parser.add_argument("poscar", metavar="POSCAR_file (or CONTCAR_file)", type=POSCAR)
 parser.add_argument(
-    "--to_direct", action="store_true", help="""Change direct coordinates""",
+    "--to_direct",
+    action="store_true",
+    help="""Change direct coordinates""",
 )
 parser.add_argument(
-    "--to_cartesian", action="store_true", help="""Change cartesian coordinates""",
+    "--to_cartesian",
+    action="store_true",
+    help="""Change cartesian coordinates""",
 )
 parser.add_argument(
     "--split",
@@ -129,9 +133,9 @@ args.site = [i - 1 for i in args.site[0]]
 if args.translate:
     if len(args.site) != len(args.translate):
         parser.error(
-            "The number of the site sets is not consistent with the number of translations",
+            "The number of the site sets is not consistent with that of translations",
         )
-    for v, a in zip(args.translate, args.site):
+    for v, a in zip(args.translate, args.site, strict=True):
         args.poscar.translate(v, a)
 #
 #  Rotation

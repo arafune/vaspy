@@ -79,7 +79,9 @@ if atomlist == []:
 #
 doses = [TDOS(doscar.dos_container.pop(0))]
 #
-doses.extend(PDOS(*each) for each in zip(doscar.dos_container, atomlist))  # tmp[1:] ?
+doses.extend(
+    PDOS(*each) for each in zip(doscar.dos_container, atomlist, strict=True)
+)  # tmp[1:] ?
 #
 # Fermi level correction
 #
@@ -89,10 +91,10 @@ if args.atomset is not None:  # atomset and atomsetname are given by
     # the command line argument.
     if len(args.atomset) == len(args.atomsetname):
         pdoses = []
-        for site, name in zip(args.atomset, args.atomsetname):
+        for site, name in zip(args.atomset, args.atomsetname, strict=True):
             each = PDOS()
-            for atomNo in site:
-                each += doses[atomNo]
+            for atom_number in site:
+                each += doses[atom_number]
             each.site = name
             pdoses.append(each)
         for a_pdos in pdoses:
@@ -103,7 +105,7 @@ if args.atomset is not None:  # atomset and atomsetname are given by
         raise ValueError(msg)
 #
 doses[0].export_csv("total.dat")
-for thedos, atom_index in zip(doses[1:], atomlist):
+for thedos, atom_index in zip(doses[1:], atomlist, strict=True):
     if isinstance(thedos, PDOS) and thedos.site == "":
         thedos.site = atom_index
     filename = atom_index + "_dos.dat"
