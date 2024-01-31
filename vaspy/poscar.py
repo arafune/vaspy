@@ -316,7 +316,8 @@ class POSCAR(PosCarHead, PosCarPos):
         self.positions = (
             self.positions[:from_site]
             + sorted(
-                self.positions[from_site:to_site], key=lambda sortaxis: sortaxis[axis],
+                self.positions[from_site:to_site],
+                key=lambda sortaxis: sortaxis[axis],
             )
             + self.positions[to_site:]
         )
@@ -444,7 +445,11 @@ class POSCAR(PosCarHead, PosCarPos):
         return candidates27
 
     def rotate_atom(
-        self, site: int, axis_name: str, theta_deg: float, center: Sequence[float],
+        self,
+        site: int,
+        axis_name: str,
+        theta_deg: float,
+        center: Sequence[float],
     ) -> None:
         """Rotate the atom.
 
@@ -715,14 +720,13 @@ class POSCAR(PosCarHead, PosCarPos):
             tmp.append("Selective Dynamics")
         tmp.append(self.coordinate_type)
         for pos, t_or_f, atom in it.zip_longest(
-            self.positions, self.coordinate_changeflags, self.site_label, fillvalue="",
+            self.positions,
+            self.coordinate_changeflags,
+            self.site_label,
+            fillvalue="",
         ):
             tmp.append(
-                " ".join(f"  {i:20.17f}" for i in pos)
-                + " "
-                + t_or_f
-                + " "
-                + atom,
+                " ".join(f"  {i:20.17f}" for i in pos) + " " + t_or_f + " " + atom,
             )
         return "\n".join(tmp) + "\n"
 
@@ -788,7 +792,9 @@ class POSCAR(PosCarHead, PosCarPos):
             self.positions = [mat.dot(v) for v in self.positions]
 
     def guess_molecule(
-        self, site_list: Sequence[int], center: Sequence[float] | None = None,
+        self,
+        site_list: Sequence[int],
+        center: Sequence[float] | None = None,
     ) -> None:
         """Arrange atom position to form a molecule.
 
@@ -841,11 +847,13 @@ class POSCAR(PosCarHead, PosCarPos):
 
             newpos = min(atoms27, key=(lambda x: func(x, center)))
             newposes.append(newpos)
-        for site, pos in zip(site_list, newposes):
+        for site, pos in zip(site_list, newposes, strict=True):
             self.positions[site] = pos
 
     def translate(
-        self, vector: Sequence[float], atomlist: Sequence[int],
+        self,
+        vector: Sequence[float],
+        atomlist: Sequence[int],
     ) -> list[NDArray[np.float64]]:
         """Translate the selected atom(s) by vector.
 

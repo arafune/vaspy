@@ -27,7 +27,7 @@ class XDATCAR(PosCarHead):
 
         Parameters
         ----------
-        arg: str
+        filename: str
             XDATCAR file name
 
         """
@@ -77,7 +77,9 @@ class XDATCAR(PosCarHead):
         tmp += f"        {self.scaling_factor}\n"
         for i in range(3):
             tmp += "      {:#.6f}   {:#.6f}    {:6f}\n".format(
-                self.cell_vecs[i][0], self.cell_vecs[i][1], self.cell_vecs[i][2],
+                self.cell_vecs[i][0],
+                self.cell_vecs[i][1],
+                self.cell_vecs[i][2],
             )
         for element in self.atom_types:
             tmp += f"    {element}"
@@ -89,6 +91,8 @@ class XDATCAR(PosCarHead):
             tmp += f"Direct configuration=    {frame_index + 1}\n"
             for position in positions:
                 tmp += "    {:#.6f}    {:#.6f}    {:6f}\n".format(
-                    position[0], position[1], position[2],
+                    position[0],
+                    position[1],
+                    position[2],
                 )
         return tmp
