@@ -18,7 +18,7 @@ class TestOUTCAR:
         datafile = datadir + "OUTCAR"
         return vaspy.load(datafile)
 
-    def test_read_basic_properties(self, outcar0: vaspy.outcar.OUTCAR):
+    def test_read_basic_properties(self, outcar0: vaspy.outcar.OUTCAR) -> None:
         """Test for OUTCAR reading basic properties."""
         assert outcar0.fermi == -0.7681
         assert outcar0.n_bands == 54

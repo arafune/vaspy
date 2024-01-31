@@ -1,8 +1,9 @@
 #! python
-"""Created on Sun Mar 30 13:25:29 2014
+"""Created on Sun Mar 30 13:25:29 2014.
 
 @author: Mao
 """
+import contextlib
 
 if __name__ == "__main__":
     import os
@@ -12,11 +13,7 @@ if __name__ == "__main__":
     file = open(logfile)
     for line in file:
         line = line.rstrip("\n")
-        try:
+        with contextlib.suppress(FileNotFoundError):
             os.remove(line)
-        except FileNotFoundError:
-            pass
-        try:
+        with contextlib.suppress(OSError):
             os.removedirs(os.path.dirname(line))
-        except OSError:
-            pass

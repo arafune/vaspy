@@ -12,12 +12,12 @@ from vaspy import poscar, wavecar
 class TestHatomWavecar:
     """Class for Test WAVECAR module by using H_gamma.wavecar."""
 
-    def setup_method(self, method):
+    def setup_method(self, method) -> None:
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         data_file = datadir + "H_gamma.wavecar"
         self.h = vaspy.load(data_file)
 
-    def test_wavecar_header_and_band(self):
+    def test_wavecar_header_and_band(self) -> None:
         """Test for H atom WAVECAR header."""
         self.h.gamma
         self.h.check_DwNGZHalf()
@@ -44,12 +44,12 @@ class TestHatomWavecar:
 class TestCOWavecar:
     """Class for Test WAVECAR module by using WAVECAR.CO.wavecar."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         data_file = datadir + "WAVECAR.CO.wavecar"
         self.co = wavecar.WAVECAR(data_file)
 
-    def test_wavecar_header(self):
+    def test_wavecar_header(self) -> None:
         """Test for CO molecule WAVECAR property.
 
         rtag, wfprec
@@ -70,7 +70,7 @@ class TestCOWavecar:
         assert_almost_equal(4913, self.co.volume)
         np.testing.assert_array_almost_equal([57, 57, 57], self.co.ngrid)
 
-    def test_wavecar_band(self):
+    def test_wavecar_band(self) -> None:
         """Test for CO WAVECAR band."""
         self.co.band()
         assert (self.co.n_spin, self.co.num_k, self.co.n_bands) == self.co.bands.shape
@@ -79,7 +79,7 @@ class TestCOWavecar:
             self.co.bands[0, 0, 0:5],
         )  # The value can be taken from EIGENVAL
 
-    def test_wavecar_str(self):
+    def test_wavecar_str(self) -> None:
         """Test for __str__ special method."""
         output = self.co.__str__()
         teststr = "record length  =       711680  spins =           2  "
@@ -97,13 +97,13 @@ class TestCOWavecar:
 class TestGrapheneWavecar:
     """Class for Test WAVECAR module by using Graphene.wavecar."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         data_file = datadir + "Graphene.wavecar"
         self.gr = wavecar.WAVECAR(data_file)
         self.gr_poscar = poscar.POSCAR(datadir + "POSCAR.Graphene")
 
-    def test_wavecar_header(self):
+    def test_wavecar_header(self) -> None:
         """Test for Graphene WAVECAR property."""
         assert self.gr.recl == 30864  # record length
         assert self.gr.n_spin == 1  # spin
@@ -126,7 +126,7 @@ class TestGrapheneWavecar:
         # FIXME!!: Where these value come from ?
         np.testing.assert_array_almost_equal([11, 11, 97], self.gr.ngrid)
 
-    def test_wavecar_band(self):
+    def test_wavecar_band(self) -> None:
         """Test for Graphene wavecar band."""
         self.gr.band()
         # from OUTCAR
@@ -140,7 +140,7 @@ class TestGrapheneWavecar:
             self.gr.bands[0, 0, 0:6],
         )  # The value can be taken from EIGENVAL
 
-    def test_realsapece_wfc(self):
+    def test_realsapece_wfc(self) -> None:
         """Test for generation real space wfc (Graphene)."""
         np.testing.assert_array_almost_equal(
             [
@@ -162,7 +162,7 @@ class TestGrapheneWavecar:
 
 class test_RestoreGammaGrid:
     #
-    def test_check_symmetry(self):
+    def test_check_symmetry(self) -> None:
         """Test for check_symmetry."""
         assert not wavecar.check_symmetry(np.arange(3 * 3 * 3).reshape((3, 3, 3)))
         k_grid = np.array(
@@ -174,7 +174,7 @@ class test_RestoreGammaGrid:
         )
         assert wavecar.check_symmetry(k_grid)
 
-    def test_RestorGammaGrid(self):
+    def test_RestorGammaGrid(self) -> None:
         """Test for RestoreGammaGrid function."""
         grid332 = np.arange(3 * 3 * 3).reshape((3, 3, 3))[:, :, :2]
         grid332[2][0][0] = np.conjugate(grid332[1][0][0])
@@ -226,13 +226,13 @@ class test_RestoreGammaGrid:
 class TestCobaltWavecar:
     """Class for Test WAVECAR module by using Co.wavecar (SOI)."""
 
-    def setup_method(self, method):
+    def setup_method(self, method) -> None:
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         data_file = datadir + "Co.wavecar"
         self.co = wavecar.WAVECAR(data_file)
         self.co_poscar = poscar.POSCAR(datadir + "Co.POSCAR")
 
-    def test_wavecar_header(self):
+    def test_wavecar_header(self) -> None:
         """Test for Cobalt property."""
         assert self.co.recl == 7968  # record length
         assert self.co.n_spin == 1  # spin
@@ -252,7 +252,7 @@ class TestCobaltWavecar:
         #  Maximum number of reciprocal cells 2x 2x 4 (in OUTCAR)
         np.testing.assert_array_almost_equal([11, 11, 19], self.co.ngrid)
 
-    def test_wavecar_band(self):
+    def test_wavecar_band(self) -> None:
         """Test for Co wavecar band."""
         self.co.band()
         # from OUTCAR
@@ -265,7 +265,7 @@ class TestCobaltWavecar:
             self.co.bands[0, 0, 0:6],
         )  # The value can be taken from EIGENVAL
 
-    def test_realsapece_wfc(self):
+    def test_realsapece_wfc(self) -> None:
         """Test for generation real space wfc (Cobalt)."""
         np.testing.assert_array_almost_equal(
             [

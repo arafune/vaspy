@@ -9,13 +9,13 @@ from vaspy import xdatcar
 class TestXDATCAR:
     """Class for Test of Vsim_asc."""
 
-    def setup_method(self, method):
+    def setup_method(self, method) -> None:
         """XDATCAR."""
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         datafile = datadir + "XDATCAR.0.bz2"
         self.xdatcar_test = xdatcar.XDATCAR(datafile)
 
-    def test_(self):
+    def test_(self) -> None:
         assert self.xdatcar_test.system_name == "MoS2"
         assert self.xdatcar_test.scaling_factor == 1.0
         np.testing.assert_allclose(

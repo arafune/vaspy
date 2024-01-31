@@ -9,13 +9,13 @@ from vaspy import vsim_asc
 class TestVsimASCII:
     """Class for Test of Vsim_asc."""
 
-    def setup_method(self, method):
+    def setup_method(self, method) -> None:
         """VSIM."""
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         datafile = datadir + "monolayer_hBN_phonon.ascii"
         self.hBN = vsim_asc.VSIM_ASC(datafile)
 
-    def test_(self):
+    def test_(self) -> None:
         self.hBN.system_name == "Phonopy generated file for v_sim 3.6"
         np.testing.assert_allclose([2.484999131, 0, 0], self.hBN.lattice_vectors[0])
         np.testing.assert_allclose(

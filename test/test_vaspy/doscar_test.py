@@ -10,7 +10,7 @@ from vaspy.doscar import DOSCAR, PDOS
 
 
 class TestDOSCAR:
-    def setUp(self):
+    def setUp(self) -> None:
         currentpath = os.path.abspath(os.path.dirname(__file__))
         testDOS = currentpath + "/DOSCAR_dummy"
         self.testDOSCAR = DOSCAR(testDOS)
@@ -30,7 +30,7 @@ def ispin2() -> vaspy.doscar.DOSCAR:
 
 
 class Test_ispin1_TDOS:
-    def test_basic_property(self, ispin1: DOSCAR):
+    def test_basic_property(self, ispin1: DOSCAR) -> None:
         assert ispin1.n_atom == 39
         assert len(ispin1.energies) == 301
         assert len(ispin1.tdos) == 301
@@ -42,7 +42,7 @@ class Test_ispin1_TDOS:
 
 
 class Test_ispin2_TDOS:
-    def test_basic_property(self, ispin2: DOSCAR):
+    def test_basic_property(self, ispin2: DOSCAR) -> None:
         assert ispin2.n_atom == 57
         assert len(ispin2.energies) == 31
         assert len(ispin2.tdos) == 31
@@ -53,7 +53,7 @@ class Test_ispin2_TDOS:
 
 
 class Test_ispin2_PDOS:
-    def test_pdos_sign(self, ispin2: DOSCAR):
+    def test_pdos_sign(self, ispin2: DOSCAR) -> None:
         assert ispin2.pdoses[0][-2] == [
             0.3502e-04,
             -0.3458e-04,
@@ -75,11 +75,11 @@ class Test_ispin2_PDOS:
             -0.0000e00,
         ]
 
-    def test_pdos_add(self, ispin2: DOSCAR):
+    def test_pdos_add(self, ispin2: DOSCAR) -> None:
         twicedos: PDOS = ispin2.pdoses[0] + ispin2.pdoses[0]
         assert twicedos[-2] == [i * 2 for i in ispin2.pdoses[0][-2]]
 
-    def test_pdos_projected(self, ispin2: DOSCAR):
+    def test_pdos_projected(self, ispin2: DOSCAR) -> None:
         assert ispin2.pdoses[0].projected("s_down") == ispin2.pdoses[0].projected(1)
         assert ispin2.pdoses[0].projected("s_down") == [
             -0.0,
@@ -115,7 +115,7 @@ class Test_ispin2_PDOS:
             -0.0,
         ]
 
-    def test_pdos_total(self, ispin2: DOSCAR):
+    def test_pdos_total(self, ispin2: DOSCAR) -> None:
         assert ispin2.pdoses[0].total == [
             (0.0, -0.0),
             (0.0, -0.0),

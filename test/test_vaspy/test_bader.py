@@ -10,13 +10,13 @@ import vaspy
 class TestBader:
     """Class for test of vaspy.outcar module."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Reading ACF.chg.dat for test."""
         datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
         datafile = datadir + "ACF.chg.dat"
         self.acf = vaspy.load(datafile)
 
-    def test_read_basic_properties(self):
+    def test_read_basic_properties(self) -> None:
         """Test for reading basic properties."""
         """
         VACUUM CHARGE:               1.2829
