@@ -1,4 +1,4 @@
-"""This module provide XDATCAR class."""
+"""XDATCAR class."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ class XDATCAR(PosCarHead):
 
         Parameters
         ----------
-        filename: str
+        filename: str | Path
             XDATCAR file name
 
         """

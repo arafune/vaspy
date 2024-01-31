@@ -26,7 +26,9 @@ def open_by_suffix(filename: str) -> IO[str]:
 
 
 def each_slice(
-    iterable: Iterable, n: int, fillvalue: float | None = None,
+    iterable: Iterable,
+    n: int,
+    fillvalue: float | None = None,
 ) -> Iterable[Any]:
     """each_slice(iterable, n[, fillvalue]) => iterator.
 
@@ -77,7 +79,8 @@ def atom_selection_to_list(input_str: str, number: bool = True) -> list[int | st
 
 
 def atom_types_atomnums_to_atoms(
-    atom_types: Iterable[str], atomnums: Iterable[int],
+    atom_types: Iterable[str],
+    atomnums: Iterable[int],
 ) -> tuple[str, ...]:
     """Return list representation for atom in use.
 
@@ -97,7 +100,7 @@ def atom_types_atomnums_to_atoms(
 
     """
     atoms = []
-    for elem, nums in zip(atom_types, atomnums):
+    for elem, nums in zip(atom_types, atomnums, strict=True):
         for _ in range(nums):
             atoms.append(elem)
     return tuple(atoms)
@@ -222,7 +225,8 @@ See epilog for notices for argument notation.""",
                 print(
                     """argument number not match (require {}, given {})
 use default values.""".format(
-                        argcounts[func], len(args.values[index]),
+                        argcounts[func],
+                        len(args.values[index]),
                     ),
                 )
                 values = demo[func]

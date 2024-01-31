@@ -54,7 +54,7 @@ class TestCHGCAR:
     def test_mag_spin(self):
         """Test for CHGCAR magnetization."""
         magCHG = self.chgcar_spin.magnetization()
-        assert 4 * 4 * 6 == magCHG.grid.data.size
+        assert magCHG.grid.data.size == 4 * 4 * 6
         np.testing.assert_array_almost_equal(
             [
                 2.57589571650e00,
@@ -70,7 +70,7 @@ class TestCHGCAR:
     def test_mag_majority(self):
         """Test for CHGCAR majority spin."""
         major_spin = self.chgcar_spin.majority_spin()
-        assert 4 * 4 * 6 == major_spin.grid.data.size
+        assert major_spin.grid.data.size == 4 * 4 * 6
         np.testing.assert_array_almost_equal(
             [2.51569334, 2.02652039, 0.95344186, 0.08366529, -0.12515836],
             major_spin.grid.data[0:5],
@@ -79,7 +79,7 @@ class TestCHGCAR:
     def test_mag_minority(self):
         """Test for CHGCAR minority spin."""
         minor_spin = self.chgcar_spin.minority_spin()
-        assert 4 * 4 * 6 == minor_spin.grid.data.size
+        assert minor_spin.grid.data.size == 4 * 4 * 6
         np.testing.assert_array_almost_equal(
             [-0.06020238, -0.06595251, -0.07922876, -0.09126546, -0.09525268],
             minor_spin.grid.data[0:5],

@@ -105,10 +105,10 @@ class VSIM_ASC:
         #
         for line in phonon_lines:
             if "metaData" in line:
-                aline = line[15:]
-                if aline[-1] == "\\":
-                    aline = aline[:-1]
-                modedata = aline.split(";")
+                a_line = line[15:]
+                if a_line[-1] == "\\":
+                    a_line = a_line[:-1]
+                modedata = a_line.split(";")
                 qpt: NDArray[np.float64] = np.array([float(x) for x in modedata[0:3]])
                 freq = float(modedata[3])
                 self.qpts.append(qpt)
@@ -126,7 +126,9 @@ class VSIM_ASC:
                 )
         n_phonons = len(freqs)
         self.d_vectors: NDArray[np.complex128] = np.array(d_vectors).reshape(
-            n_phonons, len(self.atoms), 3,
+            n_phonons,
+            len(self.atoms),
+            3,
         )
         self.freqs = np.array(freqs)
         the_file.close()
@@ -157,14 +159,18 @@ class VSIM_ASC:
         qpt_cart: NDArray[np.float64] = qpt.dot(bmatrix)
         logger.debug(
             "qpt_cart[x] = {}, qpt_cart[y] = {}, qpt_cart[z] ={}".format(
-                qpt_cart[0], qpt_cart[1], qpt_cart[2],
+                qpt_cart[0],
+                qpt_cart[1],
+                qpt_cart[2],
             ),
         )
         #
         animation_positions: list[list[NDArray[np.float64]]] = []
         for atom_i, position in enumerate(self.positions):
             for cell_id in itertools.product(
-                range(supercell[0]), range(supercell[1]), range(supercell[2]),
+                range(supercell[0]),
+                range(supercell[1]),
+                range(supercell[2]),
             ):
                 logger.debug(f" cell_id:{cell_id}")
                 abs_pos = position + (
@@ -184,7 +190,8 @@ class VSIM_ASC:
 
 
 def supercell_lattice_vectors(
-    lattice_vectors: NDArray[np.float64], cell_id: Sequence[int],
+    lattice_vectors: NDArray[np.float64],
+    cell_id: Sequence[int],
 ) -> NDArray[np.float64]:
     """Return lattice vectors of supercell.
 
@@ -200,7 +207,7 @@ def supercell_lattice_vectors(
 
     """
     supercell_vectors: list[float] = []
-    for x, x_i in zip(lattice_vectors, cell_id):
+    for x, x_i in zip(lattice_vectors, cell_id, strict=True):
         supercell_vectors.append(x * x_i)
     return np.array(supercell_vectors)
 
@@ -248,9 +255,7 @@ def animate_atom_phonon(
             1.0j * (np.dot(position0, qpt_cart) - 2 * np.pi * frame / n_frames),
         )
         logger.debug(
-            "r:{}, qpt_cart;{}, frame:{}, n_frames:{}".format(
-                position0, qpt_cart, frame, n_frames,
-            ),
+            f"r:{position0}, qpt_cart;{qpt_cart}, frame:{frame}, n_frames:{n_frames}",
         )
         logger.debug(
             "arg_exponent:{}".format(
@@ -266,7 +271,7 @@ def animate_atom_phonon(
         # taken into account the mass of the atom.
         # If the calculated displacement vector
         # does not contain the mass effect,
-        # the normal_displ should be devided by sqrt(mass)
+        # the normal_displ should be divided by sqrt(mass)
         positions.append(position0 + magnitude * normal_displ)
         logger.debug(f"position.after_move:{positions[-1]}")
     return positions

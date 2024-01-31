@@ -1,6 +1,7 @@
 """Module for WAVECAR class."""
 from __future__ import annotations
 
+from pathlib import Path
 from typing import IO, TYPE_CHECKING
 
 import numpy as np
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
     from vaspy.mesh3d import VASPGrid
 
 Ry_in_eV: float = 13.605826
-au_in_AA: float = 0.529177249
+Au_in_AA: float = 0.529177249
 
 # If parallel version vasp, set True
 # See OUTCAR file
@@ -44,7 +45,7 @@ class WAVECAR:
     n_spin: numpy.int
         Number of spins
     rtag: int
-        Tag for precsion in WAVECAR
+        Tag for precision in WAVECAR
     nplwvs: int
         Number of plane waves.
     num_k: int
@@ -70,15 +71,15 @@ class WAVECAR:
 
     """
 
-    def __init__(self, filename: str = "WAVECAR") -> None:
-        """Ideanitialize WAVECAR class.
+    def __init__(self, filename: str | Path = "WAVECAR") -> None:
+        """Initialize WAVECAR class.
 
         Parameters
         ----------
-        filname: str (Default: "WAVECAR")
+        filename: str | Path (Default: "WAVECAR")
             File name of the 'WAVECAR'
         """
-        self.wfc: IO[bytes] = open(filename, "rb")
+        self.wfc: IO[bytes] = Path(filename).open("rb")
         self.gamma: bool = False
         #
         self.header()
@@ -101,7 +102,8 @@ class WAVECAR:
         self.n_spin: int
         self.rtag: int
         self.recl, self.n_spin, self.rtag = np.array(
-            np.fromfile(self.wfc, dtype=float, count=3), dtype=int,
+            np.fromfile(self.wfc, dtype=float, count=3),
+            dtype=int,
         )
         self.wfc.seek(self.recl)
         #
@@ -115,17 +117,20 @@ class WAVECAR:
         self.volume: float = np.linalg.det(self.realcell)
         self.rcpcell: NDArray[np.float64] = np.linalg.inv(self.realcell).T
         unit_cell_vector_magnitude: NDArray[np.float64] = np.linalg.norm(
-            self.realcell, axis=1,
+            self.realcell,
+            axis=1,
         )
         cutoff: NDArray[np.float64] = np.ceil(
             np.sqrt(self.encut / Ry_in_eV)
-            / (2 * np.pi / (unit_cell_vector_magnitude / au_in_AA)),
+            / (2 * np.pi / (unit_cell_vector_magnitude / Au_in_AA)),
         )
         # FFT Minimum grid size. Always odd!!
         self.ngrid: NDArray[np.int64] = np.array(2 * cutoff + 1, dtype=int)
 
-    def check_DwNGZHalf(self) -> bool:
-        r"""self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
+    def check_DwNGZHalf(self) -> bool:  # noqa: N802
+        r"""Check DwNGZHalf.
+
+        self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
         about half of the number of gvectors equals number of plane waves.
         """
         if self.gamma:
@@ -153,7 +158,7 @@ class WAVECAR:
     def band(self) -> None:
         """Read the information about the band from WAVECAR file.
 
-        The infomation obtained by this method is as follows:
+        The information obtained by this method is as follows:
 
         * Number of plane waves (nplwv)
         * A integer set for k-vectors
@@ -163,11 +168,13 @@ class WAVECAR:
         """
         self.k_vectors: NDArray[np.float64] = np.zeros((self.num_k, 3), dtype=float)
         self.bands: NDArray[np.float64] = np.zeros(
-            (self.n_spin, self.num_k, self.n_bands), dtype=float,
+            (self.n_spin, self.num_k, self.n_bands),
+            dtype=float,
         )
         self.nplwvs: NDArray[np.float64] = np.zeros(self.num_k, dtype=int)
         self.occs: NDArray[np.float64] = np.zeros(
-            (self.n_spin, self.num_k, self.n_bands), dtype=float,
+            (self.n_spin, self.num_k, self.n_bands),
+            dtype=float,
         )
         for spin_i in range(self.n_spin):
             for k_i in range(self.num_k):
@@ -221,7 +228,11 @@ class WAVECAR:
 
         """
         k_vector = self.k_vectors[k_i]
-        k_grid: NDArray[np.float64] = make_k_grid(self.ngrid, self.gamma, para=PARALLEL)
+        k_grid: NDArray[np.float64] = make_k_grid(
+            self.ngrid,
+            gamma=self.gamma,
+            para=PARALLEL,
+        )
         hbar2over2m = 13.605826 * 0.529177249 * 0.529177249
         energy_k = (
             hbar2over2m
@@ -235,7 +246,12 @@ class WAVECAR:
         return np.array(g_vec, dtype=int)
 
     def bandcoeff(
-        self, spin_i: int = 0, k_i: int = 0, band_i: int = 0, norm: bool = False,
+        self,
+        spin_i: int = 0,
+        k_i: int = 0,
+        band_i: int = 0,
+        *,
+        norm: bool = False,
     ) -> NDArray[np.complex128]:
         """Read the coefficient of the planewave of the KS states.
 
@@ -250,7 +266,7 @@ class WAVECAR:
         band_i: int
             band index :math:`b_i`. starts with 0 (default value is 0)
         norm: bool
-            If true the Band coeffients are normliazed (default is false)
+            If true the Band coefficients are normliazed (default is false)
 
         """
         irec = 3 + spin_i * self.num_k * (self.n_bands + 1)
@@ -270,13 +286,10 @@ class WAVECAR:
         band_i: int = 0,
         gvector: NDArray[np.int64] | None = None,
         ngrid: NDArray[np.int64] | None = None,
+        *,
         norm: bool = False,
         poscar: poscar.POSCAR = poscar.POSCAR(),
-    ) -> (
-        NDArray[np.complex128]
-        | tuple[NDArray[np.float64] | NDArray[np.float64]]
-        | VASPGrid
-    ):
+    ) -> NDArray[np.complex128] | tuple[NDArray[np.float64]] | VASPGrid:
         r"""Return the pseudo-wavefunction in real space.
 
         Calculate the pseudo-wavefunction of the KS states in
@@ -336,20 +349,25 @@ class WAVECAR:
         gvec %= ngrid[np.newaxis, :]
         if self.gamma and PARALLEL:
             phi_k: NDArray[np.complex128] = np.zeros(
-                (ngrid[0], ngrid[1], ngrid[2] // 2 + 1), dtype=np.complex128,
+                (ngrid[0], ngrid[1], ngrid[2] // 2 + 1),
+                dtype=np.complex128,
             )
         elif self.gamma and not PARALLEL:
             phi_k = np.zeros(
-                (ngrid[0] // 2 + 1, ngrid[1], ngrid[2]), dtype=np.complex128,
+                (ngrid[0] // 2 + 1, ngrid[1], ngrid[2]),
+                dtype=np.complex128,
             )
         else:
             phi_k = np.zeros(ngrid, dtype=np.complex_)
         try:  # Collininear
             phi_k[gvec[:, 0], gvec[:, 1], gvec[:, 2]] = self.bandcoeff(
-                spin_i, k_i, band_i, norm,
+                spin_i,
+                k_i,
+                band_i,
+                norm=norm,
             )
         except ValueError:  # SOI:
-            bandcoeff = self.bandcoeff(spin_i, k_i, band_i, norm)
+            bandcoeff = self.bandcoeff(spin_i, k_i, band_i, norm=norm)
             phi_k = np.zeros((2, ngrid[0], ngrid[1], ngrid[2]), dtype=np.complex128)
             phi_k[0][gvec[:, 0], gvec[:, 1], gvec[:, 2]] = bandcoeff[
                 : bandcoeff.size // 2
@@ -381,18 +399,18 @@ class WAVECAR:
         #
         self.phi_k: NDArray[np.complex128] = phi_k  # For debug
         phi_r: NDArray[np.complex128] = ifftn(phi_k)
-        if poscar.scaling_factor == 0.0:  # poscar is not given.
+        if poscar.scaling_factor == 0:  # poscar is not given.
             if phi_r.ndim == 3:
                 return phi_r.T
-            else:  # SOI
-                return (phi_r[0] + phi_r[1]).T, (phi_r[0] - phi_r[1]).T
+            return (phi_r[0] + phi_r[1]).T, (phi_r[0] - phi_r[1]).T
         else:
             vaspgrid = mesh3d.VASPGrid()
             vaspgrid.poscar = poscar
             vaspgrid.grid.shape = ngrid
             # checking consistency between POSCAR and WAVECAR
             np.testing.assert_array_almost_equal(
-                poscar.scaling_factor * poscar.cell_vecs, self.realcell,
+                poscar.scaling_factor * poscar.cell_vecs,
+                self.realcell,
             )
             re: NDArray[np.float64] = np.real(phi_r)
             im: NDArray[np.float64] = np.imag(phi_r)
@@ -421,7 +439,9 @@ class WAVECAR:
         for i in range(3):
             string += "\na" + str(i + 1)
             string += " = {}    {}    {}".format(
-                self.realcell[i][0], self.realcell[i][1], self.realcell[i][2],
+                self.realcell[i][0],
+                self.realcell[i][1],
+                self.realcell[i][2],
             )
         string += "\n"
         string += f"\nvolume unit cell =   {self.volume}"
@@ -429,13 +449,16 @@ class WAVECAR:
         for i in range(3):
             string += "\nb" + str(i + 1)
             string += " = {}    {}    {}".format(
-                self.rcpcell[i][0], self.rcpcell[i][1], self.rcpcell[i][2],
+                self.rcpcell[i][0],
+                self.rcpcell[i][1],
+                self.rcpcell[i][2],
             )
         return string
 
 
 def make_k_grid(
     ngrid: tuple[int, ...] | NDArray[np.int64] = (),
+    *,
     gamma: bool = False,
     para: bool = PARALLEL,
 ) -> NDArray[np.float64]:
@@ -445,9 +468,9 @@ def make_k_grid(
     ----------
     ngrid: tuple or NDArray
         Grid size
-    gamma: boolean, default, false
+    gamma: bool, default, false
         Set true if only gamma calculations (use vasp with -DwNGZHalf)
-    para: boolean, optional (default is global variable `PARALLEL`)
+    para: bool, optional (default is global variable `PARALLEL`)
 
     Returns
     -------
@@ -504,7 +527,7 @@ def make_k_grid(
 
 
 def check_symmetry(grid3d: NDArray[np.float64]) -> bool:
-    """True if grid3d(G) == np.conjugate(grid3d(-G)) for all G.
+    """Return True if grid3d(G) == np.conjugate(grid3d(-G)) for all G.
 
     Parameters
     ----------
@@ -521,21 +544,25 @@ def check_symmetry(grid3d: NDArray[np.float64]) -> bool:
     k_grid = make_k_grid(grid)
     for k in k_grid:
         ix, iy, iz = int(k[0]), int(k[1]), int(k[2])
-        if ix >= 0 and iy >= 0 and iz >= 0:
-            if grid3d[ix][iy][iz] != np.conjugate(grid3d[-ix][-iy][-iz]):
-                print(f"[{ix} {iy} {iz}] is {grid3d[ix][iy][iz]}\n")
-                print(
-                    "[{} {} {}] is {}\n".format(
-                        -ix, -iy, -iz, grid3d[-ix][-iy][-iz],
-                    ),
-                )
-                print("check the value\n")
-                return False
+        if (
+            ix >= 0
+            and iy >= 0
+            and iz >= 0
+            and (grid3d[ix][iy][iz] != np.conjugate(grid3d[-ix][-iy][-iz]))
+        ):
+            print(f"[{ix} {iy} {iz}] is {grid3d[ix][iy][iz]}\n")
+            print(
+                f"[{-ix} {-iy} {-iz}] is {grid3d[-ix][-iy][-iz]}\n",
+            )
+            print("check the value\n")
+            return False
     return True
 
 
 def restore_gamma_grid(
-    grid3d: NDArray[np.complex128], para: bool = PARALLEL,
+    grid3d: NDArray[np.complex128],
+    *,
+    para: bool = PARALLEL,
 ) -> NDArray[np.complex128]:
     """Return Grid from the size-reduced matrix for gammareal Wavecar.
 
@@ -543,8 +570,7 @@ def restore_gamma_grid(
     ----------
     grid3d: numpy.array
         3D grid data created with gamma-only version VASP
-
-    para  : boolean, optional (default is global variable `PARALLEL`)
+    para: bool, optional (default is global variable `PARALLEL`)
 
     """
     assert grid3d.ndim == 3, "Must be 3D Grid"
@@ -560,15 +586,14 @@ def restore_gamma_grid(
         # block part
         toconj[1:, 1:, :] = toconj[1:, 1:, :][::-1, ::-1, ::-1]
         return np.concatenate((grid3d, np.conjugate(toconj)), axis=-1)
-    else:
-        toconj = np.copy(grid3d[1:, :, :])
-        # z=0 slice
-        z0slice = toconj[:, :, 0]
-        z0slice = z0slice[::-1, :]
-        z0slice[::, 1:] = z0slice[::, 1:][:, ::-1]
-        toconj[:, :, 0] = z0slice
-        # y = 0 slice
-        toconj[:, 0, 1:] = toconj[:, 0, 1:][::-1, ::-1]
-        # block part
-        toconj[:, 1:, 1:] = toconj[:, 1:, 1:][::-1, ::-1, ::-1]
-        return np.concatenate((grid3d, np.conjugate(toconj)), axis=0)
+    toconj = np.copy(grid3d[1:, :, :])
+    # z=0 slice
+    z0slice = toconj[:, :, 0]
+    z0slice = z0slice[::-1, :]
+    z0slice[::, 1:] = z0slice[::, 1:][:, ::-1]
+    toconj[:, :, 0] = z0slice
+    # y = 0 slice
+    toconj[:, 0, 1:] = toconj[:, 0, 1:][::-1, ::-1]
+    # block part
+    toconj[:, 1:, 1:] = toconj[:, 1:, 1:][::-1, ::-1, ::-1]
+    return np.concatenate((grid3d, np.conjugate(toconj)), axis=0)

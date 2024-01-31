@@ -86,7 +86,7 @@ class ProjectionBand(EnergyBand):
             label name for summed site, such as 'silicene', and 'SurfaceAu'
 
         """
-        # As the original label['site'] is just a number beginnig from zero
+        # As the original label['site'] is just a number beginning from zero
         logger.debug(f"self.label: {self.label}")
         logger.debug(f"self.n_atom: {self.n_atom}")
         logger.debug(f"sites: {sites}")
@@ -167,13 +167,13 @@ class ProjectionBand(EnergyBand):
         orbital_name = _check_orbital_name(arg)
         if orbital_name in orbital_names:
             return (orbital_names.index(orbital_name),)
-        elif orbital_name == "p":
+        if orbital_name == "p":
             return (
                 orbital_names.index("px"),
                 orbital_names.index("py"),
                 orbital_names.index("pz"),
             )
-        elif orbital_name == "d":
+        if orbital_name == "d":
             return (
                 orbital_names.index("dxy"),
                 orbital_names.index("dyz"),
@@ -181,20 +181,20 @@ class ProjectionBand(EnergyBand):
                 orbital_names.index("dxz"),
                 orbital_names.index("dz2"),
             )
-        elif orbital_name == "sp":
+        if orbital_name == "sp":
             return (
                 orbital_names.index("s"),
                 orbital_names.index("px"),
                 orbital_names.index("py"),
                 orbital_names.index("pz"),
             )
-        elif orbital_name == "pxpy":
+        if orbital_name == "pxpy":
             return (orbital_names.index("px"), orbital_names.index("py"))
-        elif orbital_name == "pypz":
+        if orbital_name == "pypz":
             return (orbital_names.index("py"), orbital_names.index("pz"))
-        elif orbital_name == "pxpz":
+        if orbital_name == "pxpz":
             return (orbital_names.index("px"), orbital_names.index("pz"))
-        elif orbital_name == "spd":
+        if orbital_name == "spd":
             return (
                 orbital_names.index("s"),
                 orbital_names.index("px"),
@@ -206,8 +206,7 @@ class ProjectionBand(EnergyBand):
                 orbital_names.index("dxz"),
                 orbital_names.index("dx2"),
             )
-        else:
-            err = str(orbital_name) + " is not a proper (composed) orbital name."
+        err = str(orbital_name) + " is not a proper (composed) orbital name."
         raise RuntimeError(err)
 
     def make_label(
@@ -228,7 +227,7 @@ class ProjectionBand(EnergyBand):
         label_list = super().make_label("k", "energy")
         if not (site_indexes and orbital_indexes_sets):
             return label_list
-        for site_i, orbitals in zip(site_indexes, orbital_indexes_sets):
+        for site_i, orbitals in zip(site_indexes, orbital_indexes_sets, strict=True):
             for orbital_i in orbitals:
                 for spin_i in self.label["spin"]:
                     try:
@@ -281,7 +280,7 @@ class ProjectionBand(EnergyBand):
         # site_indexes, orbital_indexes_sets values:
         # Note that projband.ndim is 4
         array_list = []
-        for site_i, orbitals in zip(site_indexes, orbital_indexes_sets):
+        for site_i, orbitals in zip(site_indexes, orbital_indexes_sets, strict=True):
             for orbital_i in orbitals:
                 array_list.append(
                     self.proj[:, :, :, site_i, orbital_i][:, :, :, np.newaxis],
@@ -580,11 +579,9 @@ class PROCAR(ProjectionBand):  # Version safety
         string = ""
         for orb in self.label["orbital"]:
             string += f"{orb}  "
-        template2 = """
-    # Orbitals are: {}
-        """.format(
-            str,
-        )
+        template2 = f"""
+    # Orbitals are: {str}
+        """
         return (
             template1.format(
                 self,

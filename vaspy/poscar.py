@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- conding: utf-8 -*-
-"""This module provides POSCAR class.
+"""POSCAR class.
 
 translate from poscar.rb of 2014/2/26, master branch
 
@@ -85,7 +85,7 @@ class PosCarHead:
     """
 
     def __init__(self) -> None:
-        """Initialization."""
+        """Initialize."""
         self.__cell_vecs: NDArray[np.float64] = np.array(
             [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
         )
@@ -143,7 +143,7 @@ class PosCarHead:
         #         '#{0}:{1}{2}'.format(ii + m, elm, m + 1) for m in range(n))
         self.__site_label = []
         atomnames: list[str] = []
-        for elm, atomnums in zip(self.atom_types, self.atomnums):
+        for elm, atomnums in zip(self.atom_types, self.atomnums, strict=True):
             for j in range(1, atomnums + 1):
                 elem_num = elm + str(j)
                 if elem_num not in atomnames:
@@ -175,7 +175,7 @@ class PosCarPos:
     """
 
     def __init__(self) -> None:
-        """Initialization."""
+        """Initialize."""
         self.coordinate_type = ""
         self.positions: list[NDArray[np.float64]] = []
         self.coordinate_changeflags: list[str] = []
@@ -223,7 +223,7 @@ class POSCAR(PosCarHead, PosCarPos):
     """
 
     def __init__(self, arg: Sequence[str] | None = None) -> None:
-        """Initialization.
+        """Initialize.
 
         Parameters
         ----------
@@ -270,7 +270,7 @@ class POSCAR(PosCarHead, PosCarPos):
             self.selective = False
             self.coordinate_type = line7
 
-        for line, _ in zip(poscar, self.site_label):
+        for line, _ in zip(poscar, self.site_label, strict=False):
             tmp: list[str] = line.split()
             self.positions.append(np.asarray(np.array(tmp[:3]), dtype=np.float64))
             if self.selective:
@@ -307,11 +307,11 @@ class POSCAR(PosCarHead, PosCarPos):
         """
         if to_site is None:
             to_site = sum(self.atomnums)
-        if axis == "x" or axis == "X" or axis == 0:
+        if axis in ("x", "X", 0):
             axis = 0
-        elif axis == "y" or axis == "Y" or axis == 1:
+        elif axis in ("y", "Y", 1):
             axis = 1
-        elif axis == "z" or axis == "Z" or axis == 2:
+        elif axis in ("z", "Z", 2):
             axis = 2
         self.positions = (
             self.positions[:from_site]
@@ -618,7 +618,7 @@ class POSCAR(PosCarHead, PosCarPos):
         one_atoms: list[str] = []
         other_atoms: list[str] = []
         for i, (element, position, coordinate_flag) in enumerate(
-            zip(atoms, self.positions, self.coordinate_changeflags),
+            zip(atoms, self.positions, self.coordinate_changeflags, strict=True),
         ):
             if i in indexes:
                 one_atoms.append(element)
@@ -892,8 +892,8 @@ class POSCAR(PosCarHead, PosCarPos):
         return self.positions
 
     @property
-    def axes_lengthes(self) -> tuple[float, float, float]:
-        """Return cell axis lengthes.
+    def axes_lengths(self) -> tuple[float, float, float]:
+        """Return cell axis lengths.
 
         Returns
         -------

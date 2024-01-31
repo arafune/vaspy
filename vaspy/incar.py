@@ -103,7 +103,7 @@ str_2 = ["RWIGS", "SAXIS", "EINT", "LDATYPE", "LDAUL", "LDAUU", "LDAUJ", "MAGMOM
 
 
 def remove_sharp(str_: str) -> tuple[str, bool]:
-    """Remvoe # / ! from the string head.
+    """Remove # / ! from the string head.
 
     Parameters
     ----------

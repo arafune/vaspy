@@ -21,7 +21,7 @@ class TestLOCPOT:
     def test_locpot_poscar_part(self):
         """Test whether LOCPOT correctly treats POSCAR."""
         assert self.testlocpot1.poscar.system_name == "hBN-Cu"
-        len_x, len_y, len_z = self.testlocpot2.poscar.axes_lengthes
+        len_x, len_y, len_z = self.testlocpot2.poscar.axes_lengths
         assert (len_x, len_y, len_z) == (
             6.7395854049999997,
             6.7395858129882784,
@@ -99,7 +99,6 @@ class TestLOCPOT:
             z_all,
         )
 
-
     def test_grid_integrate_y(self):
         """Test for grid integrate (y)."""
         y_0 = self.testlocpot2.grid.integrate("y", 0, 1)
@@ -134,7 +133,8 @@ class TestLOCPOT:
         )
         # along X-axis
         np.testing.assert_almost_equal(
-            np.array([34.5, 35.5, 36.5]), self.testlocpot2.grid.average_along_axis("x"),
+            np.array([34.5, 35.5, 36.5]),
+            self.testlocpot2.grid.average_along_axis("x"),
         )
         # along Y-axis
         np.testing.assert_equal(
@@ -145,10 +145,12 @@ class TestLOCPOT:
     def test_min_along(self):
         """Test for LOCPOT min."""
         np.testing.assert_equal(
-            np.array([0.0, 1.0, 2.0]), self.testlocpot2.grid.min_along_axis("x"),
+            np.array([0.0, 1.0, 2.0]),
+            self.testlocpot2.grid.min_along_axis("x"),
         )
         np.testing.assert_equal(
-            np.array([0.0, 3.0, 6.0, 9.0]), self.testlocpot2.grid.min_along_axis("y"),
+            np.array([0.0, 3.0, 6.0, 9.0]),
+            self.testlocpot2.grid.min_along_axis("y"),
         )
         np.testing.assert_equal(
             np.array([0.0, 12.0, 24.0, 36.0, 48.0, 60.0]),
@@ -158,7 +160,8 @@ class TestLOCPOT:
     def test_max_along(self):
         """Test for LOCPOT max."""
         np.testing.assert_equal(
-            np.array([69.0, 70.0, 71.0]), self.testlocpot2.grid.max_along_axis("x"),
+            np.array([69.0, 70.0, 71.0]),
+            self.testlocpot2.grid.max_along_axis("x"),
         )
         np.testing.assert_equal(
             np.array([62.0, 65.0, 68.0, 71.0]),
@@ -172,7 +175,8 @@ class TestLOCPOT:
     def test_median_along(self):
         """Test for LOCPOT median."""
         np.testing.assert_equal(
-            np.array([34.5, 35.5, 36.5]), self.testlocpot2.grid.median_along_axis("x"),
+            np.array([34.5, 35.5, 36.5]),
+            self.testlocpot2.grid.median_along_axis("x"),
         )
         np.testing.assert_equal(
             np.array([31.0, 34.0, 37.0, 40.0]),
