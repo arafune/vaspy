@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import csv
-import sys
 from logging import INFO, Formatter, StreamHandler, getLogger
 from pathlib import Path
 from typing import IO, TYPE_CHECKING
@@ -17,10 +16,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-try:
-    import matplotlib.pyplot as plt
-except ImportError:
-    sys.stderr.write("Install matplotlib, or you cannot use methods relating to draw\n")
+import matplotlib.pyplot as plt
 
 # logger
 LOGLEVEL = INFO
@@ -337,7 +333,7 @@ class EIGENVAL(EnergyBand):
     def load_file(self, the_file: IO[str]) -> None:
         """Parse EIGENVAL."""
         self.n_atom, _, _, self.n_spin = (int(i) for i in next(the_file).split())
-        if self.n_spin == 2:
+        if self.n_spin == len(("up", "down")):
             self.label["energy"] = ["Energy_up", "Energy_down"]
         else:
             self.label["energy"] = ["Energy"]

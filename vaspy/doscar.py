@@ -41,16 +41,12 @@ from __future__ import annotations
 
 import copy
 import csv
-import sys
 from collections.abc import Sequence
 from operator import add
+from pathlib import Path
 from typing import IO, ClassVar
 
-try:
-    import matplotlib.pyplot as plt
-except ImportError:
-    sys.stderr.write("Install matplotlib, or you cannot use methods relating to draw\n")
-from pathlib import Path
+import matplotlib.pyplot as plt
 
 from vaspy.tools import open_by_suffix
 
