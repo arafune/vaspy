@@ -52,6 +52,7 @@ class BaderACF:
         ----------
         filename : str|Path
             filename, by default ""
+
         """
         self.n_atom = 0
         self.positions: list[list[float]] = []
@@ -71,6 +72,7 @@ class BaderACF:
         ----------
         the_file : IO[Any]
             'ACF.dat' file
+
         """
         # the first line is like:
         #     X     Y     Z     CHARGE      MIN DIST   ATOMIC VOL

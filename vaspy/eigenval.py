@@ -130,6 +130,7 @@ class EnergyBand:
         ----------
         keys: tuple
             key tuple used for label
+
         """
         label_list: list[str] = []
         for key in keys:
@@ -323,6 +324,7 @@ class EIGENVAL(EnergyBand):
         Returns
         -------
         tuple of list of float and list of float
+
         """
         energies: list[list[list[float]]] = self.energies.transpose(1, 2, 0).tolist()
         kvec: list[list[float]] = self.k_vectors.tolist()

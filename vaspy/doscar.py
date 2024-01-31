@@ -71,6 +71,7 @@ class DOSCAR:  # Version safety
 
     energies: tuple[float]
         Energy
+
     """
 
     def __init__(self, filename: str | Path = "") -> None:
@@ -80,6 +81,7 @@ class DOSCAR:  # Version safety
         ----------
         filename : str|Path, optional
             file name of "DOSCAR"
+
         """
         self.n_atom: int = 0
         self.tdos: TDOS | None = None
@@ -202,6 +204,7 @@ class TDOS(DOS):
     header : list[str]
 
     dos:
+
     """
 
     def __init__(self, array: tuple[float] | None) -> None:
@@ -211,6 +214,7 @@ class TDOS(DOS):
         ----------
         array : tuple[float]|None
             DOS data
+
         """
         super().__init__(array)
         if len(self.dos[0]) == 1:
@@ -349,6 +353,7 @@ class PDOS(DOS):
             filename for output
         energy : list[float] |  tuple[float, ...]
             Energy data
+
         """
         header = ["Energy"]
         for i in self.orbital_spin:

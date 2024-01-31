@@ -108,6 +108,7 @@ def remove_sharp(str_: str) -> tuple[str, bool]:
     Parameters
     ----------
         str_: str
+
     """
     active: bool = True
     str_ = str_.strip()
@@ -140,6 +141,7 @@ class Incar(Mapping):
         ----------
         the_file: StringIO
             "INCAR" file
+
         """
         incar: dict[str, tuple[str, bool]] = {}
         for line in the_file:
@@ -231,6 +233,7 @@ class Incar(Mapping):
         ----------
         keyword: str
             INCAR keyword
+
         """
         if (keyword in self) and self[keyword][1]:
             return self[keyword][0]
@@ -243,6 +246,7 @@ class Incar(Mapping):
         -------
         str
             Check messages
+
         """
         checks: dict[str, bool | int | float | str] = {
             'When ICHARG = 11, Recommend "LWAVE = .FALSE, LCHARG = .FALSE"\n': (

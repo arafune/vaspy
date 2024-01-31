@@ -78,6 +78,7 @@ class WAVECAR:
         ----------
         filename: str | Path (Default: "WAVECAR")
             File name of the 'WAVECAR'
+
         """
         self.wfc: IO[bytes] = Path(filename).open("rb")
         self.gamma: bool = False
@@ -475,6 +476,7 @@ def make_k_grid(
     Returns
     -------
     numpy.array
+
     """
     fx = [
         ii if ii < ngrid[0] // 2 + 1 else ii - ngrid[0]  # <<< // or / (?)

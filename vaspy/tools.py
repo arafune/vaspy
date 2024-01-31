@@ -150,6 +150,7 @@ def cuboid(crystal_axes: Sequence[float]) -> NDArray[np.float64]:
         Three vectors for tetrahedron.  (Crystal axis a,b,c)
 
     Return
+
     """
     a: NDArray[np.float64] = np.array(crystal_axes[0])
     b: NDArray[np.float64] = np.array(crystal_axes[1], dtype=np.float64)

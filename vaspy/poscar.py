@@ -1087,6 +1087,7 @@ def _vectorize(vector: ArrayLike) -> NDArray[np.float64]:
     -------
     NDArray
         Numpy array (flatten)
+
     """
     if not isinstance(vector, np.ndarray | np.matrix | list | tuple):
         msg = "Cannot convert into vector."
