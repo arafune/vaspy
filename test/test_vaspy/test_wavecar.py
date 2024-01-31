@@ -27,7 +27,8 @@ class TestHatomWavecar:
         assert self.h.n_bands == 27
         assert self.h.encut == 600
         np.testing.assert_array_equal(
-            [[25.0, 0.0, 0.0], [0.0, 25.0, 0.0], [0.0, 0.0, 25.0]], self.h.realcell,
+            [[25.0, 0.0, 0.0], [0.0, 25.0, 0.0], [0.0, 0.0, 25.0]],
+            self.h.realcell,
         )
         assert_almost_equal(25**3, self.h.volume)
         np.testing.assert_array_almost_equal([101, 101, 101], self.h.ngrid)
@@ -35,7 +36,8 @@ class TestHatomWavecar:
         self.h.nplwvs[0] == 260834
         np.testing.assert_array_equal((260834, 3), self.h.gvectors().shape)
         np.testing.assert_array_almost_equal(
-            [0, 0, 0, 0, 0], self.h.realspace_wfc()[0][0][:5],
+            [0, 0, 0, 0, 0],
+            self.h.realspace_wfc()[0][0][:5],
         )
 
 
@@ -62,7 +64,8 @@ class TestCOWavecar:
         assert self.co.encut == 400
         assert_almost_equal(-8.05748789, self.co.efermi)
         np.testing.assert_array_equal(
-            [[17.0, 0.0, 0.0], [0.0, 17.0, 0.0], [0.0, 0.0, 17.0]], self.co.realcell,
+            [[17.0, 0.0, 0.0], [0.0, 17.0, 0.0], [0.0, 0.0, 17.0]],
+            self.co.realcell,
         )
         assert_almost_equal(4913, self.co.volume)
         np.testing.assert_array_almost_equal([57, 57, 57], self.co.ngrid)

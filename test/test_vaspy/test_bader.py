@@ -1,4 +1,5 @@
 """Unit test for OUTCAR class."""
+
 import os
 
 import numpy as np
@@ -27,7 +28,8 @@ class TestBader:
         assert self.acf.n_electron == 2828.000
         assert 344, self.acf.n_atom
         np.testing.assert_array_almost_equal(
-            [6.745000, -37.491966, 11.674620], self.acf.positions[0],
+            [6.745000, -37.491966, 11.674620],
+            self.acf.positions[0],
         )
         assert self.acf.charges[0] == 3.526327
         assert self.acf.mindists[0] == 0.423581

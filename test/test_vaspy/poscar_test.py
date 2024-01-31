@@ -34,10 +34,12 @@ class TestPOSCAR:
         """Test for POSCAR class: fundamental data read."""
         assert self.testposcar.system_name == "NiC4S4"
         np.testing.assert_allclose(
-            np.array([0.866025404, -0.5, 0.0]), self.testposcar.cell_vecs[0],
+            np.array([0.866025404, -0.5, 0.0]),
+            self.testposcar.cell_vecs[0],
         )
         np.testing.assert_allclose(
-            np.array([0.866025404, 0.5, 0.0]), self.testposcar.cell_vecs[1],
+            np.array([0.866025404, 0.5, 0.0]),
+            self.testposcar.cell_vecs[1],
         )
         self.testposcar.cell_vecs[2] = (1, 0, 0)
         np.testing.assert_allclose(np.array([1, 0, 0]), self.testposcar.cell_vecs[2])
@@ -77,7 +79,8 @@ class TestPOSCAR:
         )
         assert vaspy.poscar.point_in_box((0.5, 0.1, 0.2), self.testposcar.cell_vecs)
         assert vaspy.poscar.point_in_box(
-            (0.5, 0.5, 0.2), ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
+            (0.5, 0.5, 0.2),
+            ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
         )
 
     def test_is_cartesian(self):
@@ -96,7 +99,8 @@ class TestPOSCAR:
 
     def test_pos(self):
         np.testing.assert_array_equal(
-            np.array([0.0, 0.5, 0.5]), self.testposcar.positions[2],
+            np.array([0.0, 0.5, 0.5]),
+            self.testposcar.positions[2],
         )
         np.testing.assert_allclose(
             np.array([0.23764, 0.429027113, 0.5]),
@@ -181,13 +185,16 @@ class TestPOSCAR:
         """Tests for poscar supercell method."""
         supercell = self.testposcar.supercell(3, 2, 1)
         np.testing.assert_allclose(
-            np.array([2.59807621, -1.5, 0.0]), supercell.cell_vecs[0],
+            np.array([2.59807621, -1.5, 0.0]),
+            supercell.cell_vecs[0],
         )
         np.testing.assert_allclose(
-            np.array([1.73205081, 1.0, 0.0]), supercell.cell_vecs[1],
+            np.array([1.73205081, 1.0, 0.0]),
+            supercell.cell_vecs[1],
         )
         np.testing.assert_allclose(
-            np.array([0.0, 0.0, 1.02529049]), supercell.cell_vecs[2],
+            np.array([0.0, 0.0, 1.02529049]),
+            supercell.cell_vecs[2],
         )
         assert supercell.system_name == "NiC4S4"
         assert ["Ni", "C", "S"] == supercell.atom_types
@@ -245,7 +252,8 @@ class TestPOSCAR:
     def test__getitem(self, fepc) -> None:
         print(fepc)
         assert_array_equal(
-            fepc[0], [0.1362036989956494, 0.0552692292217493, 0.0000000000000000],
+            fepc[0],
+            [0.1362036989956494, 0.0552692292217493, 0.0000000000000000],
         )
         assert fepc[0][1] == 0.0552692292217493
         assert_array_equal(

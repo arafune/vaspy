@@ -10,7 +10,6 @@ class TestMesh3d:
     def setup_method(self):
         os.path.abspath(os.path.dirname(__file__)) + "/data/"
 
-
     def test_check_basic_parameters(self):
         """Checking the basic parameters stored."""
         meshdata = list(range(3 * 4 * 5))

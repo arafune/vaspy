@@ -6,6 +6,7 @@
 * EnergyBand class is for drawing the energy band.
 * Projection class is for storing the orbital projection data
 """
+
 from __future__ import annotations
 
 import csv

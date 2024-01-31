@@ -62,13 +62,19 @@ except NameError:
 
 wav: wavecar.WAVECAR = wavecar.WAVECAR(args.wavecar)
 grid = wav.realspace_wfc(
-    spin_i=args.spin, k_i=args.k - 1, band_i=args.band - 1, poscar=pos,
+    spin_i=args.spin,
+    k_i=args.k - 1,
+    band_i=args.band - 1,
+    poscar=pos,
 )
 #
 #
 if args.output:
     filename = "{}_s_{:01d}_k_{:003d}_b_{:003d}.vasp".format(
-        args.output, args.spin, args.k - 1, args.band - 1,
+        args.output,
+        args.spin,
+        args.k - 1,
+        args.band - 1,
     )
     grid.save(filename)
 else:

@@ -1,6 +1,5 @@
 """OUTCAR class."""
 
-
 from __future__ import annotations
 
 from typing import IO, TYPE_CHECKING

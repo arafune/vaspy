@@ -1,5 +1,6 @@
 """Setup script for vaspy
 """
+
 import sys
 from distutils.core import setup
 

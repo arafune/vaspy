@@ -1,4 +1,5 @@
 """Unit test for OUTCAR class."""
+
 import os
 
 import numpy as np
@@ -24,13 +25,16 @@ class TestOUTCAR:
         #
         # reciprocal vectors
         np.testing.assert_almost_equal(
-            np.array([0.389375981, -0.224806327, 0.000000000]), outcar0.recvec[0],
+            np.array([0.389375981, -0.224806327, 0.000000000]),
+            outcar0.recvec[0],
         )
         np.testing.assert_almost_equal(
-            np.array([0.000000000, 0.449612655, 0.000000000]), outcar0.recvec[1],
+            np.array([0.000000000, 0.449612655, 0.000000000]),
+            outcar0.recvec[1],
         )
         np.testing.assert_almost_equal(
-            np.array([0.000000000, 0.000000000, 0.023484312]), outcar0.recvec[2],
+            np.array([0.000000000, 0.000000000, 0.023484312]),
+            outcar0.recvec[2],
         )
         # k_vectors and weights
         assert len(outcar0.k_vectors) == 33

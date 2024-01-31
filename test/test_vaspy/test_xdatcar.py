@@ -19,10 +19,12 @@ class TestXDATCAR:
         assert self.xdatcar_test.system_name == "MoS2"
         assert self.xdatcar_test.scaling_factor == 1.0
         np.testing.assert_allclose(
-            [3.184000, 0.000000, 0.000000], self.xdatcar_test.cell_vecs[0],
+            [3.184000, 0.000000, 0.000000],
+            self.xdatcar_test.cell_vecs[0],
         )
         np.testing.assert_allclose(
-            [1.592000, 2.757425, 0.000000], self.xdatcar_test.cell_vecs[1],
+            [1.592000, 2.757425, 0.000000],
+            self.xdatcar_test.cell_vecs[1],
         )
         np.testing.assert_allclose([0, 0, 38.0], self.xdatcar_test.cell_vecs[2])
         assert ["Mo", "S"] == self.xdatcar_test.atom_types

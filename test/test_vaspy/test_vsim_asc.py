@@ -19,7 +19,8 @@ class TestVsimASCII:
         self.hBN.system_name == "Phonopy generated file for v_sim 3.6"
         np.testing.assert_allclose([2.484999131, 0, 0], self.hBN.lattice_vectors[0])
         np.testing.assert_allclose(
-            [1.242498697, 2.152072878, 0], self.hBN.lattice_vectors[1],
+            [1.242498697, 2.152072878, 0],
+            self.hBN.lattice_vectors[1],
         )
         np.testing.assert_allclose([0, 0, 24.85], self.hBN.lattice_vectors[2])
         ["B", "N"] == self.hBN.atoms
