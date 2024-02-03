@@ -1,6 +1,5 @@
 #! python
-"""
-Created on Sun Mar 30 13:25:29 2014
+"""Created on Sun Mar 30 13:25:29 2014
 
 @author: Mao
 """

@@ -45,7 +45,7 @@ parser.add_argument(
     dest="atomindex",
     action="append",
     type=tools.atom_selection_to_list,
-    help="""atom index specifed with range.
+    help="""atom index specified with range.
 Use "-" or ","
     (ex.) --site 1,2,7-9""",
 )
@@ -108,7 +108,7 @@ logger.debug(f"sitenames: {sitenames}")
 logger.debug(f"args.orbitals: {args.orbital}")
 logger.debug(f"orbitals flat: {flat_orbitals}")
 #
-for sites, name in zip(siteindex, sitenames):
+for sites, name in zip(siteindex, sitenames, strict=True):
     procar.append_sumsite(tuple(sites), name)
 for orb in tuple(set(flat_orbitals)):
     procar.append_sumorbital(procar.orbital_index(orb), orb)
@@ -134,6 +134,7 @@ logger.debug(f"orbital_indexes_sets: {orbital_indexes_sets}")
 #
 print(
     procar.text_sheet(
-        site_indexes=site_indexes, orbital_indexes_sets=orbital_indexes_sets,
+        site_indexes=site_indexes,
+        orbital_indexes_sets=orbital_indexes_sets,
     ),
 )

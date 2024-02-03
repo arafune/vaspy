@@ -7,7 +7,7 @@ LOCPOT, and ELFCAR.  The ELFCAR class has not yet implemented yet, though.
 from __future__ import annotations
 
 import copy
-import os
+from pathlib import Path
 from typing import IO, TYPE_CHECKING
 
 import numpy as np
@@ -17,7 +17,6 @@ from vaspy.tools import open_by_suffix
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from pathlib import Path
 
     from numpy.typing import NDArray
 
@@ -94,9 +93,9 @@ class VASPGrid:
         self.grid.shape = tuple([int(string) for string in separator.split()])
         # Volumetric data
         if pickles:
-            if os.path.splitext(pickles)[1] == ".npy":
+            if Path(pickles).suffix == ".npy":
                 self.grid.data = np.load(pickles)
-            elif os.path.splitext(pickles)[1] == ".npz":
+            elif Path(pickles).suffix == ".npz":
                 self.grid.data = np.load(pickles)["arr_0"]
             else:
                 msg = "Check the volmetric data type"
@@ -118,9 +117,9 @@ class VASPGrid:
                         griddata += next(the_file).replace("***********", "Nan")
                     section = "grid"
                 elif "augmentation occupancies " in line:
-                    pass  # Used for CHGCAR, not LOCPOT. not implementd
+                    pass  # Used for CHGCAR, not LOCPOT. not implemented
                 else:
-                    pass  # Used for CHGCAR, not LOCPOT. not implementd
+                    pass  # Used for CHGCAR, not LOCPOT. not implemented
             elif section == "grid":
                 if "augmentation occupancies " in line:
                     section = "aug"
@@ -156,7 +155,7 @@ class VASPGrid:
 
         """
         the_file: IO[str]
-        with open(filename, mode="w", newline="\n") as the_file:
+        with Path(filename).open(mode="w", newline="\n") as the_file:
             the_file.write(str(self))
 
     def frame(self, frame_i: int) -> VASPGrid:
@@ -182,7 +181,7 @@ class VASPGrid:
         Parameters
         ----------
         other: VASPGrid
-            Addtion VaspGrid object
+            Addition VaspGrid object
 
         Returns
         -------
@@ -206,7 +205,7 @@ class VASPGrid:
         Parameters
         ----------
         other: VASPGrid
-            Addtion VaspGrid object
+            Addition VaspGrid object
 
         Returns
         -------
@@ -338,21 +337,20 @@ class Grid3D:
                 :,
                 position,
             ]
-        elif axis == "y":
+        if axis == "y":
             return griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
                 :,
                 position,
                 :,
             ]
-        elif axis == "z":
+        if axis == "z":
             return griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
                 position,
                 :,
                 :,
             ]
-        else:
-            msg = 'axis must be "x", "y" or "z".'
-            raise RuntimeError(msg)
+        msg = 'axis must be "x", "y" or "z".'
+        raise RuntimeError(msg)
 
     def integrate(
         self,
@@ -374,6 +372,8 @@ class Grid3D:
             'from' value of range of interval integration
         to_coor: int
             'to' value of range interval integration
+        frame_i: int
+            frame index
 
         Return
         ------
@@ -392,7 +392,7 @@ class Grid3D:
                 ],
                 axis=2,
             )
-        elif axis == "y":
+        if axis == "y":
             return np.sum(
                 griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
                     :,
@@ -401,7 +401,7 @@ class Grid3D:
                 ],
                 axis=1,
             )
-        elif axis == "z":
+        if axis == "z":
             return np.sum(
                 griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
                     from_coor:to_coor,
@@ -410,9 +410,8 @@ class Grid3D:
                 ],
                 axis=0,
             )
-        else:
-            msg = "incorrect axis"
-            raise ValueError(msg)
+        msg = "incorrect axis"
+        raise ValueError(msg)
 
     def __str__(self) -> str:
         """Return as string object.
@@ -450,6 +449,8 @@ class Grid3D:
             'X', 'Y', or 'Z'
         mode: int, optional (default is 0)
             select data by integer
+        frame_i: int
+            frame index
 
         Returns
         -------
@@ -481,6 +482,8 @@ class Grid3D:
             'X', 'Y', or 'Z'
         mode: int, optional (default is 0)
             select data by integer
+        frame_i: int
+            frame index
 
         Returns
         -------
@@ -512,6 +515,8 @@ class Grid3D:
             'X', 'Y', or 'Z'
         mode: int, optional (default is 0)
             select data by integer
+        frame_i: int
+            frame index
 
         Returns
         -------
@@ -547,6 +552,8 @@ class Grid3D:
             'X', 'Y', or 'Z'
         mode: int, optional (default is 0)
             select data by integer
+        frame_i: int
+            frame index
 
         Returns
         -------

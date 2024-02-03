@@ -74,26 +74,25 @@ def load(filename: str, mode: str = "", additional: str = "") -> Any:
     mode = mode.lower()
     if re.search(r"poscar|contcar", filenamebase) or mode == "poscar":
         return poscar.POSCAR(filename)
-    elif re.search(r"incar", filenamebase) or mode == "incar":
+    if re.search(r"incar", filenamebase) or mode == "incar":
         return incar.Incar(filename)
-    elif re.search(r"outcar", filenamebase) or mode == "outcar":
+    if re.search(r"outcar", filenamebase) or mode == "outcar":
         return outcar.OUTCAR(filename)
-    elif re.search(r"chgcar|parchg", filenamebase) or mode == "chgcar":
+    if re.search(r"chgcar|parchg", filenamebase) or mode == "chgcar":
         return chgcar.CHGCAR(filename, pickles=additional)
-    elif re.search(r"procar", filenamebase) or mode == "procar":
+    if re.search(r"procar", filenamebase) or mode == "procar":
         return procar.PROCAR(filename)
-    elif re.search(r"locpot", filenamebase) or mode == "locpot":
+    if re.search(r"locpot", filenamebase) or mode == "locpot":
         return locpot.LOCPOT(filename, pickles=additional)
-    elif re.search(r"doscar", filenamebase) or mode == "doscar":
+    if re.search(r"doscar", filenamebase) or mode == "doscar":
         return doscar.DOSCAR(filename)
-    elif re.search(r"vasp", filenamebase):
+    if re.search(r"vasp", filenamebase):
         return poscar.POSCAR(filename)
-    elif re.search(r"eigenval", filenamebase) or mode == "eigenval":
+    if re.search(r"eigenval", filenamebase) or mode == "eigenval":
         return eigenval.EIGENVAL(filename)
-    elif re.search(r"wavecar", filenamebase) or mode == "wavecar":
+    if re.search(r"wavecar", filenamebase) or mode == "wavecar":
         return wavecar.WAVECAR(filename)
-    elif re.search(r"acf", filenamebase) or mode == "bader":
+    if re.search(r"acf", filenamebase) or mode == "bader":
         return bader.BaderACF(filename)
-    else:
-        msg = "The loding mode cannot be identified!  Set 'mode'"
-        raise RuntimeError(msg)
+    msg = "The loading mode cannot be identified!  Set 'mode'"
+    raise RuntimeError(msg)

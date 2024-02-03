@@ -1,10 +1,11 @@
-"""This module provides EIGENVAL."""
+"""EIGENVAL."""
 
 from __future__ import annotations
 
 import csv
 import sys
 from logging import INFO, Formatter, StreamHandler, getLogger
+from pathlib import Path
 from typing import IO, TYPE_CHECKING
 
 import numpy as np
@@ -13,7 +14,6 @@ from vaspy.tools import open_by_suffix
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from pathlib import Path
 
     from numpy.typing import NDArray
 
@@ -148,13 +148,17 @@ class EnergyBand:
         band_structure: list[list[float]] = []
         for energies in self.energies.T.tolist():
             band: list[float] = []
-            for k, energy in zip(self.kdistances[:, np.newaxis].tolist(), energies):
+            for k, energy in zip(
+                self.kdistances[:, np.newaxis].tolist(),
+                energies,
+                strict=True,
+            ):
                 k.extend(energy)
                 band.append(k)
             band_structure.append(band)
         return band_structure
 
-    def to_csv(self, csv_file: str, blankline: bool = True) -> None:
+    def to_csv(self, csv_file: str, *, blankline: bool = True) -> None:
         """Write data to csv file.
 
         Parameters
@@ -168,7 +172,7 @@ class EnergyBand:
 
         """
         label_str: str = "\t".join(self.make_label("k", "energy")) + "\n"
-        with open(csv_file, "w") as fhandle:
+        with Path(csv_file).open("w") as fhandle:
             fhandle.writelines(label_str)
             writer = csv.writer(fhandle, delimiter="\t")
             for band_i in self.to_3dlist():
@@ -235,7 +239,9 @@ class EnergyBand:
         return plt.gca()
 
     def show(
-        self, y_range: tuple[float, float] | None = None, spin_i: int = 0,
+        self,
+        y_range: tuple[float, float] | None = None,
+        spin_i: int = 0,
     ) -> None:  # How to set default value?
         """Draw band structure by using maptlotlib.
 
@@ -243,7 +249,7 @@ class EnergyBand:
 
         Parameters
         ----------
-        yrange: tuple, optional  (default: all range)
+        y_range: tuple, optional  (default: all range)
             Minimum and maximum value of the y-axis.
             If not specified, use the matplotlib default value.
 
@@ -259,12 +265,7 @@ class EnergyBand:
         plt.ylabel(self.label["energy"][spin_i] + " (eV)")
         plt.show()
 
-    def to_physical_kvector(
-        self,
-        recvec: NDArray[np.float64] = np.array(
-            ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)),
-        ),
-    ) -> None:
+    def to_physical_kvector(self, recvec: NDArray[np.float64] | None = None) -> None:
         """Change k-vector unit to inverse AA.
 
         Parameters
@@ -279,6 +280,9 @@ class EnergyBand:
             unit of the wavevector.
 
         """
+        if recvec is None:
+            recvec = np.array(((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)))
+        assert recvec is not None
         logger.debug(f"recvec: {recvec}")
         logger.debug(f"self.k_vectors: {self.k_vectors}")
         recvec = np.array(recvec)
@@ -322,7 +326,7 @@ class EIGENVAL(EnergyBand):
         """
         energies: list[list[list[float]]] = self.energies.transpose(1, 2, 0).tolist()
         kvec: list[list[float]] = self.k_vectors.tolist()
-        return list(zip(kvec, energies))[item]
+        return list(zip(kvec, energies, strict=True))[item]
 
     def __len__(self) -> int:
         """Return num_k as the result of len()."""
@@ -352,6 +356,8 @@ class EIGENVAL(EnergyBand):
                 )
         self.k_vectors: NDArray[np.float64] = np.array(k_vectors)
         self.energies: NDArray[np.float64] = np.array(energies).T.reshape(
-            self.n_spin, self.num_k, self.n_bands,
+            self.n_spin,
+            self.num_k,
+            self.n_bands,
         )
         the_file.close()
