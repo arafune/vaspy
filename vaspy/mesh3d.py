@@ -227,12 +227,13 @@ class VASPGrid:
         """Subtract the density.
 
         x.__sub__(y) <=> x - y
+
         Parameters
-        ---------------
+        ----------
         other: VASPGrid
             difference VASPGrid object
 
-        Returns:
+        Returns
         -------
         Grid3D
             Resultant by difference between two objects.
@@ -428,11 +429,7 @@ class Grid3D:
         mesharray = self.data.reshape(self.n_frame, self.size)
         for tmp in mesharray:
             output = []
-            outputstr += "\n  {}  {}  {}\n".format(
-                self.shape[0],
-                self.shape[1],
-                self.shape[2],
-            )
+            outputstr += f"\n  {self.shape[0]}  {self.shape[1]}  {self.shape[2]}\n"
             for array in tools.each_slice(tmp, 5):
                 output.append(
                     "".join(f"  {i:18.11E}" for i in array if i is not None),

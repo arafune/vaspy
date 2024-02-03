@@ -525,9 +525,7 @@ def check_symmetry(grid3d: NDArray[np.float64]) -> bool:
             if grid3d[ix][iy][iz] != np.conjugate(grid3d[-ix][-iy][-iz]):
                 print(f"[{ix} {iy} {iz}] is {grid3d[ix][iy][iz]}\n")
                 print(
-                    "[{} {} {}] is {}\n".format(
-                        -ix, -iy, -iz, grid3d[-ix][-iy][-iz],
-                    ),
+                    f"[{-ix} {-iy} {-iz}] is {grid3d[-ix][-iy][-iz]}\n",
                 )
                 print("check the value\n")
                 return False

@@ -580,11 +580,9 @@ class PROCAR(ProjectionBand):  # Version safety
         string = ""
         for orb in self.label["orbital"]:
             string += f"{orb}  "
-        template2 = """
-    # Orbitals are: {}
-        """.format(
-            str,
-        )
+        template2 = f"""
+    # Orbitals are: {str}
+        """
         return (
             template1.format(
                 self,
