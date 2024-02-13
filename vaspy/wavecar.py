@@ -128,7 +128,9 @@ class WAVECAR:
         self.ngrid: NDArray[np.int64] = np.array(2 * cutoff + 1, dtype=int)
 
     def check_DwNGZHalf(self) -> bool:  # noqa: N802
-        r"""self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
+        r"""Check if DwNGZHalf.
+
+        self.gamma = True if self gvectors(0)[0] :math:`\neq` nplwvs[0] and
         about half of the number of gvectors equals number of plane waves.
         """
         if self.gamma:
@@ -145,13 +147,12 @@ class WAVECAR:
     @property
     def prec(self) -> DTypeLike:
         """Return precision determined from self.rtag."""
-        if self.rtag == 45200:
+        if self.rtag == 45200:  # noqa: PLR2004
             return np.complex64
-        elif self.rtag == 45210:
+        if self.rtag == 45210:  # noqa: PLR2004
             return np.complex128
-        else:
-            msg = f"Invalid TAG value: {self.rtag}"
-            raise ValueError(msg)
+        msg = f"Invalid TAG value: {self.rtag}"
+        raise ValueError(msg)
 
     def band(self) -> None:
         """Read the information about the band from WAVECAR file.
@@ -164,8 +165,8 @@ class WAVECAR:
         * occupation  (as a function of spin-, k-, and band index)
 
         """
-        self.k_vectors: NDArray[np.float64] = np.zeros((self.num_k, 3), dtype=float)
-        self.bands: NDArray[np.float64] = np.zeros(
+        self.k_vectors: NDArray[np.float_] = np.zeros((self.num_k, 3), dtype=float)
+        self.bands: NDArray[np.float_] = np.zeros(
             (self.n_spin, self.num_k, self.n_bands),
             dtype=float,
         )
@@ -397,32 +398,31 @@ class WAVECAR:
         #
         self.phi_k: NDArray[np.complex128] = phi_k  # For debug
         phi_r: NDArray[np.complex128] = ifftn(phi_k)
-        if poscar.scaling_factor == 0.0:  # poscar is not given.
-            if phi_r.ndim == 3:
+        if poscar.scaling_factor == 0:  # poscar is not given.
+            if phi_r.ndim == 3:  # noqa: PLR2004
                 return phi_r.T
             return (phi_r[0] + phi_r[1]).T, (phi_r[0] - phi_r[1]).T
-        else:
-            vaspgrid = mesh3d.VASPGrid()
-            vaspgrid.poscar = poscar
-            vaspgrid.grid.shape = ngrid
-            # checking consistency between POSCAR and WAVECAR
-            np.testing.assert_array_almost_equal(
-                poscar.scaling_factor * poscar.cell_vecs,
-                self.realcell,
+        vaspgrid = mesh3d.VASPGrid()
+        vaspgrid.poscar = poscar
+        vaspgrid.grid.shape = ngrid
+        # checking consistency between POSCAR and WAVECAR
+        np.testing.assert_array_almost_equal(
+            poscar.scaling_factor * poscar.cell_vecs,
+            self.realcell,
+        )
+        re: NDArray[np.float64] = np.real(phi_r)
+        im: NDArray[np.float64] = np.imag(phi_r)
+        if phi_r.ndim == 3:  # noqa: PLR2004
+            vaspgrid.grid.data = np.concatenate((re.flatten("F"), im.flatten("F")))
+        else:  # SOI
+            vaspgrid.grid.data = np.concatenate(
+                (
+                    (re[0] + re[1]).flatten("F"),
+                    (im[0] + im[1]).flatten("F"),
+                    (re[0] - re[1]).flatten("F"),
+                    (im[0] - im[1]).flatten("F"),
+                ),
             )
-            re: NDArray[np.float64] = np.real(phi_r)
-            im: NDArray[np.float64] = np.imag(phi_r)
-            if phi_r.ndim == 3:
-                vaspgrid.grid.data = np.concatenate((re.flatten("F"), im.flatten("F")))
-            else:  # SOI
-                vaspgrid.grid.data = np.concatenate(
-                    (
-                        (re[0] + re[1]).flatten("F"),
-                        (im[0] + im[1]).flatten("F"),
-                        (re[0] - re[1]).flatten("F"),
-                        (im[0] - im[1]).flatten("F"),
-                    ),
-                )
         return vaspgrid
 
     def __str__(self) -> str:
@@ -537,7 +537,7 @@ def check_symmetry(grid3d: NDArray[np.float64]) -> bool:
     Boolean
 
     """
-    assert grid3d.ndim == 3, "Must be 3D Grid"
+    assert grid3d.ndim == 3, "Must be 3D Grid"  # noqa: PLR2004
     grid = grid3d.shape
     k_grid = make_k_grid(grid)
     for k in k_grid:
@@ -558,7 +558,7 @@ def check_symmetry(grid3d: NDArray[np.float64]) -> bool:
 
 
 def restore_gamma_grid(
-    grid3d: NDArray[np.complex128],
+    grid3d: NDArray[np.complex_],
     *,
     para: bool = PARALLEL,
 ) -> NDArray[np.complex128]:
@@ -566,12 +566,17 @@ def restore_gamma_grid(
 
     Parameters
     ----------
-    grid3d: numpy.array
+    grid3d: NDArray[np.complex_]
         3D grid data created with gamma-only version VASP
-    para: bool, optional (default is global variable `PARALLEL`)
+    para: bool
+        optional (default is global variable `PARALLEL`)
 
+    Returns
+    -------
+    NDArray[np.complex128]
+        [TODO:description]
     """
-    assert grid3d.ndim == 3, "Must be 3D Grid"
+    assert grid3d.ndim == 3, "Must be 3D Grid"  # noqa: PLR2004
     if para:
         toconj = np.copy(grid3d[:, :, 1:])
         # x=0 slice

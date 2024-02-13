@@ -107,7 +107,13 @@ def remove_sharp(str_: str) -> tuple[str, bool]:
 
     Parameters
     ----------
-        str_: str
+    str_: str
+        string that "#" to be removed
+
+    Returns
+    -------
+    tuple[str, bool]
+        [TODO:description]
     """
     active: bool = True
     str_ = str_.strip()
@@ -118,11 +124,13 @@ def remove_sharp(str_: str) -> tuple[str, bool]:
     return str_, active
 
 
-class Incar(Mapping):
+class Incar(Mapping[str, float | str]):
     """General class for INCAR file."""
 
     def __init__(self, filename: Path | str = "") -> None:
-        """Parameters
+        """Initialize Incar object.
+
+        Parameters
         ----------
         filename: str, pathlib.Path
             filename of INCAR

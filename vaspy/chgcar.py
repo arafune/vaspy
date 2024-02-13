@@ -62,13 +62,15 @@ class CHGCAR(VASPGrid):
         the_file: IO
             CHGCAR file
 
+        pickles: str
+            filename of griddata stored by np.save or np.savez
         """
         super().load_file(the_file, pickles)
         if self.grid.n_frame == 1:
             self.spin = [""]
-        elif self.grid.n_frame == 2:
+        elif self.grid.n_frame == 2:  # noqa: PLR2004
             self.spin = ["up+down", "up-down"]
-        elif self.grid.n_frame == 4:
+        elif self.grid.n_frame == 4:  # noqa: PLR2004
             self.spin = ["mT", "mX", "mY", "mZ"]
         else:
             msg = "CHGCAR is correct?"
@@ -109,10 +111,10 @@ class CHGCAR(VASPGrid):
             msg = "This CHGCAR is not spin resolved version"
             raise RuntimeError(msg)
         dest = copy.deepcopy(self)
-        if len(self.spin) == 2:
+        if len(self.spin) == 2:  # noqa: PLR2004
             dest.grid = dest.grid.frame(1)
             dest.spin = ["up-down"]
-        elif len(self.spin) == 4:
+        elif len(self.spin) == 4:  # noqa: PLR2004
             if direction == "t":
                 dest.grid = dest.grid.frame(0)
                 dest.spin = ["mT"]
@@ -140,7 +142,9 @@ class CHGCAR(VASPGrid):
             CHGCAR for the majority spin charge
 
         """
-        assert len(self.spin) == 2, "This CHGCAR is not spin resolved version"
+        assert (
+            len(self.spin) == 2  # noqa: PLR2004
+        ), "This CHGCAR is not spin resolved version"
         dest = copy.deepcopy(self)
         tmp = dest.grid.data.reshape(2, self.grid.size)
         dest.grid.data = (tmp[0] + tmp[1]) / 2
@@ -159,7 +163,9 @@ class CHGCAR(VASPGrid):
             CHGCAR for the minority spin charge
 
         """
-        assert len(self.spin) == 2, "This CHGCAR is not spin resolved version"
+        assert (
+            len(self.spin) == 2  # noqa: PLR2004
+        ), "This CHGCAR is not spin resolved version"
         dest = copy.deepcopy(self)
         tmp = dest.grid.data.reshape(2, self.grid.size)
         dest.grid.data = (tmp[0] - tmp[1]) / 2

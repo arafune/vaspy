@@ -80,6 +80,7 @@ class DOSCAR:  # Version safety
         ----------
         filename : str|Path, optional
             file name of "DOSCAR"
+
         """
         self.n_atom: int = 0
         self.tdos: TDOS | None = None
