@@ -27,7 +27,10 @@ parser.add_argument(
     help="export into XDATCAR file from POSCAR files",
 )
 parser.add_argument(
-    "files", nargs="+", metavar="XDATCAR or POSCAR files", help="XDATCAR file(s)",
+    "files",
+    nargs="+",
+    metavar="XDATCAR or POSCAR files",
+    help="XDATCAR file(s)",
 )
 #
 args = parser.parse_args()

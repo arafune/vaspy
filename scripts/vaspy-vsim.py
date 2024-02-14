@@ -11,10 +11,16 @@ from vaspy import poscar, vsim_asc
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("--dim", type=str, help="dimension of supercell, such as 2,2,1")
 parser.add_argument(
-    "--frames", type=int, default=30, help="Total number of frames, default is 30",
+    "--frames",
+    type=int,
+    default=30,
+    help="Total number of frames, default is 30",
 )
 parser.add_argument(
-    "--mode", type=int, default=0, help="phonon mode to calculate, default is 0",
+    "--mode",
+    type=int,
+    default=0,
+    help="phonon mode to calculate, default is 0",
 )
 parser.add_argument(
     "--magnitude",
@@ -23,10 +29,16 @@ parser.add_argument(
     help="magnitude of the amplitude of the motion",
 )
 parser.add_argument(
-    "--poscar", action="store_true", default=False, help="Export to POSCAR",
+    "--poscar",
+    action="store_true",
+    default=False,
+    help="Export to POSCAR",
 )
 parser.add_argument(
-    "--xdatcar", action="store_true", default=False, help="Export to XDATCAR",
+    "--xdatcar",
+    action="store_true",
+    default=False,
+    help="Export to XDATCAR",
 )
 parser.add_argument("vsim", metavar="VSIM_file", help="""VSIM ascii file""")
 #
@@ -37,7 +49,10 @@ dim = [int(x) for x in args.dim.split(",")]
 vsim_data = vsim_asc.VSIM_ASC(args.vsim)
 n_modes = len(vsim_data.freqs)
 positions = vsim_data.build_phono_motion(
-    mode=args.mode, supercell=dim, n_frames=args.frames, magnitude=args.magnitude,
+    mode=args.mode,
+    supercell=dim,
+    n_frames=args.frames,
+    magnitude=args.magnitude,
 )
 ionnums, atom_types = vsim_asc.ions_to_atom_types_ionnums(vsim_data.ions)
 ionnums = [i * dim[0] * dim[1] * dim[2] for i in ionnums]
@@ -64,7 +79,9 @@ else:
     xdatcar_str += "       1.00\n"
     for i in range(3):
         xdatcar_str += "      {:#.6f}   {:#.6f}    {:6f}\n".format(
-            supercell[i][0], supercell[i][1], supercell[i][2],
+            supercell[i][0],
+            supercell[i][1],
+            supercell[i][2],
         )
     for element in atom_types:
         xdatcar_str += f"    {element}"
@@ -78,6 +95,8 @@ else:
         positions = [mat.dot(v) for v in motion_frames[frame - 1]]
         for position in positions:
             xdatcar_str += "    {:#.6f}    {:#.6f}    {:6f}\n".format(
-                position[0], position[1], position[2],
+                position[0],
+                position[1],
+                position[2],
             )
     print(xdatcar_str)
