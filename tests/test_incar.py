@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import pytest
-
 import vaspy
 import vaspy.incar
 

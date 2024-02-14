@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 """Test for PROCAR class."""
 import os
+from pathlib import Path
 
 import numpy as np
 import pytest
 from vaspy import procar
-from pathlib import Path
 
 data_dir = Path(__file__).parent / "data"
 

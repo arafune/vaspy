@@ -152,8 +152,7 @@ class PosCarHead:
                     while elem_num in atomnames:
                         j = j + 1
                         elem_num = elm + str(j)
-                    else:
-                        atomnames.append(elem_num)
+                    atomnames.append(elem_num)
         self.__site_label = ["#" + str(s) + ":" + a for s, a in enumerate(atomnames)]
         return self.__site_label
 
@@ -276,14 +275,14 @@ class POSCAR(PosCarHead, PosCarPos):
             if self.selective:
                 self.coordinate_changeflags.append(" ".join(tmp[3:]))
 
-    def __iter__(self) -> Generator[NDArray[np.float_], None, None]:
-        """
-        [TODO:summary].
+    def __iter__(self) -> Generator[NDArray[np.float64], None, None]:
+        """[TODO:summary].
 
         Returns
         -------
         Generator[NDArray[np.float_], None, None]
             Atom position
+
         """
         yield from self.positions
 

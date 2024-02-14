@@ -65,6 +65,7 @@ class CHGCAR(VASPGrid):
 
         pickles: str
             filename of griddata stored by np.save or np.savez
+
         """
         super().load_file(the_file, pickles)
         if self.grid.n_frame == 1:

@@ -4,7 +4,6 @@
 import argparse
 
 import numpy as np
-
 from vaspy.chgcar import CHGCAR
 
 # HINT list methods for --spin option below.

@@ -7,6 +7,7 @@ import re
 from itertools import zip_longest
 from pathlib import Path
 from typing import IO, TYPE_CHECKING, Any
+
 import numpy as np
 
 if TYPE_CHECKING:

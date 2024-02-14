@@ -4,7 +4,6 @@
 import argparse
 
 import numpy as np
-
 from vaspy import poscar, vsim_asc
 
 #

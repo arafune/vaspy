@@ -4,9 +4,8 @@ import os
 
 import numpy as np
 import pytest
-from numpy.testing import assert_array_almost_equal, assert_array_equal
-
 import vaspy
+from numpy.testing import assert_array_almost_equal, assert_array_equal
 from vaspy import eigenval
 
 datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
