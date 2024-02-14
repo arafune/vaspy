@@ -137,14 +137,14 @@ class OUTCAR:  # Version safety
                 elif "tot    " in line:
                     self.total_charges.append(total_charges)
                     section.pop()
-                elif len(line) == 2:
+                elif len(line) == 2:  # noqa: PLR2004
                     pass
                 else:
                     total_charges.append([float(x) for x in line.split()[1:4]])
                     if self.n_atom == 1:
                         section.pop()
             elif section == ["kvec_weight"]:
-                if len(line) > 3:
+                if len(line) > len(("kx", "ky", "kz")):
                     kvec_weight.append([float(x) for x in line.split()])
                 else:
                     section.pop()
