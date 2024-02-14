@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import pprint
 import re
-from collections.abc import Generator, Mapping
+from collections.abc import Iterator, Mapping
 from logging import INFO, Formatter, StreamHandler, getLogger
 from typing import IO, TYPE_CHECKING
 
@@ -150,11 +150,7 @@ class Incar(Mapping):
                 tag, value_str = line.split("=")
                 incar[tag.upper().strip()] = value_str.strip(), active
         for tag, value in incar.items():
-            if tag in str_:
-                self[tag] = value
-            elif tag in bool_:
-                self[tag] = value
-            elif tag in str_2:
+            if tag in str_ or tag in bool_ or tag in str_2:
                 self[tag] = value
             elif tag in float_:
                 try:
@@ -180,7 +176,7 @@ class Incar(Mapping):
                     self[tag] = (int(real_value), value[1])
                     self.additional_comments[tag] = com
 
-    def __iter__(self) -> Generator:
+    def __iter__(self) -> Iterator:
         yield from self._incar
 
     def __getitem__(self, key_item: str) -> tuple[str | float, bool]:
@@ -208,11 +204,10 @@ class Incar(Mapping):
                                 output += f"    {tag} = {incar[tag][0]:.2E}"
                             else:
                                 output += f"#   {tag} = {incar[tag][0]:.2E}"
+                        elif incar[tag][1]:
+                            output += f"    {tag} = {incar[tag][0]}"
                         else:
-                            if incar[tag][1]:
-                                output += f"    {tag} = {incar[tag][0]}"
-                            else:
-                                output += f"#   {tag} = {incar[tag][0]}"
+                            output += f"#   {tag} = {incar[tag][0]}"
                         if tag in self.additional_comments:
                             output += f"   ! {self.additional_comments[tag]}\n"
                         else:

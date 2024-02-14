@@ -79,8 +79,7 @@ class OUTCAR:  # Version safety
                     while tmp in self.atom_names:
                         j = j + 1
                         tmp = elm + str(j)
-                    else:
-                        self.atom_names.append(tmp)
+                    self.atom_names.append(tmp)
         return self.atom_names
 
     def set_posforce_title(self) -> None:
@@ -116,9 +115,7 @@ class OUTCAR:  # Version safety
                 else:
                     posforce.append([float(x) for x in line.split()])
             elif section == ["magnetization"]:
-                if "---------------------------------" in line:
-                    pass
-                elif "# of ion" in line:
+                if "---------------------------------" in line or "# of ion" in line:
                     pass
                 elif "tot    " in line:
                     self.magnetizations.append(magnetizations)
@@ -130,9 +127,7 @@ class OUTCAR:  # Version safety
                     if self.n_atom == 1:
                         section.pop()
             elif section == ["total_charge"]:
-                if "---------------------------------" in line:
-                    pass
-                elif "# of ion" in line:
+                if "---------------------------------" in line or "# of ion" in line:
                     pass
                 elif "tot    " in line:
                     self.total_charges.append(total_charges)
@@ -148,40 +143,39 @@ class OUTCAR:  # Version safety
                     kvec_weight.append([float(x) for x in line.split()])
                 else:
                     section.pop()
+            elif "number of dos" in line:
+                self.n_atom = int(line.split()[-1])
+            elif "TITEL  =" in line:
+                self.atom_types.append(line.split()[3])
+            elif "ions per type " in line:
+                self.atomnums = [int(x) for x in line.split()[4:]]
+            elif "POSITION" in line and "TOTAL-FORCE" in line:
+                section.append("force")
+            elif "E-fermi" in line:
+                self.fermi = float(line.split()[2])
+            elif "NBANDS=" in line:
+                self.num_k = int(line.split()[3])
+                self.nkdim = int(line.split()[9])
+                self.n_bands = int(line.split()[14])
+            elif "free energy    TOTEN  =" in line:
+                self.totens.append(float(line.split("=")[-1].split()[0]))
+            elif "reciprocal lattice vectors" in line:
+                self.recvec = [
+                    [float(_) for _ in next(the_file)[43:].split()]
+                    for _ in range(3)
+                ]
+            elif " magnetization (x)" in line:
+                magnetizations = []
+                section.append("magnetization")
+            elif " total charge     " in line:
+                total_charges = []
+                section.append("total_charge")
+            elif " Following reciprocal coordinates:" in line:
+                next(the_file)
+                kvec_weight = []
+                section.append("kvec_weight")
             else:
-                if "number of dos" in line:
-                    self.n_atom = int(line.split()[-1])
-                elif "TITEL  =" in line:
-                    self.atom_types.append(line.split()[3])
-                elif "ions per type " in line:
-                    self.atomnums = [int(x) for x in line.split()[4:]]
-                elif "POSITION" in line and "TOTAL-FORCE" in line:
-                    section.append("force")
-                elif "E-fermi" in line:
-                    self.fermi = float(line.split()[2])
-                elif "NBANDS=" in line:
-                    self.num_k = int(line.split()[3])
-                    self.nkdim = int(line.split()[9])
-                    self.n_bands = int(line.split()[14])
-                elif "free energy    TOTEN  =" in line:
-                    self.totens.append(float(line.split("=")[-1].split()[0]))
-                elif "reciprocal lattice vectors" in line:
-                    self.recvec = [
-                        [float(_) for _ in next(the_file)[43:].split()]
-                        for _ in range(3)
-                    ]
-                elif " magnetization (x)" in line:
-                    magnetizations = []
-                    section.append("magnetization")
-                elif " total charge     " in line:
-                    total_charges = []
-                    section.append("total_charge")
-                elif " Following reciprocal coordinates:" in line:
-                    next(the_file)
-                    kvec_weight = []
-                    section.append("kvec_weight")
-                else:
-                    pass
+                pass
         self.site_label = [
             name + ":#" + str(index + 1)
             for (index, name) in enumerate(

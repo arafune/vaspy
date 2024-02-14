@@ -313,7 +313,7 @@ class Grid3D:
         position: int,
         axis: Literal["x", "y", "z"] = "z",
         frame_i: int = 0,
-    ) -> NDArray[np.float_]:
+    ) -> NDArray[np.float64]:
         """Parameters
         ----------
         axis: str

@@ -2,7 +2,6 @@
 import os
 
 import numpy as np
-
 from vaspy import vsim_asc
 
 

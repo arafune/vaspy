@@ -7,6 +7,7 @@ import re
 from itertools import chain
 from logging import INFO, Formatter, StreamHandler, getLogger
 
+import numpy as np
 from vaspy import procar, tools
 from vaspy.outcar import OUTCAR
 
@@ -78,7 +79,7 @@ if args.outcar is not None:
     outcar = OUTCAR(args.outcar)
     fermi = outcar.fermi
     logger.debug(f"Fermi: {fermi}")
-    recvec = [[v * 6.283185307179586 for v in recv] for recv in outcar.recvec]
+    recvec = [[v * 2 * np.pi for v in recv] for recv in outcar.recvec]
     logger.debug(f"recvec: {recvec}")
 elif args.fermi is not None:
     fermi = args.fermi

@@ -360,7 +360,7 @@ class WAVECAR:
                 dtype=np.complex128,
             )
         else:
-            phi_k = np.zeros(ngrid, dtype=np.complex_)
+            phi_k = np.zeros(ngrid, dtype=np.complex128)
         try:  # Collininear
             phi_k[gvec[:, 0], gvec[:, 1], gvec[:, 2]] = self.bandcoeff(
                 spin_i,
