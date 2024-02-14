@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 import bz2
-import os
 import re
 from itertools import zip_longest
+from pathlib import Path
 from typing import IO, TYPE_CHECKING, Any
-
 import numpy as np
 
 if TYPE_CHECKING:
@@ -18,10 +17,10 @@ if TYPE_CHECKING:
 
 def open_by_suffix(filename: str) -> IO[str]:
     """Open file."""
-    if os.path.splitext(filename)[1] == ".bz2":
+    if Path(filename).suffix == ".bz2":
         the_file = bz2.open(filename, mode="rt")
     else:
-        the_file = open(filename)
+        the_file = Path(filename).open()
     return the_file
 
 

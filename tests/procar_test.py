@@ -3,8 +3,11 @@
 import os
 
 import numpy as np
-
+import pytest
 from vaspy import procar
+from pathlib import Path
+
+data_dir = Path(__file__).parent / "data"
 
 
 class TestSinglePROCAR:
@@ -533,37 +536,37 @@ class TestSpinPolarizedPROCAR:
 # # -------------------------
 
 
+@pytest.fixture()
+def soiprocar() -> procar.PROCAR:
+    """Load PROCAR_SOR_dummy as test data."""
+    return procar.PROCAR(str(Path(data_dir / "PROCAR_SOI_dummy")))
+
+
 class TestSOIPROCAR:
     """Class for Test of PROCAR module.
 
     Use PROCAR_SOI_dummy for test data (dummy PROCAR)
     """
 
-    def setup(self) -> None:
-        """PROCAR object by using file of "PROCAR_single" in data directory."""
-        datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
-        data_file = datadir + "PROCAR_SOI_dummy"
-        self.soiprocar = procar.PROCAR(data_file)
-
-    def test_soiprocar_firstcheck(self) -> None:
+    def test_soiprocar_firstcheck(self, soiprocar: procar.PROCAR) -> None:
         """Load test for PROCAR_SOI_dummy."""
-        assert ["_mT", "_mX", "_mY", "_mZ"] == self.soiprocar.label["spin"]
-        assert self.soiprocar.n_atom == 3
-        assert self.soiprocar.n_bands == 2
-        assert self.soiprocar.num_k == 3
+        assert ["_mT", "_mX", "_mY", "_mZ"] == soiprocar.label["spin"]
+        assert soiprocar.n_atom == 3
+        assert soiprocar.n_bands == 2
+        assert soiprocar.num_k == 3
         np.testing.assert_array_equal(
             np.array([[[-10.0, -5.0], [-7.0, -4.0], [-6.0, -1.0]]]),
-            self.soiprocar.energies,
+            soiprocar.energies,
         )
         np.testing.assert_array_equal(
             ["s", "py", "pz", "px", "dxy", "dyz", "dz2", "dxz", "dx2", "tot"],
-            self.soiprocar.label["orbital"],
+            soiprocar.label["orbital"],
         )
         np.testing.assert_array_equal(
             [[0.0, 0.0, 0.0], [0.25, 0.25, 0.00], [0.50, 0.50, 0.00]],
-            self.soiprocar.k_vectors,
+            soiprocar.k_vectors,
         )
-        np.testing.assert_array_equal(720, self.soiprocar.proj.size)
+        np.testing.assert_array_equal(720, soiprocar.proj.size)
         np.testing.assert_array_equal(
             [
                 0.0000,
@@ -577,7 +580,7 @@ class TestSOIPROCAR:
                 0.0008,
                 0.0036,
             ],
-            self.soiprocar.proj[0, 0, 0, 0],
+            soiprocar.proj[0, 0, 0, 0],
         )
         np.testing.assert_array_equal(
             [
@@ -592,7 +595,7 @@ class TestSOIPROCAR:
                 0.0018,
                 0.0126,
             ],
-            self.soiprocar.proj[0, 0, 0, 1],
+            soiprocar.proj[0, 0, 0, 1],
         )
         np.testing.assert_array_equal(
             [
@@ -607,12 +610,12 @@ class TestSOIPROCAR:
                 0.0028,
                 0.0216,
             ],
-            self.soiprocar.proj[0, 0, 0, 2],
+            soiprocar.proj[0, 0, 0, 2],
         )
 
-    def test_make_label(self) -> None:
+    def test_make_label(self, soiprocar: procar.PROCAR) -> None:
         """Test for make label from PROCAR_soi w/o append_sum*."""
-        label = self.soiprocar.make_label((0, 2), ((0, 3, 1), (4, 7)))
+        label = soiprocar.make_label((0, 2), ((0, 3, 1), (4, 7)))
         assert label == [
             "#k",
             "Energy",
@@ -638,44 +641,44 @@ class TestSOIPROCAR:
             "2_mZ_dxz",
         ]
 
-    def test_soiprocar_band(self) -> None:
+    def test_soiprocar_band(self, soiprocar: procar.PROCAR) -> None:
         """Band_with_projection object test generated from PROCAR_soi_dummy."""
         np.testing.assert_array_almost_equal(
-            self.soiprocar.kdistances,
+            soiprocar.kdistances,
             [0.0, 0.353553, 0.707107],
         )
         """test for Band_with_projection.energies setter (SOI)"""
-        assert self.soiprocar.energies.shape == (
+        assert soiprocar.energies.shape == (
             1,
-            self.soiprocar.num_k,
-            self.soiprocar.n_bands,
+            soiprocar.num_k,
+            soiprocar.n_bands,
         )
         np.testing.assert_array_equal(
-            self.soiprocar.energies,
+            soiprocar.energies,
             [[[-10, -5], [-7, -4], [-6, -1]]],
         )
         """test for Band_with_projection.fermi_correction
         """
-        self.soiprocar.fermi_correction(1.0)
+        soiprocar.fermi_correction(1.0)
         np.testing.assert_array_equal(
-            self.soiprocar.energies,
+            soiprocar.energies,
             [[[-11, -6], [-8, -5], [-7, -2]]],
         )
 
-    def test_soiprocar_band_orbitalread(self) -> None:
+    def test_soiprocar_band_orbitalread(self, soiprocar: procar.PROCAR) -> None:
         """Test for Band_with_projection.orbitals setter (SOI)."""
-        assert self.soiprocar.proj.shape == (
+        assert soiprocar.proj.shape == (
             4,
-            self.soiprocar.num_k,
-            self.soiprocar.n_bands,
-            self.soiprocar.n_atom,
+            soiprocar.num_k,
+            soiprocar.n_bands,
+            soiprocar.n_atom,
             10,
         )
 
         # for ik = 0, ib = 1, atom=2, spin=mY,
         #                      (k#=1,  band#=2, atom#=3, spin=mY)
         np.testing.assert_array_equal(
-            self.soiprocar.proj[2][0][1][2],
+            soiprocar.proj[2][0][1][2],
             #                   ^ This two means "mY"
             [
                 2.0050,
@@ -693,7 +696,7 @@ class TestSOIPROCAR:
         # for ik = 1, ib = 0, atom=1, spin=mZ,
         #                      (k#=2,  band#=1, atom#=2, spin=mZ)
         np.testing.assert_array_equal(
-            self.soiprocar.proj[3][1][0][1],
+            soiprocar.proj[3][1][0][1],
             #                   ^ This two means "mY"
             [
                 3.0070,
@@ -709,12 +712,12 @@ class TestSOIPROCAR:
             ],
         )
 
-    def test_soiprocar_band_sum_site(self) -> None:
+    def test_soiprocar_band_sum_site(self, soiprocar: procar.PROCAR) -> None:
         """Test for Band_with_projection.sum_site (SOI)."""
-        self.soiprocar.append_sumsite((0, 2), "test")
-        assert self.soiprocar.label["site"].index("test") == 3
+        soiprocar.append_sumsite((0, 2), "test")
+        assert soiprocar.label["site"].index("test") == 3
         np.testing.assert_allclose(
-            self.soiprocar.proj[0][0][0][self.soiprocar.label["site"].index("test")],
+            soiprocar.proj[0][0][0][soiprocar.label["site"].index("test")],
             [
                 0.0020,
                 0.0022,
@@ -729,19 +732,19 @@ class TestSOIPROCAR:
             ],
         )
 
-    def test_soiprocar_band_sum_orbital1(self) -> None:
+    def test_soiprocar_band_sum_orbital1(self, soiprocar: procar.PROCAR) -> None:
         """Test for Band_with_projection.sum_orbital (SOI).
 
         raise RuntimeError when no item in sitecomposed
         """
-        self.soiprocar.append_sumsite((0, 2), "test")
+        soiprocar.append_sumsite((0, 2), "test")
         for orbital in ("p", "pxpy", "d"):
-            self.soiprocar.append_sumorbital(
-                self.soiprocar.orbital_index(orbital),
+            soiprocar.append_sumorbital(
+                soiprocar.orbital_index(orbital),
                 orbital,
             )
         np.testing.assert_allclose(
-            self.soiprocar.proj[0][0][0][3],  # mT
+            soiprocar.proj[0][0][0][3],  # mT
             [
                 0.0020,
                 0.0022,
@@ -759,7 +762,7 @@ class TestSOIPROCAR:
             ],
         )
         np.testing.assert_allclose(
-            self.soiprocar.proj[2][0][0][3],  # mY
+            soiprocar.proj[2][0][0][3],  # mY
             [
                 4.002,
                 4.0022,
@@ -776,7 +779,7 @@ class TestSOIPROCAR:
                 20.016,
             ],
         )
-        assert self.soiprocar.label["orbital"] == [
+        assert soiprocar.label["orbital"] == [
             "s",
             "py",
             "pz",
@@ -792,20 +795,20 @@ class TestSOIPROCAR:
             "d",
         ]
 
-    def test_soiprocar_make_label(self) -> None:
+    def test_soiprocar_make_label(self, soiprocar: procar.PROCAR) -> None:
         """Test for make_label  (SOI)."""
-        self.soiprocar.append_sumsite((0, 2), "test")
+        soiprocar.append_sumsite((0, 2), "test")
         for orbital in ("p", "pxpy", "d"):
-            self.soiprocar.append_sumorbital(
-                self.soiprocar.orbital_index(orbital),
+            soiprocar.append_sumorbital(
+                soiprocar.orbital_index(orbital),
                 orbital,
             )
         for orbital in ("p", "pxpy", "d"):
-            self.soiprocar.append_sumorbital(
-                self.soiprocar.label["orbital"].index(orbital),
+            soiprocar.append_sumorbital(
+                soiprocar.label["orbital"].index(orbital),
                 orbital,
             )
-        assert self.soiprocar.make_label((3,), ((10, 11, 12),)) == [
+        assert soiprocar.make_label((3,), ((10, 11, 12),)) == [
             "#k",
             "Energy",
             "test_mT_p",
@@ -822,10 +825,10 @@ class TestSOIPROCAR:
             "test_mZ_d",
         ]
 
-    def test_text_sheet(self) -> None:
+    def test_text_sheet(self, soiprocar: procar.PROCAR) -> None:
         """Test for simple band data output (SOI)."""
         assert (
-            self.soiprocar.text_sheet()
+            soiprocar.text_sheet()
             == """#k	Energy
  0.00000000e+00	-1.00000000e+01
  3.53553391e-01	-7.00000000e+00
