@@ -14,6 +14,7 @@ from vaspy.tools import open_by_suffix
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+    from matplotlib.axes import Axes
     from numpy.typing import NDArray
 
 import matplotlib.pyplot as plt
@@ -88,10 +89,10 @@ class EnergyBand:
         if self.n_spin == 1:  # standard
             self.label["spin"] = [""]
             self.label["energy"] = ["Energy"]
-        elif self.n_spin == 2:  # spin-polarized
+        elif self.n_spin == 2:  # spin-polarized  # noqa: PLR2004
             self.label["energy"] = ["Energy_up", "Energy_down"]
             self.label["spin"] = ["_up", "_down"]
-        elif self.n_spin == 4:  # non-collinear
+        elif self.n_spin == 4:  # non-collinear  # noqa: PLR2004
             self.label["energy"] = ["Energy"]
             self.label["spin"] = ["_mT", "_mX", "_mY", "_mZ"]
         self.label["k"] = ["#k"]
@@ -202,7 +203,7 @@ class EnergyBand:
             output += "\n"
         return output
 
-    def figure(self, color: str = "blue", spin_i: int = 0) -> plt.Axes:
+    def figure(self, color: str = "blue", spin_i: int = 0) -> Axes:
         """Return Axes object of the energy band.
 
         Parameters

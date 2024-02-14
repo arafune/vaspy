@@ -335,7 +335,7 @@ class ProjectionBand(EnergyBand):
         self,
         site_indexes: Sequence[int] = (),
         orbital_indexes_sets: Sequence[Sequence[int]] = (),
-    ):
+    ) -> str:
         """Return csv-like text data.
 
         Parameters
@@ -418,13 +418,13 @@ class PROCAR(ProjectionBand):  # Version safety
 
     """
 
-    def __init__(self, filename: str | Path = "", phase_read: bool = False) -> None:
+    def __init__(self, filename: str | Path = "", *, phase_read: bool = False) -> None:
         """Initialize."""
         super().__init__()
         if filename:
-            self.load_file(open_by_suffix(str(filename)), phase_read)
+            self.load_file(open_by_suffix(str(filename)), phase_read=phase_read)
 
-    def load_file(self, the_file: IO[str], phase_read: bool = False) -> None:
+    def load_file(self, the_file: IO[str], *, phase_read: bool = False) -> None:
         """Parse PROCAR.
 
         Parameters
@@ -450,7 +450,7 @@ class PROCAR(ProjectionBand):  # Version safety
         for line in the_file:
             if line.isspace():
                 continue
-            elif "k-points: " in line:
+            if "k-points: " in line:
                 self.num_k, self.n_bands, self.n_atom = (
                     int(i) for i in re.split(r"\s|:", line) if i.isdigit()
                 )
