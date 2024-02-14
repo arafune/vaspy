@@ -28,3 +28,6 @@ ignore = [
   "FBT002", # boolean-default-value-in-function-definition
 ]
 select = ["ALL"]
+
+[tool.ruff.lint.per-file-ignores]
+"test/*" = ["D100", "PLR2004"] # undocumented-public-module
