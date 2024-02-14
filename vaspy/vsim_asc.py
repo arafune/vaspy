@@ -207,7 +207,7 @@ def supercell_lattice_vectors(
 
     """
     supercell_vectors: list[float] = []
-    for x, x_i in zip(lattice_vectors, cell_id):
+    for x, x_i in zip(lattice_vectors, cell_id, strict=True):
         supercell_vectors.append(x * x_i)
     return np.array(supercell_vectors)
 

@@ -3,7 +3,7 @@
 from vaspy import tools
 
 
-def test_atom_selection_to_list():
+def test_atom_selection_to_list() -> None:
     assert tools.atom_selection_to_list("1-5,8,8,9-15,10", False) == [
         "1",
         "10",

@@ -11,14 +11,14 @@ datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
 
 
 class TestLOCPOT:
-    def setup_method(self, method):
+    def setup_method(self, method) -> None:
         """Setup: load data."""
         locpot_1 = datadir + "LOCPOT.dummy"
         locpot_2 = datadir + "LOCPOT.dummy2"
         self.testlocpot1 = LOCPOT(locpot_1)
         self.testlocpot2 = vaspy.load(locpot_2)
 
-    def test_locpot_poscar_part(self):
+    def test_locpot_poscar_part(self) -> None:
         """Test whether LOCPOT correctly treats POSCAR."""
         assert self.testlocpot1.poscar.system_name == "hBN-Cu"
         len_x, len_y, len_z = self.testlocpot2.poscar.axes_lengths
@@ -28,21 +28,21 @@ class TestLOCPOT:
             36.271284721999997,
         )
 
-    def test__str__(self):
+    def test__str__(self) -> None:
         """Test for __str__() special method."""
         output = self.testlocpot2.__str__()
         teststr = "hBN-Cu\n  0.99700000000000\n    6.759865    0.000000"
         assert teststr in output
         assert len(output) == 3363
 
-    def test___str__grid(self):
+    def test___str__grid(self) -> None:
         """Test for __str__() special method in grid object."""
         output = self.testlocpot2.grid.__str__()
         teststr = "\n  3  4  6\n   0.00000000000E+00"
         assert teststr in output
         assert len(output) == 1466
 
-    def test_grid_slice_z(self):
+    def test_grid_slice_z(self) -> None:
         """Test for grid slice (z)."""
         z0 = self.testlocpot2.grid.slice(0, "z")
         z1 = self.testlocpot2.grid.slice(1, "z")
@@ -50,7 +50,7 @@ class TestLOCPOT:
         np.testing.assert_equal(testarray2D, z0)
         np.testing.assert_equal(testarray2D + 12, z1)
 
-    def test_grid_slice_y(self):
+    def test_grid_slice_y(self) -> None:
         """Test for grid slice (y)."""
         y0 = self.testlocpot2.grid.slice(0, "y")
         y1 = self.testlocpot2.grid.slice(1, "y")
@@ -67,7 +67,7 @@ class TestLOCPOT:
         np.testing.assert_equal(testarray2D, y0)
         np.testing.assert_equal(testarray2D + 3, y1)
 
-    def test_grid_slice_x(self):
+    def test_grid_slice_x(self) -> None:
         """Test for grid slice (x)."""
         x0 = self.testlocpot2.grid.slice(0, "x")
         x1 = self.testlocpot2.grid.slice(1, "x")
@@ -84,7 +84,7 @@ class TestLOCPOT:
         np.testing.assert_equal(testarray2D, x0)
         np.testing.assert_equal(testarray2D + 1, x1)
 
-    def test_grid_integrate_z(self):  # <<< FIXME
+    def test_grid_integrate_z(self) -> None:  # <<< FIXME
         """Test for grid integrate (z)."""
         z_0 = self.testlocpot2.grid.integrate("z", 0, 1)
         z_all = self.testlocpot2.grid.integrate("z")
@@ -99,7 +99,7 @@ class TestLOCPOT:
             z_all,
         )
 
-    def test_grid_integrate_y(self):
+    def test_grid_integrate_y(self) -> None:
         """Test for grid integrate (y)."""
         y_0 = self.testlocpot2.grid.integrate("y", 0, 1)
         y_all = self.testlocpot2.grid.integrate("y")
@@ -112,7 +112,7 @@ class TestLOCPOT:
             y_all,
         )
 
-    def test_grid_integrate_x(self):  # <<< FIXME
+    def test_grid_integrate_x(self) -> None:  # <<< FIXME
         """Test for grid integrate (x)."""
         x_0 = self.testlocpot2.grid.integrate("x", 0, 1)
         x_all = self.testlocpot2.grid.integrate("x")
@@ -124,7 +124,7 @@ class TestLOCPOT:
             x_all,
         )
 
-    def test_average_along(self):
+    def test_average_along(self) -> None:
         """Test LOCPOT averaging."""
         # along Z-axis
         np.testing.assert_equal(
@@ -142,7 +142,7 @@ class TestLOCPOT:
             self.testlocpot2.grid.average_along_axis("Y"),
         )
 
-    def test_min_along(self):
+    def test_min_along(self) -> None:
         """Test for LOCPOT min."""
         np.testing.assert_equal(
             np.array([0.0, 1.0, 2.0]),
@@ -157,7 +157,7 @@ class TestLOCPOT:
             self.testlocpot2.grid.min_along_axis("z"),
         )
 
-    def test_max_along(self):
+    def test_max_along(self) -> None:
         """Test for LOCPOT max."""
         np.testing.assert_equal(
             np.array([69.0, 70.0, 71.0]),
@@ -172,7 +172,7 @@ class TestLOCPOT:
             self.testlocpot2.grid.max_along_axis("z"),
         )
 
-    def test_median_along(self):
+    def test_median_along(self) -> None:
         """Test for LOCPOT median."""
         np.testing.assert_equal(
             np.array([34.5, 35.5, 36.5]),
@@ -188,7 +188,7 @@ class TestLOCPOT:
         )
 
     #    @raises(TypeError, AssertionError, ValueError)
-    def test_exception_in_locpot(self):
+    def test_exception_in_locpot(self) -> None:
         """Test for Exception."""
         with pytest.raises((ValueError, ValueError, AssertionError)):
             self.testlocpot2.grid.median_along_axis("k")

@@ -1,6 +1,5 @@
 """OUTCAR class."""
 
-
 from __future__ import annotations
 
 from typing import IO, TYPE_CHECKING
@@ -188,7 +187,7 @@ class OUTCAR:  # Version safety
             for (index, name) in enumerate(
                 [
                     elm + str(j)
-                    for (elm, n) in zip(self.atom_types, self.atomnums)
+                    for (elm, n) in zip(self.atom_types, self.atomnums, strict=True)
                     for j in range(1, int(n) + 1)
                 ],
             )
@@ -217,7 +216,7 @@ class OUTCAR:  # Version safety
         return [
             posforce
             for (index, site) in enumerate(self.posforce_title)
-            for (posforce, boolian) in zip(site, posforce_flag)
+            for (posforce, boolian) in zip(site, posforce_flag, strict=True)
             if boolian and (index + 1 in selected_sites)
         ]
 
@@ -246,7 +245,7 @@ class OUTCAR:  # Version safety
             [
                 posforce
                 for (index, site) in enumerate(one_cycle)
-                for (posforce, boolian) in zip(site, posforce_flag)
+                for (posforce, boolian) in zip(site, posforce_flag, strict=True)
                 if boolian
                 if index + 1 in selected_sites
             ]

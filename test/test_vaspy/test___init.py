@@ -11,10 +11,10 @@ class TestInitModule:
     The functions should be tested are in __init__.py
     """
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         self.datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
 
-    def test_load_in_init(self):
+    def test_load_in_init(self) -> None:
         """Test for __init__.py."""
         poscar = self.datadir + "POSCAR_dummy"
         procar_single = self.datadir + "PROCAR_single"

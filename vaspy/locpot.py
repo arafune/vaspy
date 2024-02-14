@@ -1,20 +1,16 @@
 #!/usr/bin/env python
 """LOCPOT class."""
 #
-import sys
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
+import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.axes import Axes
 
 from vaspy import mesh3d
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
-
-try:
-    import matplotlib.pyplot as plt
-except ImportError:
-    sys.stderr.write("Install matplotlib, or you cannot use methods relating to draw\n")
 
 
 class LOCPOT(mesh3d.VASPGrid):
@@ -30,10 +26,12 @@ class LOCPOT(mesh3d.VASPGrid):
 
     def plot_potential_along_axis(
         self,
-        axis_name: str,
+        axis_name: Literal["X", "Y", "Z", "x", "y", "z"],
+        ax: Axes | None = None,
         frame: int = 0,
         save: str = "",
-    ) -> None:  # FIXME!!
+        **kwargs,
+    ) -> Axes:
         """Plot potential curve along the axis.
 
         Parameters
@@ -42,26 +40,32 @@ class LOCPOT(mesh3d.VASPGrid):
             the name of the axis (X, Y, or Z)
         frame: int, optional  (default is 0)
             'select frame potential' (very optional)
+        ax: Axes
+            Matplotlib axes object.
+        save: str | Path
+            string or Path object to save the plot image.
+        kwargs: Incomplete
+            pass to plt.subplots
 
         """
-        axis_name = axis_name.capitalize()
         axes_length = self.poscar.axes_lengths
-        if axis_name == "X":
+
+        if ax is None:
+            _, ax = plt.subplots(figsize=kwargs.pop("figsize", (11, 5)))
+        assert isinstance(ax, Axes)
+        if axis_name in ("X", "x"):
             horizontal_axis: NDArray[np.float64] = np.linspace(
                 0,
                 axes_length[0],
                 self.grid.shape[0],
             )
-            plt.clf()
-            plt.xlim(xmax=axes_length[0])
-        elif axis_name == "Y":
+            ax.set_xlim(xmax=axes_length[0])
+        elif axis_name in ("Y", "y"):
             horizontal_axis = np.linspace(0, axes_length[1], self.grid.shape[1])
-            plt.clf()
-            plt.xlim(xmax=axes_length[1])
-        elif axis_name == "Z":
+            ax.set_xlim(xmax=axes_length[1])
+        elif axis_name in ("Z", "z"):
             horizontal_axis = np.linspace(0, axes_length[2], self.grid.shape[2])
-            plt.clf()
-            plt.xlim(xmax=axes_length[2])
+            ax.set_xlim(xmax=axes_length[2])
         else:
             msg = "Wrong axis name"
             raise ValueError(msg)
@@ -69,19 +73,19 @@ class LOCPOT(mesh3d.VASPGrid):
         y_max = self.grid.max_along_axis(axis_name, frame)
         y_min = self.grid.min_along_axis(axis_name, frame)
         y_median = self.grid.median_along_axis(axis_name, frame)
-        plt.plot(horizontal_axis, y_average, label="average")
-        plt.plot(horizontal_axis, y_max, label="max")
-        plt.plot(horizontal_axis, y_min, label="min")
-        plt.plot(horizontal_axis, y_median, label="median")
+        ax.plot(horizontal_axis, y_average, label="average")
+        ax.plot(horizontal_axis, y_max, label="max")
+        ax.plot(horizontal_axis, y_min, label="min")
+        ax.plot(horizontal_axis, y_median, label="median")
         x_label = "Position along " + axis_name + "-axis (A)"
         title = "Local potential (" + axis_name + ")"
-        plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left", borderaxespad=0)
-        plt.title(title)
-        plt.xlabel(x_label)
-        plt.ylabel("Energy  ( eV )")
+        ax.legend(bbox_to_anchor=(1.05, 1), loc="upper left", borderaxespad=0)
+        ax.set_title(title)
+        ax.set_xlabel(x_label)
+        ax.set_ylabel("Energy  ( eV )")
         if save:
             plt.savefig(save, dpi=600, format="png")
-        plt.show()
+        return ax
 
 
 # LVHAR-tag:  This tag is available in VASP.5.2.12 and newer version.

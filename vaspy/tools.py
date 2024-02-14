@@ -100,7 +100,7 @@ def atom_types_atomnums_to_atoms(
 
     """
     atoms = []
-    for elem, nums in zip(atom_types, atomnums):
+    for elem, nums in zip(atom_types, atomnums, strict=True):
         for _ in range(nums):
             atoms.append(elem)
     return tuple(atoms)
@@ -150,6 +150,7 @@ def cuboid(crystal_axes: Sequence[float]) -> NDArray[np.float64]:
         Three vectors for tetrahedron.  (Crystal axis a,b,c)
 
     Return
+
     """
     a: NDArray[np.float64] = np.array(crystal_axes[0])
     b: NDArray[np.float64] = np.array(crystal_axes[1], dtype=np.float64)

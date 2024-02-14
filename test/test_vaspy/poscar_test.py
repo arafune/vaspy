@@ -30,14 +30,16 @@ class TestPOSCAR:
         self.blancposcar = vaspy.poscar.POSCAR()
         os.remove(filePOSCAR[1])
 
-    def test_fundamentals(self):
+    def test_fundamentals(self) -> None:
         """Test for POSCAR class: fundamental data read."""
         assert self.testposcar.system_name == "NiC4S4"
         np.testing.assert_allclose(
-            np.array([0.866025404, -0.5, 0.0]), self.testposcar.cell_vecs[0],
+            np.array([0.866025404, -0.5, 0.0]),
+            self.testposcar.cell_vecs[0],
         )
         np.testing.assert_allclose(
-            np.array([0.866025404, 0.5, 0.0]), self.testposcar.cell_vecs[1],
+            np.array([0.866025404, 0.5, 0.0]),
+            self.testposcar.cell_vecs[1],
         )
         self.testposcar.cell_vecs[2] = (1, 0, 0)
         np.testing.assert_allclose(np.array([1, 0, 0]), self.testposcar.cell_vecs[2])
@@ -71,32 +73,34 @@ class TestPOSCAR:
             "#26:S12",
         ] == self.testposcar.site_label
 
-    def test_point_in_box(self):
+    def test_point_in_box(self) -> None:
         assert not (
             vaspy.poscar.point_in_box((0.5, 0.5, 0.2), self.testposcar.cell_vecs)
         )
         assert vaspy.poscar.point_in_box((0.5, 0.1, 0.2), self.testposcar.cell_vecs)
         assert vaspy.poscar.point_in_box(
-            (0.5, 0.5, 0.2), ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
+            (0.5, 0.5, 0.2),
+            ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
         )
 
-    def test_is_cartesian(self):
+    def test_is_cartesian(self) -> None:
         assert not (self.testposcar.is_cartesian())
         self.testposcar.to_cartesian()
         assert self.testposcar.is_cartesian()
 
-    def test_is_direct(self):
+    def test_is_direct(self) -> None:
         assert self.testposcar.is_direct()
         self.testposcar.to_cartesian()
         assert not self.testposcar.is_direct()
 
-    def test_is_selective(self):
+    def test_is_selective(self) -> None:
         assert self.testposcar.selective
         assert not self.blancposcar.selective
 
-    def test_pos(self):
+    def test_pos(self) -> None:
         np.testing.assert_array_equal(
-            np.array([0.0, 0.5, 0.5]), self.testposcar.positions[2],
+            np.array([0.0, 0.5, 0.5]),
+            self.testposcar.positions[2],
         )
         np.testing.assert_allclose(
             np.array([0.23764, 0.429027113, 0.5]),
@@ -104,7 +108,7 @@ class TestPOSCAR:
             rtol=1e-04,
         )
 
-    def test_tune_scaling_factor(self):
+    def test_tune_scaling_factor(self) -> None:
         self.testposcar.tune_scaling_factor(1.0)
         np.testing.assert_allclose(
             np.array([12.66995166052, -7.315, 0.0]),
@@ -112,7 +116,7 @@ class TestPOSCAR:
             rtol=1e-07,
         )
 
-    def test_tune_scaling_factor_withCartesian(self):
+    def test_tune_scaling_factor_withCartesian(self) -> None:
         self.testposcar.to_cartesian()
         self.testposcar.tune_scaling_factor(1.0)
         np.testing.assert_allclose(
@@ -131,7 +135,7 @@ class TestPOSCAR:
             rtol=1e-06,
         )
 
-    def test_to_cartesian(self):
+    def test_to_cartesian(self) -> None:
         self.testposcar.to_cartesian()
         np.testing.assert_allclose(
             np.array([0.494477, -0.047847, 0.512645]),
@@ -140,12 +144,12 @@ class TestPOSCAR:
         )
         self.testposcar.to_direct()
 
-    def test_to_direct(self):
+    def test_to_direct(self) -> None:
         tmp = self.testposcar.positions[5]
         self.testposcar.to_direct()
         np.testing.assert_array_equal(tmp, self.testposcar.positions[5])
 
-    def test_to_list(self):
+    def test_to_list(self) -> None:
         tmp = self.testposcar.to_list()
         assert tmp[0] == "NiC4S4"
         assert tmp[1] == 14.63
@@ -170,24 +174,27 @@ class TestPOSCAR:
         assert tmp[11][2] == "#2:Ni3"
         assert tmp[11][3] == "#3:C1"
 
-    def test_to_str(self):
+    def test_to_str(self) -> None:
         global tmpstr_original
         global tmpstr_after_rotate
         assert tmpstr_original == self.testposcar.__str__()
         self.testposcar.rotate_atom(0, "z", 90, (0, 0, 0))
         self.testposcar.to_direct()
 
-    def test_poscar_supercell1(self):
+    def test_poscar_supercell1(self) -> None:
         """Tests for poscar supercell method."""
         supercell = self.testposcar.supercell(3, 2, 1)
         np.testing.assert_allclose(
-            np.array([2.59807621, -1.5, 0.0]), supercell.cell_vecs[0],
+            np.array([2.59807621, -1.5, 0.0]),
+            supercell.cell_vecs[0],
         )
         np.testing.assert_allclose(
-            np.array([1.73205081, 1.0, 0.0]), supercell.cell_vecs[1],
+            np.array([1.73205081, 1.0, 0.0]),
+            supercell.cell_vecs[1],
         )
         np.testing.assert_allclose(
-            np.array([0.0, 0.0, 1.02529049]), supercell.cell_vecs[2],
+            np.array([0.0, 0.0, 1.02529049]),
+            supercell.cell_vecs[2],
         )
         assert supercell.system_name == "NiC4S4"
         assert ["Ni", "C", "S"] == supercell.atom_types
@@ -218,7 +225,7 @@ class TestPOSCAR:
         supercell = self.testposcar.supercell(3, 2, 1)
         assert 6 * len(self.testposcar.positions) == len(supercell.positions)
 
-    def test_poscar_split(self):
+    def test_poscar_split(self) -> None:
         """Test for POSCAR.split."""
         one, other = self.testposcar.split([2, 3, 4, 5, 6])
         assert len(one.positions) == 5
@@ -227,25 +234,26 @@ class TestPOSCAR:
         assert one.selective
         assert other.selective
 
-    def test_nearest(self):
+    def test_nearest(self) -> None:
         pass
 
-    def test_make27candidate(self):
+    def test_make27candidate(self) -> None:
         pass
 
-    def test_guess_molecule(self):
+    def test_guess_molecule(self) -> None:
         pass
 
-    def test_atom_rotate(self):
+    def test_atom_rotate(self) -> None:
         pass
 
-    def test_plus(self):
+    def test_plus(self) -> None:
         pass
 
     def test__getitem(self, fepc) -> None:
         print(fepc)
         assert_array_equal(
-            fepc[0], [0.1362036989956494, 0.0552692292217493, 0.0000000000000000],
+            fepc[0],
+            [0.1362036989956494, 0.0552692292217493, 0.0000000000000000],
         )
         assert fepc[0][1] == 0.0552692292217493
         assert_array_equal(

@@ -107,13 +107,8 @@ def remove_sharp(str_: str) -> tuple[str, bool]:
 
     Parameters
     ----------
-    str_: str
-        string that "#" to be removed
+        str_: str
 
-    Returns
-    -------
-    tuple[str, bool]
-        [TODO:description]
     """
     active: bool = True
     str_ = str_.strip()
@@ -124,13 +119,11 @@ def remove_sharp(str_: str) -> tuple[str, bool]:
     return str_, active
 
 
-class Incar(Mapping[str, float | str]):
+class Incar(Mapping):
     """General class for INCAR file."""
 
     def __init__(self, filename: Path | str = "") -> None:
-        """Initialize Incar object.
-
-        Parameters
+        """Parameters
         ----------
         filename: str, pathlib.Path
             filename of INCAR
@@ -148,6 +141,7 @@ class Incar(Mapping[str, float | str]):
         ----------
         the_file: StringIO
             "INCAR" file
+
         """
         incar: dict[str, tuple[str, bool]] = {}
         for line in the_file:
@@ -239,6 +233,7 @@ class Incar(Mapping[str, float | str]):
         ----------
         keyword: str
             INCAR keyword
+
         """
         if (keyword in self) and self[keyword][1]:
             return self[keyword][0]
@@ -251,6 +246,7 @@ class Incar(Mapping[str, float | str]):
         -------
         str
             Check messages
+
         """
         checks: dict[str, bool | int | float | str] = {
             'When ICHARG = 11, Recommend "LWAVE = .FALSE, LCHARG = .FALSE"\n': (

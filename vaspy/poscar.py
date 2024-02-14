@@ -270,7 +270,7 @@ class POSCAR(PosCarHead, PosCarPos):
             self.selective = False
             self.coordinate_type = line7
 
-        for line, _ in zip(poscar, self.site_label):
+        for line, _ in zip(poscar, self.site_label, strict=False):
             tmp: list[str] = line.split()
             self.positions.append(np.asarray(np.array(tmp[:3]), dtype=np.float64))
             if self.selective:
@@ -618,7 +618,7 @@ class POSCAR(PosCarHead, PosCarPos):
         one_atoms: list[str] = []
         other_atoms: list[str] = []
         for i, (element, position, coordinate_flag) in enumerate(
-            zip(atoms, self.positions, self.coordinate_changeflags),
+            zip(atoms, self.positions, self.coordinate_changeflags, strict=True),
         ):
             if i in indexes:
                 one_atoms.append(element)
@@ -847,7 +847,7 @@ class POSCAR(PosCarHead, PosCarPos):
 
             newpos = min(atoms27, key=(lambda x: func(x, center)))
             newposes.append(newpos)
-        for site, pos in zip(site_list, newposes):
+        for site, pos in zip(site_list, newposes, strict=True):
             self.positions[site] = pos
 
     def translate(
@@ -1087,6 +1087,7 @@ def _vectorize(vector: ArrayLike) -> NDArray[np.float64]:
     -------
     NDArray
         Numpy array (flatten)
+
     """
     if not isinstance(vector, np.ndarray | np.matrix | list | tuple):
         msg = "Cannot convert into vector."

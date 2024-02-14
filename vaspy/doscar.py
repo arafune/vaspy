@@ -41,16 +41,12 @@ from __future__ import annotations
 
 import copy
 import csv
-import sys
 from collections.abc import Sequence
 from operator import add
+from pathlib import Path
 from typing import IO, ClassVar
 
-try:
-    import matplotlib.pyplot as plt
-except ImportError:
-    sys.stderr.write("Install matplotlib, or you cannot use methods relating to draw\n")
-from pathlib import Path
+import matplotlib.pyplot as plt
 
 from vaspy.tools import open_by_suffix
 
@@ -71,6 +67,7 @@ class DOSCAR:  # Version safety
 
     energies: tuple[float]
         Energy
+
     """
 
     def __init__(self, filename: str | Path = "") -> None:
@@ -107,7 +104,7 @@ class DOSCAR:  # Version safety
         tmp: list[list[float]] = [
             [float(i) for i in next(the_file).split()] for _ in range(nedos)
         ]
-        tmp_dos: list[tuple[float]] = [*zip(*tmp)]
+        tmp_dos: list[tuple[float]] = [*zip(*tmp, strict=True)]
         #
         self.energies = tmp_dos[0]
         if len(tmp_dos) == 3:
@@ -125,7 +122,7 @@ class DOSCAR:  # Version safety
             line = ""
         while line == header:
             tmp = [[float(i) for i in next(the_file).split()] for _ in range(nedos)]
-            self.pdoses.append(PDOS([*zip(*tmp)][1:]))
+            self.pdoses.append(PDOS([*zip(*tmp, strict=True)][1:]))
             try:
                 line = next(the_file)
             except StopIteration:
@@ -166,7 +163,7 @@ class DOS(Sequence):  # Version safety
         self.dos: list[tuple[float, ...] | list[float]] = []
         self.header: str | list[str] = ""
         if array:
-            self.dos = [*zip(*array)]
+            self.dos = [*zip(*array, strict=True)]
 
     def __len__(self) -> int:
         """x.__len__() <=> len(x)."""
@@ -177,7 +174,7 @@ class DOS(Sequence):  # Version safety
 
     @property
     def T(self):
-        return [*zip(*self.dos)]
+        return [*zip(*self.dos, strict=True)]
 
     def _export_csv(
         self,
@@ -191,7 +188,7 @@ class DOS(Sequence):  # Version safety
         with Path(filename).open(mode="w") as csv_file:
             writer = csv.writer(csv_file, delimiter="\t")
             writer.writerow(header)
-            for e, d in zip(energy, self.dos):
+            for e, d in zip(energy, self.dos, strict=True):
                 writer.writerow([e, *list(d)])
 
 
@@ -203,6 +200,7 @@ class TDOS(DOS):
     header : list[str]
 
     dos:
+
     """
 
     def __init__(self, array: tuple[float] | None) -> None:
@@ -212,6 +210,7 @@ class TDOS(DOS):
         ----------
         array : tuple[float]|None
             DOS data
+
         """
         super().__init__(array)
         if len(self.dos[0]) == 1:
@@ -328,11 +327,11 @@ class PDOS(DOS):
             alist: list[int] = [
                 self.orbital_spin.index(orbname) for orbname in orbitalnames
             ]
-        except ValueError:
+        except ValueError as v_err:
             err = "Check argument of this function\n"
             err += "The following name(s) are accepted:\n"
             err += ", ".join(self.orbital_spin)
-            raise ValueError(err)
+            raise ValueError(err) from v_err
         for orbital in alist:
             plt.plot(self.dos[0], self.dos[orbital + 1])
         plt.show()
@@ -350,6 +349,7 @@ class PDOS(DOS):
             filename for output
         energy : list[float] |  tuple[float, ...]
             Energy data
+
         """
         header = ["Energy"]
         for i in self.orbital_spin:
@@ -395,12 +395,14 @@ class PDOS(DOS):
 
         """
         if not isinstance(other, PDOS):
-            return NotImplemented
+            raise NotImplementedError
         if len(self.dos) == 0 and self.site == "":
             return copy.deepcopy(other)
-        else:
-            sum_pdos = PDOS()
-            sum_pdos.site = self.site + other.site
-            sum_pdos.orbital_spin = self.orbital_spin
-            sum_pdos.dos = [list(map(add, x, y)) for x, y, in zip(self.dos, other.dos)]
-            return sum_pdos
+
+        sum_pdos = PDOS()
+        sum_pdos.site = self.site + other.site
+        sum_pdos.orbital_spin = self.orbital_spin
+        sum_pdos.dos = [
+            list(map(add, x, y)) for x, y, in zip(self.dos, other.dos, strict=True)
+        ]
+        return sum_pdos

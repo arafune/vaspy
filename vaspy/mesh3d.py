@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import copy
 from pathlib import Path
-from typing import IO, TYPE_CHECKING
+from typing import IO, TYPE_CHECKING, Literal
 
 import numpy as np
 
@@ -22,8 +22,6 @@ if TYPE_CHECKING:
 
 
 class VASPGrid:
-    # TODO: Use Composite pattern!!!
-    # VASPGrid should consists of POSCAR and Mesh3D object!!
     """Class for VaspGrid used in CHGCAR, LOCPOT, ELFCAR, etc.
 
     General format of the file uses VaspGrid format::
@@ -133,7 +131,7 @@ class VASPGrid:
         the_file.close()
 
     def __str__(self) -> str:
-        """String representation.
+        """Return th string representation.
 
         Returns
         -------
@@ -192,9 +190,9 @@ class VASPGrid:
         add_grid = copy.deepcopy(self)
         try:
             add_grid.grid.data = self.grid.data + other.grid.data
-        except ValueError:
+        except ValueError as v_err:
             msg = "The mesh shapes are different each other"
-            raise RuntimeError(msg)
+            raise RuntimeError(msg) from v_err
         return add_grid
 
     def __add__(self, other: VASPGrid) -> VASPGrid:
@@ -217,9 +215,9 @@ class VASPGrid:
         add_grid.poscar = self.poscar + other.poscar
         try:
             add_grid.grid.data = self.grid.data + other.grid.data
-        except ValueError:
+        except ValueError as v_err:
             msg = "The mesh shapes are different each other"
-            raise RuntimeError(msg)
+            raise RuntimeError(msg) from v_err
         return add_grid
 
     def __sub__(self, other: VASPGrid) -> VASPGrid:
@@ -248,9 +246,9 @@ class VASPGrid:
         diff_grid = copy.deepcopy(self)
         try:
             diff_grid.grid.data = self.grid.data - other.grid.data
-        except ValueError:
+        except ValueError as v_err:
             msg = "The mesh shapes are different each other"
-            raise RuntimeError(msg)
+            raise RuntimeError(msg) from v_err
         return diff_grid
 
 
@@ -276,7 +274,7 @@ class Grid3D:
 
     def __init__(
         self,
-        shape: tuple[int, ...] | NDArray[np.int64] = (0, 0, 0),
+        shape: tuple[int, ...] | NDArray[np.int_] = (0, 0, 0),
         data: Sequence[float] | None = None,
     ) -> None:
         """Initialize."""
@@ -313,15 +311,17 @@ class Grid3D:
     def slice(
         self,
         position: int,
-        axis: str = "z",
+        axis: Literal["x", "y", "z"] = "z",
         frame_i: int = 0,
-    ) -> NDArray[np.float64]:
+    ) -> NDArray[np.float_]:
         """Parameters
         ----------
         axis: str
             'x', 'y', or 'z'.  Case insensitive.
         position: int
             position for slice
+        frame_i: int
+            frame index (0-3)
 
         Return:
         ------
@@ -330,20 +330,19 @@ class Grid3D:
 
         """
         griddata = self.data[frame_i * self.size : (frame_i + 1) * self.size]
-        axis = axis.lower()
-        if axis == "x":
+        if axis in ("x", "X"):
             return griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
                 :,
                 :,
                 position,
             ]
-        if axis == "y":
+        if axis in ("y", "Y"):
             return griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
                 :,
                 position,
                 :,
             ]
-        if axis == "z":
+        if axis in ("z", "Z"):
             return griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
                 position,
                 :,
@@ -354,7 +353,7 @@ class Grid3D:
 
     def integrate(
         self,
-        axis: str,
+        axis: Literal["X", "Y", "Z", "x", "y", "z"],
         from_coor: int | None = None,
         to_coor: int | None = None,
         frame_i: int = 0,
@@ -382,8 +381,7 @@ class Grid3D:
 
         """
         griddata = self.data[frame_i * self.size : (frame_i + 1) * self.size]
-        axis = axis.lower()
-        if axis == "x":
+        if axis in ("x", "X"):
             return np.sum(
                 griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
                     :,
@@ -392,7 +390,7 @@ class Grid3D:
                 ],
                 axis=2,
             )
-        if axis == "y":
+        if axis in ("y", "Y"):
             return np.sum(
                 griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
                     :,
@@ -401,7 +399,7 @@ class Grid3D:
                 ],
                 axis=1,
             )
-        if axis == "z":
+        if axis in ("z", "Z"):
             return np.sum(
                 griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
                     from_coor:to_coor,
@@ -438,7 +436,7 @@ class Grid3D:
 
     def average_along_axis(
         self,
-        axis_name: str,
+        axis_name: Literal["X", "Y", "Z", "x", "y", "z"],
         frame_i: int = 0,
     ) -> NDArray[np.float64]:
         """Calculate average value of potential along 'axis'.
@@ -458,22 +456,25 @@ class Grid3D:
             average value along the axis
 
         """
-        axis_name = axis_name.capitalize()
         data: NDArray[np.float64] = self.data[
             frame_i * self.size : (frame_i + 1) * self.size
         ].reshape((self.shape[2], self.shape[1], self.shape[0]))
-        if axis_name == "X":
+        if axis_name in ("x", "X"):
             data = np.average(np.average(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
-        elif axis_name == "Y":
+        elif axis_name in ("y", "Y"):
             data = np.average(np.average(np.transpose(data, (1, 0, 2)), axis=2), axis=1)
-        elif axis_name == "Z":
+        elif axis_name in ("z", "Z"):
             data = np.average(np.average(data, axis=2), axis=1)
         else:
             msg = "Wrong axis name set"
             raise ValueError(msg)
         return data
 
-    def min_along_axis(self, axis_name: str, frame_i: int = 0) -> NDArray[np.float64]:
+    def min_along_axis(
+        self,
+        axis_name: Literal["X", "Y", "Z", "x", "y", "z"],
+        frame_i: int = 0,
+    ) -> NDArray[np.float64]:
         """Calculate minimum value of potential along 'axis'.
 
         Parameters
@@ -491,22 +492,25 @@ class Grid3D:
             minimum value along the axis
 
         """
-        axis_name = axis_name.capitalize()
         data: NDArray[np.float64] = self.data[
             frame_i * self.size : (frame_i + 1) * self.size
         ].reshape((self.shape[2], self.shape[1], self.shape[0]))
-        if axis_name == "X":
+        if axis_name in ("x", "X"):
             data = np.min(np.min(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
-        elif axis_name == "Y":
+        elif axis_name in ("y", "Y"):
             data = np.min(np.min(np.transpose(data, (1, 0, 2)), axis=2), axis=1)
-        elif axis_name == "Z":
+        elif axis_name in ("z", "Z"):
             data = np.min(np.min(data, axis=2), axis=1)
         else:
             msg = "Wrong axis name set"
             raise ValueError(msg)
         return data
 
-    def max_along_axis(self, axis_name: str, frame_i: int = 0) -> NDArray[np.float64]:
+    def max_along_axis(
+        self,
+        axis_name: Literal["X", "Y", "Z", "x", "y", "z"],
+        frame_i: int = 0,
+    ) -> NDArray[np.float64]:
         """Calculate maximum value of potential along 'axis'.
 
         Parameters
@@ -524,15 +528,14 @@ class Grid3D:
             maximum value along the axis
 
         """
-        axis_name = axis_name.capitalize()
         data: NDArray[np.float64] = self.data[
             frame_i * self.size : (frame_i + 1) * self.size
         ].reshape((self.shape[2], self.shape[1], self.shape[0]))
-        if axis_name == "X":
+        if axis_name in ("x", "X"):
             data = np.max(np.max(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
-        elif axis_name == "Y":
+        elif axis_name in ("y", "Y"):
             data = np.max(np.max(np.transpose(data, (1, 0, 2)), axis=2), axis=1)
-        elif axis_name == "Z":
+        elif axis_name in ("z", "Z"):
             data = np.max(np.max(data, axis=2), axis=1)
         else:
             msg = "Wrong axis name set"
@@ -541,7 +544,7 @@ class Grid3D:
 
     def median_along_axis(
         self,
-        axis_name: str,
+        axis_name: Literal["X", "Y", "Z", "x", "y", "z"],
         frame_i: int = 0,
     ) -> NDArray[np.float64]:
         """Calculate median value of potential along 'axis'.
@@ -561,15 +564,14 @@ class Grid3D:
             median value along the axis
 
         """
-        axis_name = axis_name.capitalize()
         data: NDArray[np.float64] = self.data[
             frame_i * self.size : (frame_i + 1) * self.size
         ].reshape((self.shape[2], self.shape[1], self.shape[0]))
-        if axis_name == "X":
+        if axis_name in ("x", "X"):
             data = np.median(np.median(np.transpose(data, (2, 0, 1)), axis=2), axis=1)
-        elif axis_name == "Y":
+        elif axis_name in ("y", "Y"):
             data = np.median(np.median(np.transpose(data, (1, 0, 2)), axis=2), axis=1)
-        elif axis_name == "Z":
+        elif axis_name in ("z", "Z"):
             data = np.median(np.median(data, axis=2), axis=1)
         else:
             msg = "Wrong axis name set"

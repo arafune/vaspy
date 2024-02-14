@@ -2,6 +2,7 @@
 
 translate from chgcar.rb in scRipt4VASP, 2014/2/26 master branch
 """
+
 from __future__ import annotations
 
 import copy

@@ -1,6 +1,5 @@
 """This module provide constant data such as atom mass etc."""
 
-
 radii: dict[str, float] = {
     "Ac": 2.15,
     "Ag": 1.45,

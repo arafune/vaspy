@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import csv
-import sys
 from logging import INFO, Formatter, StreamHandler, getLogger
 from pathlib import Path
 from typing import IO, TYPE_CHECKING
@@ -18,10 +17,7 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
 
-try:
-    import matplotlib.pyplot as plt
-except ImportError:
-    sys.stderr.write("Install matplotlib, or you cannot use methods relating to draw\n")
+import matplotlib.pyplot as plt
 
 # logger
 LOGLEVEL = INFO
@@ -131,6 +127,7 @@ class EnergyBand:
         ----------
         keys: tuple
             key tuple used for label
+
         """
         label_list: list[str] = []
         for key in keys:
@@ -149,7 +146,11 @@ class EnergyBand:
         band_structure: list[list[float]] = []
         for energies in self.energies.T.tolist():
             band: list[float] = []
-            for k, energy in zip(self.kdistances[:, np.newaxis].tolist(), energies):
+            for k, energy in zip(
+                self.kdistances[:, np.newaxis].tolist(),
+                energies,
+                strict=True,
+            ):
                 k.extend(energy)
                 band.append(k)
             band_structure.append(band)
@@ -320,10 +321,11 @@ class EIGENVAL(EnergyBand):
         Returns
         -------
         tuple of list of float and list of float
+
         """
         energies: list[list[list[float]]] = self.energies.transpose(1, 2, 0).tolist()
         kvec: list[list[float]] = self.k_vectors.tolist()
-        return list(zip(kvec, energies))[item]
+        return list(zip(kvec, energies, strict=True))[item]
 
     def __len__(self) -> int:
         """Return num_k as the result of len()."""
@@ -332,7 +334,7 @@ class EIGENVAL(EnergyBand):
     def load_file(self, the_file: IO[str]) -> None:
         """Parse EIGENVAL."""
         self.n_atom, _, _, self.n_spin = (int(i) for i in next(the_file).split())
-        if self.n_spin == 2:
+        if self.n_spin == len(("up", "down")):
             self.label["energy"] = ["Energy_up", "Energy_down"]
         else:
             self.label["energy"] = ["Energy"]

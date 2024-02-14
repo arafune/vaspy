@@ -1,9 +1,9 @@
 [project]
 name = "vaspy"
-version = "0.1.0"
+version = "0.5.3"
 description = "Add a short description here"
 authors = [{ name = "Ryuichi Arafune", email = "ryuichi.arafune@gmail.com" }]
-dependencies = []
+dependencies = ["numpy>=1.24.4"]
 readme = "README.md"
 requires-python = ">= 3.8"
 

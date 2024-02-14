@@ -74,6 +74,7 @@ def view3d(
         the polar angle of the camera.
     phi: float
         the azimuth angle of the camera.
+
     """
     # Read POSCAR
     poscar = vaspy_poscar
@@ -209,6 +210,7 @@ def view_atom_with_surface(
     Important:
     ---------
     The unit cell must be rectangle.  This limitation comes from mayavi.
+
     """
     poscar = vaspy_chgcar.poscar
     poscar.repack_in_cell()
@@ -303,6 +305,7 @@ def _grid_nums(n_grids, crystal_axes, lab_axes):
     original_grids:
     tetrahedron_vectors:
     cuboid_vectors
+
     """
     new_grids = []
     for lab_axis in lab_axes:
@@ -340,6 +343,7 @@ def grid_nums(n_grids, crystal_axes) -> tuple[int, ...]:
 
     Return: tuple
         number of grid points of the laboratory frame.
+
     """
     lab_box = tools.cuboid(crystal_axes)
     lab_axes = np.array(
@@ -363,6 +367,7 @@ def _find_diagonal_indexes(n_grids, crystal_axes):
 
     Returns
     -------
+
     """
     cuboid = tools.cuboid(crystal_axes)
     n_labgrids = grid_nums(n_grids, crystal_axes)

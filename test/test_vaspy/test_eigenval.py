@@ -1,4 +1,5 @@
 """Test for EIGENVAL class."""
+
 import os
 
 import numpy as np
@@ -105,7 +106,7 @@ class TestEIGENVAL:
             ],
         )
 
-    def test_cobalt(self, cobalt: eigenval.EIGENVAL):
+    def test_cobalt(self, cobalt: eigenval.EIGENVAL) -> None:
         """Test EIGENVAL by using EIGENVAL.Co-collinear.
 
         Collinear magnetism

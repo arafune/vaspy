@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-"""Setup script for vaspy
-"""
+"""Setup script for vaspy."""
+
 import sys
 from distutils.core import setup
 
