@@ -276,7 +276,15 @@ class POSCAR(PosCarHead, PosCarPos):
             if self.selective:
                 self.coordinate_changeflags.append(" ".join(tmp[3:]))
 
-    def __iter__(self) -> Generator:
+    def __iter__(self) -> Generator[NDArray[np.float_], None, None]:
+        """
+        [TODO:summary].
+
+        Returns
+        -------
+        Generator[NDArray[np.float_], None, None]
+            Atom position
+        """
         yield from self.positions
 
     def sort(
@@ -341,16 +349,12 @@ class POSCAR(PosCarHead, PosCarPos):
             POSCAR object of the supercell
 
         """
-        if (
-            not isinstance(n_x, int)
-            or not isinstance(n_y, int)
-            or not isinstance(n_z, int)
-        ):
-            msg = "arguments must be positive integer"
-            raise ValueError(msg)
-        if n_x <= 0 or n_y <= 0 or n_z <= 0:
-            msg = "arguments must be positive integer"
-            raise ValueError(msg)
+        assert isinstance(n_x, int)
+        assert isinstance(n_y, int)
+        assert isinstance(n_z, int)
+        assert n_x > 0
+        assert n_y > 0
+        assert n_z > 0
         #
         sposcar = copy.deepcopy(self)
         original_is_cartesian = sposcar.is_cartesian()
@@ -551,11 +555,11 @@ class POSCAR(PosCarHead, PosCarPos):
             self.to_direct()
         for pos in self.positions:
             for i in (0, 1, 2):
-                while pos[i] < 0.0 or pos[i] > 1.0:
-                    if pos[i] < 0.0:
-                        pos[i] += 1.0
-                    elif pos[i] > 1.0:
-                        pos[i] -= 1.0
+                while pos[i] < 0 or pos[i] > 1:
+                    if pos[i] < 0:
+                        pos[i] += 1
+                    elif pos[i] > 1:
+                        pos[i] -= 1
         if original_is_cartesian:
             self.to_cartesian()
 
@@ -565,6 +569,7 @@ class POSCAR(PosCarHead, PosCarPos):
         Parameters
         ----------
         other: POSCAR
+            another POSCAR object
 
         Returns
         -------
@@ -576,7 +581,7 @@ class POSCAR(PosCarHead, PosCarPos):
 
         """
         if not isinstance(other, POSCAR):
-            raise RuntimeError  # return NotImplemented
+            raise TypeError
         dest_poscar = copy.deepcopy(self)
         if dest_poscar.scaling_factor != other.scaling_factor:
             msg = "scaling factor is different."
@@ -654,7 +659,7 @@ class POSCAR(PosCarHead, PosCarPos):
 
         """
         if not isinstance(other, POSCAR):
-            raise RuntimeError  ## return NotImplemented
+            raise TypeError
         dest_poscar = copy.deepcopy(self)
         original_is_direct = False
         if dest_poscar.is_direct():
@@ -759,6 +764,7 @@ class POSCAR(PosCarHead, PosCarPos):
         Parameters
         ----------
         new_scaling_factor: float
+            scaling factor in the new system.
 
         Note
         -----
