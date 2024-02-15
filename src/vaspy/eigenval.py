@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import csv
-from logging import INFO, Formatter, StreamHandler, getLogger
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 from pathlib import Path
 from typing import IO, TYPE_CHECKING
 
@@ -20,7 +20,8 @@ if TYPE_CHECKING:
 import matplotlib.pyplot as plt
 
 # logger
-LOGLEVEL = INFO
+LOGLEVES = (DEBUG, INFO)
+LOGLEVEL = LOGLEVES[1]
 logger = getLogger(__name__)
 fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
 formatter = Formatter(fmt)
@@ -58,9 +59,9 @@ class EnergyBand:
 
     Parameters
     ----------
-    k_vectors: NDArray
+    k_vectors: Sequence[float] |  NDArray[np.float64]
             1D array data of k-vectors.
-    energies: NDArray
+    energies:  Sequence[float] |  NDArray[np.float64]
             1D array data of energies
     n_spin: int
             number of spin: '1' means No-spin.  '2' means collinear spin,
@@ -72,8 +73,8 @@ class EnergyBand:
 
     def __init__(
         self,
-        k_vectors: Sequence[float] = (),
-        energies: Sequence[float] = (),
+        k_vectors: Sequence[float] | NDArray[np.float64] = (),
+        energies: Sequence[float] | NDArray[np.float64] = (),
         n_spin: int = 1,
     ) -> None:
         """Initialize."""
@@ -313,7 +314,9 @@ class EIGENVAL(EnergyBand):
             self.load_file(open_by_suffix(str(filename)))
 
     def __getitem__(self, item: int) -> tuple[list[float], list[list[float]]]:
-        """Parameters
+        """Get item.
+
+        Parameters
         ----------
         item: int
             index of k-vector

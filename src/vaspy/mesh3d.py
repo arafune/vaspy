@@ -314,7 +314,9 @@ class Grid3D:
         axis: Literal["x", "y", "z"] = "z",
         frame_i: int = 0,
     ) -> NDArray[np.float64]:
-        """Parameters
+        """Slice the 3D data.
+
+        Parameters
         ----------
         axis: str
             'x', 'y', or 'z'.  Case insensitive.
@@ -425,12 +427,11 @@ class Grid3D:
         outputstr: str = ""
         mesharray = self.data.reshape(self.n_frame, self.size)
         for tmp in mesharray:
-            output = []
             outputstr += f"\n  {self.shape[0]}  {self.shape[1]}  {self.shape[2]}\n"
-            for array in tools.each_slice(tmp, 5):
-                output.append(
-                    "".join(f"  {i:18.11E}" for i in array if i is not None),
-                )
+            output = [
+                "".join(f"  {i:18.11E}" for i in array if i is not None)
+                for array in tools.each_slice(tmp, 5)
+            ]
             outputstr += "\n".join(output)
         return outputstr + "\n"
 
