@@ -4,12 +4,13 @@
 import argparse
 import os
 import sys
+from pathlib import Path
 
 from vaspy import tools
 from vaspy.doscar import DOSCAR, PDOS, TDOS
 from vaspy.outcar import OUTCAR
 
-mypath = os.readlink(__file__) if os.path.islink(__file__) else __file__
+mypath = os.readlink(__file__) if Path(__file__).is_symlink() else __file__
 sys.path.append(os.path.dirname(os.path.abspath(mypath)))
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
@@ -67,7 +68,7 @@ doscar = DOSCAR(args.doscar)
 atomlist: list[str] = []
 if args.outcar is not NotImplemented:
     if args.outcar is None:
-        args.outcar = os.path.join(os.path.dirname(args.doscar), "OUTCAR")
+        args.outcar = str(Path(args.doscar).parent / "OUTCAR")
     outcar = OUTCAR(args.outcar)
     atomlist = outcar.atom_names
     args.fermi = outcar.fermi
