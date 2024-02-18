@@ -329,6 +329,7 @@ class Grid3D:
             2D numpy array that sliced from 3D mesh data.
 
         """
+        assert axis in ("x", "y", "z", "X", "Y", "Z")
         griddata = self.data[frame_i * self.size : (frame_i + 1) * self.size]
         if axis in ("x", "X"):
             return griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
@@ -342,14 +343,11 @@ class Grid3D:
                 position,
                 :,
             ]
-        if axis in ("z", "Z"):
-            return griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
-                position,
-                :,
-                :,
-            ]
-        msg = 'axis must be "x", "y" or "z".'
-        raise RuntimeError(msg)
+        return griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
+            position,
+            :,
+            :,
+        ]
 
     def integrate(
         self,
@@ -380,6 +378,7 @@ class Grid3D:
             2D numpy array that integrated from 3D mesh data
 
         """
+        assert axis in ("x", "y", "z", "X", "Y", "Z")
         griddata = self.data[frame_i * self.size : (frame_i + 1) * self.size]
         if axis in ("x", "X"):
             return np.sum(
@@ -399,17 +398,14 @@ class Grid3D:
                 ],
                 axis=1,
             )
-        if axis in ("z", "Z"):
-            return np.sum(
-                griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
-                    from_coor:to_coor,
-                    :,
-                    :,
-                ],
-                axis=0,
-            )
-        msg = "incorrect axis"
-        raise ValueError(msg)
+        return np.sum(  # axis in ("z", "Z")
+            griddata.reshape(self.shape[2], self.shape[1], self.shape[0])[
+                from_coor:to_coor,
+                :,
+                :,
+            ],
+            axis=0,
+        )
 
     def __str__(self) -> str:
         """Return as string object.
@@ -427,10 +423,10 @@ class Grid3D:
         for tmp in mesharray:
             output = []
             outputstr += f"\n  {self.shape[0]}  {self.shape[1]}  {self.shape[2]}\n"
-            for array in tools.each_slice(tmp, 5):
-                output.append(
-                    "".join(f"  {i:18.11E}" for i in array if i is not None),
-                )
+            output = [
+                "".join(f"  {i:18.11E}" for i in array if i is not None)
+                for array in tools.each_slice(tmp, 5)
+            ]
             outputstr += "\n".join(output)
         return outputstr + "\n"
 
