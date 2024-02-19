@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import argparse
 import itertools
-from logging import INFO, Formatter, StreamHandler, getLogger
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -23,7 +23,8 @@ if TYPE_CHECKING:
 
     from vaspy.poscar import POSCAR
 
-LOGLEVEL = INFO
+LOGLEVELS = (DEBUG, INFO)
+LOGLEVEL = LOGLEVELS[1]
 logger = getLogger(__name__)
 fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
 formatter = Formatter(fmt)
