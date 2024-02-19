@@ -6,7 +6,7 @@ from __future__ import annotations
 import pprint
 import re
 from collections.abc import Iterator, Mapping
-from logging import INFO, Formatter, StreamHandler, getLogger
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 from typing import IO, TYPE_CHECKING
 
 from vaspy.tools import open_by_suffix
@@ -15,7 +15,8 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 # logger
-LOGLEVEL = INFO
+LOGLEVELS = (DEBUG, INFO)
+LOGLEVEL = LOGLEVELS[1]
 logger = getLogger(__name__)
 fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
 formatter = Formatter(fmt)
@@ -123,10 +124,13 @@ class Incar(Mapping):
     """General class for INCAR file."""
 
     def __init__(self, filename: Path | str = "") -> None:
-        """Parameters
+        """Initialize Incar class.
+
+        Parameters
         ----------
         filename: str, pathlib.Path
             filename of INCAR
+
         """
         self._incar: dict[str, tuple[str | int | float, bool]] = {}
         self.additional_comments: dict[str, str] = {}

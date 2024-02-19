@@ -42,9 +42,7 @@ assert ([args.merge, args.poscar].count(True) == 1 and args.split is None) or (
 ), "Option error"
 #
 if args.merge:
-    xdatcars = []
-    for xdatcar_file in args.files:
-        xdatcars.append(XDATCAR(xdatcar_file))
+    xdatcars = [XDATCAR(xdatcar_file) for xdatcar_file in args.files]
     output_xdatcar = copy.deepcopy(xdatcars[0])
     configurations = []
     for xdatcar in xdatcars:

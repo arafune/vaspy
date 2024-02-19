@@ -78,11 +78,15 @@ def check_position_axes(chgcar1: CHGCAR, chgcar2: CHGCAR) -> bool:
 
     Parameters
     ----------
-    chgcar1, chgcar2: vaspy.CHGCAR
+    chgcar1
+        CHGCAR object
+    chgcar2
+        CHGCAR object
 
     Returns
     -------
     bool
+        Return True if the cell-axes are same in CHGCAR
 
     """
     cell1 = chgcar1.poscar.cell_vecs
@@ -94,6 +98,7 @@ def check_position_axes(chgcar1: CHGCAR, chgcar2: CHGCAR) -> bool:
     return True
 
 
+dest_chgcar: CHGCAR | None = None
 #
 if args.spin is not None:
     if args.CHGCAR_file_2 is not None:
@@ -117,7 +122,7 @@ if args.spin is not None:
 if args.add or args.diff or args.merge:
     if args.CHGCAR_file_2 is None:
         msg = "Two CHGCAR files are required."
-        raise parser.error(msg)
+        raise RuntimeError(msg)
     if args.add:
         dest_chgcar = args.CHGCAR_file_1 + args.CHGCAR_file_2
     elif args.diff:
@@ -128,6 +133,7 @@ if args.add or args.diff or args.merge:
         dest_chgcar = args.CHGCAR_file_1.merge(args.CHGCAR_file_2)
 #
 if args.output is not None:
+    assert dest_chgcar is not None
     dest_chgcar.save(args.output)
 else:
     print(dest_chgcar)
