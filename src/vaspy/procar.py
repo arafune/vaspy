@@ -65,7 +65,7 @@ class ProjectionBand(EnergyBand):
         n_spin: int = 1,
     ) -> None:
         """Initialize."""
-        super().__init__(k_vectors, energies, n_spin)
+        super().__init__(k_vectors=k_vectors, energies=energies, n_spin=n_spin)
         self.n_atom: int = 0
         self.proj = proj
         self.phase = phase

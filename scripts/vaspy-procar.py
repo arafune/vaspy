@@ -8,6 +8,7 @@ from itertools import chain
 from logging import INFO, Formatter, StreamHandler, getLogger
 
 import numpy as np
+from numpy.typing import NDArray
 from vaspy import procar, tools
 from vaspy.outcar import OUTCAR
 
@@ -74,12 +75,12 @@ parser.add_argument("procar", metavar="PROCAR_file", help="""PROCAR file""")
 
 args = parser.parse_args()
 logger.debug("Debugging...")
-recvec = None
+recvec: NDArray[np.float64] | None = None
 if args.outcar is not None:
     outcar = OUTCAR(args.outcar)
     fermi = outcar.fermi
     logger.debug(f"Fermi: {fermi}")
-    recvec = [[v * 2 * np.pi for v in recv] for recv in outcar.recvec]
+    recvec = np.array(outcar.recvec) * 2 * np.pi
     logger.debug(f"recvec: {recvec}")
 elif args.fermi is not None:
     fermi = args.fermi
@@ -114,14 +115,12 @@ for sites, name in zip(siteindex, sitenames, strict=True):
 for orb in tuple(set(flat_orbitals)):
     procar.append_sumorbital(procar.orbital_index(orb), orb)
 #
-logger.debug("label['site'] is {}".format(procar.label["site"]))
-logger.debug("label['orbital'] is {}".format(procar.label["orbital"]))
+logger.debug(f"label['site'] is {procar.label['site']}")
+logger.debug(f"label['orbital'] is {procar.label['orbital']}")
 #
-site_indexes: list[int] = []
-orbtal_indexes_sets = []
 tmp: list[str] | tuple[str, ...]
-for site in sitenames:
-    site_indexes.append(procar.label["site"].index(site))
+site_indexes = [procar.label["site"].index(site) for site in sitenames]
+orbtal_indexes_sets = []
 for orbitals in args.orbital:
     tmp = []
     for orbital_in_site in orbitals:

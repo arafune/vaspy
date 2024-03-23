@@ -6,8 +6,9 @@ modules for VASP pre/post-process
 from __future__ import annotations
 
 import os.path
+from pathlib import Path
 import re
-from typing import Any
+from typing import TypeAlias
 
 from vaspy import (
     bader,
@@ -47,8 +48,21 @@ __all__: list[str] = [
 
 __version__: str = "0.6.0"
 
+VASP: TypeAlias = (
+    poscar.POSCAR
+    | incar.Incar
+    | outcar.OUTCAR
+    | chgcar.CHGCAR
+    | procar.PROCAR
+    | locpot.LOCPOT
+    | doscar.DOSCAR
+    | eigenval.EIGENVAL
+    | bader.BaderACF
+    | wavecar.WAVECAR
+)
 
-def load(filename: str, mode: str = "", additional: str = "") -> Any:
+
+def load(filename: str, mode: str = "", additional: str = "") -> VASP:
     """Load files.
 
     Guess the file type by the filename.
@@ -60,6 +74,9 @@ def load(filename: str, mode: str = "", additional: str = "") -> Any:
         filename
     mode: str, optional
         optional argument mode
+    additional: str, optional
+        additional arg to load the VASP file.
+
 
     Notes
     -----
@@ -70,7 +87,7 @@ def load(filename: str, mode: str = "", additional: str = "") -> Any:
             eigenval, wavecar (case insensitive).
 
     """
-    filenamebase = os.path.basename(filename).lower()
+    filenamebase = Path(filename).name.lower()
     mode = mode.lower()
     if re.search(r"poscar|contcar", filenamebase) or mode == "poscar":
         return poscar.POSCAR(filename)

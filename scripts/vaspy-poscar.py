@@ -21,6 +21,28 @@ logger.propagate = False
 
 
 def split_to_float(string: str, n: int, name: str) -> list[float]:
+    """Convert string with float value with comma into list of flaot.
+
+
+    Parameters
+    ----------
+    string
+        input string
+    n
+        [TODO:description]
+    name
+        [TODO:description]
+
+    Returns
+    -------
+    list[float]
+        [TODO:description]
+
+    Raises
+    ------
+    argparse.ArgumentTypeError:
+        [TODO:description]
+    """
     lis = string.split(",")
     if len(lis) != n:
         message = f"--{name} option requires {n} numbers"

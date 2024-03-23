@@ -19,7 +19,7 @@ import vaspy
 # -- Project information -----------------------------------------------------
 
 project = "vaspy"
-copyright = "2019, Ryuichi Arafune"
+copyright = "2019-2024, Ryuichi Arafune"
 author = "Ryuichi Arafune"
 
 # The short X.Y version
