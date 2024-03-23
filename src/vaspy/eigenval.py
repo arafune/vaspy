@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import csv
-from logging import INFO, Formatter, StreamHandler, getLogger
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 from pathlib import Path
-from typing import IO, TYPE_CHECKING
+from typing import IO, TYPE_CHECKING, reveal_type
 
 import numpy as np
 
@@ -20,7 +20,8 @@ if TYPE_CHECKING:
 import matplotlib.pyplot as plt
 
 # logger
-LOGLEVEL = INFO
+LOGLEVELS = (DEBUG, INFO)
+LOGLEVEL = LOGLEVELS[1]
 logger = getLogger(__name__)
 fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
 formatter = Formatter(fmt)
@@ -72,8 +73,8 @@ class EnergyBand:
 
     def __init__(
         self,
-        k_vectors: Sequence[float] = (),
-        energies: Sequence[float] = (),
+        k_vectors: Sequence[float] | NDArray[np.float64] = (),
+        energies: Sequence[float] | NDArray[np.float64] = (),
         n_spin: int = 1,
     ) -> None:
         """Initialize."""
@@ -133,9 +134,10 @@ class EnergyBand:
         for key in keys:
             for tmp in self.label[key]:
                 label_list.append(tmp)
+            label_list = list(self.label[key])
         return label_list
 
-    def to_3dlist(self) -> list[list[float]]:
+    def to_3dlist(self) -> list[list[list[float]]]:
         """Return 3D list.
 
         list[band_i, [k_i, energy, (energy_down)]]
@@ -143,7 +145,7 @@ class EnergyBand:
         This list format would be useful for str output
 
         """
-        band_structure: list[list[float]] = []
+        band_structure: list[list[list[float]]] = []
         for energies in self.energies.T.tolist():
             band: list[float] = []
             for k, energy in zip(

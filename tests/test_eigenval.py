@@ -1,14 +1,13 @@
 """Test for EIGENVAL class."""
 
-import os
-
+from pathlib import Path
 import numpy as np
 import pytest
 import vaspy
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from vaspy import eigenval
 
-datadir = os.path.abspath(os.path.dirname(__file__)) + "/data/"
+datadir = str(Path(__file__).parent / "data/")
 
 
 @pytest.fixture()
@@ -25,9 +24,9 @@ class TestEIGENVAL:
 
     def test_check_basic_parameters(self) -> None:
         """Check the basic parameters stored."""
-        assert self.eigenval_spin.n_atom == 344
-        assert self.eigenval_spin.n_spin == 2
-        assert self.eigenval_spin.n_bands == 1890
+        assert self.eigenval_spin.n_atom == 344  # noqa: PLR2004
+        assert self.eigenval_spin.n_spin == 2  # noqa: PLR2004
+        assert self.eigenval_spin.n_bands == 1890  # noqa: PLR2004
         assert self.eigenval_spin.num_k == 1
         assert self.eigenval_spin.energies.shape == (2, 1, 1890)
         assert_array_equal([0.0, 0.0, 0.0], self.eigenval_spin.k_vectors[0])
