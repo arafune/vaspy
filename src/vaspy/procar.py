@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import csv
 import re
-from logging import INFO, Formatter, StreamHandler, getLogger
+from logging import DEBUG, INFO, Formatter, StreamHandler, getLogger
 from typing import IO, TYPE_CHECKING
 
 import numpy as np
@@ -26,7 +26,8 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 # logger
-LOGLEVEL = INFO
+LOGLEVELS = (DEBUG, INFO)
+LOGLEVEL = LOGLEVELS[0]
 logger = getLogger(__name__)
 fmt = "%(asctime)s %(levelname)s %(name)s :%(message)s"
 formatter = Formatter(fmt)
@@ -57,8 +58,8 @@ class ProjectionBand(EnergyBand):
 
     def __init__(
         self,
-        k_vectors: Sequence[float] = (),
-        energies: Sequence[float] = (),
+        k_vectors: Sequence[float] | NDArray[np.float64] = (),
+        energies: Sequence[float] | NDArray[np.float64] = (),
         proj: NDArray[np.float64] | None = None,
         phase: NDArray[np.float64] | None = None,
         n_spin: int = 1,
