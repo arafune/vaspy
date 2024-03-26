@@ -6,8 +6,8 @@ modules for VASP pre/post-process
 from __future__ import annotations
 
 import os.path
-from pathlib import Path
 import re
+from pathlib import Path
 from typing import TypeAlias
 
 from vaspy import (

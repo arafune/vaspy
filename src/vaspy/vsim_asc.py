@@ -158,11 +158,7 @@ class VSIM_ASC:
         )
         qpt_cart: NDArray[np.float64] = qpt.dot(bmatrix)
         logger.debug(
-            "qpt_cart[x] = {}, qpt_cart[y] = {}, qpt_cart[z] ={}".format(
-                qpt_cart[0],
-                qpt_cart[1],
-                qpt_cart[2],
-            ),
+            f"qpt_cart[x] = {qpt_cart[0]}, qpt_cart[y] = {qpt_cart[1]}, qpt_cart[z] ={qpt_cart[2]}",
         )
         #
         animation_positions: list[list[NDArray[np.float64]]] = []
@@ -258,9 +254,7 @@ def animate_atom_phonon(
             f"r:{position0}, qpt_cart;{qpt_cart}, frame:{frame}, n_frames:{n_frames}",
         )
         logger.debug(
-            "arg_exponent:{}".format(
-                1.0j * (np.dot(position0, qpt_cart) - 2 * np.pi * frame / n_frames),
-            ),
+            f"arg_exponent:{1.0j * (np.dot(position0, qpt_cart) - 2 * np.pi * frame / n_frames)}",
         )
         logger.debug(f"exponent:{exponent}")
         normal_displ: NDArray[np.float64] = np.array(

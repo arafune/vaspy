@@ -440,21 +440,15 @@ class WAVECAR:
         string += "\nreal space lattice vectors:"
         for i in range(3):
             string += "\na" + str(i + 1)
-            string += " = {}    {}    {}".format(
-                self.realcell[i][0],
-                self.realcell[i][1],
-                self.realcell[i][2],
-            )
+            string += f" = {self.realcell[i][0]}"
+            string += f"    {self.realcell[i][1]}"
+            string += f"    {self.realcell[i][2]}"
         string += "\n"
         string += f"\nvolume unit cell =   {self.volume}"
         string += "\nReciprocal lattice vectors:"
         for i in range(3):
             string += "\nb" + str(i + 1)
-            string += " = {}    {}    {}".format(
-                self.rcpcell[i][0],
-                self.rcpcell[i][1],
-                self.rcpcell[i][2],
-            )
+            string += f" = {self.rcpcell[i][0]}    {self.rcpcell[i][1]}    {self.rcpcell[i][2]}"
         return string
 
 
