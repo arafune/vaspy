@@ -987,12 +987,11 @@ def rotate_x(theta_deg: float) -> NDArray[np.float64]:
             [ 0.       ,  0.8660254,  0.5      ]])
 
     """
-    degree: float = np.pi / 180.0
     return np.array(
         [
             [1.0, 0.0, 0.0],
-            [0.0, np.cos(theta_deg * degree), -np.sin(theta_deg * degree)],
-            [0.0, np.sin(theta_deg * degree), np.cos(theta_deg * degree)],
+            [0.0, np.cos(np.deg2rad(theta_deg)), -np.sin(np.deg2rad(theta_deg))],
+            [0.0, np.sin(np.deg2rad(theta_deg)), np.cos(np.deg2rad(theta_deg))],
         ],
     )
 
@@ -1018,12 +1017,11 @@ def rotate_y(theta_deg: float) -> NDArray[np.float64]:
         [-0.8660254,  0.       ,  0.5      ]])
 
     """
-    degree: float = np.pi / 180.0
     return np.array(
         [
-            [np.cos(theta_deg * degree), 0.0, np.sin(theta_deg * degree)],
+            [np.cos(np.deg2rad(theta_deg)), 0.0, np.sin(np.deg2rad(theta_deg))],
             [0.0, 1.0, 0.0],
-            [-np.sin(theta_deg * degree), 0.0, np.cos(theta_deg * degree)],
+            [-np.sin(np.deg2rad(theta_deg)), 0.0, np.cos(np.deg2rad(theta_deg))],
         ],
     )
 
@@ -1049,11 +1047,10 @@ def rotate_z(theta_deg: float) -> NDArray[np.float64]:
         [ 0.       ,  0.       ,  1.       ]])
 
     """
-    degree: float = np.pi / 180.0
     return np.array(
         [
-            [np.cos(theta_deg * degree), -np.sin(theta_deg * degree), 0.0],
-            [np.sin(theta_deg * degree), np.cos(theta_deg * degree), 0.0],
+            [np.cos(np.deg2rad(theta_deg)), -np.sin(np.deg2rad(theta_deg)), 0.0],
+            [np.sin(np.deg2rad(theta_deg)), np.cos(np.deg2rad(theta_deg)), 0.0],
             [0.0, 0.0, 1.0],
         ],
     )

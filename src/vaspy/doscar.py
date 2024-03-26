@@ -51,6 +51,38 @@ import matplotlib.pyplot as plt
 from vaspy.tools import open_by_suffix
 
 
+ORBITALS_SPD = (
+    "s",
+    "py",
+    "pz",
+    "px",
+    "dxy",
+    "dyz",
+    "dz2",
+    "dxz",
+    "dx2",
+)
+
+ORBITALS_SPDF = (
+    "s",
+    "py",
+    "pz",
+    "px",
+    "dxy",
+    "dyz",
+    "dz2",
+    "dxz",
+    "dx2",
+    "f-3",
+    "f-2",
+    "f-1",
+    "f0",
+    "f1",
+    "f2",
+    "f3",
+)
+
+
 class DOSCAR:  # Version safety
     """Class for DOSCAR file.
 
@@ -283,11 +315,73 @@ class PDOS(DOS):
         self.orbital_spin: list[str] = []
         self.total: list[tuple[float, ...]] = []
         if array is not None:
-            if len(self.dos[0]) == 9 or len(self.dos[0]) == 16:
+            if len(self.dos[0]) == len(
+                (
+                    "s",
+                    "py",
+                    "pz",
+                    "px",
+                    "dxy",
+                    "dyz",
+                    "dz2",
+                    "dxz",
+                    "dx2",
+                )
+            ) or len(self.dos[0]) == len(
+                (
+                    "s",
+                    "py",
+                    "pz",
+                    "px",
+                    "dxy",
+                    "dyz",
+                    "dz2",
+                    "dxz",
+                    "dx2",
+                    "f-3",
+                    "f-2",
+                    "f-1",
+                    "f0",
+                    "f1",
+                    "f2",
+                    "f3",
+                ),
+            ):
                 self.orbital_spin = self.orbitalnames
                 for dos_at_energy in self.dos:
                     self.total.append((sum(dos_at_energy),))
-            elif len(self.dos[0]) == 18 or len(self.dos[0]) == 32:  # Spin resolved
+            elif len(self.dos[0]) == 2 * len(
+                (
+                    "s",
+                    "py",
+                    "pz",
+                    "px",
+                    "dxy",
+                    "dyz",
+                    "dz2",
+                    "dxz",
+                    "dx2",
+                )
+            ) or len(self.dos[0]) == 2 * len(
+                (
+                    "s",
+                    "py",
+                    "pz",
+                    "px",
+                    "dxy",
+                    "dyz",
+                    "dz2",
+                    "dxz",
+                    "dx2",
+                    "f-3",
+                    "f-2",
+                    "f-1",
+                    "f0",
+                    "f1",
+                    "f2",
+                    "f3",
+                )
+            ):  # Spin resolved
                 self.orbital_spin = [
                     orb + "_" + spin for orb in self.orbitalnames for spin in self.spins
                 ]
@@ -304,7 +398,26 @@ class PDOS(DOS):
                         else:
                             tmp.append(-energy)
                     self.dos[i] = tmp
-            elif len(self.dos[0]) == 36:  # SOI
+            elif len(self.dos[0]) == 4 * len(
+                (
+                    "s",
+                    "py",
+                    "pz",
+                    "px",
+                    "dxy",
+                    "dyz",
+                    "dz2",
+                    "dxz",
+                    "dx2",
+                    "f-3",
+                    "f-2",
+                    "f-1",
+                    "f0",
+                    "f1",
+                    "f2",
+                    "f3",
+                )
+            ):  # SOI
                 self.orbital_spin = [
                     orb + "_" + spin
                     for orb in self.orbitalnames
