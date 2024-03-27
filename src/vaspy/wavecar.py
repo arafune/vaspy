@@ -8,7 +8,8 @@ from typing import IO, TYPE_CHECKING
 import numpy as np
 from scipy.fftpack import ifftn
 
-from vaspy import mesh3d, poscar
+from vaspy import mesh3d
+from vaspy.poscar import POSCAR
 
 if TYPE_CHECKING:
     from numpy.typing import DTypeLike, NDArray
@@ -149,9 +150,9 @@ class WAVECAR:
     @property
     def prec(self) -> DTypeLike:
         """Return precision determined from self.rtag."""
-        if self.rtag == 45200:
+        if self.rtag == 45200:  # noqa: PLR2004
             return np.complex64
-        elif self.rtag == 45210:
+        elif self.rtag == 45210:  # noqa: PLR2004
             return np.complex128
         else:
             msg = f"Invalid TAG value: {self.rtag}"
@@ -290,7 +291,7 @@ class WAVECAR:
         ngrid: NDArray[np.int64] | None = None,
         *,
         norm: bool = False,
-        poscar: poscar.POSCAR = poscar.POSCAR(),
+        poscar: POSCAR | None = None,
     ) -> NDArray[np.complex128] | tuple[NDArray[np.float64]] | VASPGrid:
         r"""Return the pseudo-wavefunction in real space.
 
@@ -343,6 +344,8 @@ class WAVECAR:
             (Judging SOI by gvectors(k_i).shape[0] :math:`\neq` bandcoeff(k_i).size)
 
         """
+        if poscar is None:
+            poscar = POSCAR()
         ngrid = self.ngrid.copy() if ngrid is None else np.array(ngrid, dtype=int)
         if gvector is None:
             gvec: NDArray[np.int64] = self.gvectors(k_i)
@@ -402,31 +405,30 @@ class WAVECAR:
         self.phi_k: NDArray[np.complex128] = phi_k  # For debug
         phi_r: NDArray[np.complex128] = ifftn(phi_k)
         if poscar.scaling_factor == 0:  # poscar is not given.
-            if phi_r.ndim == 3:
+            if phi_r.ndim == 3:  # noqa: PLR2004
                 return phi_r.T
             return (phi_r[0] + phi_r[1]).T, (phi_r[0] - phi_r[1]).T
-        else:
-            vaspgrid = mesh3d.VASPGrid()
-            vaspgrid.poscar = poscar
-            vaspgrid.grid.shape = ngrid
-            # checking consistency between POSCAR and WAVECAR
-            np.testing.assert_array_almost_equal(
-                poscar.scaling_factor * poscar.cell_vecs,
-                self.realcell,
+        vaspgrid = mesh3d.VASPGrid()
+        vaspgrid.poscar = poscar
+        vaspgrid.grid.shape = ngrid
+        # checking consistency between POSCAR and WAVECAR
+        np.testing.assert_array_almost_equal(
+            poscar.scaling_factor * poscar.cell_vecs,
+            self.realcell,
+        )
+        re: NDArray[np.float64] = np.real(phi_r)
+        im: NDArray[np.float64] = np.imag(phi_r)
+        if phi_r.ndim == 3:
+            vaspgrid.grid.data = np.concatenate((re.flatten("F"), im.flatten("F")))
+        else:  # SOI
+            vaspgrid.grid.data = np.concatenate(
+                (
+                    (re[0] + re[1]).flatten("F"),
+                    (im[0] + im[1]).flatten("F"),
+                    (re[0] - re[1]).flatten("F"),
+                    (im[0] - im[1]).flatten("F"),
+                ),
             )
-            re: NDArray[np.float64] = np.real(phi_r)
-            im: NDArray[np.float64] = np.imag(phi_r)
-            if phi_r.ndim == 3:
-                vaspgrid.grid.data = np.concatenate((re.flatten("F"), im.flatten("F")))
-            else:  # SOI
-                vaspgrid.grid.data = np.concatenate(
-                    (
-                        (re[0] + re[1]).flatten("F"),
-                        (im[0] + im[1]).flatten("F"),
-                        (re[0] - re[1]).flatten("F"),
-                        (im[0] - im[1]).flatten("F"),
-                    ),
-                )
         return vaspgrid
 
     def __str__(self) -> str:
