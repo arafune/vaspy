@@ -19,7 +19,7 @@ allow-direct-references = true
 
 [tool.ruff]
 target-version = "py311"
-ignore = [
+lint.ignore = [
   "ANN101",
   "G004",
   "S101",
@@ -28,7 +28,7 @@ ignore = [
   "PD011",  # pandas-use-of-dot-values
   "FBT002", # boolean-default-value-in-function-definition
 ]
-select = ["ALL"]
+lint.select = ["ALL"]
 
 [tool.coverage.report]
 exclude_also = [

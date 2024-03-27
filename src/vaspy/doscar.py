@@ -44,11 +44,18 @@ import csv
 from collections.abc import Sequence
 from operator import add
 from pathlib import Path
-from typing import IO, ClassVar
+from typing import IO
 
 import matplotlib.pyplot as plt
 
 from vaspy.tools import open_by_suffix
+
+ORBITALS_SP = (
+    "s",
+    "py",
+    "pz",
+    "px",
+)
 
 ORBITALS_SPD = (
     "s",
@@ -79,7 +86,7 @@ ORBITALS_SPDF = (
     "f1",
     "f2",
     "f3",
-)
+)  # << see sphpro.F of vasp sourcev
 
 
 class DOSCAR:  # Version safety
@@ -197,7 +204,7 @@ class DOS(Sequence):  # Version safety
             self.dos = [*zip(*array, strict=True)]
 
     def __len__(self) -> int:
-        """x.__len__() <=> len(x)."""
+        """Retern the length of DOS object."""
         return len(self.dos)
 
     def __getitem__(self, idx: int | slice) -> tuple[float, ...] | list[tuple[float]]:
@@ -246,7 +253,7 @@ class TDOS(DOS):
         super().__init__(array)
         if len(self.dos[0]) == 1:
             self.header = ["Energy", "TDOS"]
-        elif len(self.dos[0]) == 2:  # collinear spin
+        elif len(self.dos[0]) == len(["up", "down"]):
             self.header = ["Energy", "TDOS_up", "TDOS_down"]
             self.dos = [(d[0], -d[1]) for d in self.dos]
 
@@ -286,24 +293,6 @@ class PDOS(DOS):
 
     """
 
-    orbitalnames: ClassVar[list[str]] = [
-        "s",
-        "py",
-        "pz",
-        "px",
-        "dxy",
-        "dyz",
-        "dz2",
-        "dxz",
-        "dx2",
-        "f-3",
-        "f-2",
-        "f-1",
-        "f0",
-        "f1",
-        "f2",
-        "f3",
-    ]  # << see sphpro.F of vasp sourcev
     spins_soi = ("mT", "mX", "mY", "mZ")
     spins = ("up", "down")
 
@@ -314,75 +303,17 @@ class PDOS(DOS):
         self.orbital_spin: list[str] = []
         self.total: list[tuple[float, ...]] = []
         if array is not None:
-            if len(self.dos[0]) == len(
-                (
-                    "s",
-                    "py",
-                    "pz",
-                    "px",
-                    "dxy",
-                    "dyz",
-                    "dz2",
-                    "dxz",
-                    "dx2",
-                ),
-            ) or len(self.dos[0]) == len(
-                (
-                    "s",
-                    "py",
-                    "pz",
-                    "px",
-                    "dxy",
-                    "dyz",
-                    "dz2",
-                    "dxz",
-                    "dx2",
-                    "f-3",
-                    "f-2",
-                    "f-1",
-                    "f0",
-                    "f1",
-                    "f2",
-                    "f3",
-                ),
+            if len(self.dos[0]) == len(ORBITALS_SPD) or len(self.dos[0]) == len(
+                ORBITALS_SPDF,
             ):
-                self.orbital_spin = self.orbitalnames
+                self.orbital_spin = list(ORBITALS_SPDF)
                 for dos_at_energy in self.dos:
                     self.total.append((sum(dos_at_energy),))
-            elif len(self.dos[0]) == 2 * len(
-                (
-                    "s",
-                    "py",
-                    "pz",
-                    "px",
-                    "dxy",
-                    "dyz",
-                    "dz2",
-                    "dxz",
-                    "dx2",
-                ),
-            ) or len(self.dos[0]) == 2 * len(
-                (
-                    "s",
-                    "py",
-                    "pz",
-                    "px",
-                    "dxy",
-                    "dyz",
-                    "dz2",
-                    "dxz",
-                    "dx2",
-                    "f-3",
-                    "f-2",
-                    "f-1",
-                    "f0",
-                    "f1",
-                    "f2",
-                    "f3",
-                ),
-            ):  # Spin resolved
+            elif len(self.dos[0]) == 2 * len(ORBITALS_SPD) or len(
+                self.dos[0],
+            ) == 2 * len(ORBITALS_SPDF):
                 self.orbital_spin = [
-                    orb + "_" + spin for orb in self.orbitalnames for spin in self.spins
+                    orb + "_" + spin for orb in ORBITALS_SPDF for spin in self.spins
                 ]
                 # In collinear spin calculation, DOS of down-spin is
                 # set by negative value.
@@ -397,30 +328,9 @@ class PDOS(DOS):
                         else:
                             tmp.append(-energy)
                     self.dos[i] = tmp
-            elif len(self.dos[0]) == 4 * len(
-                (
-                    "s",
-                    "py",
-                    "pz",
-                    "px",
-                    "dxy",
-                    "dyz",
-                    "dz2",
-                    "dxz",
-                    "dx2",
-                    "f-3",
-                    "f-2",
-                    "f-1",
-                    "f0",
-                    "f1",
-                    "f2",
-                    "f3",
-                ),
-            ):  # SOI
+            elif len(self.dos[0]) == 4 * len(ORBITALS_SPDF):
                 self.orbital_spin = [
-                    orb + "_" + spin
-                    for orb in self.orbitalnames
-                    for spin in self.spins_soi
+                    orb + "_" + spin for orb in ORBITALS_SPDF for spin in self.spins_soi
                 ]
                 for dos_at_energy in self.dos:
                     self.total.append((sum(dos_at_energy),))
