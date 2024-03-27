@@ -134,7 +134,6 @@ class EnergyBand:
         for key in keys:
             for tmp in self.label[key]:
                 label_list.append(tmp)
-            label_list = list(self.label[key])
         return label_list
 
     def to_3dlist(self) -> list[list[list[float]]]:
