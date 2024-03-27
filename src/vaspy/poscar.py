@@ -962,8 +962,7 @@ def point_in_box(point: ArrayLike, cell_vecs: ArrayLike) -> bool:
         cell_vectors: NDArray[np.float64] = np.array(cell_vecs)
         result: NDArray[np.float64] = np.dot(np.linalg.inv(cell_vectors.T), thepoint)
         return all((0 <= float(q) <= 1) for q in result)
-    else:
-        raise TypeError
+    raise TypeError
 
 
 def rotate_x(theta_deg: float) -> NDArray[np.float64]:
@@ -1072,7 +1071,7 @@ def three_by_three(vec: ArrayLike) -> bool:
     """
     if not isinstance(vec, np.ndarray | np.matrix | list | tuple):
         return False
-    if len(vec) != 3:
+    if len(vec) != 3:  # noqa: PLR2004
         return False
     return [3, 3, 3] == [len(_) for _ in vec]
 

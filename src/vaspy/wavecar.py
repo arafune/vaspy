@@ -343,23 +343,21 @@ class WAVECAR:
             (Judging SOI by gvectors(k_i).shape[0] :math:`\neq` bandcoeff(k_i).size)
 
         """
-        if poscar is None:
-            poscar = POSCAR()
+        poscar = POSCAR() if poscar is None else poscar
         ngrid = self.ngrid.copy() if ngrid is None else np.array(ngrid, dtype=int)
-        if gvector is None:
-            gvec: NDArray[np.int64] = self.gvectors(k_i)
-        else:
-            gvec = gvector
+        gvec = self.gvectors(k_i) if gvector is None else gvector
         gvec %= ngrid[np.newaxis, :]
-        if self.gamma and PARALLEL:
-            phi_k: NDArray[np.complex128] = np.zeros(
-                (ngrid[0], ngrid[1], ngrid[2] // 2 + 1),
-                dtype=np.complex128,
-            )
-        elif self.gamma and not PARALLEL:
-            phi_k = np.zeros(
-                (ngrid[0] // 2 + 1, ngrid[1], ngrid[2]),
-                dtype=np.complex128,
+        if self.gamma:
+            phi_k = (
+                np.zeros(
+                    (ngrid[0], ngrid[1], ngrid[2] // 2 + 1),
+                    dtype=np.complex128,
+                )
+                if PARALLEL
+                else np.zeros(
+                    (ngrid[0] // 2 + 1, ngrid[1], ngrid[2]),
+                    dtype=np.complex128,
+                )
             )
         else:
             phi_k = np.zeros(ngrid, dtype=np.complex128)
@@ -408,16 +406,14 @@ class WAVECAR:
                 return phi_r.T
             return (phi_r[0] + phi_r[1]).T, (phi_r[0] - phi_r[1]).T
         vaspgrid = mesh3d.VASPGrid()
-        vaspgrid.poscar = poscar
-        vaspgrid.grid.shape = ngrid
+        vaspgrid.poscar, vaspgrid.grid.shape = poscar, ngrid
         # checking consistency between POSCAR and WAVECAR
         np.testing.assert_array_almost_equal(
             poscar.scaling_factor * poscar.cell_vecs,
             self.realcell,
         )
-        re: NDArray[np.float64] = np.real(phi_r)
-        im: NDArray[np.float64] = np.imag(phi_r)
-        if phi_r.ndim == 3:
+        re, im = np.real(phi_r), np.imag(phi_r)
+        if phi_r.ndim == 3:  # noqa: PLR2004
             vaspgrid.grid.data = np.concatenate((re.flatten("F"), im.flatten("F")))
         else:  # SOI
             vaspgrid.grid.data = np.concatenate(
@@ -449,7 +445,9 @@ class WAVECAR:
         string += "\nReciprocal lattice vectors:"
         for i in range(3):
             string += "\nb" + str(i + 1)
-            string += f" = {self.rcpcell[i][0]}    {self.rcpcell[i][1]}    {self.rcpcell[i][2]}"
+            string += f" = {self.rcpcell[i][0]}    "
+            string += f"{self.rcpcell[i][1]}    "
+            string += f"{self.rcpcell[i][2]}"
         return string
 
 
@@ -467,7 +465,8 @@ def make_k_grid(
         Grid size
     gamma: bool, default, false
         Set true if only gamma calculations (use vasp with -DwNGZHalf)
-    para: bool, optional (default is global variable `PARALLEL`)
+    para: bool, optional
+        default is global variable `PARALLEL`
 
     Returns
     -------
@@ -537,7 +536,7 @@ def check_symmetry(grid3d: NDArray[np.float64]) -> bool:
     Boolean
 
     """
-    assert grid3d.ndim == 3, "Must be 3D Grid"
+    assert grid3d.ndim == 3, "Must be 3D Grid"  # noqa: PLR2004
     grid = grid3d.shape
     k_grid = make_k_grid(grid)
     for k in k_grid:
@@ -568,10 +567,11 @@ def restore_gamma_grid(
     ----------
     grid3d: numpy.array
         3D grid data created with gamma-only version VASP
-    para: bool, optional (default is global variable `PARALLEL`)
+    para: bool, optional
+        default is global variable `PARALLEL`
 
     """
-    assert grid3d.ndim == 3, "Must be 3D Grid"
+    assert grid3d.ndim == 3, "Must be 3D Grid"  # noqa: PLR2004
     if para:
         toconj = np.copy(grid3d[:, :, 1:])
         # x=0 slice

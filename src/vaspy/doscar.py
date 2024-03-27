@@ -50,7 +50,6 @@ import matplotlib.pyplot as plt
 
 from vaspy.tools import open_by_suffix
 
-
 ORBITALS_SPD = (
     "s",
     "py",
@@ -326,7 +325,7 @@ class PDOS(DOS):
                     "dz2",
                     "dxz",
                     "dx2",
-                )
+                ),
             ) or len(self.dos[0]) == len(
                 (
                     "s",
@@ -361,7 +360,7 @@ class PDOS(DOS):
                     "dz2",
                     "dxz",
                     "dx2",
-                )
+                ),
             ) or len(self.dos[0]) == 2 * len(
                 (
                     "s",
@@ -380,7 +379,7 @@ class PDOS(DOS):
                     "f1",
                     "f2",
                     "f3",
-                )
+                ),
             ):  # Spin resolved
                 self.orbital_spin = [
                     orb + "_" + spin for orb in self.orbitalnames for spin in self.spins
@@ -416,7 +415,7 @@ class PDOS(DOS):
                     "f1",
                     "f2",
                     "f3",
-                )
+                ),
             ):  # SOI
                 self.orbital_spin = [
                     orb + "_" + spin
