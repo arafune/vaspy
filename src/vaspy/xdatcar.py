@@ -76,11 +76,7 @@ class XDATCAR(PosCarHead):
         tmp = self.system_name + "\n"
         tmp += f"        {self.scaling_factor}\n"
         for i in range(3):
-            tmp += "      {:#.6f}   {:#.6f}    {:6f}\n".format(
-                self.cell_vecs[i][0],
-                self.cell_vecs[i][1],
-                self.cell_vecs[i][2],
-            )
+            tmp += f"      {self.cell_vecs[i][0]:#.6f}   {self.cell_vecs[i][1]:#.6f}    {self.cell_vecs[i][2]:6f}\n"
         for element in self.atom_types:
             tmp += f"    {element}"
         tmp += "\n"
@@ -90,9 +86,5 @@ class XDATCAR(PosCarHead):
         for frame_index, positions in enumerate(self.configurations):
             tmp += f"Direct configuration=    {frame_index + 1}\n"
             for position in positions:
-                tmp += "    {:#.6f}    {:#.6f}    {:6f}\n".format(
-                    position[0],
-                    position[1],
-                    position[2],
-                )
+                tmp += f"    {position[0]:#.6f}    {position[1]:#.6f}    {position[2]:6f}\n"
         return tmp

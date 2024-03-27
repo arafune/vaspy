@@ -224,11 +224,8 @@ See epilog for notices for argument notation.""",
         else:
             if argcounts[func] != len(args.values[index]):
                 print(
-                    """argument number not match (require {}, given {})
-use default values.""".format(
-                        argcounts[func],
-                        len(args.values[index]),
-                    ),
+                    f"""argument number not match (require {argcounts[func]}, given {len(args.values[index])})
+use default values.""",
                 )
                 values = demo[func]
             else:
