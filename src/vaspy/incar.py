@@ -108,7 +108,8 @@ def remove_sharp(str_: str) -> tuple[str, bool]:
 
     Parameters
     ----------
-        str_: str
+    str_: str
+        string to be treated.
 
     """
     active: bool = True
@@ -226,7 +227,7 @@ class Incar(Mapping):
         return output
 
     def active(self, keyword: str) -> str | float | bool:
-        """Return True if keyword is active.  False if keyword is not set or comment out.
+        """Return True if keyword is active. False if keyword is not set or comment out.
 
         Parameters
         ----------
@@ -249,7 +250,7 @@ class Incar(Mapping):
         """
         checks: dict[str, bool | int | float | str] = {
             'When ICHARG = 11, Recommend "LWAVE = .FALSE, LCHARG = .FALSE"\n': (
-                self.active("ICHARG") == 11
+                self.active("ICHARG") == 11  # noqa: PLR2004
                 and (
                     self.active("LWAVE") == ".TRUE."
                     or self.active("LCHARG") == ".TRUE."
@@ -257,13 +258,15 @@ class Incar(Mapping):
             ),
         }
         checks["DIPOLE correction is hard for not ISTART=2."] = (
-            self.active("ISTART") != 2 and self.active("LDIPOL") == ".TRUE."
+            self.active("ISTART") != 2  # noqa: PLR2004
+            and self.active("LDIPOL") == ".TRUE."
         )
         checks['For dipoloe correction, need both "LDIPOL" and "IDIPOL"\n'] = (
             self.active("LDIPOL") == ".TRUE."
         ) ^ self.active("IDIPOL")
         checks['For LPARD to get partial charge densities, ISTART must be "2"'] = (
-            self.active("LPARD") == ".TRUE." and self.active("ISTART") != 2
+            self.active("LPARD") == ".TRUE."
+            and self.active("ISTART") != 2  # noqa: PLR2004
         )
         checks["For SOI calculation, ISYM = -1 is recommended."] = (
             self.active("LSORBIT") == ".TRUE." and self.active("ISYM") != -1
@@ -272,7 +275,7 @@ class Incar(Mapping):
             "NPAR",
         )
         checks['if IBRION > 4 (to DFPT), Remove "NPAR/NCORE" keyword\n'] = (
-            self.active("IBRION") > 4
+            self.active("IBRION") > 4  # noqa: PLR2004
         ) and (self.active("NPAR") or self.active("NCORE"))
 
         msg_lint = ""

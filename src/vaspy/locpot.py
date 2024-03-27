@@ -1,10 +1,11 @@
-#!/usr/bin/env python
 """LOCPOT class."""
+
 #
 from typing import TYPE_CHECKING, Literal
 
 import matplotlib.pyplot as plt
 import numpy as np
+from _typeshed import Incomplete
 from matplotlib.axes import Axes
 
 from vaspy import mesh3d
@@ -30,7 +31,7 @@ class LOCPOT(mesh3d.VASPGrid):
         ax: Axes | None = None,
         frame: int = 0,
         save: str = "",
-        **kwargs,
+        **kwargs: Incomplete,
     ) -> Axes:
         """Plot potential curve along the axis.
 
