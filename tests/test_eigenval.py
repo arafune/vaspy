@@ -7,20 +7,20 @@ import vaspy
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from vaspy import eigenval
 
-datadir = str(Path(__file__).parent / "data/")
+datadir = Path(__file__).parent / "data"
 
 
 @pytest.fixture()
 def cobalt() -> eigenval.EIGENVAL:
-    return vaspy.load(datadir + "EIGENVAL.Co-collinear", mode="EIGENVAL")
+    return vaspy.load(str(datadir / "EIGENVAL.Co-collinear"), mode="EIGENVAL")
 
 
 class TestEIGENVAL:
     """Class for EIGENVAL class test."""
 
     def setup_method(self) -> None:
-        self.eigenval_spin = eigenval.EIGENVAL(datadir + "EIGENVAL.spin")
-        self.eigenval_soi = eigenval.EIGENVAL(datadir + "EIGENVAL.soi")
+        self.eigenval_spin = eigenval.EIGENVAL(str(datadir / "EIGENVAL.spin"))
+        self.eigenval_soi = eigenval.EIGENVAL(str(datadir / "EIGENVAL.soi"))
 
     def test_check_basic_parameters(self) -> None:
         """Check the basic parameters stored."""
