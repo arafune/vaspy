@@ -152,11 +152,10 @@ class WAVECAR:
         """Return precision determined from self.rtag."""
         if self.rtag == 45200:  # noqa: PLR2004
             return np.complex64
-        elif self.rtag == 45210:  # noqa: PLR2004
+        if self.rtag == 45210:  # noqa: PLR2004
             return np.complex128
-        else:
-            msg = f"Invalid TAG value: {self.rtag}"
-            raise ValueError(msg)
+        msg = f"Invalid TAG value: {self.rtag}"
+        raise ValueError(msg)
 
     def band(self) -> None:
         """Read the information about the band from WAVECAR file.
